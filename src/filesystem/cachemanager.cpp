@@ -49,22 +49,23 @@
 
 namespace {
     constexpr const char* _loggerCat = "CacheManager";
-    constexpr const char* _cacheFile = "cache";
+    const std::filesystem::path CacheFile = "cache";
 
     // something that cannot occur in the filesystem
-    constexpr const char _hashDelimiter = '|';
+    constexpr const char HashDelimiter = '|';
 
-    unsigned int generateHash(std::string_view file, std::string_view information) {
-        std::string hashString = fmt::format("{}{}{}", file, _hashDelimiter, information);
-        unsigned int hash = ghoul::hashCRC32(hashString);
+    using LoadedCacheInfo = std::pair<unsigned int, std::filesystem::path>;
+
+    unsigned int generateHash(std::filesystem::path file, std::string_view information) {
+        std::string s = fmt::format("{}{}{}", file.string(), HashDelimiter, information);
+        unsigned int hash = ghoul::hashCRC32(s);
         return hash;
     }
 
     std::string lastModifiedDate(std::filesystem::path path) {
         if (!std::filesystem::is_regular_file(path)) {
             throw ghoul::RuntimeError(fmt::format(
-                "Error retrieving last-modified date for file '{}'. File did not exist",
-                path.string()
+                "Error retrieving last-modified date for {}. File did not exist", path
             ));
         }
 #ifdef WIN32
@@ -91,21 +92,19 @@ namespace {
             std::string msg(errorBuffer);
             LocalFree(errorBuffer);
             throw ghoul::RuntimeError(fmt::format(
-                "Could not retrieve last-modified date for file '{}': {}",
-                path.string(), msg
+                "Could not retrieve last-modified date for file {}: {}", path, msg
             ));
         }
         else {
             FILETIME lastWriteTime = infoData.ftLastWriteTime;
             SYSTEMTIME time;
             //LPSYSTEMTIME time = NULL;
-            success = FileTimeToSystemTime(&lastWriteTime, &time);
-            if (!success) {
+            bool success2 = FileTimeToSystemTime(&lastWriteTime, &time);
+            if (!success2) {
                 const DWORD error = GetLastError();
                 LPTSTR errorBuffer = nullptr;
                 FormatMessage(
-                    FORMAT_MESSAGE_FROM_SYSTEM |
-                        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
                         FORMAT_MESSAGE_IGNORE_INSERTS,
                     nullptr,
                     error,
@@ -117,7 +116,7 @@ namespace {
                 std::string msg(errorBuffer);
                 LocalFree(errorBuffer);
                 throw ghoul::RuntimeError(fmt::format(
-                    "'FileTimeToSystemTime' failed for file '{}': {}", path.string(), msg
+                    "'FileTimeToSystemTime' failed for file {}: {}", path, msg
                 ));
             }
             else {
@@ -136,33 +135,124 @@ namespace {
         return buffer;
 #endif
     }
+
+    void cleanDirectory(const std::filesystem::path& path) {
+        if (!std::filesystem::is_directory(path)) {
+            return;
+        }
+
+        // First search for all subdirectories and call this function recursively on them
+        namespace fs = std::filesystem;
+        for (const fs::directory_entry& e : fs::directory_iterator(path)) {
+            if (e.is_directory()) {
+                cleanDirectory(e.path());
+            }
+        }
+
+        // We get to this point in the recursion if either all subdirectories have been
+        // deleted or there exists a file somewhere in the directory tree
+        bool isEmpty = true;
+        for (const fs::directory_entry& e : fs::directory_iterator(path)) {
+            if (e.is_regular_file() || e.is_directory()) {
+                isEmpty = false;
+                break;
+            }
+        }
+
+#ifdef __APPLE__
+        // Apple stores the .DS_Store directory in the directory which can be removed
+        std::string dsStore = FileSys.pathByAppendingComponent(dir, ".DS_Store");
+        isEmpty |= ((contents.size() == 1) && contents[0] == dsStore);
+#endif // __APPLE__
+        // If this directory is empty, we can delete it
+        if (isEmpty) {
+            std::filesystem::remove(path);
+        }
+    }
+
+
+    std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
+                                                        const std::filesystem::path& path)
+    {
+        std::vector<LoadedCacheInfo> result;
+        namespace fs = std::filesystem;
+        for (const fs::directory_entry& e : fs::directory_iterator(path)) {
+            if (!e.is_directory()) {
+                continue;
+            }
+
+            // Extract the name of the directory
+            // +1 as the last path delimiter is missing from the path
+            std::string directoryName = e.path().string().substr(path.string().size() + 1);
+
+            for (const fs::directory_entry& f : fs::directory_iterator(e)) {
+                const std::string hash = f.path().string();
+                // Extract the hash from the directory name
+                // +1 as the last path delimiter is missing from the path
+                const std::string hashName = hash.substr(e.path().string().size() + 1);
+
+                std::vector<fs::directory_entry> files;
+                for (fs::directory_entry g : fs::directory_iterator(hash)) {
+                    files.push_back(g);
+                }
+
+                // Cache directories should only contain a single file with the
+                // same name as the directory
+                if (files.size() > 1) {
+                    throw ghoul::filesystem::CacheManager::ErrorLoadingCacheException(
+                        fmt::format("Directory '{}' contained more than one file", hash)
+                    );
+                }
+                if (files.size() == 1) {
+                    // Extract the file name from the full path
+                    // +1 as the last path delimiter is missing from the path
+                    std::string filename = files[0].path().string().substr(hash.size() + 1);
+                    if (filename != directoryName) {
+                        throw ghoul::filesystem::CacheManager::ErrorLoadingCacheException(
+                            fmt::format(
+                                "File contained in cache directory '{}' contains a file "
+                                "with name '{}' instead of expected '{}'",
+                                hash, filename, directoryName
+                            )
+                        );
+                    }
+
+                    result.emplace_back(std::stoul(hashName), files[0].path());
+                }
+            }
+        }
+
+        return result;
+    }
 } // namespace
 
 namespace ghoul::filesystem {
 
-CacheManager::CacheException::CacheException(std::string msg)
-    : RuntimeError(std::move(msg), "Cache")
+CacheManager::CacheException::CacheException(std::filesystem::path msg)
+    : RuntimeError(msg.string(), "Cache")
 {}
 
-CacheManager::MalformedCacheException::MalformedCacheException(std::string file)
-    : CacheException(fmt::format("Malformed cache at '{}'", file))
+CacheManager::MalformedCacheException::MalformedCacheException(std::filesystem::path file)
+    : CacheException(fmt::format("Malformed cache at {}", file))
     , cacheFile(std::move(file))
 {}
 
-CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(std::string msg)
+CacheManager::ErrorLoadingCacheException::ErrorLoadingCacheException(
+                                                                std::filesystem::path msg)
     : CacheException(std::move(msg))
 {}
 
-CacheManager::IllegalArgumentException::IllegalArgumentException(std::string argument)
+CacheManager::IllegalArgumentException::IllegalArgumentException(
+                                                           std::filesystem::path argument)
     : CacheException(fmt::format("Argument '{}' contains an illegal character", argument))
     , argumentName(std::move(argument))
 {}
 
 CacheManager::CacheManager(std::filesystem::path directory, int version)
-    : _version(version)
+    : _directory(std::move(directory))
+    , _version(version)
 {
-    ghoul_assert(!directory.empty(), "Directory must not be empty");
-    _directory = std::move(directory);
+    ghoul_assert(!_directory.empty(), "Directory must not be empty");
 
     // In the cache state, we check our cache directory for all values, in a later step
     // we remove all persistent values, so that only the non-persistent values remain
@@ -170,7 +260,7 @@ CacheManager::CacheManager(std::filesystem::path directory, int version)
     // last execution of the application crashed, the directory was not cleaned up
     // properly
     std::vector<LoadedCacheInfo> cacheState = cacheInformationFromDirectory(_directory);
-    std::string path = fmt::format("{}/{}", _directory.string(), _cacheFile);
+    const std::filesystem::path path = _directory / CacheFile;
 
     std::ifstream file(path);
     if (file.good()) {
@@ -207,12 +297,15 @@ CacheManager::CacheManager(std::filesystem::path directory, int version)
             unsigned long hash;
             try {
                 hash = std::stoul(line);
-            } catch (const std::invalid_argument&) {
+            }
+            catch (const std::invalid_argument&) {
                 throw MalformedCacheException(path);
             }
 
             CacheInformation info;
-            std::getline(file, info.file);
+            std::string filename;
+            std::getline(file, filename);
+            info.file = filename;
             if (!file.good()) {
                 throw MalformedCacheException(path);
             }
@@ -247,7 +340,6 @@ CacheManager::CacheManager(std::filesystem::path directory, int version)
         }
         // First clean the cache directory with all contents
         cleanDirectory(_directory);
-        //FileSys.deleteDirectory(_directory, true);
         file.close();
         if (std::filesystem::is_regular_file(path)) {
             std::filesystem::remove(path);
@@ -260,10 +352,10 @@ CacheManager::CacheManager(std::filesystem::path directory, int version)
 }
 
 CacheManager::~CacheManager() {
-    std::string path = fmt::format("{}/{}", _directory.string(), _cacheFile);
+    const std::filesystem::path path = _directory / CacheFile;
     std::ofstream file(path, std::ofstream::out);
     if (file.good()) {
-        file << _version << std::endl;
+        file << _version << '\n';
         for (const std::pair<const unsigned long, CacheInformation>& p : _files) {
             if (!p.second.isPersistent) {
                 // Delete all the non-persistent files
@@ -279,9 +371,7 @@ CacheManager::~CacheManager() {
         file.close();
     }
     else {
-        LERROR(fmt::format(
-            "Could not open file '{}' for writing permanent cache files", path
-        ));
+        LERROR(fmt::format("Could not open {} for writing permanent cache files", path));
     }
     cleanDirectory(_directory);
 }
@@ -289,7 +379,7 @@ CacheManager::~CacheManager() {
 std::string CacheManager::cachedFilename(const std::filesystem::path& file,
                                          Persistent isPersistent)
 {
-    std::string lastModifiedTime = lastModifiedDate(file);
+    const std::string lastModifiedTime = lastModifiedDate(file);
     return cachedFilename(file, lastModifiedTime, isPersistent);
 }
 
@@ -297,18 +387,17 @@ std::string CacheManager::cachedFilename(const std::filesystem::path& file,
                                          std::string_view information,
                                          Persistent isPersistent)
 {
-    std::string baseName = file.filename().string();
-    size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
+    const std::filesystem::path baseName = file.filename();
+    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
 
-    unsigned int hash = generateHash(baseName, information);
+    const unsigned int hash = generateHash(baseName, information);
 
     // If we couldn't find the file, we have to generate a directory with the name of the
-    // hash and return the full path containing of the cache path + requested filename +
-    // hash value
-    std::string destinationBase = fmt::format("{}/{}", _directory.string(), baseName);
+    // hash and return the full path containing of the cache path + filename + hash value
+    const std::filesystem::path destinationBase = _directory / baseName;
 
     // If this is the first time anyone requests a cache for the file name, we have to
     // create the base directory under the cache directory
@@ -316,7 +405,7 @@ std::string CacheManager::cachedFilename(const std::filesystem::path& file,
         std::filesystem::create_directory(destinationBase);
     }
 
-    std::string destination = fmt::format("{}/{}", destinationBase, hash);
+    const std::string destination = fmt::format("{}/{}", destinationBase.string(), hash);
 
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
@@ -329,46 +418,46 @@ std::string CacheManager::cachedFilename(const std::filesystem::path& file,
     if (it != _files.end()) {
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
-        return it->second.file;
+        return it->second.file.string();
     }
 
     // Generate and output the newly generated cache name
-    std::string cachedFileName = fmt::format("{}/{}", destination, baseName);
+    const std::string cachedName = fmt::format("{}/{}", destination, baseName.string());
 
     // Store the cache information in the map
-    CacheInformation info = { cachedFileName, isPersistent };
+    CacheInformation info = { cachedName, isPersistent };
     _files[hash] = info;
-    return cachedFileName;
+    return cachedName;
 }
 
 bool CacheManager::hasCachedFile(const std::filesystem::path& file) const {
-    std::string lastModifiedTime = lastModifiedDate(file);
+    const std::string lastModifiedTime = lastModifiedDate(file);
     return hasCachedFile(file, lastModifiedTime);
 }
 
 bool CacheManager::hasCachedFile(const std::filesystem::path& file,
                                  std::string_view information) const
 {
-    std::string baseName = file.filename().string();
-    const size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
+    const std::filesystem::path baseName = file.filename();
+    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
 
-    unsigned long hash = generateHash(baseName, information);
+    const unsigned long hash = generateHash(baseName, information);
     return _files.find(hash) != _files.end();
 }
 
 void CacheManager::removeCacheFile(const std::filesystem::path& file) {
-    std::string lastModifiedTime = lastModifiedDate(file);
+    const std::string lastModifiedTime = lastModifiedDate(file);
     removeCacheFile(file, lastModifiedTime);
 }
 
 void CacheManager::removeCacheFile(const std::filesystem::path& file,
                                    std::string_view information)
 {
-    std::string baseName = file.filename().string();
-    const size_t pos = baseName.find_first_of("/\\?%*:|\"<>");
+    const std::filesystem::path baseName = file.filename();
+    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
@@ -378,100 +467,12 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
     if (it != _files.end()) {
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
-        const std::string& cachedFileName = it->second.file;
+        const std::filesystem::path& cachedFileName = it->second.file;
         if (std::filesystem::is_regular_file(cachedFileName)) {
             std::filesystem::remove(cachedFileName);
         }
         _files.erase(it);
     }
-}
-
-void CacheManager::cleanDirectory(const std::filesystem::path& path) const {
-    if (!std::filesystem::is_directory(path)) {
-        return;
-    }
-
-    // First search for all subdirectories and call this function recursively on them
-    namespace fs = std::filesystem;
-    for (const fs::directory_entry& e : fs::directory_iterator(path)) {
-        if (e.is_directory()) {
-            cleanDirectory(e.path().string());
-        }
-    }
-
-    // We get to this point in the recursion if either all subdirectories have been
-    // deleted or there exists a file somewhere in the directory tree
-    bool isEmpty = true;
-    for (const fs::directory_entry& e : fs::directory_iterator(path)) {
-        if (e.is_regular_file() || e.is_directory()) {
-            isEmpty = false;
-            break;
-        }
-    }
-    
-#ifdef __APPLE__
-    // Apple stores the .DS_Store directory in the directory which can be removed
-    std::string dsStore = FileSys.pathByAppendingComponent(dir, ".DS_Store");
-    isEmpty |= ((contents.size() == 1) && contents[0] == dsStore);
-#endif // __APPLE__
-    // If this directory is empty, we can delete it
-    if (isEmpty) {
-        std::filesystem::remove(path);
-    }
-}
-
-std::vector<CacheManager::LoadedCacheInfo> CacheManager::cacheInformationFromDirectory(
-                                                  const std::filesystem::path& path) const
-{
-    std::vector<LoadedCacheInfo> result;
-    namespace fs = std::filesystem;
-    for (const fs::directory_entry& e : fs::directory_iterator(path)) {
-        if (!e.is_directory()) {
-            continue;
-        }
-
-        std::filesystem::path d = e.path();
-
-        // Extract the name of the directory
-        // +1 as the last path delimiter is missing from the path
-        std::string directoryName = e.path().string().substr(path.string().size() + 1);
-
-        for (const fs::directory_entry& f : fs::directory_iterator(e)) {
-            std::string hash = f.path().string();
-            // Extract the hash from the directory name
-            // +1 as the last path delimiter is missing from the path
-            std::string hashName = hash.substr(d.string().size() + 1);
-
-            std::vector<fs::directory_entry> files;
-            for (fs::directory_entry g : fs::directory_iterator(hash)) {
-                files.push_back(g);
-            }
-
-            // Cache directories should only contain a single file with the
-            // same name as the directory
-            if (files.size() > 1) {
-                throw ErrorLoadingCacheException(fmt::format(
-                    "Directory '{}' contained more than one file", hash
-                ));
-            }
-            if (files.size() == 1) {
-                // Extract the file name from the full path
-                // +1 as the last path delimiter is missing from the path
-                std::string filename = files[0].path().string().substr(hash.size() + 1);
-                if (filename != directoryName) {
-                    throw ErrorLoadingCacheException(fmt::format(
-                        "File contained in cache directory '{}' contains a file with "
-                        "name '{}' instead of expected '{}'",
-                        hash, filename, directoryName
-                    ));
-                }
-
-                result.emplace_back(std::stoul(hashName), files[0].path().string());
-            }
-        }
-    }
-
-    return result;
 }
 
 } // namespace ghoul::filesystem

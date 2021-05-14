@@ -27,30 +27,18 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
-#include <ghoul/fmt.h>
-#include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/stacktrace.h>
-#include <algorithm>
-#include <filesystem>
-#include <regex>
-#include <Shlobj.h>
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
+#include <Windows.h>
 
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
-
-    const unsigned int changeBufferSize = 16384u;
+    constexpr const unsigned int ChangeBufferSize = 16384u;
 } // namespace
-
-void CALLBACK completionHandler(DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred,
-    LPOVERLAPPED lpOverlapped);
 
 namespace ghoul::filesystem {
 
@@ -66,7 +54,7 @@ struct DirectoryHandle {
 void FileSystem::deinitializeInternalWindows() {
     for (const std::pair<const std::string, DirectoryHandle*>& d : _directories) {
         DirectoryHandle* dh = d.second;
-        if (dh != nullptr && dh->_handle != nullptr) {
+        if (dh && dh->_handle) {
             CancelIo(dh->_handle);
             CloseHandle(dh->_handle);
         }
@@ -77,17 +65,16 @@ void FileSystem::deinitializeInternalWindows() {
 int FileSystem::addFileListener(std::filesystem::path path,
                                 File::FileChangedCallback callback)
 {
-
-    std::string d = path.parent_path().string();
-    auto f = _directories.find(d);
+    std::string dir = path.parent_path().string();
+    auto f = _directories.find(dir);
     if (f == _directories.end()) {
-        LDEBUG(fmt::format("Started watching: {}", d));
+        LDEBUG(fmt::format("Started watching: {}", dir));
         DirectoryHandle* handle = new DirectoryHandle;
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;
 
         handle->_handle = CreateFile(
-            d.c_str(),
+            dir.c_str(),
             FILE_LIST_DIRECTORY,
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
             nullptr,
@@ -96,14 +83,14 @@ int FileSystem::addFileListener(std::filesystem::path path,
             nullptr
         );
 
-        if (handle->_handle == INVALID_HANDLE_VALUE) {  // NOLINT
+        if (handle->_handle == INVALID_HANDLE_VALUE) {
             delete handle;
             throw ghoul::RuntimeError(
-                fmt::format("Directory handle for '{}' could not be obtained", d)
+                fmt::format("Directory handle for '{}' could not be obtained", dir)
             );
         }
 
-        _directories[d] = handle;
+        _directories[dir] = handle;
         beginRead(handle);
     }
 
@@ -136,7 +123,7 @@ void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
     std::string fullPath;
     for (const std::pair<const std::string, DirectoryHandle*>& d : FileSys._directories) {
         if (d.second == directoryHandle) {
-            fullPath = d.first + PathSeparator + filePath;
+            fullPath = d.first + '/' + filePath;
         }
     }
 
@@ -166,7 +153,7 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
     // Restart change listener as soon as possible
     readStarter(handle);
 
-    char* buffer = reinterpret_cast<char*>(&(handle->_changeBuffer[currentBuffer][0]));
+    BYTE* buffer = handle->_changeBuffer[currentBuffer].data();
 
     // data might have queued up, so we need to check all changes
     while (true) {
@@ -190,7 +177,6 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
                 // make sure the last char is string terminating
                 currentFilenameBuffer[i - 1] = '\0';
                 const std::string currentFilename(currentFilenameBuffer.data(), i - 1);
-
                 callbackHandler(handle, currentFilename);
             }
         }
@@ -214,8 +200,8 @@ void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
     ZeroMemory(overlappedBuffer, sizeof(OVERLAPPED));
     overlappedBuffer->hEvent = directoryHandle;
 
-    changeBuffer[activeBuffer].resize(changeBufferSize);
-    ZeroMemory(changeBuffer[activeBuffer].data(), changeBufferSize);
+    changeBuffer[activeBuffer].resize(ChangeBufferSize);
+    ZeroMemory(changeBuffer[activeBuffer].data(), ChangeBufferSize);
 
     DWORD returnedBytes;
     ReadDirectoryChangesW(

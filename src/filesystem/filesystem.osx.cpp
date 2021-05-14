@@ -192,8 +192,6 @@ void FileSystem::callbackHandler(const std::string& path) {
     }
 }
 
-void FileSystem::triggerFilesystemEventsInternalApple() {}
-
 } // namespace ghoul::filesystem
 
 #endif

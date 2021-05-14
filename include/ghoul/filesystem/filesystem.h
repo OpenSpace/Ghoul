@@ -31,9 +31,6 @@
 #include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <map>
-#include <memory>
-#include <string>
-#include <vector>
 
 #if !defined(WIN32) && !defined(__APPLE__)
 #include <thread>
@@ -48,27 +45,20 @@ void callbackHandler(DirectoryHandle* directoryHandle, const std::string& filePa
 #elif defined(__APPLE__)
 struct DirectoryHandle;
 void callbackHandler(const std::string& path);
-#endif
+#endif // WIN32
 
 class CacheManager;
 class File;
 
 /**
- * The methods in this class are used to access platform-independent features of the
- * underlying filesystem. It is possible to convert relative paths into absolute paths
- * (#absolutePath) and vice versa (#relativePath). The current working directory can be
- * accessed and changed (#currentDirectory), #setCurrentDirectory, #setCurrentDirectory).
- * All methods that require a Directory or File parameter can use an
- * <code>std::string</code> or <code>char*</code> directly as this will be converted into
- * a lightweight Directory or File object. The main functionality of the FileSystem is to
- * deal with path tokens. These are tokens of the form <code>${...}</code> which are like
- * variables, pointing to a specific location. These tokens are resolved in various
- * methods (for example #absolutePath) and thus be used to dynamically set, for example,
- * asset paths with only one point of specification. These tokens can only be bound once,
- * as some of the tokens might already have been resolved and changing the tokens later
- * might lead to inconsistencies. For the same reason, it is not possible to unregister
- * tokens. Every FileSystem contains one token <code>${TEMPORARY}</code> that points to
- * the location of the system's temporary files.
+ * The methods in this class are used to convert relative paths into absolute paths
+ * (#absolutePath), however the main functionality of the FileSystem is to deal with path
+ * tokens. These are tokens of the form <code>${...}</code> which are like variables,
+ * pointing to a specific location. These tokens can only be bound once, as some of the
+ * tokens might already have been resolved and changing the tokens later might lead to
+ * inconsistencies. For the same reason, it is not possible to unregister tokens. Every
+ * FileSystem contains one token <code>${TEMPORARY}</code> that points to the location of
+ * the system's temporary files.
  */
 class FileSystem {
 public:
@@ -83,18 +73,8 @@ public:
     struct ResolveTokenException : FileSystemException {
         explicit ResolveTokenException(std::string t);
 
-        std::string token;
+        const std::string token;
     };
-
-    /**
-     * The token used to separate individual path elements (<code>\\</code> or
-     * <code>/</code>)
-     */
-#ifdef WIN32
-    static constexpr const char PathSeparator = '\\';
-#else
-    static constexpr const char PathSeparator = '/';
-#endif // WIN32
 
     /// Opening braces that are used for path tokens
     static constexpr const char* TokenOpeningBraces = "${";
@@ -143,7 +123,7 @@ public:
      *      FileSystem::TokenClosingBraces
      * \pre \p token must not have been registered before if \p override is false
      */
-    void registerPathToken(std::string token, std::string path,
+    void registerPathToken(std::string token, std::filesystem::path path,
         Override override = Override::No);
 
     /**
@@ -287,10 +267,10 @@ private:
      * \throw FileSystemException If the token could not be resolved
      * \pre \p token must not be empty
      */
-    std::string resolveToken(const std::string& token) const;
+    std::filesystem::path resolveToken(const std::string& token) const;
 
     /// This map stores all the tokens that are used in the FileSystem.
-    std::map<std::string, std::string> _tokenMap;
+    std::map<std::string, std::filesystem::path> _tokenMap;
 
     /// The cache manager object, only allocated if createCacheManager is called
     std::unique_ptr<CacheManager> _cacheManager;
@@ -328,9 +308,6 @@ private:
 #elif defined(__APPLE__)
     /// OS X specific deinitialize function
     void deinitializeInternalApple();
-
-    /// OS X specific triger filesystem
-    void triggerFilesystemEventsInternalApple();
 
     /// OS X callback handler
     static void callbackHandler(const std::string& path);

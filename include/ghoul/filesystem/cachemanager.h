@@ -58,26 +58,26 @@ public:
 
     /// Superclass for all cache-related exceptions
     struct CacheException : public RuntimeError {
-        explicit CacheException(std::string msg);
+        explicit CacheException(std::filesystem::path msg);
     };
 
     /// Exception that gets thrown if the cache has a malformed information file
     struct MalformedCacheException : public CacheException {
-        explicit MalformedCacheException(std::string file);
+        explicit MalformedCacheException(std::filesystem::path file);
 
-        const std::string cacheFile;
+        const std::filesystem::path cacheFile;
     };
 
     /// Exception that gets thrown if there was an error loading the previous cache files
     struct ErrorLoadingCacheException : public CacheException {
-        explicit ErrorLoadingCacheException(std::string msg);
+        explicit ErrorLoadingCacheException(std::filesystem::path msg);
     };
 
     /// Exception that gets thrown if the argument for retrieving a cache file is invalid
     struct IllegalArgumentException : public CacheException {
-        explicit IllegalArgumentException(std::string argument);
+        explicit IllegalArgumentException(std::filesystem::path argument);
 
-        const std::string argumentName;
+        const std::filesystem::path argumentName;
     };
 
     /**
@@ -240,24 +240,9 @@ public:
 protected:
     /// This struct stores the cache information for a specific hash value.
     struct CacheInformation {
-        std::string file; ///< The path to the cached file
+        std::filesystem::path file; ///< The path to the cached file
         bool isPersistent = false; ///< if the cached file should be automatically deleted
     };
-
-    using LoadedCacheInfo = std::pair<unsigned int, std::string>;
-
-    /**
-     * Cleans a directory from files not flagged as persistent and removes
-     */
-    void cleanDirectory(const std::filesystem::path& path) const;
-
-    /**
-     * Reads informations from a directory about the content and transofrms it to a
-     * vector of content. This vector is compared with the cache description file
-     * and used as a foundation for cleaning directories.
-     */
-    std::vector<LoadedCacheInfo> cacheInformationFromDirectory(
-        const std::filesystem::path& path) const;
 
     /// The cache directory
     std::filesystem::path _directory;
