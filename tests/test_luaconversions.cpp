@@ -231,7 +231,7 @@ TEMPLATE_TEST_CASE("LuaConversion Float Fuzz", "[luaconversion]", float, double,
         REQUIRE(value == Approx(val));
 
         if (typeid(T) == typeid(long double)) {
-            if (value != std::numeric_limits<long double>::infinity()) {
+            if (Approx(value) != std::numeric_limits<long double>::infinity()) {
                 REQUIRE(value == Approx(val));
             }
         }
