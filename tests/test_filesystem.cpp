@@ -27,6 +27,7 @@
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/misc/exception.h>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
@@ -154,10 +155,7 @@ TEST_CASE("FileSystem: OverrideExistingPathToken", "[filesystem]") {
 
 TEST_CASE("FileSystem: ExpandingTokensNonExistingToken", "[filesystem]") {
     std::string p = "${NOTFOUND}";
-    REQUIRE_THROWS_AS(
-        FileSys.expandPathTokens(p),
-        ghoul::filesystem::FileSystem::ResolveTokenException
-    );
+    REQUIRE_THROWS_AS(FileSys.expandPathTokens(p), ghoul::RuntimeError);
 }
 
 TEST_CASE("FileSystem: ExpandingTokens", "[filesystem]") {

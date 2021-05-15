@@ -28,7 +28,6 @@
 
 #include <ghoul/filesystem/file.h>
 #include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <map>
 
@@ -48,38 +47,18 @@ void callbackHandler(const std::string& path);
 #endif // WIN32
 
 class CacheManager;
-class File;
 
 /**
- * The methods in this class are used to convert relative paths into absolute paths
- * (#absolutePath), however the main functionality of the FileSystem is to deal with path
- * tokens. These are tokens of the form <code>${...}</code> which are like variables,
- * pointing to a specific location. These tokens can only be bound once, as some of the
- * tokens might already have been resolved and changing the tokens later might lead to
- * inconsistencies. For the same reason, it is not possible to unregister tokens. Every
- * FileSystem contains one token <code>${TEMPORARY}</code> that points to the location of
- * the system's temporary files.
+ * The methods are for dealing with path tokens. These are tokens of the form
+ * <code>${...}</code> which are like variables, pointing to a specific location. These
+ * tokens can only be bound once, as some of the tokens might already have been resolved
+ * and changing the tokens later might lead to inconsistencies. For the same reason, it is
+ * not possible to unregister tokens. Every FileSystem contains one token
+ * <code>${TEMPORARY}</code> that points to the location of the system's temporary files.
  */
 class FileSystem {
 public:
     BooleanType(Override);
-
-    /// Exception that gets thrown if the FileSystem encounters a nonrecoverable error
-    struct FileSystemException : RuntimeError {
-        explicit FileSystemException(std::string msg);
-    };
-
-    /// Exception that gets thrown if a file system token could not be resolved
-    struct ResolveTokenException : FileSystemException {
-        explicit ResolveTokenException(std::string t);
-
-        const std::string token;
-    };
-
-    FileSystem(const FileSystem& rhs) = delete;
-    FileSystem(const FileSystem&&) = delete;
-    FileSystem& operator=(const FileSystem& rhs) = delete;
-    FileSystem& operator=(FileSystem&& rhs) = delete;
 
     static void initialize();
     static void deinitialize();
@@ -152,11 +131,6 @@ public:
      *
      * \param cacheDirectory The directory in which all cached files will be stored. Has
      *        to be an existing directory with proper read/write access.
-     * \return <code>true</code> if the CacheManager was created successfully;
-     *         <code>false</code> otherwise. Causes for failure are, among others, a
-     *         non-existing directory, missing read/write rights, or if the CacheManager
-     *         was created previously without destroying it in between
-     *         (destroyCacheManager)
      *
      * \pre \p cacheDirectory must point to an existing directory
      * \pre \p The CacheManager must not have been created before without destroying it
@@ -222,16 +196,10 @@ private:
      */
     ~FileSystem();
 
-    /**
-     * Returns true, if the \p path contains the \p token.
-     *
-     * \param path The path that is checked for the existence of the \p token
-     * \param token The token that is checked for existence in the \p path
-     * \return <code>true</code> if the \p token exists in the \p path
-     * \pre \p path must not be empty
-     * \pre \p token must not be empty
-     */
-    bool hasToken(const std::string& path, const std::string& token) const;
+    FileSystem(const FileSystem& rhs) = delete;
+    FileSystem(const FileSystem&&) = delete;
+    FileSystem& operator=(const FileSystem& rhs) = delete;
+    FileSystem& operator=(FileSystem&& rhs) = delete;
 
     /// This map stores all the tokens that are used in the FileSystem.
     std::map<std::string, std::filesystem::path> _tokenMap;
@@ -267,7 +235,7 @@ private:
     std::vector<FileChangeInfo> _trackedFiles;
 
     /// The list of tracked directories
-    std::map<std::string, DirectoryHandle*> _directories;
+    std::map<std::filesystem::path, DirectoryHandle*> _directories;
 
 #elif defined(__APPLE__)
     /// OS X specific deinitialize function

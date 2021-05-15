@@ -128,11 +128,6 @@ public:
         std::optional<std::string_view> information = std::nullopt);
 
 protected:
-    CacheManager(const CacheManager& c) = delete;
-    CacheManager(CacheManager&& m) = delete;
-    CacheManager& operator=(const CacheManager& rhs) = delete;
-    CacheManager& operator=(CacheManager&& rhs) = delete;
-
     /// The cache directory
     std::filesystem::path _directory;
 

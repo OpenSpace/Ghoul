@@ -90,11 +90,13 @@ struct DirectoryHandle {
 };
 
 void FileSystem::deinitializeInternalApple() {
-    for (const auto& d : _directories) {
+    for (const std::pair<const std::string, DirectoryHandle*>& d : _directories) {
         DirectoryHandle* dh = d.second;
-        FSEventStreamStop(dh->_eventStream);
-        FSEventStreamInvalidate(dh->_eventStream);
-        FSEventStreamRelease(dh->_eventStream);
+        if (dh) {
+            FSEventStreamStop(dh->_eventStream);
+            FSEventStreamInvalidate(dh->_eventStream);
+            FSEventStreamRelease(dh->_eventStream);
+        }
         delete dh;
     }
 }
@@ -104,7 +106,7 @@ int FileSystem::addFileListener(std::filesystem::path path,
 {
     std::string d = path.parent_path().string();
 
-    auto f = _directories.find(d);
+    const auto f = _directories.find(d);
     if (f == _directories.end()) {
         bool alreadyTrackingParent = false;
         for (const std::pair<const std::string, DirectoryHandle*>& dir : _directories) {
@@ -148,10 +150,10 @@ int FileSystem::addFileListener(std::filesystem::path path,
                 kFSEventStreamCreateFlagFileEvents
             );
 
-            // Add checking the event stream to the current run loop
-            // If there is a performance bottleneck, this could be done on a separate
-            // thread?
-            FSEventStreamScheduleWithRunLoop(handle->_eventStream,
+            // Add checking the event stream to the current run loop. If there is a
+            // performance bottleneck, this could be done on a separate thread?
+            FSEventStreamScheduleWithRunLoop(
+                handle->_eventStream,
                 CFRunLoopGetCurrent(),
                 kCFRunLoopDefaultMode
             );

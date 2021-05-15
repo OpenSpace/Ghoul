@@ -44,13 +44,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define EVENT_SIZE  (sizeof(struct inotify_event))
-#define BUF_LEN     (1024 * (EVENT_SIZE + 16))
-
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
     const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
                           IN_UNMOUNT | IN_ISDIR;
+    constexpr const int EventSize = sizeof(struct inotify_event);
+    constexpr const int BufferLength = 1024 * (EventSize + 16);
 } // namespace
 
 namespace ghoul::filesystem {
@@ -104,19 +103,19 @@ void FileSystem::removeFileListener(int callbackIdentifier) {
 
 void FileSystem::inotifyWatcher() {
     int fd = FileSys._inotifyHandle;
-    char buffer[BUF_LEN];
+    char buffer[BufferLength];
     struct timeval tv;
     tv.tv_sec = 1;
     tv.tv_usec = 0;
     fd_set rfds;
     while (FileSys._keepGoing) {
-        FD_ZERO (&rfds);
-        FD_SET (fd, &rfds);
+        FD_ZERO(&rfds);
+        FD_SET(fd, &rfds);
         if (select(FD_SETSIZE, &rfds, nullptr, nullptr, &tv) < 1) {
             continue;
         }
 
-        ssize_t length = read(fd, buffer, BUF_LEN );
+        const ssize_t length = read(fd, buffer, BufferLength);
         if (length < 0) {
             continue;
         }
@@ -160,11 +159,11 @@ void FileSystem::inotifyWatcher() {
                 default:
                     break;
             }
-            offset += EVENT_SIZE + e->len;
+            offset += EventSize + e->len;
         }
     }
 }
 
 } // namespace ghoul::filesystem
 
-#endif
+#endif // !defined(WIN32) && !defined(__APPLE__)

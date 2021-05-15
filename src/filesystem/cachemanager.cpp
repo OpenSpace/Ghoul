@@ -46,12 +46,12 @@ namespace {
     const std::filesystem::path CacheFile = "cache";
     constexpr const int CacheVersion = 2;
 
-    // something that cannot occur in the filesystem
-    constexpr const char HashDelimiter = '|';
-
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;
 
     unsigned int generateHash(std::filesystem::path file, std::string_view information) {
+        // something that cannot occur in the filesystem
+        constexpr const char HashDelimiter = '|';
+
         std::string s = fmt::format("{}{}{}", file.string(), HashDelimiter, information);
         unsigned int hash = ghoul::hashCRC32(s);
         return hash;
@@ -139,26 +139,27 @@ namespace {
         std::map<unsigned long, std::filesystem::path> result;
         namespace fs = std::filesystem;
         for (const fs::directory_entry& e : fs::recursive_directory_iterator(path)) {
-            if (e.is_regular_file() && e.path().filename() != CacheFile) {
-                std::filesystem::path thisFilename = e.path().filename();
-                std::filesystem::path hashName = e.path().parent_path().filename();
-                std::filesystem::path parentFilename =
-                    e.path().parent_path().parent_path().filename();
-
-                if (thisFilename != parentFilename) {
-                    throw ghoul::RuntimeError(
-                        fmt::format(
-                            "File contained in cache directory {} contains a file "
-                            "with name {} instead of expected {}",
-                            path, thisFilename, parentFilename
-                        ),
-                        "Cache"
-                    );
-                }
-
-                unsigned long hash = std::stoul(hashName.string());
-                result[hash] = e.path();
+            if (!e.is_regular_file() || e.path().filename() == CacheFile) {
+                continue;
             }
+
+            fs::path thisFilename = e.path().filename();
+            fs::path hashName = e.path().parent_path().filename();
+            fs::path parentFilename = e.path().parent_path().parent_path().filename();
+
+            if (thisFilename != parentFilename) {
+                throw ghoul::RuntimeError(
+                    fmt::format(
+                        "File contained in cache directory {} contains a file "
+                        "with name {} instead of expected {}",
+                        path, thisFilename, parentFilename
+                    ),
+                    "Cache"
+                );
+            }
+
+            unsigned long hash = std::stoul(hashName.string());
+            result[hash] = e.path();
         }
 
         return result;
@@ -176,7 +177,6 @@ CacheManager::CacheManager(std::filesystem::path directory)
     std::ifstream file(cacheFile);
     if (file.good()) {
         std::string line;
-        // The first line of the file contains the version number
         std::getline(file, line);
         if (line != std::to_string(CacheVersion)) {
             LINFO(fmt::format(
@@ -242,8 +242,8 @@ std::string CacheManager::cachedFilename(const std::filesystem::path& file,
         std::filesystem::create_directory(destination);
     }
 
-    auto it = _files.find(hash);
-    if (it != _files.end()) {
+    const auto it = _files.find(hash);
+    if (it != _files.cend()) {
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
         return it->second.string();
@@ -292,7 +292,7 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
         baseName,
         information.has_value() ? *information : lastModifiedDate(file)
     );
-    auto it = _files.find(hash);
+    const auto it = _files.find(hash);
     if (it != _files.end()) {
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
