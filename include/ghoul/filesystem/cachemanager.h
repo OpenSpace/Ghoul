@@ -48,44 +48,18 @@ namespace ghoul::filesystem {
  */
 class CacheManager {
 public:
-    /// Superclass for all cache-related exceptions
-    struct CacheException : public RuntimeError {
-        explicit CacheException(std::filesystem::path msg);
-    };
-
-    /// Exception that gets thrown if the cache has a malformed information file
-    struct MalformedCacheException : public CacheException {
-        explicit MalformedCacheException(std::filesystem::path file);
-
-        const std::filesystem::path cacheFile;
-    };
-
-    /// Exception that gets thrown if there was an error loading the previous cache files
-    struct ErrorLoadingCacheException : public CacheException {
-        explicit ErrorLoadingCacheException(std::filesystem::path msg);
-    };
-
-    /// Exception that gets thrown if the argument for retrieving a cache file is invalid
-    struct IllegalArgumentException : public CacheException {
-        explicit IllegalArgumentException(std::filesystem::path argument);
-
-        const std::filesystem::path argumentName;
-    };
-
     /**
      * The constructor will automatically register all persistent cache entries from
      * previous application runs. After the constructor returns, the persistent files are
      * correctly registered and available.
      *
      * \param directory The directory that is used for the CacheManager
-     * \param version The version of the cache. If a major change happens that shouldn't
-     *        be dealt on an individual level, this invalidates previous caches
      *
      * \throw MalformedCacheException If the cache file could is malformed
-     * \throw ErrorLoadingCacheException If the previous cache could not be loaded
+     * \throw RuntimeError If the previous cache could not be loaded
      * \pre \p directory must not be empty
      */
-    CacheManager(std::filesystem::path directory, int version = -1);
+    CacheManager(std::filesystem::path directory);
 
     /**
      * The destructor will save all information in a <code>cache</code> file in the cache
@@ -93,11 +67,6 @@ public:
      * application is started up again.
      */
     ~CacheManager();
-
-    CacheManager(const CacheManager& c) = delete;
-    CacheManager(CacheManager&& m) = delete;
-    CacheManager& operator=(const CacheManager& rhs) = delete;
-    CacheManager& operator=(CacheManager&& rhs) = delete;
 
     /**
      * Returns the path to a storage location for the cached file. If no information is
@@ -112,12 +81,12 @@ public:
      *        identify a cached file
      * \return The cached file that can be used by the caller to store the results
      *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
+     * \throw RuntimeError If there is an illegal character (<code>/</code>,
      *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    std::string cachedFilename(const std::filesystem::path& file,
+    [[nodiscard]] std::string cachedFilename(const std::filesystem::path& file,
         std::optional<std::string_view> information = std::nullopt);
 
     /**
@@ -137,7 +106,7 @@ public:
      *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *         <code>\></code>, or <code>.</code>) in the \p file
      */
-    bool hasCachedFile(const std::filesystem::path& file,
+    [[nodiscard]] bool hasCachedFile(const std::filesystem::path& file,
         std::optional<std::string_view> information = std::nullopt) const;
 
     /**
@@ -159,11 +128,13 @@ public:
         std::optional<std::string_view> information = std::nullopt);
 
 protected:
+    CacheManager(const CacheManager& c) = delete;
+    CacheManager(CacheManager&& m) = delete;
+    CacheManager& operator=(const CacheManager& rhs) = delete;
+    CacheManager& operator=(CacheManager&& rhs) = delete;
+
     /// The cache directory
     std::filesystem::path _directory;
-
-    /// The cache version
-    const int _version;
 
     /// A map containing file hashes and file information
     std::map<unsigned long, std::filesystem::path> _files;

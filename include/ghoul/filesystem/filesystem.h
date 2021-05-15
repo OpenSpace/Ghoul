@@ -152,8 +152,6 @@ public:
      *
      * \param cacheDirectory The directory in which all cached files will be stored. Has
      *        to be an existing directory with proper read/write access.
-     * \param version The version of the this cache. If the passed version is different
-     *        from the cache on disk, the cache is completely discarded
      * \return <code>true</code> if the CacheManager was created successfully;
      *         <code>false</code> otherwise. Causes for failure are, among others, a
      *         non-existing directory, missing read/write rights, or if the CacheManager
@@ -163,7 +161,7 @@ public:
      * \pre \p cacheDirectory must point to an existing directory
      * \pre \p The CacheManager must not have been created before without destroying it
      */
-    void createCacheManager(const std::filesystem::path& directory, int version = -1);
+    void createCacheManager(const std::filesystem::path& directory);
 
     /**
      * Destroys the previously created CacheManager. The destruction of the CacheManager
