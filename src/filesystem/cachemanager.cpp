@@ -302,24 +302,25 @@ CacheManager::CacheManager(std::filesystem::path directory, int version)
                 throw MalformedCacheException(path);
             }
 
-            CacheInformation info;
+            //CacheInformation info;
             std::string filename;
             std::getline(file, filename);
-            info.file = filename;
+            std::filesystem::path p = filename;
+            //info.file = filename;
             if (!file.good()) {
                 throw MalformedCacheException(path);
             }
 
-            info.isPersistent = true;
-            _files[hash] = info;
+            //info.isPersistent = true;
+            _files[hash] = p;
 
             // If the current hash + file is contained in the cache state, we have to
             // remove it
             cacheState.erase(
                 std::remove_if(
                     cacheState.begin(), cacheState.end(),
-                    [hash, &info](const LoadedCacheInfo& i) {
-                        return hash == i.first && info.file == i.second;
+                    [hash, &p](const LoadedCacheInfo& i) {
+                        return hash == i.first && p == i.second;
                     }
                 ),
                 cacheState.end()
@@ -356,17 +357,9 @@ CacheManager::~CacheManager() {
     std::ofstream file(path, std::ofstream::out);
     if (file.good()) {
         file << _version << '\n';
-        for (const std::pair<const unsigned long, CacheInformation>& p : _files) {
-            if (!p.second.isPersistent) {
-                // Delete all the non-persistent files
-                if (std::filesystem::is_regular_file(p.second.file)) {
-                    std::filesystem::remove(p.second.file);
-                }
-            }
-            else {
-                // Save the persistent files in the cache file
-                file << p.first << '\n' << p.second.file.string() << '\n';
-            }
+        for (const std::pair<const unsigned long, std::filesystem::path>& p : _files) {
+            // Save the persistent files in the cache file
+            file << p.first << '\n' << p.second.string() << '\n';
         }
         file.close();
     }
@@ -377,23 +370,23 @@ CacheManager::~CacheManager() {
 }
 
 std::string CacheManager::cachedFilename(const std::filesystem::path& file,
-                                         Persistent isPersistent)
+                                         std::optional<std::string_view> information)
 {
-    const std::string lastModifiedTime = lastModifiedDate(file);
-    return cachedFilename(file, lastModifiedTime, isPersistent);
-}
+    std::string info;
+    if (information.has_value()) {
+        info = std::string(*information);
+    }
+    else {
+        info = lastModifiedDate(file);
+    }
 
-std::string CacheManager::cachedFilename(const std::filesystem::path& file,
-                                         std::string_view information,
-                                         Persistent isPersistent)
-{
     const std::filesystem::path baseName = file.filename();
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
 
-    const unsigned int hash = generateHash(baseName, information);
+    const unsigned int hash = generateHash(baseName, info);
 
     // If we couldn't find the file, we have to generate a directory with the name of the
     // hash and return the full path containing of the cache path + filename + hash value
@@ -418,58 +411,62 @@ std::string CacheManager::cachedFilename(const std::filesystem::path& file,
     if (it != _files.end()) {
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
-        return it->second.file.string();
+        return it->second.string();
     }
 
     // Generate and output the newly generated cache name
     const std::string cachedName = fmt::format("{}/{}", destination, baseName.string());
 
     // Store the cache information in the map
-    CacheInformation info = { cachedName, isPersistent };
-    _files[hash] = info;
+    _files[hash] = cachedName;
     return cachedName;
 }
 
-bool CacheManager::hasCachedFile(const std::filesystem::path& file) const {
-    const std::string lastModifiedTime = lastModifiedDate(file);
-    return hasCachedFile(file, lastModifiedTime);
-}
-
 bool CacheManager::hasCachedFile(const std::filesystem::path& file,
-                                 std::string_view information) const
+                                 std::optional<std::string_view> information) const
 {
+    std::string info;
+    if (information.has_value()) {
+        info = std::string(*information);
+    }
+    else {
+        info = lastModifiedDate(file);
+    }
+
     const std::filesystem::path baseName = file.filename();
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
 
-    const unsigned long hash = generateHash(baseName, information);
+    const unsigned long hash = generateHash(baseName, info);
     return _files.find(hash) != _files.end();
 }
 
-void CacheManager::removeCacheFile(const std::filesystem::path& file) {
-    const std::string lastModifiedTime = lastModifiedDate(file);
-    removeCacheFile(file, lastModifiedTime);
-}
-
 void CacheManager::removeCacheFile(const std::filesystem::path& file,
-                                   std::string_view information)
+                                   std::optional<std::string_view> information)
 {
+    std::string info;
+    if (information.has_value()) {
+        info = std::string(*information);
+    }
+    else {
+        info = lastModifiedDate(file);
+    }
+
     const std::filesystem::path baseName = file.filename();
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw IllegalArgumentException(baseName);
     }
 
-    const unsigned int hash = generateHash(baseName, information);
+    const unsigned int hash = generateHash(baseName, info);
     auto it = _files.find(hash);
     if (it != _files.end()) {
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
-        const std::filesystem::path& cachedFileName = it->second.file;
-        if (std::filesystem::is_regular_file(cachedFileName)) {
-            std::filesystem::remove(cachedFileName);
+        if (std::filesystem::is_regular_file(it->second)) {
+            std::filesystem::remove(it->second);
         }
         _files.erase(it);
     }

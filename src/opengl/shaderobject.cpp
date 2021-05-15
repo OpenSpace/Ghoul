@@ -244,11 +244,7 @@ void ShaderObject::rebuildFromFile() {
     if (FileSys.cacheManager()) {
         // we use the .baseName() version because otherwise we get a new file
         // every time we reload the shader
-        generatedFilename = FileSys.cacheManager()->cachedFilename(
-            baseName,
-            "",
-            filesystem::CacheManager::Persistent::Yes
-        );
+        generatedFilename = FileSys.cacheManager()->cachedFilename(baseName, "");
     }
     else {
         // Either the cachemanager wasn't initialized or the

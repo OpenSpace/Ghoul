@@ -30,32 +30,24 @@
 #include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <string>
 
 namespace ghoul::filesystem {
 
 /**
- * The CacheManager allows users to request a storage location for an, optionally
- * persistent, file path to store a cached result. This class only generates and manages
- * the file paths and does not do any caching itself. The use case for this is are
- * two-fold:<br>
- * First, expensive operation that has a result, which gets written to a file and the
- * developer wants to retain the results without recomputing it at every application
- * start. For this, a cache file is requested with the getCachedFile method and the
- * <code>isPersistent</code> flag set to <code>true</code>. Using the same
- * <code>file</code> and <code>information</code> values, the same path will be retrieved
- * in subsequent application runs.<br>
- * The second use-case is a temporary file, also with the getCachedFile method, but the
- * <code>isPersistent</code> flag set to <code>false</code>. Non-persistent files will
- * automatically be deleted when the program ends.<br>
- * The persistent files are stored in a <code>cache</code> file so that they can be
- * retained between application runs. If two CacheManagers are pointing at the same
- * directory, the result is undefined.
+ * The CacheManager allows users to request a storage location for a file path to store a
+ * cached result. This class only generates and manages the file paths and does not do any
+ * caching itself. The use case for this is for expensive operations that has have result,
+ * which gets written to a file and the developer wants to retain the results without
+ * recomputing it at every application start. Using the same <code>file</code> and
+ * <code>information</code> values, the same path will be retrieved in subsequent
+ * application runs. The persistent files are stored in a <code>cache</code> file so that
+ * they can be retained between application runs. If two CacheManagers are pointing at the
+ * same directory, the result is undefined.
  */
 class CacheManager {
 public:
-    BooleanType(Persistent);
-
     /// Superclass for all cache-related exceptions
     struct CacheException : public RuntimeError {
         explicit CacheException(std::filesystem::path msg);
@@ -82,10 +74,8 @@ public:
 
     /**
      * The constructor will automatically register all persistent cache entries from
-     * previous application runs and clean the directory of non-persistent entries that
-     * might have been left intact if the previous run crashed. After the constructor
-     * returns, the CacheManager will leave a cleaned cache directory and the persistent
-     * files are correctly registered and available.
+     * previous application runs. After the constructor returns, the persistent files are
+     * correctly registered and available.
      *
      * \param directory The directory that is used for the CacheManager
      * \param version The version of the cache. If a major change happens that shouldn't
@@ -98,10 +88,9 @@ public:
     CacheManager(std::filesystem::path directory, int version = -1);
 
     /**
-     * The destructor will save all information on persistent files in a
-     * <code>cache</code> file in the cache directory that was passed in the constructor
-     * so that they can be retrieved when the application is started up again. All
-     * non-persistent files are automatically deleted in the destructor.
+     * The destructor will save all information in a <code>cache</code> file in the cache
+     * directory that was passed in the constructor so that they can be retrieved when the
+     * application is started up again.
      */
     ~CacheManager();
 
@@ -111,53 +100,16 @@ public:
     CacheManager& operator=(CacheManager&& rhs) = delete;
 
     /**
-     * Returns the path to a storage location for the cached file. Depending on the
-     * persistence (\p isPersistent), the directory and files will automatically be
-     * cleaned on application end or be made available automatically on the next
-     * application run. The method will use the date of last modification as a unique
-     * identifier for the file. Subsequent calls (in the same run or different) with the
-     * same \p file will consistently produce the same file path until the last-modified
-     * date changes. If the cached file was created before, the \p isPersistent parameter
-     * is silently ignored.
-     *
-     * \param file The file name of the file for which the cached entry is to be retrieved
-     * \param isPersistent This parameter will only be used if the cached file is used for
-     *        the first time and determines if the CacheManager should automatically
-     *        delete the file when the application closes (<code>false</code>) or if the
-     *        file should be kept and automatically be re-added to the CacheManager on the
-     *        next application run (<code>true</code>). If the cached file has been
-     *        created before, this parameter is silently ignored.
-     * \return The cached file that can be used by the caller to store the results
-     *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p file
-     */
-    std::string cachedFilename(const std::filesystem::path& file,
-        Persistent isPersistent = Persistent::No);
-
-    /**
-     * Returns the path to a storage location for the cached file. Depending on the
-     * persistence (\p isPersistent), the directory and files will automatically be
-     * cleaned on application end or be made available automatically on the next
-     * application run. Subsequent calls (in the same run or different) with the same
-     * \p file and \p information will consistently produce the same file path. The
-     * combination of \p file and \p information is the unique key for the returned cached
-     * file. If the cached file was created before, the \p isPersistent parameter is
-     * silently ignored.
+     * Returns the path to a storage location for the cached file. If no information is
+     * provided, the method will use the date of last modification as a unique identifier
+     * for the file. Subsequent calls (in the same run or different) with the same \p file
+     * and \p information will consistently produce the same file path. The combination of
+     * \p file and \p information is the unique key for the returned cached file.
      *
      * \param file The file name of the file for which the cached entry is to be retrieved
      * \param information Additional information that is used to uniquely identify the
-     *        cached file. This can be, for example, resolutions or parameters. The
-     *        combination of the \p file and \p information must uniquely identify a
-     *        cached file
-     * \param isPersistent This parameter will only be used if the cached file is used for
-     *        the first time and determines if the CacheManager should automatically
-     *        delete the file when the application closes (<code>false</code>) or if the
-     *        file should be kept and automatically be re-added to the CacheManager on the
-     *        next application run (<code>true</code>). If the cached file has been
-     *        created before, this parameter is silently ignored.
+     *        cached file. The combination of the \p file and \p information must uniquely
+     *        identify a cached file
      * \return The cached file that can be used by the caller to store the results
      *
      * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
@@ -166,32 +118,14 @@ public:
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
     std::string cachedFilename(const std::filesystem::path& file,
-        std::string_view information, Persistent isPersistent = Persistent::No);
+        std::optional<std::string_view> information = std::nullopt);
 
     /**
-     * This method checks if a cached \p file has been registered before in this
-     * application run (persistent and non-persistent files) or in a previous run
-     * (persistent cache files only). Note that this only checks if a file has been
-     * requested before, not if the cached file has actually been used. The method will
-     * use the date of last modification as a unique identifier for the file.
-     *
-     * \param file The file for which the cached file should be searched
-     * \return <code>true</code> if a cached file was requested before; <code>false</code>
-     *         otherwise
-     *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p file
-     */
-    bool hasCachedFile(const std::filesystem::path& file) const;
-
-    /**
-     * This method checks if a cached \p file has been registered before in this
-     * application run (persistent and non-persistent files) or in a previous run
-     * (persistent cache files only) with the provided \p information. Note that this only
-     * checks if a file has been requested before, not if the cached file has actually
-     * been used.
+     * This method checks if a cached \p file has been registered before in this or in a
+     * previous application run with the provided \p information. If no information is
+     * provided, the method will use the date of last modification as a unique identifier
+     * for the file.Note that this only checks if a file has been requested before, not if
+     * the cached file has actually been used.
      *
      * \param file The file for which the cached file should be searched
      * \param information The identifying information for the file
@@ -204,27 +138,13 @@ public:
      *         <code>\></code>, or <code>.</code>) in the \p file
      */
     bool hasCachedFile(const std::filesystem::path& file,
-        std::string_view information) const;
-
-    /**
-     * Removes the cached file and deleted the entry from the CacheManager. If the
-     * \p file has not previously been used to request a cache entry, no error
-     * will be signaled. The method will use the date of last modification as a unique
-     * identifier for the file.
-     *
-     * \param file The file for which the cache file should be deleted
-     *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p file
-     */
-    void removeCacheFile(const std::filesystem::path& file);
+        std::optional<std::string_view> information = std::nullopt) const;
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
      * <code>file</code> has not previously been used to request a cache entry, no error
-     * will be signaled.
+     * will be signaled. If no information is provided, the method will use the date of
+     * last modification as a unique identifier for the file.
      *
      * \param file The file for which the cache file should be deleted
      * \param information The detailed information for the cached file which should be
@@ -235,15 +155,10 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    void removeCacheFile(const std::filesystem::path& file, std::string_view information);
+    void removeCacheFile(const std::filesystem::path& file,
+        std::optional<std::string_view> information = std::nullopt);
 
 protected:
-    /// This struct stores the cache information for a specific hash value.
-    struct CacheInformation {
-        std::filesystem::path file; ///< The path to the cached file
-        bool isPersistent = false; ///< if the cached file should be automatically deleted
-    };
-
     /// The cache directory
     std::filesystem::path _directory;
 
@@ -251,7 +166,7 @@ protected:
     const int _version;
 
     /// A map containing file hashes and file information
-    std::map<unsigned long, CacheInformation> _files;
+    std::map<unsigned long, std::filesystem::path> _files;
 };
 
 } // namespace ghoul::filesystem
