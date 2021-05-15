@@ -29,6 +29,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <filesystem>
 
 using std::map;
 using std::string;
@@ -332,18 +333,18 @@ void ProgramObject::deactivate() {
 }
 
 std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
-                                                    const std::string& vertexShaderPath,
-                                                    const std::string& fragmentShaderPath,
+                                            const std::filesystem::path& vertexShaderPath,
+                                          const std::filesystem::path& fragmentShaderPath,
                                                     Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(vertexShaderPath),
+        std::filesystem::is_regular_file(vertexShaderPath),
         "VertexShaderPath file must exist"
     );
     ghoul_assert(!fragmentShaderPath.empty(), "FragmentShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(fragmentShaderPath),
+        std::filesystem::is_regular_file(fragmentShaderPath),
         "FragmentShaderPath file must exist"
     );
 
@@ -367,24 +368,24 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 }
 
 std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
-                                                    const std::string& vertexShaderPath,
-                                                    const std::string& fragmentShaderPath,
-                                                    const std::string& geometryShaderPath,
-                                                    Dictionary dictionary)
+                                            const std::filesystem::path& vertexShaderPath,
+                                          const std::filesystem::path& fragmentShaderPath,
+                                          const std::filesystem::path& geometryShaderPath,
+                                                                    Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(vertexShaderPath),
+        std::filesystem::is_regular_file(vertexShaderPath),
         "VertexShaderPath file must exist"
     );
     ghoul_assert(!fragmentShaderPath.empty(), "FragmentShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(fragmentShaderPath),
+        std::filesystem::is_regular_file(fragmentShaderPath),
         "FragmentShaderPath file must exist"
     );
     ghoul_assert(!geometryShaderPath.empty(), "GeometryShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(geometryShaderPath),
+        std::filesystem::is_regular_file(geometryShaderPath),
         "GeometryShaderPath file must exist"
     );
 
@@ -414,26 +415,26 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
 }
 
 std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
-                                                    const std::string& vertexShaderPath,
-                                                    const std::string& fragmentShaderPath,
-                                                    const std::string& geometryShaderPath,
-                                      const std::string& tessellationEvaluationShaderPath,
-                                         const std::string& tessellationControlShaderPath,
+                                            const std::filesystem::path& vertexShaderPath,
+                                          const std::filesystem::path& fragmentShaderPath,
+                                          const std::filesystem::path& geometryShaderPath,
+                            const std::filesystem::path& tessellationEvaluationShaderPath,
+                               const std::filesystem::path& tessellationControlShaderPath,
                                                                     Dictionary dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(vertexShaderPath),
+        std::filesystem::is_regular_file(vertexShaderPath),
         "VertexShaderPath file must exist"
     );
     ghoul_assert(!fragmentShaderPath.empty(), "FragmentShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(fragmentShaderPath),
+        std::filesystem::is_regular_file(fragmentShaderPath),
         "FragmentShaderPath file must exist"
     );
     ghoul_assert(!geometryShaderPath.empty(), "GeometryShaderPath must not be empty");
     ghoul_assert(
-        FileSys.fileExists(geometryShaderPath),
+        std::filesystem::is_regular_file(geometryShaderPath),
         "GeometryShaderPath file must exist"
     );
     ghoul_assert(
@@ -441,7 +442,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
         "Tessellation evaluation shader must not be empty"
     );
     ghoul_assert(
-        FileSys.fileExists(tessellationEvaluationShaderPath),
+        std::filesystem::is_regular_file(tessellationEvaluationShaderPath),
         "Tessellation evaluation shader file must exist"
     );
     ghoul_assert(
@@ -449,7 +450,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
         "Tessellation control shader must not be empty"
     );
     ghoul_assert(
-        FileSys.fileExists(tessellationControlShaderPath),
+        std::filesystem::is_regular_file(tessellationControlShaderPath),
         "Tessellation control shader file must exist"
     );
 

@@ -27,32 +27,23 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
-#include <ghoul/fmt.h>
-#include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/stacktrace.h>
-#include <algorithm>
-#include <regex>
-#include <Shlobj.h>
 
-using std::string;
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
+
+#include <Windows.h>
 
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
-
-    const unsigned int changeBufferSize = 16384u;
-
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+    constexpr const unsigned int ChangeBufferSize = 16384u;
 } // namespace
 
-void CALLBACK completionHandler(DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred,
-    LPOVERLAPPED lpOverlapped);
-
 namespace ghoul::filesystem {
+
+int FileSystem::FileChangeInfo::NextIdentifier = 0;
 
 struct DirectoryHandle {
     HANDLE _handle = nullptr;
@@ -62,9 +53,11 @@ struct DirectoryHandle {
 };
 
 void FileSystem::deinitializeInternalWindows() {
-    for (const std::pair<const std::string, DirectoryHandle*>& d : _directories) {
+    using K = std::filesystem::path;
+    using V = DirectoryHandle*;
+    for (const std::pair<const K, V>& d : _directories) {
         DirectoryHandle* dh = d.second;
-        if (dh != nullptr && dh->_handle != nullptr) {
+        if (dh && dh->_handle) {
             CancelIo(dh->_handle);
             CloseHandle(dh->_handle);
         }
@@ -72,19 +65,19 @@ void FileSystem::deinitializeInternalWindows() {
     }
 }
 
-void FileSystem::addFileListener(File* file) {
-    ghoul_assert(file != nullptr, "File must not be nullptr");
-
-    std::string d = file->directoryName();
-    auto f = _directories.find(d);
+int FileSystem::addFileListener(std::filesystem::path path,
+                                File::FileChangedCallback callback)
+{
+    std::filesystem::path dir = path.parent_path();
+    auto f = _directories.find(dir);
     if (f == _directories.end()) {
-        LDEBUG(fmt::format("Started watching: {}", d));
+        LDEBUG(fmt::format("Started watching: {}", dir));
         DirectoryHandle* handle = new DirectoryHandle;
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;
 
         handle->_handle = CreateFile(
-            d.c_str(),
+            dir.string().c_str(),
             FILE_LIST_DIRECTORY,
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
             nullptr,
@@ -93,59 +86,55 @@ void FileSystem::addFileListener(File* file) {
             nullptr
         );
 
-        if (handle->_handle == INVALID_HANDLE_VALUE) {  // NOLINT
-            LERROR(fmt::format("Directory handle for '{}' could not be obtained", d));
+        if (handle->_handle == INVALID_HANDLE_VALUE) {
             delete handle;
-            return;
+            throw ghoul::RuntimeError(
+                fmt::format("Directory handle for '{}' could not be obtained", dir)
+            );
         }
 
-        _directories[d] = handle;
+        _directories[dir] = handle;
         beginRead(handle);
     }
 
-#ifdef GHL_DEBUG
-    auto eqRange = _trackedFiles.equal_range(file->path());
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            LERROR("Already tracking fileobject");
-            return;
-        }
-    }
-#endif
-    _trackedFiles.emplace(file->path(), file);
+    int idx = FileChangeInfo::NextIdentifier;
+
+    FileChangeInfo info;
+    info.identifier = idx;
+    info.path = std::move(path);
+    info.callback = std::move(callback);
+    _trackedFiles.push_back(std::move(info));
+
+    FileChangeInfo::NextIdentifier += 1;
+    return idx;
 }
 
-void FileSystem::removeFileListener(File* file) {
-    ghoul_assert(file != nullptr, "File must not be nullptr");
-    auto eqRange = _trackedFiles.equal_range(file->path());
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            _trackedFiles.erase(it);
+void FileSystem::removeFileListener(int callbackIdentifier) {
+    for (size_t i = 0; i < _trackedFiles.size(); i += 1) {
+        if (_trackedFiles[i].identifier == callbackIdentifier) {
+            _trackedFiles.erase(_trackedFiles.begin() + i);
             return;
         }
     }
-    LWARNING(fmt::format(
-        "Could not find tracked '{0:x}' for path '{}'",
-        reinterpret_cast<void*>(file), file->path()
-    ));
+
+    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,
                                  const std::string& filePath)
 {
-    std::string fullPath;
-    for (const std::pair<const std::string, DirectoryHandle*>& d : FileSys._directories) {
+    std::filesystem::path fullPath;
+    using K = std::filesystem::path;
+    using V = DirectoryHandle*;
+    for (const std::pair<const K, V>& d : FileSys._directories) {
         if (d.second == directoryHandle) {
-            fullPath = d.first + PathSeparator + filePath;
+            fullPath = d.first / filePath;
         }
     }
 
-    const size_t n = FileSys._trackedFiles.count(fullPath);
-    if (n > 0) {
-        auto eqRange = FileSys._trackedFiles.equal_range(fullPath);
-        for (auto it = eqRange.first; it != eqRange.second; ++it) {
-            File* f = (*it).second;
-            f->callback()(*f);
+    for (const FileChangeInfo& info : FileSys._trackedFiles) {
+        if (info.path == fullPath) {
+            info.callback();
         }
     }
 }
@@ -161,7 +150,7 @@ void readStarter(DirectoryHandle* directoryHandle) {
 void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
     DirectoryHandle* handle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
 
-    unsigned char currentBuffer = handle->_activeBuffer;
+    const unsigned char currentBuffer = handle->_activeBuffer;
 
     // Change active buffer (ping-pong buffering)
     handle->_activeBuffer = (handle->_activeBuffer + 1) % 2;
@@ -169,56 +158,54 @@ void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
     // Restart change listener as soon as possible
     readStarter(handle);
 
-    char* buffer = reinterpret_cast<char*>(&(handle->_changeBuffer[currentBuffer][0]));
+    BYTE* buf = handle->_changeBuffer[currentBuffer].data();
 
     // data might have queued up, so we need to check all changes
     while (true) {
         // extract the information which file has changed
-        FILE_NOTIFY_INFORMATION& information =
-            reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buffer);
+        FILE_NOTIFY_INFORMATION& info = reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buf);
 
-        if (information.Action == FILE_ACTION_MODIFIED) {
-            std::vector<char> currentFilenameBuffer(information.FileNameLength);
+        if (info.Action == FILE_ACTION_MODIFIED) {
+            std::vector<char> currentFilenameBuffer(info.FileNameLength);
 
             // Convert from DWORD to char*
             size_t i;
             wcstombs_s(
                 &i,
                 currentFilenameBuffer.data(),
-                information.FileNameLength,
-                information.FileName,
-                information.FileNameLength
+                info.FileNameLength,
+                info.FileName,
+                info.FileNameLength
             );
             if (i > 0) {
                 // make sure the last char is string terminating
                 currentFilenameBuffer[i - 1] = '\0';
-                const string currentFilename(currentFilenameBuffer.data(), i - 1);
-
+                const std::string currentFilename(currentFilenameBuffer.data(), i - 1);
                 callbackHandler(handle, currentFilename);
             }
         }
-        if (!information.NextEntryOffset) {
+        if (!info.NextEntryOffset) {
             // we are done with all entries and didn't find our file
             break;
         }
         else {
             // continue with the next entry
-            buffer += information.NextEntryOffset;
+            buf += info.NextEntryOffset;
         }
     }
 }
 
 void FileSystem::beginRead(DirectoryHandle* directoryHandle) {
     HANDLE handle = directoryHandle->_handle;
-    unsigned char activeBuffer = directoryHandle->_activeBuffer;
+    const unsigned char activeBuffer = directoryHandle->_activeBuffer;
     std::vector<BYTE>* changeBuffer = directoryHandle->_changeBuffer;
     OVERLAPPED* overlappedBuffer = &directoryHandle->_overlappedBuffer;
 
     ZeroMemory(overlappedBuffer, sizeof(OVERLAPPED));
     overlappedBuffer->hEvent = directoryHandle;
 
-    changeBuffer[activeBuffer].resize(changeBufferSize);
-    ZeroMemory(changeBuffer[activeBuffer].data(), changeBufferSize);
+    changeBuffer[activeBuffer].resize(ChangeBufferSize);
+    ZeroMemory(changeBuffer[activeBuffer].data(), ChangeBufferSize);
 
     DWORD returnedBytes;
     ReadDirectoryChangesW(

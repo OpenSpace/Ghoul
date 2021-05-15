@@ -25,7 +25,6 @@
 
 set(GHOUL_SOURCE 
   filesystem/cachemanager.cpp
-  filesystem/directory.cpp
   filesystem/file.cpp
   filesystem/filesystem.cpp
   filesystem/filesystem.linux.cpp
@@ -147,7 +146,6 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/designpattern/event.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
-  ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/directory.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelanimation.h

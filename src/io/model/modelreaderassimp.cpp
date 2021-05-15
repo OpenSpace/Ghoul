@@ -155,11 +155,9 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
             // Local texture
             try {
                 std::string pathString(path.C_Str());
-                std::string absolutePath =
-                    ghoul::filesystem::FileSystem::ref().pathByAppendingComponent(
-                        modelDirectory.string(),
-                        pathString
-                    );
+                std::string absolutePath = fmt::format(
+                    "{}/{}", modelDirectory.string(), pathString
+                );
 
                 textureEntry.texture = TextureReader::ref().loadTexture(
                     absPath(absolutePath)

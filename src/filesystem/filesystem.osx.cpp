@@ -83,32 +83,30 @@ namespace {
 
 namespace ghoul::filesystem {
 
+int FileSystem::FileChangeInfo::NextIdentifier = 0;
+
 struct DirectoryHandle {
     FSEventStreamRef _eventStream;
 };
 
 void FileSystem::deinitializeInternalApple() {
-    for (const auto& d : _directories) {
+    for (const std::pair<const std::string, DirectoryHandle*>& d : _directories) {
         DirectoryHandle* dh = d.second;
-        FSEventStreamStop(dh->_eventStream);
-        FSEventStreamInvalidate(dh->_eventStream);
-        FSEventStreamRelease(dh->_eventStream);
+        if (dh) {
+            FSEventStreamStop(dh->_eventStream);
+            FSEventStreamInvalidate(dh->_eventStream);
+            FSEventStreamRelease(dh->_eventStream);
+        }
         delete dh;
     }
 }
 
-void FileSystem::addFileListener(File* file) {
-    ghoul_assert(file, "File must not a nullptr");
+int FileSystem::addFileListener(std::filesystem::path path,
+                                File::FileChangedCallback callback)
+{
+    std::string d = path.parent_path().string();
 
-#ifdef GHL_DEBUG
-    auto eqRange = _trackedFiles.equal_range(file->path());
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        ghoul_assert(it->second != file, "File already registered");
-    }
-#endif
-
-    std::string d = file->directoryName();
-    auto f = _directories.find(d);
+    const auto f = _directories.find(d);
     if (f == _directories.end()) {
         bool alreadyTrackingParent = false;
         for (const std::pair<const std::string, DirectoryHandle*>& dir : _directories) {
@@ -152,10 +150,10 @@ void FileSystem::addFileListener(File* file) {
                 kFSEventStreamCreateFlagFileEvents
             );
 
-            // Add checking the event stream to the current run loop
-            // If there is a performance bottleneck, this could be done on a separate
-            // thread?
-            FSEventStreamScheduleWithRunLoop(handle->_eventStream,
+            // Add checking the event stream to the current run loop. If there is a
+            // performance bottleneck, this could be done on a separate thread?
+            FSEventStreamScheduleWithRunLoop(
+                handle->_eventStream,
                 CFRunLoopGetCurrent(),
                 kCFRunLoopDefaultMode
             );
@@ -165,28 +163,25 @@ void FileSystem::addFileListener(File* file) {
         }
     }
 
-    _trackedFiles.insert({ file->path(), file });
+    FileChangeInfo info;
+    info.identifier = idx;
+    info.path = std::move(path);
+    info.callback = std::move(callback);
+    _trackedFiles.push_back(std::move(info));
+
+    FileChangeInfo::NextIdentifier += 1;
+    return idx;
 }
 
-void FileSystem::removeFileListener(File* file) {
-    ghoul_assert(file, "File must not be nullptr");
-
-    auto eqRange = _trackedFiles.equal_range(file->path());
-
-    bool found = false;
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        found |= (it->second == file);
-    }
-    ghoul_assert(found, "File not previously registered");
-
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        //LDEBUG("comparing for removal, " << file << "==" << it->second);
-        if (it->second == file) {
-            //LWARNING("Removing tracking of " << file);
-            _trackedFiles.erase(it);
+void FileSystem::removeFileListener(int callbackIdentifier) {
+    for (size_t i = 0; i < _trackedFiles.size(); i += 1) {
+        if (_trackedFiles[i].identifier == callbackIdentifier) {
+            _trackedFiles.erase(_trackedFiles.begin() + i);
             return;
         }
     }
+
+    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void callbackHandler(const std::string& path) {
@@ -194,19 +189,12 @@ void callbackHandler(const std::string& path) {
 }
 
 void FileSystem::callbackHandler(const std::string& path) {
-    size_t n = FileSys._trackedFiles.count(path);
-    if (n == 0) {
-        return;
-    }
-
-    auto eqRange = FileSys._trackedFiles.equal_range(path);
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        File* f = (*it).second;
-        f->callback()(*f);
+    for (const FileChangeInfo& info : FileSys._trackedFiles) {
+        if (info.path == path) {
+            info.callback();
+        }
     }
 }
-
-void FileSystem::triggerFilesystemEventsInternalApple() {}
 
 } // namespace ghoul::filesystem
 

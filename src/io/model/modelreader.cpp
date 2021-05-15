@@ -34,6 +34,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/fmt.h>
 #include <algorithm>
+#include <filesystem>
 
 namespace {
     constexpr const char* _loggerCat = "ModelReader";
@@ -62,7 +63,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    const std::string& extension = filesystem::File(filename).fileExtension();
+    std::string extension = std::filesystem::path(filename).extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     ModelReaderBase* reader = readerForExtension(extension);
@@ -71,13 +75,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         throw MissingReaderException(extension, filename);
     }
 
-    std::string cachedFile = FileSys.cacheManager()->cachedFilename(
-        filename,
-        filesystem::CacheManager::Persistent::Yes
-    );
-
-    bool hasCachedFile = FileSys.fileExists(cachedFile);
-
+    std::string cachedFile = FileSys.cacheManager()->cachedFilename(filename);
+    bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
         LINFO(fmt::format(
             "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename

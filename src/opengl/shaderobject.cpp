@@ -29,8 +29,9 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/misc/crc32.h>
 #include <algorithm>
-#include <functional>
+#include <filesystem>
 #include <fstream>
+#include <functional>
 
 namespace ghoul::opengl {
 
@@ -51,7 +52,7 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
     , shaderName(std::move(name))
 {}
 
-ShaderObject::ShaderObject(ShaderType shaderType, std::string filename,
+ShaderObject::ShaderObject(ShaderType shaderType, std::filesystem::path filename,
                            std::string name, Dictionary dictionary)
     : _type(shaderType)
     , _shaderName(std::move(name))
@@ -203,16 +204,16 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
     _preprocessor.setCallback(_onChangeCallback);
 }
 
-void ShaderObject::setFilename(const std::string& filename) {
+void ShaderObject::setFilename(std::filesystem::path filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    if (!FileSys.fileExists(filename)) {
-        throw FileNotFoundError(filename);
+    if (!std::filesystem::is_regular_file(filename)) {
+        throw FileNotFoundError(filename.string());
     }
 
     _preprocessor.setFilename(filename);
 }
 
-std::string ShaderObject::filename() const {
+std::filesystem::path ShaderObject::filename() const {
     return _preprocessor.filename();
 }
 
@@ -234,8 +235,7 @@ void ShaderObject::rebuildFromFile() {
 
     std::string baseName;
     if (_shaderName.empty()) {
-        filesystem::File ghlFile(filename());
-        baseName = ghlFile.baseName();
+        baseName = std::filesystem::path(filename()).stem().string();
     }
     else {
         baseName = _shaderName;
@@ -244,11 +244,7 @@ void ShaderObject::rebuildFromFile() {
     if (FileSys.cacheManager()) {
         // we use the .baseName() version because otherwise we get a new file
         // every time we reload the shader
-        generatedFilename = FileSys.cacheManager()->cachedFilename(
-            baseName,
-            "",
-            filesystem::CacheManager::Persistent::Yes
-        );
+        generatedFilename = FileSys.cacheManager()->cachedFilename(baseName, "");
     }
     else {
         // Either the cachemanager wasn't initialized or the

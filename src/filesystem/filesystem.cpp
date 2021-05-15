@@ -25,14 +25,9 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
-#include <algorithm>
-#include <regex>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -41,7 +36,7 @@
 #endif // NOMINMAX
 #include <direct.h>
 #include <Shlwapi.h>
-#include <windows.h>
+#include <Windows.h>
 #else
 #include <dirent.h>
 #include <unistd.h>
@@ -57,66 +52,25 @@
 #include <sys/inotify.h>
 #endif
 
-using std::string;
-using std::vector;
-
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
-    constexpr const char* TemporaryPathToken = "TEMPORARY";
-
-    constexpr size_t constLength(const char* str) {
-        return (*str == '\0') ? 0 : constLength(str + 1) + 1;
-    }
-
-    constexpr size_t TokenOpeningBracesSize = constLength(
-        ghoul::filesystem::FileSystem::TokenOpeningBraces
-    );
-
-    constexpr size_t TokenClosingBracesSize = constLength(
-        ghoul::filesystem::FileSystem::TokenClosingBraces
-    );
 } // namespace
+
+std::string absPath(std::string path) {
+    ghoul_assert(!path.empty(), "Path must not be empty");
+    std::filesystem::path expanded = FileSys.expandPathTokens(std::move(path));
+    std::filesystem::path absolute = std::filesystem::absolute(std::move(expanded));
+    return absolute.string();
+}
 
 namespace ghoul::filesystem {
 
 FileSystem* FileSystem::_instance = nullptr;
 
-FileSystem::FileSystemException::FileSystemException(string msg)
-    : RuntimeError(std::move(msg), "FileSystem")
-{}
-
-FileSystem::ResolveTokenException::ResolveTokenException(string t)
-    : FileSystemException(fmt::format("Token '{}' could not be resolved", t))
-    , token(std::move(t))
-{}
-
 FileSystem::FileSystem() {
-    std::string temporaryPath;
-#ifdef WIN32
-    std::vector<char> ptr;
-    DWORD result = GetTempPath(0, ptr.data());
-    if (result != 0) {
-        std::vector<TCHAR> tempPath(result);
-        result = GetTempPath(result, tempPath.data());
-        if ((result != 0) || (result <= tempPath.size())) {
-            temporaryPath = tempPath.data();
-        }
-    }
-#else // WIN32
-    temporaryPath = P_tmpdir;
-#endif // WIN32
-
-    if (!temporaryPath.empty()) {
-        LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to {}", temporaryPath));
-        registerPathToken(
-            TokenOpeningBraces + std::string(TemporaryPathToken) + TokenClosingBraces,
-            temporaryPath
-        );
-    }
-    else {
-        throw FileSystemException(
-            "Could not find the path of the system's temporary files");
-    }
+    std::filesystem::path temporaryPath = std::filesystem::temp_directory_path();
+    LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to {}", temporaryPath));
+    registerPathToken("${TEMPORARY}", temporaryPath);
 
 #if !defined(WIN32) && !defined(__APPLE__)
     _inotifyHandle = inotify_init();
@@ -155,494 +109,22 @@ FileSystem& FileSystem::ref() {
     return *_instance;
 }
 
-string FileSystem::absolutePath(string path, const vector<string>& ignoredTokens) const {
-    ghoul_assert(!path.empty(), "Path must not be empty");
-    expandPathTokens(path, ignoredTokens);
-
-    const int PathBufferSize = 4096;
-    std::vector<char> buffer(PathBufferSize);
-
-#ifdef WIN32
-    const DWORD success = GetFullPathName(
-        path.c_str(),
-        PathBufferSize,
-        buffer.data(),
-        nullptr
-    );
-    if (success == 0) {
-        throw FileSystemException(fmt::format(
-            "Error retrieving absolute path '{}'", path
-        ));
-    }
-    else {
-        path = buffer.data();
-    }
-#else
-    bool hadTrailingSlash = path.back() == '/';
-    if (!realpath(path.c_str(), buffer.data())) {
-        // Find the longest path that exists
-        string fullPath(path);
-        string::size_type match;
-        string::size_type lastMatch = std::string::npos;
-        while ((match = fullPath.rfind(PathSeparator, lastMatch - 1)) != string::npos) {
-            string before = fullPath.substr(0, match);
-            string after = fullPath.substr(match, string::npos);
-            if (realpath(before.c_str(), buffer.data())) {
-                string resolvedPath = string(buffer.data()) + after;
-                return resolvedPath;
-            }
-            lastMatch = match;
-        }
-        // Nothing in the relative path was found, use current directory
-        string before = ".";
-        string after = fullPath;
-        if (realpath(before.c_str(), buffer.data())) {
-            string resolvedPath = string(buffer.data()) + PathSeparator + after;
-            return resolvedPath;
-        }
-    }
-    path = buffer.data();
-    if (hadTrailingSlash) {
-        path += "/";
-    }
-#endif
-
-    return path;
-}
-
-string FileSystem::relativePath(string path, const Directory& baseDirectory) const {
-    ghoul_assert(!path.empty(), "Path must not be empty");
-
-    string pathAbsolute = cleanupPath(absolutePath(path));
-    string directoryAbsolute = cleanupPath(absolutePath(baseDirectory));
-
-    // Return identity path if absolutes are equal
-    if (pathAbsolute == directoryAbsolute) {
-        return ".";
-    }
-
-    // Check for different drives on Windows
-    if (pathAbsolute[0] != directoryAbsolute[0]) {
-        return path;
-    }
-
-    // Find the common part in the 'path' and 'baseDirectory'
-    size_t commonBasePosition = commonBasePathPosition(pathAbsolute, directoryAbsolute);
-    string directoryRemainder = directoryAbsolute.substr(commonBasePosition);
-    string relativePath = pathAbsolute.substr(commonBasePosition);
-    if (relativePath[0] == PathSeparator) {
-        relativePath = relativePath.substr(1);
-    }
-
-    // Construct the relative path by iteratively subtracting the additional folders from
-    // 'directoryRemainder'
-    size_t position = directoryRemainder.find(PathSeparator);
-    while (position != string::npos) {
-        if (relativePath.empty()) {
-            relativePath = "..";
-        }
-        else {
-            relativePath = ".." + (PathSeparator + relativePath); // NOLINT
-        }
-        position = directoryRemainder.find(PathSeparator, position + 1);
-    }
-    return relativePath;
-}
-
-string FileSystem::pathByAppendingComponent(string path, string component) const {
-    return std::move(path) + PathSeparator + std::move(component);
-}
-
-std::string FileSystem::convertPathSeparator(std::string path, char separator) const {
-    std::replace(path.begin(), path.end(), PathSeparator, separator);
-    return path;
-}
-
-Directory FileSystem::currentDirectory() const {
-#ifdef WIN32
-    // Get the size of the directory
-    DWORD size = GetCurrentDirectory(0, nullptr);
-    std::vector<char> buffer(size);
-    DWORD success = GetCurrentDirectory(size, buffer.data());
-    if (success == 0) {
-        // Log error
-        DWORD error = GetLastError();
-        LPTSTR errorBuffer = nullptr;
-        DWORD nValues = FormatMessage(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            reinterpret_cast<LPTSTR>(&errorBuffer),
-            0,
-            nullptr
-        );
-        if (nValues > 0) {
-            string msg(errorBuffer);
-            LocalFree(errorBuffer);
-            throw FileSystemException(fmt::format(
-                "Error retrieving current directory: {}", msg
-            ));
-        }
-        throw FileSystemException("Error retrieving current directory");
-    }
-    string currentDir(buffer.data());
-#else
-    std::vector<char> buffer(MAXPATHLEN);
-    char* result = getcwd(buffer.data(), MAXPATHLEN);
-    if (!result) {
-        throw FileSystemException(fmt::format(
-            "Error retrieving current directory: {}", strerror(errno)
-        ));
-    }
-    string currentDir(buffer.data());
-#endif
-    return Directory(currentDir);
-}
-
-void FileSystem::setCurrentDirectory(const Directory& directory) const {
-#ifdef WIN32
-    const BOOL success = SetCurrentDirectory(directory.path().c_str());
-    if (success == 0) {
-        // Log error
-        DWORD error = GetLastError();
-        LPTSTR errorBuffer = nullptr;
-        DWORD nValues = FormatMessage(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            reinterpret_cast<LPTSTR>(&errorBuffer),
-            0,
-            nullptr
-        );
-        if (nValues > 0) {
-            string msg(errorBuffer);
-            LocalFree(errorBuffer);
-            throw FileSystemException(fmt::format(
-                "Error setting current directory: {}", msg
-            ));
-        }
-    }
-#else
-    const int success = chdir(directory.path().c_str());
-    if (success != 0) {
-        throw FileSystemException(fmt::format(
-            "Error setting current directory: {}", strerror(errno)
-        ));
-    }
-#endif
-}
-
-bool FileSystem::fileExists(const File& path) const {
-#ifdef WIN32
-    BOOL exists = PathFileExists(path.path().c_str());
-    if (exists == FALSE) {
-        // The path did not exist, so the file cannot exist
-        return false;
-    }
-    else {
-        const DWORD attributes = GetFileAttributes(path.path().c_str());
-        if (attributes == INVALID_FILE_ATTRIBUTES) {
-            const DWORD error = GetLastError();
-            if ((error != ERROR_FILE_NOT_FOUND) && (error != ERROR_PATH_NOT_FOUND)) {
-                LPTSTR errorBuffer = nullptr;
-                DWORD nValues = FormatMessage(
-                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                    nullptr,
-                    error,
-                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    reinterpret_cast<LPTSTR>(&errorBuffer),
-                    0,
-                    nullptr
-                );
-                if (nValues > 0) {
-                    string msg(errorBuffer);
-                    LocalFree(errorBuffer);
-                    throw FileSystemException(fmt::format(
-                        "Error retrieving file attributes: {}", msg
-                    ));
-                }
-            }
-            throw FileSystemException("Error retrieving file attributes");
-        }
-        else {
-            return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
-        }
-    }
-#else
-    struct stat buffer;
-    const int statResult = stat(path.path().c_str(), &buffer);
-    if (statResult != 0) {
-        if (errno == ENOENT) {
-            // The error is that the file didn't exist
-            return false;
-        }
-        else {
-            throw FileSystemException(fmt::format(
-                "Error retrieving file attributes: {}", strerror(errno)
-            ));
-        }
-    }
-    const int isFile = S_ISREG(buffer.st_mode);
-    return (isFile != 0);
-#endif
-}
-
-bool FileSystem::directoryExists(const Directory& path) const {
-#ifdef WIN32
-    BOOL isDirectory = PathIsDirectory(path.path().c_str());
-    return isDirectory == static_cast<BOOL>(FILE_ATTRIBUTE_DIRECTORY);
-#else
-    const string& dirPath = path.path();
-    struct stat buffer;
-    const int statResult = stat(dirPath.c_str(), &buffer);
-    if (statResult != 0) {
-        if (errno == ENOENT) {
-            // The error is that the file didn't exist
-            return false;
-        }
-        else {
-            throw FileSystemException(fmt::format(
-                "Error retrieving file attributes: {}", strerror(errno)
-            ));
-        }
-    }
-    const int isDir = S_ISDIR(buffer.st_mode);
-    return (isDir != 0);
-#endif
-}
-
-bool FileSystem::deleteFile(const File& path) const {
-    bool isFile = fileExists(path);
-    if (isFile) {
-        int removeResult = remove(path.path().c_str());
-        return (removeResult == 0);
-    }
-    else {
-        return false;
-    }
-}
-
-void FileSystem::createDirectory(const Directory& path, Recursive recursive) const {
-    if (recursive) {
-        std::vector<Directory> directories;
-        Directory dir = path;
-        while (!FileSys.directoryExists(dir)) {
-            //LERROR("Adding path to v: " << d.path());
-            directories.push_back(dir);
-            dir = absPath(dir.parentDirectory());
-        }
-
-        std::for_each(
-            directories.rbegin(),
-            directories.rend(),
-            [this](const Directory& d) {
-                if (!FileSys.directoryExists(d)) {
-                    createDirectory(d, Recursive::No);
-                }
-            });
-
-        return;
-    }
-    else {
-#ifdef WIN32
-        BOOL success = CreateDirectory(path.path().c_str(), nullptr);
-        if (!success) {
-            DWORD error = GetLastError();
-            if (ERROR == ERROR_ALREADY_EXISTS) {
-                return;
-            }
-            else {
-                LPTSTR errorBuffer = nullptr;
-                DWORD nValues = FormatMessage(
-                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                    nullptr,
-                    error,
-                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    reinterpret_cast<LPTSTR>(&errorBuffer),
-                    0,
-                    nullptr
-                );
-                if (nValues > 0) {
-                    string errorMsg(errorBuffer);
-                    LocalFree(errorBuffer);
-                    throw FileSystemException(fmt::format(
-                        "Error creating directory '{}': {}", path.path(), errorMsg
-                    ));
-                }
-                throw FileSystemException(fmt::format(
-                    "Error creating directory '{}'", path.path()
-                ));
-            }
-        }
-#else
-        int success = mkdir(path.path().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        if (success != 0 && errno != EEXIST) {
-            throw FileSystemException(fmt::format(
-                "Error creating diretory '{}': {}", path.path(), strerror(errno)
-            ));
-        }
-#endif
-    }
-}
-
-void FileSystem::deleteDirectory(const Directory& path, Recursive recursive) const {
-    ghoul_assert(directoryExists(path), "Path must be an existing directory");
-    if ((!recursive) && (!emptyDirectory(path))) {
-        throw FileSystemException("Directory must be empty");
-    }
-
-#ifdef WIN32
-    const string& dirPath = path;
-
-    WIN32_FIND_DATA FindFileData;
-
-    const std::string dirWildcard = dirPath + PathSeparator + "*";
-
-    //List files
-    HANDLE hFind = FindFirstFile(dirWildcard.c_str(), &FindFileData);
-    do {
-        const std::string p = FindFileData.cFileName;
-        if (p == "." || p == "..") {
-            continue;
-        }
-
-        const std::string fullPath = dirPath + PathSeparator + p;
-        if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-            try {
-                deleteDirectory(fullPath, recursive);
-            }
-            catch (...) {
-                FindClose(hFind);
-                throw;
-            }
-        }
-        else {
-            const int rmFileResult = remove(fullPath.c_str());
-            if (rmFileResult != 0) {
-                FindClose(hFind);
-                throw FileSystemException(fmt::format(
-                    "Error removing directory '{}'", path.path()
-                ));
-            }
-        }
-    } while (FindNextFile(hFind, &FindFileData));
-    FindClose(hFind);
-
-    const int rmDirResult = _rmdir(dirPath.c_str());
-    if (rmDirResult == -1) {
-        throw FileSystemException(fmt::format(
-            "Error removing directory '{}'", path.path()
-        ));
-    }
-#else
-    const string& dirPath = path;
-
-    if (recursive) {
-        DIR* directory = opendir(dirPath.c_str());
-
-        if (!directory) {
-            throw FileSystemException(fmt::format(
-                "Error removing directory '{}': {}", path.path(), strerror(errno)
-            ));
-        }
-
-        while (true) {
-            struct dirent* p = readdir(directory);
-            if (p == nullptr) {
-                break;
-            }
-
-            string name = string(p->d_name);
-            if (name == "." || name == "..") {
-                continue;
-            }
-
-            struct stat statbuf;
-            string fullName = dirPath + "/" + name;
-            int statResult = stat(fullName.c_str(), &statbuf);
-            if (statResult == 0) {
-                if (S_ISDIR(statbuf.st_mode)) {
-                    deleteDirectory(fullName);
-                }
-                else {
-                    int removeSuccess = remove(fullName.c_str());
-                    if (removeSuccess != 0) {
-                        throw FileSystemException(fmt::format(
-                            "Error deleting file '{}' in directory '{}': {}",
-                            fullName, path.path(), strerror(errno)
-                        ));
-                    }
-                }
-            }
-            else {
-                throw FileSystemException(fmt::format(
-                    "Error getting information about file '{}' in directory '{}': {}",
-                    fullName, path.path(), strerror(errno)
-                ));
-            }
-        }
-        closedir(directory);
-    }
-    int rmdirSuccess = rmdir(dirPath.c_str());
-    if (rmdirSuccess == -1) {
-        throw FileSystemException(fmt::format(
-            "Error deleting directory '{}': {}", path.path(), strerror(errno)
-        ));
-    }
-#endif
-}
-
-bool FileSystem::emptyDirectory(const Directory& path) const {
-    const string& dirPath = path;
-#ifdef WIN32
-    return PathIsDirectoryEmpty(dirPath.c_str()) == TRUE;
-#else
-    int n = 0;
-    DIR* dir = opendir(dirPath.c_str());
-    if (!dir) {
-        // Not a directory or doesn't exist
-        return false;
-    }
-    while (readdir(dir) != nullptr) {
-        // The '.' and '..' are always present
-        if (++n > 2) {
-            break;
-        }
-    }
-    closedir(dir);
-    if (n <= 2) {
-        // Directory Empty
-        return true;
-    }
-    else {
-        return false;
-    }
-#endif
-}
-
-void FileSystem::registerPathToken(string token, string path, Override override) {
+void FileSystem::registerPathToken(std::string token, std::filesystem::path path,
+                                   Override override)
+{
     ghoul_assert(!token.empty(), "Token must not be empty");
-
-    ghoul_assert(
-        (token.substr(0, TokenOpeningBracesSize) == TokenOpeningBraces) &&
-        (token.substr(token.size() - TokenClosingBracesSize) == TokenClosingBraces),
-        "Token must be enclosed by TokenBraces"
-    );
+    ghoul_assert(token.find("${") == 0, "Token must start with '${'");
+    ghoul_assert(token[token.size() - 1] == '}', "Token must end with '}'");
 
     if (!override) {
-        ghoul_assert(_tokenMap.find(token) == _tokenMap.end(),
+        ghoul_assert(
+            _tokenMap.find(token) == _tokenMap.end(),
             "Token must not have been registered before"
         );
     }
 
     if (override) {
-        auto it = _tokenMap.find(token);
+        const auto it = _tokenMap.find(token);
         if (it != _tokenMap.end()) {
             _tokenMap.erase(it);
         }
@@ -650,41 +132,36 @@ void FileSystem::registerPathToken(string token, string path, Override override)
     _tokenMap[std::move(token)] = std::move(path);
 }
 
-bool FileSystem::expandPathTokens(string& path, const vector<string>& ignoredTokens) const
+std::filesystem::path FileSystem::expandPathTokens(std::string path,
+                                      const std::vector<std::string>& ignoredTokens) const
 {
     // TokenInformation = <token, beginning position, length>
     struct TokenInformation {
-        string token;
-        string::size_type beginning;
-        string::size_type length;
+        std::string token;
+        size_t beginning;
+        size_t length;
     };
-    auto nextToken = [ignoredTokens, &path]() -> TokenInformation {
-        string::size_type currentPosition = 0;
+    auto nextToken = [ignoredTokens, &path]() {
+        size_t currentPosition = 0;
         while (true) {
-            string::size_type beginning = path.find(TokenOpeningBraces, currentPosition);
-            string::size_type closing = path.find(
-                TokenClosingBraces, beginning + std::strlen(TokenOpeningBraces)
-            );
-            string::size_type closingLocation = closing + TokenClosingBracesSize;
+            const size_t beginning = path.find("${", currentPosition);
+            const size_t closing = path.find("}", beginning + 2);
+            const size_t closingLocation = closing + 1;
 
-            if (beginning == string::npos || closing == string::npos) {
+            if (beginning == std::string::npos || closing == std::string::npos) {
                 // There is no token left
-                return { "", string::npos, 0 };
+                return TokenInformation{ "", std::string::npos, 0 };
             }
 
-            std::string currentToken = path.substr(
-                beginning,
-                closingLocation - beginning
-            );
-
-            auto it = std::find(ignoredTokens.begin(), ignoredTokens.end(), currentToken);
+            const std::string token = path.substr(beginning, closingLocation - beginning);
+            const auto it = std::find(ignoredTokens.begin(), ignoredTokens.end(), token);
             if (it != ignoredTokens.end()) {
                 // The found token is an ignored one
                 currentPosition = closingLocation;
                 continue;
             }
             else {
-                return { currentToken, beginning, closingLocation - beginning };
+                return TokenInformation{ token, beginning, closingLocation - beginning };
             }
         }
     };
@@ -695,60 +172,50 @@ bool FileSystem::expandPathTokens(string& path, const vector<string>& ignoredTok
             break;
         }
 
-        const std::string& replacement = resolveToken(tokenInformation.token);
-        path.replace(
-            tokenInformation.beginning,
-            tokenInformation.length,
-            replacement
-        );
+        const auto it = _tokenMap.find(tokenInformation.token);
+        if (it == _tokenMap.end()) {
+            throw RuntimeError(
+                fmt::format("Token '{}' could not be resolved", tokenInformation.token),
+                "FileSystem"
+            );
+        }
+
+        std::string replacement = it->second.string();
+        path.replace(tokenInformation.beginning, tokenInformation.length, replacement);
     }
 
-    //while (containsToken(path)) {
-    //    string::size_type beginning = path.find(TokenOpeningBraces, currentPosition);
-    //    string::size_type closing = path.find(
-    //        TokenClosingBraces, beginning + TokenOpeningBraces.size()
-    //    );
-    //    string::size_type closingLocation = closing + TokenClosingBraces.size();
-    //    std::string currentToken = path.substr(beginning, closingLocation - beginning);
-
-    //    currentPosition = closingLocation;
-    //    auto it = std::find(ignoredTokens.begin(), ignoredTokens.end(), currentToken);
-    //    if (it != ignoredTokens.end()) {
-    //        // The token we have found has to be ignored
-    //        continue;
-    //    }
-    //    const std::string& replacement = resolveToken(currentToken);
-    //    if (replacement == currentToken) {
-    //        // replacement == currentToken will be true if the respective token could
-    //        // not be found;  resolveToken will print an error in that case
-    //        return false;
-    //    }
-    //    path.replace(
-    //        beginning,
-    //        closing + TokenClosingBraces.size() - beginning,
-    //        replacement
-    //    );
-    //}
-    return true;
+    return path;
 }
 
-std::vector<string> FileSystem::tokens() const {
-    std::vector<string> tokens;
-    for (const auto& token : _tokenMap) {
+std::vector<std::string> FileSystem::tokens() const {
+    std::vector<std::string> tokens;
+    tokens.reserve(_tokenMap.size());
+    for (const std::pair<const std::string, std::filesystem::path>& token : _tokenMap) {
         tokens.push_back(token.first);
     }
     return tokens;
 }
 
-bool FileSystem::hasRegisteredToken(const string& token) const {
+bool FileSystem::hasRegisteredToken(const std::string& token) const {
     return _tokenMap.find(token) != _tokenMap.end();
 }
 
-void FileSystem::createCacheManager(const Directory& cacheDirectory, int version) {
-    ghoul_assert(directoryExists(cacheDirectory), "Cache directory did not exist");
+bool FileSystem::containsToken(const std::string& path) const {
+    ghoul_assert(!path.empty(), "Path must not be empty");
+
+    bool hasOpeningBrace = path.find("${") != std::string::npos;
+    bool hasClosingBrace = path.find("}") != std::string::npos;
+    return hasOpeningBrace && hasClosingBrace;
+}
+
+void FileSystem::createCacheManager(const std::filesystem::path& directory) {
+    ghoul_assert(
+        std::filesystem::is_directory(directory),
+        "Cache directory did not exist"
+    );
     ghoul_assert(!_cacheManager, "CacheManager was already created");
 
-    _cacheManager = std::make_unique<CacheManager>(cacheDirectory, version);
+    _cacheManager = std::make_unique<CacheManager>(directory.string());
     ghoul_assert(_cacheManager, "CacheManager creation failed");
 }
 
@@ -768,115 +235,6 @@ void FileSystem::triggerFilesystemEvents() {
     // Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls
     SleepEx(0, TRUE);
 #endif
-#if defined(__APPLE__)
-    triggerFilesystemEventsInternalApple();
-#endif
-}
-
-string FileSystem::cleanupPath(string path) const {
-    ghoul_assert(!path.empty(), "Path must not be empty");
-
-#ifdef WIN32
-    // In Windows, replace all '/' by '\\' for conformity
-    std::replace(path.begin(), path.end(), '/', '\\');
-    std::string drivePart = path.substr(0, 3);
-    std::regex driveRegex = std::regex(R"(([[:lower:]][\:][\\]))");
-    bool hasCorrectSize = path.size() >= 3;
-    if (hasCorrectSize && std::regex_match(drivePart, driveRegex)) {
-        std::transform(
-            path.begin(),
-            path.begin() + 1,
-            path.begin(),
-            [](char v) { return static_cast<char>(toupper(v)); }
-        );
-    }
-#else
-    // Remove all double separators (will automatically be done on Windows)
-#endif
-    size_t position = 0;
-    while (position != string::npos) {
-        char dualSeparator[] = { PathSeparator, PathSeparator };
-        position = path.find(dualSeparator, 0, 2);
-        if (position != string::npos) {
-            path = path.substr(0, position) + path.substr(position + 1);
-        }
-    }
-
-    // Remove trailing separator
-    if (path[path.size() - 1] == PathSeparator) {
-        path = path.substr(0, path.size() - 1);
-    }
-
-    return path;
-}
-
-size_t FileSystem::commonBasePathPosition(const string& p1, const string& p2) const {
-    // 'currentPosition' stores the position until which the two paths are the same,
-    // 'nextPosition' is a look-ahead. If the look-ahead is equal as well,
-    // 'currentPosition' is replaced by this. At the end of the loop 'currentPosition'
-    // contains the last position until which both paths are the same
-    size_t currentPosition = 0;
-    size_t nextPosition = p1.find(PathSeparator);
-    while (nextPosition != string::npos) {
-        int result = p1.compare(0, nextPosition, p2, 0 , nextPosition);
-        if (result == 0) {
-            currentPosition = nextPosition;
-            nextPosition = p1.find(PathSeparator, nextPosition + 1);
-        }
-        else {
-            break;
-        }
-    }
-    int result = p1.compare(0, p1.length(), p2, 0 , p1.length());
-    if (result == 0) {
-        currentPosition = p1.length();
-    }
-    return currentPosition;
-}
-
-bool FileSystem::containsToken(const string& path) const {
-    ghoul_assert(!path.empty(), "Path must not be empty");
-
-    bool hasOpeningBrace = path.find(TokenOpeningBraces) != string::npos;
-    bool hasClosingBrace = path.find(TokenClosingBraces) != string::npos;
-    return hasOpeningBrace && hasClosingBrace;
-}
-
-bool FileSystem::hasToken(const string& path, const string& token) const {
-    ghoul_assert(!path.empty(), "Path must not be empty");
-    ghoul_assert(!token.empty(), "Token must not be empty");
-
-    if (!containsToken(path)) {
-        return false;
-    }
-    else {
-        string::size_type beginning = path.find(TokenOpeningBraces);
-        string::size_type closing = path.find(TokenClosingBraces);
-        while ((beginning != string::npos) && (closing != string::npos)) {
-            string::size_type closingLocation = closing + TokenClosingBracesSize;
-            std::string currentToken = path.substr(beginning, closingLocation);
-            if (currentToken == token) {
-                return true;
-            }
-            else {
-                beginning = path.find(TokenOpeningBraces, closing);
-                closing = path.find(TokenClosingBraces, beginning);
-            }
-        }
-        return false;
-    }
-}
-
-string FileSystem::resolveToken(const string& token) const {
-    ghoul_assert(!token.empty(), "Token must not be empty");
-
-    auto it = _tokenMap.find(token);
-    if (it == _tokenMap.end()) {
-        throw ResolveTokenException(token);
-    }
-    else {
-        return it->second;
-    }
 }
 
 } // namespace ghoul::filesystem

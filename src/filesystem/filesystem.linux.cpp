@@ -44,18 +44,17 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define EVENT_SIZE  (sizeof(struct inotify_event))
-#define BUF_LEN     (1024 * (EVENT_SIZE + 16))
-
-using std::string;
-
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
     const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
                           IN_UNMOUNT | IN_ISDIR;
+    constexpr const int EventSize = sizeof(struct inotify_event);
+    constexpr const int BufferLength = 1024 * (EventSize + 16);
 } // namespace
 
 namespace ghoul::filesystem {
+
+int FileSystem::FileChangeInfo::NextIdentifier = 0;
 
 void FileSystem::initializeInternalLinux() {
     _inotifyHandle = inotify_init();
@@ -71,54 +70,52 @@ void FileSystem::deinitializeInternalLinux() {
     close(_inotifyHandle);
 }
 
-void FileSystem::addFileListener(File* file) {
-    ghoul_assert(file != nullptr, "File cannot be nullptr");
+int FileSystem::addFileListener(std::filesystem::path path,
+                                File::FileChangedCallback callback)
+{
 
-    const std::string filename = file->path();
+    const std::string filename = path.string();
     int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
-    auto eqRange = _trackedFiles.equal_range(wd);
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            LERROR("Already tracking fileobject");
-            return;
-        }
-    }
-    _trackedFiles.emplace(wd, file);
+
+    int idx = FileChangeInfo::NextIdentifier;
+
+    FileChangeInfo info;
+    info.identifier = idx;
+    info.inotifyHandle = wd;
+    info.path = std::move(path);
+    info.callback = std::move(callback);
+    _trackedFiles.push_back(std::move(info));
+
+    FileChangeInfo::NextIdentifier += 1;
+    return idx;
 }
 
-void FileSystem::removeFileListener(File* file) {
-    ghoul_assert(file != nullptr, "File cannot be nullptr");
-
-    const std::string filename = file->path();
-    int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
-    auto eqRange = _trackedFiles.equal_range(wd);
-    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-        if (it->second == file) {
-            _trackedFiles.erase(it);
+void FileSystem::removeFileListener(int callbackIdentifier) {
+    for (size_t i = 0; i < _trackedFiles.size(); i += 1) {
+        if (_trackedFiles[i].identifier == callbackIdentifier) {
+            _trackedFiles.erase(_trackedFiles.begin() + i);
             return;
         }
     }
-    LWARNING(fmt::format(
-        "Could not find tracked '{}' for path '{}'",
-        reinterpret_cast<void*>(file), file->path()
-    ));
+
+    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void FileSystem::inotifyWatcher() {
     int fd = FileSys._inotifyHandle;
-    char buffer[BUF_LEN];
+    char buffer[BufferLength];
     struct timeval tv;
     tv.tv_sec = 1;
     tv.tv_usec = 0;
     fd_set rfds;
     while (FileSys._keepGoing) {
-        FD_ZERO (&rfds);
-        FD_SET (fd, &rfds);
+        FD_ZERO(&rfds);
+        FD_SET(fd, &rfds);
         if (select(FD_SETSIZE, &rfds, nullptr, nullptr, &tv) < 1) {
             continue;
         }
 
-        ssize_t length = read(fd, buffer, BUF_LEN );
+        const ssize_t length = read(fd, buffer, BufferLength);
         if (length < 0) {
             continue;
         }
@@ -131,10 +128,10 @@ void FileSystem::inotifyWatcher() {
                 case IN_ATTRIB:
                 {
                     int wd = e->wd;
-                    auto eqRange = FileSys._trackedFiles.equal_range(wd);
-                    for (auto it = eqRange.first; it != eqRange.second; ++it) {
-                        File* fileobject = it->second;
-                        fileobject->callback()(*fileobject);
+                    for (const FileChangeInfo& info : FileSys._trackedFiles) {
+                        if (info.inotifyHandle == wd) {
+                            info.callback();
+                        }
                     }
                     break;
                 }
@@ -142,43 +139,31 @@ void FileSystem::inotifyWatcher() {
                 {
                     int wd = e->wd;
 
-                    auto eqRange = FileSys._trackedFiles.equal_range(wd);
-                    auto it = eqRange.first;
-
                     // remove tracking of the removed descriptor
                     inotify_rm_watch(fd, wd);
 
-                    // if there are files tracking
-                    if (it != eqRange.second) {
+                    for (FileChangeInfo& info : FileSys._trackedFiles) {
+                        if (info.inotifyHandle != wd) {
+                            continue;
+                        }
+
                         // add new tracking
-                        int new_wd = inotify_add_watch(
+                        info.inotifyHandle = inotify_add_watch(
                             fd,
-                            it->second->path().c_str(),
+                            info.path.string().c_str(),
                             mask
                         );
-
-                        // save all files
-                        std::vector<File*> v;
-                        for (; it != eqRange.second; ++it) {
-                            v.push_back(it->second);
-                        }
-
-                        // erase all previous files and add them again
-                        FileSys._trackedFiles.erase(eqRange.first, eqRange.second);
-                        for (auto f : v) {
-                            FileSys._trackedFiles.emplace(new_wd, f);
-                        }
                     }
                     break;
                 }
                 default:
                     break;
             }
-            offset += EVENT_SIZE + e->len;
+            offset += EventSize + e->len;
         }
     }
 }
 
 } // namespace ghoul::filesystem
 
-#endif
+#endif // !defined(WIN32) && !defined(__APPLE__)

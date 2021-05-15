@@ -34,6 +34,7 @@
 #include <ghoul/misc/crc32.h>
 #include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/texture.h>
+#include <filesystem>
 
 namespace {
     /// The default set of glyphs that are loaded when a new Font is initialized
@@ -74,7 +75,7 @@ void FontManager::deinitialize() {
 }
 
 unsigned int FontManager::registerFontPath(std::string_view fontName,
-                                           const std::string& filePath)
+                                           std::filesystem::path filePath)
 {
     ghoul_assert(!fontName.empty(), "Fontname must not be empty");
     ghoul_assert(!filePath.empty(), "Filepath must not be empty");
@@ -94,7 +95,7 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
             ));
         }
     }
-    _fontPaths[hash] = filePath;
+    _fontPaths[hash] = filePath.string();
     return hash;
 }
 
@@ -108,7 +109,7 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
     const auto itPath = _fontPaths.find(hash);
     if (itPath == _fontPaths.cend()) {
         // There is no hash registered for the current name, so it might be a local file
-        if (FileSys.fileExists(name)) {
+        if (std::filesystem::is_regular_file(name)) {
             hash = registerFontPath(name, name);
         }
         else {

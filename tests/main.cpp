@@ -30,6 +30,7 @@
 #include <ghoul/logging/consolelog.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/supportmacros.h>
+#include <filesystem>
 
 using namespace ghoul::filesystem;
 using namespace ghoul::logging;
@@ -40,14 +41,14 @@ int main(int argc, char** argv) {
 
     FileSystem::initialize();
 
-    const std::string Root = absPath(GHOUL_ROOT_DIR);
-    const std::string TestDirectory = Root + "/tests";
-    const std::string ScriptDirectory = Root + "/scripts";
+    const std::filesystem::path root = absPath(GHOUL_ROOT_DIR);
+    const std::filesystem::path testDirectory = root / "tests";
+    const std::filesystem::path scriptDirectory = root / "scripts";
 
-    FileSys.registerPathToken("${UNIT_TEST}", TestDirectory);
-    FileSys.registerPathToken("${UNIT_SCRIPT}", ScriptDirectory);
+    FileSys.registerPathToken("${UNIT_TEST}", testDirectory);
+    FileSys.registerPathToken("${UNIT_SCRIPT}", scriptDirectory);
 
-    if (!FileSys.directoryExists(TestDirectory)) {
+    if (!std::filesystem::is_directory(testDirectory)) {
         LFATALC("main", "Fix me");
         return 0;
     }
