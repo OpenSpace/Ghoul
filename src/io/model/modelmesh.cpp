@@ -31,6 +31,20 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/fmt.h>
 
+namespace {
+    std::string textureTypeToString(const ghoul::io::ModelMesh::TextureType& type) {
+        using TextureType = ghoul::io::ModelMesh::TextureType;
+        switch (type) {
+            case TextureType::TextureDiffuse:  return "texture_diffuse";
+            case TextureType::TextureNormal:   return "texture_normal";
+            case TextureType::TextureSpecular: return "texture_specular";
+            case TextureType::ColorDiffuse:    return "color_diffuse";
+            case TextureType::ColorSpecular:   return "color_specular";
+            default:                           throw ghoul::MissingCaseException();
+        }
+    }
+} // namespace
+
 namespace ghoul::io {
 
 ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
@@ -39,17 +53,6 @@ ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> ind
     , _indices(std::move(indices))
     , _textures(std::move(textures))
 {}
-
-std::string textureTypeToString(const ModelMesh::TextureType& type) {
-    switch (type) {
-        case ModelMesh::TextureType::TextureDiffuse: return "texture_diffuse";
-        case ModelMesh::TextureType::TextureNormal: return "texture_normal";
-        case ModelMesh::TextureType::TextureSpecular: return "texture_specular";
-        case ModelMesh::TextureType::ColorDiffuse: return "color_diffuse";
-        case ModelMesh::TextureType::ColorSpecular: return "color_specular";
-        default: throw MissingCaseException();
-    }
-}
 
 void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
                        bool isTexturedModel) const

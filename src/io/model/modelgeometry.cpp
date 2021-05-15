@@ -252,7 +252,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             for (int32_t i = 0; i < nIndices; ++i) {
                 uint32_t index;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
-                indexArray.push_back(std::move(static_cast<unsigned int>(index)));
+                indexArray.push_back(index);
             }
 
             // Textures
@@ -698,7 +698,10 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
 
     if (_animation != nullptr) {
         // Name
-        uint8_t nameSize = _animation->name().size();
+        if (_animation->name().size() >= std::numeric_limits<uint8_t>::max()) {
+            LWARNING("A maximum name length of 255 is supported");
+        }
+        uint8_t nameSize = static_cast<uint8_t>(_animation->name().size());
         fileStream.write(reinterpret_cast<const char*>(&nameSize), sizeof(uint8_t));
         fileStream.write(
             reinterpret_cast<const char*>(_animation->name().data()),
@@ -729,7 +732,10 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
             fileStream.write(reinterpret_cast<const char*>(&nodeIndex), sizeof(int32_t));
 
             // Positions
-            uint8_t nPos = nodeAnimation.positions.size();
+            if (nodeAnimation.positions.size() >= std::numeric_limits<uint8_t>::max()) {
+                LWARNING("A maximum number of 255 position keyframes are supported");
+            }
+            uint8_t nPos = static_cast<uint8_t>(nodeAnimation.positions.size());
             fileStream.write(reinterpret_cast<const char*>(&nPos), sizeof(uint8_t));
             for (const io::ModelAnimation::PositionKeyframe& posKeyframe :
                 nodeAnimation.positions)
@@ -756,7 +762,10 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
             }
 
             // Rotations
-            uint8_t nRot = nodeAnimation.rotations.size();
+            uint8_t nRot = static_cast<uint8_t>(nodeAnimation.rotations.size());
+            if (nodeAnimation.rotations.size() >= std::numeric_limits<uint8_t>::max()) {
+                LWARNING("A maximum number of 255 rotation keyframes are supported");
+            }
             fileStream.write(reinterpret_cast<const char*>(&nRot), sizeof(uint8_t));
             for (const io::ModelAnimation::RotationKeyframe& rotKeyframe :
                 nodeAnimation.rotations)
@@ -787,7 +796,10 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
             }
 
             // Scales
-            uint8_t nScale = nodeAnimation.scales.size();
+            uint8_t nScale = static_cast<uint8_t>(nodeAnimation.scales.size());
+            if (nodeAnimation.scales.size() >= std::numeric_limits<uint8_t>::max()) {
+                LWARNING("A maximum number of 255 scale keyframes are supported");
+            }
             fileStream.write(reinterpret_cast<const char*>(&nScale), sizeof(uint8_t));
             for (const io::ModelAnimation::ScaleKeyframe& scaleKeyframe :
                 nodeAnimation.scales)
@@ -822,7 +834,7 @@ double ModelGeometry::boundingRadius() const {
     return _boundingRadius;
 }
 
-void calculateBoundingRadiusRecursive(const std::vector<io::ModelNode>& nodes,
+static void calculateBoundingRadiusRecursive(const std::vector<io::ModelNode>& nodes,
                                       const io::ModelNode* node,
                                       glm::mat4x4& parentTransform,
                                       float& maximumDistanceSquared)
@@ -897,9 +909,9 @@ const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() 
     return _textureStorage;
 }
 
-void renderRecursive(const std::vector<io::ModelNode>& nodes, const io::ModelNode* node,
-                     opengl::ProgramObject& program, glm::mat4x4& parentTransform,
-                     bool isTexturedModel)
+static void renderRecursive(const std::vector<io::ModelNode>& nodes,
+                            const io::ModelNode* node, opengl::ProgramObject& program,
+                            glm::mat4x4& parentTransform, bool isTexturedModel)
 {
     if (!node) {
         LERROR("Cannot render empty node");
