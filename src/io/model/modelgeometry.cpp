@@ -96,7 +96,7 @@ namespace {
 namespace ghoul::modelgeometry {
 
 ModelGeometry::ModelCacheException::ModelCacheException(std::string file,
-    std::string msg)
+                                                        std::string msg)
     : RuntimeError(fmt::format("Error: '{}' with cache file: '{}'", msg, file))
     , filename(std::move(file))
     , errorMessage(std::move(msg))
@@ -188,17 +188,16 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::byte* data = new std::byte[textureSize];
         fileStream.read(reinterpret_cast<char*>(data), textureSize);
 
-        textureEntry.texture =
-            std::make_unique<opengl::Texture>(
-                dimensions,
-                format,
-                internalFormat,
-                dataType,
-                opengl::Texture::FilterMode::Linear,
-                opengl::Texture::WrappingMode::Repeat,
-                opengl::Texture::AllocateData::No,
-                opengl::Texture::TakeOwnership::Yes
-                );
+        textureEntry.texture = std::make_unique<opengl::Texture>(
+            dimensions,
+            format,
+            internalFormat,
+            dataType,
+            opengl::Texture::FilterMode::Linear,
+            opengl::Texture::WrappingMode::Repeat,
+            opengl::Texture::AllocateData::No,
+            opengl::Texture::TakeOwnership::Yes
+        );
 
         textureEntry.texture->setPixelData(data, opengl::Texture::TakeOwnership::Yes);
         textureStorageArray.push_back(std::move(textureEntry));
@@ -278,10 +277,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 
                 // useForcedColor
                 uint8_t f;
-                fileStream.read(
-                    reinterpret_cast<char*>(&f),
-                    sizeof(uint8_t)
-                );
+                fileStream.read(reinterpret_cast<char*>(&f), sizeof(uint8_t));
                 texture.useForcedColor = f == 1;
 
                 // color
@@ -319,19 +315,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Transform
         glm::mat4x4 transform;
         GLfloat rawTransform[16];
-        fileStream.read(
-            reinterpret_cast<char*>(rawTransform),
-            16 * sizeof(GLfloat)
-        );
+        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
         transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         glm::mat4x4 animationTransform;
         GLfloat rawAnimTransform[16];
-        fileStream.read(
-            reinterpret_cast<char*>(&rawAnimTransform),
-            16 * sizeof(GLfloat)
-        );
+        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
         animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
@@ -346,7 +336,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::vector<int> childrenArray;
         nodeArray.reserve(nChildren);
         for (int32_t c = 0; c < nChildren; ++c) {
-            int child;
+            int32_t child;
             fileStream.read(reinterpret_cast<char*>(&child), sizeof(int32_t));
             childrenArray.push_back(child);
         }
@@ -354,7 +344,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // HasAnimation
         uint8_t a;
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
-        bool hasAnimation = a == 1;
+        bool hasAnimation = (a == 1);
 
         // Create Node
         io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
@@ -377,7 +367,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         uint8_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(uint8_t));
         std::string name;
-        fileStream.read(reinterpret_cast<char*>(name.data()), nameSize * sizeof(char));
+        fileStream.read(name.data(), nameSize);
 
         // Duration
         double duration;
@@ -415,11 +405,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                float posX, posY, posZ;
-                fileStream.read(reinterpret_cast<char*>(&posX), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&posY), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&posZ), sizeof(float));
-                posKeyframe.position = glm::vec3(posX, posY, posZ);
+                glm::vec3 pos;
+                fileStream.read(reinterpret_cast<char*>(&pos.x), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&pos.y), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&pos.z), sizeof(float));
+                posKeyframe.position = pos;
 
                 // Time
                 double time;
@@ -436,7 +426,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             for (uint8_t p = 0; p < nRot; ++p) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
-                // Rotition
+                // Rotation
                 float rotW, rotX, rotY, rotZ;
                 fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
@@ -459,12 +449,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             for (uint8_t p = 0; p < nScale; ++p) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
-                // Scaleition
-                float scaleX, scaleY, scaleZ;
-                fileStream.read(reinterpret_cast<char*>(&scaleX), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scaleY), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scaleZ), sizeof(float));
-                scaleKeyframe.scale = glm::vec3(scaleX, scaleY, scaleZ);
+                // Scale
+                glm::vec3 scale;
+                fileStream.read(reinterpret_cast<char*>(&scale.x), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&scale.y), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&scale.z), sizeof(float));
+                scaleKeyframe.scale = scale;
 
                 // Time
                 double time;
@@ -537,14 +527,13 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
         );
 
         // format
-        std::string format =
-            formatToString(_textureStorage[te].texture->format());
+        std::string format = formatToString(_textureStorage[te].texture->format());
         fileStream.write(format.data(), FormatStringSize * sizeof(char));
 
         // internal format
         uint32_t internalFormat = static_cast<uint32_t>(
             _textureStorage[te].texture->internalFormat()
-            );
+        );
         fileStream.write(
             reinterpret_cast<const char*>(&internalFormat),
             sizeof(uint32_t)
@@ -557,7 +546,9 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
 
         // data
         _textureStorage[te].texture->downloadTexture();
-        int32_t pixelSize = static_cast<int32_t>(_textureStorage[te].texture->expectedPixelDataSize());
+        int32_t pixelSize = static_cast<int32_t>(
+            _textureStorage[te].texture->expectedPixelDataSize()
+        );
         if (pixelSize == 0) {
             throw ModelCacheException(cachedFile, "No texture size was loaded");
         }
@@ -646,9 +637,9 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
 
                 // texture
                 if (mesh.textures()[t].hasTexture) {
-                    // Search the textureStorage to find which entry this texture points to
+                    // Search the textureStorage to find the texture entry
                     bool wasFound = false;
-                    for (int te = 0; te < _textureStorage.size(); ++te) {
+                    for (size_t te = 0; te < _textureStorage.size(); ++te) {
                         if (_textureStorage[te].name ==
                             mesh.textures()[t].texture->name())
                         {
@@ -674,10 +665,7 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
 
         // Transform
         glm::mat4x4 transform = node.transform();
-        fileStream.write(
-            reinterpret_cast<const char*>(&transform),
-            16 * sizeof(GLfloat)
-        );
+        fileStream.write(reinterpret_cast<const char*>(&transform), 16 * sizeof(GLfloat));
 
         // AnimationTransform
         glm::mat4x4 animationTransform = node.animationTransform();
@@ -688,21 +676,15 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
 
         // Parent
         int32_t parent = static_cast<int32_t>(node.parent());
-        fileStream.write(
-            reinterpret_cast<const char*>(&parent),
-            sizeof(int32_t)
-        );
+        fileStream.write(reinterpret_cast<const char*>(&parent), sizeof(int32_t));
 
         // Write how many children are to be written
         int32_t nChildren = static_cast<int32_t>(node.children().size());
         fileStream.write(reinterpret_cast<const char*>(&nChildren), sizeof(int32_t));
 
         // Children
-        for (const int& child : node.children()) {
-            fileStream.write(
-                reinterpret_cast<const char*>(&child),
-                sizeof(int32_t)
-            );
+        for (int32_t child : node.children()) {
+            fileStream.write(reinterpret_cast<const char*>(&child), sizeof(int32_t));
         }
 
         // HasAnimation
@@ -732,11 +714,11 @@ bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
         fileStream.write(reinterpret_cast<const char*>(&timeScale), sizeof(float));
 
         // Write how many NodeAnimations are to be written
-        int32_t nNodeAnimations = static_cast<int32_t>(_animation->nodeAnimations().size());
-        if (nNodeAnimations == 0) {
+        int32_t nAnimations = static_cast<int32_t>(_animation->nodeAnimations().size());
+        if (nAnimations == 0) {
             throw ModelCacheException(cachedFile, "No node animations were loaded");
         }
-        fileStream.write(reinterpret_cast<const char*>(&nNodeAnimations), sizeof(int32_t));
+        fileStream.write(reinterpret_cast<const char*>(&nAnimations), sizeof(int32_t));
 
         // NodeAnimations
         for (const io::ModelAnimation::NodeAnimation& nodeAnimation :

@@ -106,7 +106,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
     }
 
     // Transform mesh
-    program.setUniform("meshTransform", glm::mat4(meshTransform));
+    program.setUniform("meshTransform", meshTransform);
     glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
     program.setUniform("meshNormalTransform", glm::mat4(normalTransform));
 
@@ -127,17 +127,14 @@ float ModelMesh::calculateBoundingRadius(glm::mat4x4& transform) const {
     float maximumDistanceSquared = 0.f;
     for (const Vertex& v : _vertices) {
         // Apply the transform to the vertex to get its final position
-        glm::vec4 position(
-            v.position[0],
-            v.position[1],
-            v.position[2],
-            1.f
-        );
+        glm::vec4 position(v.position[0], v.position[1], v.position[2], 1.f);
         position = transform * position;
 
-        float d = glm::pow(position.x, 2.f) +
+        const float d = glm::pow(
+            position.x, 2.f) +
             glm::pow(position.y, 2.f) +
-            glm::pow(position.z, 2.f);
+            glm::pow(position.z, 2.f
+        );
 
         maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
     }
@@ -245,9 +242,7 @@ void ModelMesh::initialize() {
 
         if (texture.hasTexture) {
             texture.texture->uploadTexture();
-            texture.texture->setFilter(
-                opengl::Texture::FilterMode::AnisotropicMipMap
-            );
+            texture.texture->setFilter(opengl::Texture::FilterMode::AnisotropicMipMap);
             texture.texture->purgeFromRAM();
         }
     }
@@ -263,10 +258,10 @@ void ModelMesh::initialize() {
 
 void ModelMesh::deinitialize() {
     glDeleteBuffers(1, &_vbo);
-    glDeleteVertexArrays(1, &_vaoID);
-    glDeleteBuffers(1, &_ibo);
     _vbo = 0;
+    glDeleteVertexArrays(1, &_vaoID);
     _vaoID = 0;
+    glDeleteBuffers(1, &_ibo);
     _ibo = 0;
 }
 
