@@ -57,8 +57,9 @@ ModelReader& ModelReader::ref() {
 }
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
-                        std::string& filename, ForceRenderInvisible forceRenderInvisible,
-                                           NotifyInvisibleDropped notifyInvisibleDropped)
+                                                              const std::string& filename,
+                                                ForceRenderInvisible forceRenderInvisible,
+                                            NotifyInvisibleDropped notifyInvisibleDropped)
 {
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");

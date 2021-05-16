@@ -161,7 +161,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                 );
 
                 textureEntry.texture = TextureReader::ref().loadTexture(
-                    absPath(absolutePath)
+                    absPath(absolutePath).string()
                 );
                 meshTexture.texture = textureEntry.texture.get();
                 meshTexture.texture->setName(path.C_Str());
@@ -630,7 +630,7 @@ static void processNode(const aiNode& node, const aiScene& scene,
 }
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
-                                                                    std::string& filename,
+                                                              const std::string& filename,
                                                                 bool forceRenderInvisible,
                                                         bool notifyInvisibleDropped) const
 {

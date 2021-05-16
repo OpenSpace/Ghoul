@@ -56,11 +56,11 @@ namespace {
     constexpr const char* _loggerCat = "FileSystem";
 } // namespace
 
-std::string absPath(std::string path) {
+std::filesystem::path absPath(std::string path) {
     ghoul_assert(!path.empty(), "Path must not be empty");
     std::filesystem::path expanded = FileSys.expandPathTokens(std::move(path));
     std::filesystem::path absolute = std::filesystem::absolute(std::move(expanded));
-    return absolute.string();
+    return absolute;
 }
 
 namespace ghoul::filesystem {

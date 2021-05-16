@@ -304,6 +304,6 @@ private:
  *
  * \pre \p path must not be empty
  */
-std::string absPath(std::string path);
+std::filesystem::path absPath(std::string path);
 
 #endif // __GHOUL___FILESYSTEM___H__

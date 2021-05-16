@@ -83,7 +83,7 @@ public:
      * \pre At least one ModelReaderBase must have been added to the ModelReader
      *      before (addReader)
      */
-    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(std::string& filename,
+    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename,
         ForceRenderInvisible forceRenderInvisible = ForceRenderInvisible::No,
         NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes);
 

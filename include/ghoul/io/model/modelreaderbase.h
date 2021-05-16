@@ -72,7 +72,7 @@ public:
      * \throw ModelLoadException If there was an error loading the model from disk
      */
     virtual std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
-        std::string& filename, bool forceRenderInvisible = false,
+        const std::string& filename, bool forceRenderInvisible = false,
         bool notifyInvisibleDropped = true) const = 0;
 
     /**

@@ -43,8 +43,8 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     using ghoul::filesystem::FileSystem;
 
     const char* cpath = "${TEMPORARY}/tmpfil.txt";
-    std::string path = absPath(cpath);
-    std::ofstream f;
+    std::filesystem::path path = absPath(cpath);
+    std::ofstream f(path);
     f.open(path);
     f << "tmp";
     f.close();
