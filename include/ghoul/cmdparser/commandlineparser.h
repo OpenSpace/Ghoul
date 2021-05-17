@@ -42,14 +42,6 @@ public:
     BooleanType(DisplayHelpText);
 
     /**
-     * The exception that is thrown in the CommandlineParser::execute method when an
-     * error occurs.
-     */
-    struct CommandlineException : public RuntimeError {
-        explicit CommandlineException(const std::string& msg);
-    };
-
-    /**
      * Default constructor.
      *
      * \param programName The name of the program. Used in the #displayUsage and
@@ -219,13 +211,12 @@ public:
     std::string usageInformationForNamelessCommand() const;
 
     /**
-     * Print the full help test to the provided \p stream. It consists of the usage
-     * information (#displayUsage) followed by the help text for each CommandlineCommand
-     * (CommandlineCommand::help).
+     * Return the full help text. It consists of the usage information (#displayUsage)
+     * followed by the help text for each CommandlineCommand (CommandlineCommand::help).
      *
-     * \param stream The stream to which the help information is printed
+     * \return The help information
      */
-    void displayHelp(std::ostream& stream) const;
+    std::string helpText() const;
 
 protected:
     /** Returns the CommandlineCommand with a specific CommandlineCommand::shortName or

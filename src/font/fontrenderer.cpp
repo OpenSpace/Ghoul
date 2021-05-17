@@ -198,7 +198,6 @@ namespace {
         view = view.substr(p + 1);
         return res;
     }
-
 } // namespace
 
 namespace ghoul::fontrendering {
@@ -237,7 +236,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
         LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
+        LDEBUG(fmt::format("Writing default vertex shader to {}", vsPath));
         std::ofstream file(vsPath);
         file << DefaultVertexShaderSource;
     }
@@ -247,7 +246,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
         LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", fsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
+        LDEBUG(fmt::format("Writing default fragment shader to {}", fsPath));
         std::ofstream file(fsPath);
         file << DefaultFragmentShaderSource;
     }
@@ -280,7 +279,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
         LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
+        LDEBUG(fmt::format("Writing default vertex shader to {}", vsPath));
         std::ofstream file(vsPath);
         file << ProjectionVertexShaderSource;
     }
@@ -290,32 +289,34 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
         LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
+        LDEBUG(fmt::format("Writing default fragment shader to {}", fsPath));
         std::ofstream file(fsPath);
         file << ProjectionFragmentShaderSource;
     }
     using namespace opengl;
-    std::unique_ptr<ProgramObject> prog = std::make_unique<ProgramObject>(
-        "ProjectionFont"
-    );
-    prog->attachObject(
+    std::unique_ptr<ProgramObject> pg = std::make_unique<ProgramObject>("ProjectionFont");
+    pg->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
     );
-    prog->attachObject(
+    pg->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Fragment, fsPath)
     );
 
     LDEBUG("Compile projection font shader");
-    prog->compileShaderObjects();
+    pg->compileShaderObjects();
 
     LDEBUG("Link projection font shader");
-    prog->linkProgramObject();
+    pg->linkProgramObject();
 
+    // Can't create a unique_ptr directly here as the FontRenderer is not private
     FontRenderer* fr = new FontRenderer;
-    fr->_program = std::move(prog);
+    fr->_program = std::move(pg);
 
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection,
-        UniformNamesProjection);
+    ghoul::opengl::updateUniformLocations(
+        *fr->_program,
+        fr->_uniformCacheProjection,
+        UniformNamesProjection
+    );
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
 
     return std::unique_ptr<FontRenderer>(fr);
@@ -491,7 +492,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         GL_FLOAT,
         GL_FALSE,
         sizeof(Vertex),
-        reinterpret_cast<const void*>(offsetof(Vertex, s)) // NOLINT
+        reinterpret_cast<const void*>(offsetof(Vertex, s))
     );
 
     glEnableVertexAttribArray(2);
@@ -501,7 +502,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         GL_FLOAT,
         GL_FALSE,
         sizeof(Vertex),
-        reinterpret_cast<const void*>(offsetof(Vertex, outlineS)) // NOLINT
+        reinterpret_cast<const void*>(offsetof(Vertex, outlineS))
     );
 
     glDrawElements(
@@ -585,21 +586,20 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             }
             else {
                 glm::dvec3 normal = glm::normalize(labelInfo.cameraPos - glm::dvec3(pos));
-                glm::vec3 newRight = glm::vec3(
-                    glm::cross(labelInfo.cameraLookUp, normal)
-                );
-                glm::vec3 newUp = glm::vec3(glm::cross(normal, glm::dvec3(newRight)));
+                glm::vec3 right = glm::vec3(glm::cross(labelInfo.cameraLookUp, normal));
+                glm::vec3 up = glm::vec3(glm::cross(normal, glm::dvec3(right)));
 
-                p0 = (x0 * newRight + y0 * newUp) * labelInfo.scale + pos;
-                p1 = (x0 * newRight + y1 * newUp) * labelInfo.scale + pos;
-                p2 = (x1 * newRight + y1 * newUp) * labelInfo.scale + pos;
-                p3 = (x1 * newRight + y0 * newUp) * labelInfo.scale + pos;
+                p0 = (x0 * right + y0 * up) * labelInfo.scale + pos;
+                p1 = (x0 * right + y1 * up) * labelInfo.scale + pos;
+                p2 = (x1 * right + y1 * up) * labelInfo.scale + pos;
+                p3 = (x1 * right + y0 * up) * labelInfo.scale + pos;
             }
 
 
-            glm::vec4 projPos[2];
-            projPos[0] = glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p0, 1.0));
-            projPos[1] = glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p1, 1.0));
+            glm::vec4 projPos[2] = {
+                glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p0, 1.0)),
+                glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p1, 1.0))
+            };
             glm::vec4 topLeft =
                 (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
                 glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
@@ -609,7 +609,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
             // The billboard is bigger than the maximum size allowed:
             heightInPixels =
-                std::equal_to<>()(heightInPixels, 0.0) ?
+                heightInPixels == 0.0 ?
                 glm::length(topLeft - bottomLeft) :
                 heightInPixels;
 
@@ -725,14 +725,22 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE,
-        7 * sizeof(float), reinterpret_cast<const void*>(3 * sizeof(float))
+        1,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        7 * sizeof(float),
+        reinterpret_cast<const void*>(3 * sizeof(float))
     );
 
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE,
-        7 * sizeof(float), reinterpret_cast<const void*>(5 * sizeof(float))
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        7 * sizeof(float),
+        reinterpret_cast<const void*>(5 * sizeof(float))
     );
 
     glDrawElements(

@@ -29,8 +29,9 @@
 #include <ghoul/glm.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-#include <map>
+#include <filesystem>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace ghoul::opengl {
@@ -56,29 +57,6 @@ namespace ghoul::fontrendering {
 class Font {
 public:
     BooleanType(Outline);
-
-    /// Superclass for all font-related exceptions that this class throws
-    struct FontException : public RuntimeError {
-        explicit FontException(std::string msg);
-    };
-
-    /// The exception that gets thrown when a FreeType-specific error occurs
-    struct FreeTypeException : public FontException {
-        explicit FreeTypeException(std::string name, float size, int code,
-            std::string msg);
-
-        /// The name of the font for which the FreeType error occurred
-        const std::string fontName;
-
-        /// The size of the font for which the FreeType error occurred
-        const float fontSize;
-
-        /// The FreeType error code that occurred
-        const int errorCode;
-
-        /// The FreeType error message that occurred
-        const std::string errorMessage;
-    };
 
     /**
      * This class contains the metrics and the texture locations in the TextureAtlas for a
@@ -146,7 +124,7 @@ public:
 
     private:
         /// A vector of kerning pairs relative to this glyph
-        std::map<wchar_t, float> _kerning;
+        std::unordered_map<wchar_t, float> _kerning;
     };
 
     /**
@@ -163,11 +141,11 @@ public:
      * \param outlineThickness The thickness of the outline. This setting is ignored if
      *        the Font does not have an outline
      *
-     * \throw FreeTypeException If there was an error loading the basic font information
+     * \throw RuntimeError If there was an error loading the basic font information
      * \pre \p filename must not be empty
      * \pre \p pointSize must be positive and bigger than 0
      */
-    Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
+    Font(std::filesystem::path filename, float pointSize, opengl::TextureAtlas& atlas,
          Outline hasOutline = Outline::Yes, float outlineThickness = 1.f
     );
 
@@ -176,7 +154,7 @@ public:
      *
      * \return The name of the Font
      */
-    const std::string& name() const;
+    const std::filesystem::path& name() const;
 
     /**
      * Returns the font size of this Font.
@@ -219,7 +197,7 @@ public:
      * \param character The character for which the Glyph should be returned
      * \return A pointer to the Glyph
      *
-     * \throw FreeTypeException If a FreeType exception occurred while loading the glyph
+     * \throw RuntimeError If a FreeType exception occurred while loading the glyph
      * \throw GlyphException If there was an error loading the glyph
      */
     const Glyph* glyph(wchar_t character);
@@ -231,7 +209,7 @@ public:
      * \param characters A list of characters for which Glyphs should be created and
      *        cached
      *
-     * \throw FreeTypeException If a FreeType exception occurred while loading the glyphs
+     * \throw RuntimeError If a FreeType exception occurred while loading the glyphs
      * \throw GlyphException If there was an error loading the glyph
      */
     void loadGlyphs(std::vector<wchar_t> characters);
@@ -256,7 +234,7 @@ private:
     opengl::TextureAtlas& _atlas;
 
     /// The file name of this Font
-    const std::string _name;
+    const std::filesystem::path _name;
 
     /// The font size in pt
     const float _pointSize;

@@ -43,7 +43,7 @@ namespace {
     constexpr const int DPI = 96;
 
     void handleError(FT_Error error, FT_Library library, FT_Face face, FT_Stroker stroker,
-                     const std::string& name, float size)
+                     const std::filesystem::path& name, float size)
     {
         if (!error) {
             return;
@@ -60,19 +60,25 @@ namespace {
         }
         using namespace ghoul;
         fontrendering::Error e = fontrendering::error(error);
-        throw fontrendering::Font::FreeTypeException(name, size, e.code, e.message);
+        throw RuntimeError(
+            fmt::format(
+                "Error loading font {} for size {}: {} {}", name, size, e.code, e.message
+            ),
+            "Font"
+        );
     }
 
     // Initializes the passed 'library' and loads the font face specified by the 'name'
     // and 'size' into the provided 'face'
-    void loadFace(const std::string& name, float size, FT_Library& library, FT_Face& face)
+    void loadFace(const std::filesystem::path& name, float size, FT_Library& library,
+                  FT_Face& face)
     {
         ZoneScoped
 
         const FT_Error e1 = FT_Init_FreeType(&library);
         handleError(e1, nullptr, nullptr, nullptr, name, size);
 
-        const FT_Error e2 = FT_New_Face(library, name.c_str(), 0, &face);
+        const FT_Error e2 = FT_New_Face(library, name.string().c_str(), 0, &face);
         handleError(e2, library, nullptr, nullptr, name, size);
 
         const FT_Error e3 = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -102,21 +108,6 @@ namespace {
 
 namespace ghoul::fontrendering {
 
-Font::FontException::FontException(std::string msg)
-    : RuntimeError(std::move(msg), "Font")
-{}
-
-Font::FreeTypeException::FreeTypeException(std::string name, float size, int code,
-                                           std::string msg)
-    : FontException(fmt::format(
-        "Error loading font '{}' for size '{}': ({}) {}", name, size, code, msg
-    ))
-    , fontName(std::move(name))
-    , fontSize(size)
-    , errorCode(code)
-    , errorMessage(std::move(msg))
-{}
-
 Font::Glyph::Glyph(wchar_t character_, int width_, int height_, float leftBearing_,
                    float topBearing_, float advanceX_, float advanceY_,
                    glm::vec2 texCoordTopLeft_, glm::vec2 texCoordBottomRight_,
@@ -144,7 +135,7 @@ float Font::Glyph::kerning(wchar_t character) const {
     return it != _kerning.cend() ? it->second : 0.f;
 }
 
-Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
+Font::Font(std::filesystem::path filename, float pointSize, opengl::TextureAtlas& atlas,
            Outline hasOutline, float outlineThickness)
     : _atlas(atlas)
     , _name(std::move(filename))
@@ -175,7 +166,7 @@ Font::Font(std::string filename, float pointSize, opengl::TextureAtlas& atlas,
     glyph(static_cast<wchar_t>(-1));
 }
 
-const std::string& Font::name() const {
+const std::filesystem::path& Font::name() const {
     return _name;
 }
 
@@ -239,7 +230,7 @@ const Font::Glyph* Font::glyph(wchar_t character) {
         _atlas.setRegionData(handle, data.data());
 
         Glyph glyph(static_cast<wchar_t>(-1));
-        ghoul::opengl::TextureAtlas::TextureCoordinatesResult coords =
+        opengl::TextureAtlas::TextureCoordinatesResult coords =
             _atlas.textureCoordinates(handle);
         glyph.topLeft = coords.topLeft;
         glyph.bottomRight = coords.bottomRight;
@@ -257,7 +248,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
     ZoneScoped
     TracyGpuZone("loadGlyph")
 
-    unsigned int atlasDepth  = _atlas.size().z;
+    const unsigned int atlasDepth  = _atlas.size().z;
 
     FT_Library library = nullptr;
     FT_Face face = nullptr;
@@ -315,18 +306,18 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         handleError(error, library, face, nullptr, _name, _pointSize);
 
         // In case the font has an outline, we load it first as we need the size of the
-        // outline for loading the base layer
-        // The reason for this is that the outline is slightly bigger than the base layer
-        // for most Glyphs. Therefore, if the Font has an outline, we need to increase the
-        // size of the base to match the outline so that they can be rendered on top of
-        // each other
+        // outline for loading the base layer. The reason for this is that the outline is
+        // slightly bigger than the base layer for most Glyphs. Therefore, if the Font has
+        // an outline, we need to increase the size of the base to match the outline so
+        // that they can be rendered on top of each other
         if (_hasOutline) {
             ZoneScopedN("Outline")
             FT_Stroker stroker;
             const FT_Error e1 = FT_Stroker_New(library, &stroker);
             handleError(e1, library, face, stroker, _name, _pointSize);
 
-            FT_Stroker_Set(stroker,
+            FT_Stroker_Set(
+                stroker,
                 static_cast<int>(_outlineThickness * PointConversionFactor),
                 FT_STROKER_LINECAP_ROUND,
                 FT_STROKER_LINEJOIN_ROUND,
@@ -416,10 +407,8 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
                     const int l = j - heightOffset;
 
                     const bool inBorder =
-                        (k < 0) ||
-                        (k >= static_cast<int>(insideBitmap->bitmap.width)) ||
-                        (l < 0) ||
-                        (l >= static_cast<int>(insideBitmap->bitmap.rows));
+                        (k < 0) || (k >= static_cast<int>(insideBitmap->bitmap.width)) ||
+                        (l < 0) || (l >= static_cast<int>(insideBitmap->bitmap.rows));
 
                     if (!inBorder) {
                         buffer[(i + j*width)] =
@@ -472,7 +461,6 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
 void Font::generateKerning() {
     FT_Library library;
     FT_Face face;
-
     loadFace(_name, _pointSize, library, face);
 
     const bool hasKerning = FT_HAS_KERNING(face);

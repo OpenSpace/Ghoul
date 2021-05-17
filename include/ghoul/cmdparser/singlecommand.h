@@ -145,8 +145,8 @@ protected:
 
 /**
  * This class represents a command that can occur only once in a given commandline and has
- * 3 arguments of respective types \p T, \p U, and \p V. The template classes \p T,
- * \p U, and \p V must be convertable using an <code>std::stringstream</code>.
+ * 3 arguments of respective types \p T, \p U, and \p V. The template classes \p T, \p U,
+ * and \p V must be convertable using an <code>std::stringstream</code>.
  *
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
@@ -208,8 +208,7 @@ protected:
  * This class represents a command that can occur only once in a given commandline and
  * has 4 arguments of respective types \p T, \p U, \p V, and \p U. The command tries to
  * convert the parameters to the appropriate types and stores them. The template classes
- * \p T, \p U, \p V, and \p U must be convertable using an
- * <code>std::stringstream</code>.
+ * \p T, \p U, \p V, and \p U must be convertable using an <code>std::stringstream</code>.
  *
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type

@@ -54,14 +54,6 @@ namespace {
 
 namespace ghoul::fontrendering {
 
-FontManager::FontRegistrationException::FontRegistrationException(std::string msg)
-    : RuntimeError(std::move(msg), "FontManager")
-{}
-
-FontManager::FontAccessException::FontAccessException(std::string msg)
-    : RuntimeError(std::move(msg), "FontManager")
-{}
-
 FontManager::FontManager(glm::ivec3 atlasDimensions)
     : _textureAtlas(std::move(atlasDimensions))
 {}
@@ -80,22 +72,24 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
     ghoul_assert(!fontName.empty(), "Fontname must not be empty");
     ghoul_assert(!filePath.empty(), "Filepath must not be empty");
 
-    unsigned int hash = hashCRC32(fontName);
+    const unsigned int hash = hashCRC32(fontName);
     const auto it = _fontPaths.find(hash);
     if (it != _fontPaths.cend()) {
-        const std::string& registeredPath = it->second;
+        const std::filesystem::path& registeredPath = it->second;
 
-        if (registeredPath == filePath) {
-            return hash;
+        if (registeredPath != filePath) {
+            throw RuntimeError(
+                fmt::format(
+                    "Font '{}' was registered with path {} before, trying '{}' now",
+                    fontName, registeredPath, filePath
+                ),
+                "FontManager"
+            );
         }
-        else {
-            throw FontRegistrationException(fmt::format(
-                "Font '{}' was registered with path '{}' before, trying '{}' now",
-                fontName, registeredPath, filePath
-            ));
-        }
+
+        return hash;
     }
-    _fontPaths[hash] = filePath.string();
+    _fontPaths[hash] = filePath;
     return hash;
 }
 
@@ -114,9 +108,10 @@ std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
         }
         else {
             // The name has not neen previously registered and it is not a valid path
-            throw FontAccessException(fmt::format(
-                "Name '{}' does not name a valid font or file", name
-            ));
+            throw RuntimeError(
+                fmt::format("Name '{}' is not a valid font or file", name),
+                "FontManager"
+            );
         }
     }
 
@@ -130,11 +125,15 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
 
     const auto itPath = _fontPaths.find(hashName);
     if (itPath == _fontPaths.cend()) {
-        throw FontAccessException(fmt::format(
-            "Error retrieving font with hash '{}' for size '{}'", hashName, fontSize
-        ));
+        throw RuntimeError(
+            fmt::format(
+                "Error retrieving font with hash '{}' for size '{}'", hashName, fontSize
+            ),
+            "FontManager"
+        );
     }
 
+    // First check if we already have a font of the correct size created
     auto fonts = _fonts.equal_range(hashName);
     for (auto it = fonts.first; it != fonts.second; ++it) {
         const float delta = 1e-6f; // Font sizes are 1-1000, so a delta of 1/e6 is fine
@@ -145,11 +144,12 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
         }
     }
 
+    // If we get this far, it's a new font that has to be created
     std::shared_ptr<Font> f = std::make_shared<Font>(
         _fontPaths[hashName],
         fontSize,
         _textureAtlas,
-        withOutline ? Font::Outline::Yes : Font::Outline::No
+        Font::Outline(withOutline)
     );
 
     if (loadGlyphs) {

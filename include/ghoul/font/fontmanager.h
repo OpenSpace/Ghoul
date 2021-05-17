@@ -31,9 +31,9 @@
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <filesystem>
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace ghoul::fontrendering {
@@ -52,15 +52,6 @@ class FontManager {
 public:
     BooleanType(Outline);
     BooleanType(LoadGlyphs);
-
-    /// This exception is thrown if registering a Font fails
-    struct FontRegistrationException : public RuntimeError {
-        explicit FontRegistrationException(std::string msg);
-    };
-
-    struct FontAccessException : public RuntimeError {
-        explicit FontAccessException(std::string msg);
-    };
 
     /**
      * The constructor that initializes the TextureAtlas. This means that this constructor
@@ -157,7 +148,7 @@ private:
     std::multimap<unsigned int, std::shared_ptr<Font>> _fonts;
 
     /// The map that correlates the hashed names with the file paths for the fonts
-    std::map<unsigned int, std::string> _fontPaths;
+    std::unordered_map<unsigned int, std::filesystem::path> _fontPaths;
 };
 
 } // namespace ghoul::fontrendering
