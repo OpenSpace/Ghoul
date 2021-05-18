@@ -25,16 +25,9 @@
 
 #include <ghoul/font/fontmanager.h>
 
-#include <ghoul/fmt.h>
-#include <ghoul/filesystem/file.h>
-#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/font/font.h>
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
 #include <ghoul/misc/profiling.h>
-#include <ghoul/opengl/texture.h>
-#include <filesystem>
 
 namespace {
     /// The default set of glyphs that are loaded when a new Font is initialized

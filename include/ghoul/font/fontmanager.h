@@ -29,12 +29,10 @@
 #include <ghoul/glm.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 namespace ghoul::fontrendering {
 

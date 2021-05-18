@@ -205,29 +205,114 @@ namespace ghoul::fontrendering {
 std::unique_ptr<FontRenderer> FontRenderer::_defaultRenderer = nullptr;
 std::unique_ptr<FontRenderer> FontRenderer::_defaultProjectionRenderer = nullptr;
 
-FontRenderer::FontRenderer() {
-    glGenVertexArrays(1, &_vao);
-    glGenBuffers(1, &_vbo);
-    glGenBuffers(1, &_ibo);
-
-    _vertexBuffer.reserve(128 * 4);
-    _indexBuffer.reserve(128 * 4);
-}
-
 FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
                            glm::vec2 framebufferSize)
-    : FontRenderer()
+    : _program(std::move(program))
+    , _framebufferSize(std::move(framebufferSize))
 {
-    ghoul_assert(program != nullptr, "No program provided");
+    ghoul_assert(_program, "No program provided");
 
-    _program = std::move(program);
-    setFramebufferSize(std::move(framebufferSize));
+        //
+    // Configure the OpenGL objects for the orthogonal font rendering
+    glGenVertexArrays(1, &_orthogonal.vao);
+    glBindVertexArray(_orthogonal.vao);
+
+    glGenBuffers(1, &_orthogonal.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _orthogonal.vbo);
+
+    struct OrthogonalVertex {
+        float x;
+        float y;
+        float s;
+        float t;
+        float outlineS;
+        float outlineT;
+    };
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(OrthogonalVertex), nullptr);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(
+        1,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(OrthogonalVertex),
+        reinterpret_cast<const void*>(offsetof(OrthogonalVertex, s))
+    );
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(OrthogonalVertex),
+        reinterpret_cast<const void*>(offsetof(OrthogonalVertex, outlineS))
+    );
+
+    glGenBuffers(1, &_orthogonal.ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _orthogonal.ibo);
+
+
+    //
+    // Configure the OpenGL objects for the projective font rendering
+    glGenVertexArrays(1, &_perspective.vao);
+    glBindVertexArray(_perspective.vao);
+
+    glGenBuffers(1, &_perspective.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _perspective.vbo);
+
+    struct PerspectiveVertex {
+        float x;
+        float y;
+        float z;
+        float s;
+        float t;
+        float outlineS;
+        float outlineT;
+    };
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PerspectiveVertex), nullptr);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(
+        1,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        7 * sizeof(float),
+        reinterpret_cast<const void*>(offsetof(PerspectiveVertex, s))
+    );
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        7 * sizeof(float),
+        reinterpret_cast<const void*>(offsetof(PerspectiveVertex, outlineS))
+    );
+
+    glGenBuffers(1, &_perspective.ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _perspective.ibo);
+    glBindVertexArray(0);
+
+    _vertexBuffer.reserve(128 * 10);
+    _indexBuffer.reserve(128 * 10);
 }
 
 FontRenderer::~FontRenderer() {
-    glDeleteVertexArrays(1, &_vao);
-    glDeleteBuffers(1, &_vbo);
-    glDeleteBuffers(1, &_ibo);
+    glDeleteVertexArrays(1, &_orthogonal.vao);
+    glDeleteBuffers(1, &_orthogonal.vbo);
+    glDeleteBuffers(1, &_orthogonal.ibo);
+
+    glDeleteVertexArrays(1, &_perspective.vao);
+    glDeleteBuffers(1, &_perspective.vbo);
+    glDeleteBuffers(1, &_perspective.ibo);
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
@@ -265,12 +350,12 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     LDEBUG("Link default font shader");
     program->linkProgramObject();
 
-    FontRenderer* fr = new FontRenderer;
-    fr->_program = std::move(program);
-
+    std::unique_ptr<FontRenderer> fr = std::make_unique<FontRenderer>(
+        std::move(program),
+        glm::vec2(0.f)
+    );
     ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache, UniformNames);
-
-    return std::unique_ptr<FontRenderer>(fr);
+    return fr;
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
@@ -309,8 +394,10 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     pg->linkProgramObject();
 
     // Can't create a unique_ptr directly here as the FontRenderer is not private
-    FontRenderer* fr = new FontRenderer;
-    fr->_program = std::move(pg);
+    std::unique_ptr<FontRenderer> fr = std::make_unique<FontRenderer>(
+        std::move(pg),
+        glm::vec2(0.f)
+    );
 
     ghoul::opengl::updateUniformLocations(
         *fr->_program,
@@ -319,7 +406,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     );
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
 
-    return std::unique_ptr<FontRenderer>(fr);
+    return fr;
 }
 
 void FontRenderer::initialize() {
@@ -378,15 +465,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     _program->activate();
-
-    struct Vertex {
-        float x;
-        float y;
-        float s;
-        float t;
-        float outlineS;
-        float outlineT;
-    };
 
     _vertexBuffer.clear();
     _indexBuffer.clear();
@@ -464,9 +542,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         glm::ortho(0.f, _framebufferSize.x, 0.f, _framebufferSize.y)
     );
 
-    glBindVertexArray(_vao);
+    glBindVertexArray(_orthogonal.vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _orthogonal.vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
         _vertexBuffer.size() * sizeof(float),
@@ -474,35 +552,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         GL_DYNAMIC_DRAW
     );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _orthogonal.ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         _indexBuffer.size() * sizeof(GLushort),
         _indexBuffer.data(),
         GL_DYNAMIC_DRAW
-    );
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(
-        1,
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(Vertex),
-        reinterpret_cast<const void*>(offsetof(Vertex, s))
-    );
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(
-        2,
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(Vertex),
-        reinterpret_cast<const void*>(offsetof(Vertex, outlineS))
     );
 
     glDrawElements(
@@ -702,9 +757,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         labelInfo.disableTransmittance
     );
 
-    glBindVertexArray(_vao);
+    glBindVertexArray(_perspective.vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _perspective.vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
         _vertexBuffer.size() * sizeof(float),
@@ -712,35 +767,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         GL_DYNAMIC_DRAW
     );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _perspective.ibo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         _indexBuffer.size() * sizeof(GLushort),
         _indexBuffer.data(),
         GL_DYNAMIC_DRAW
-    );
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), nullptr);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(
-        1,
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        7 * sizeof(float),
-        reinterpret_cast<const void*>(3 * sizeof(float))
-    );
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(
-        2,
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        7 * sizeof(float),
-        reinterpret_cast<const void*>(5 * sizeof(float))
     );
 
     glDrawElements(
@@ -751,8 +783,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     );
 
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     if (!labelInfo.enableDepth) {
         glEnable(GL_DEPTH_TEST);
     }
