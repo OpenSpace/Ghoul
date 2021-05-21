@@ -28,10 +28,12 @@
 #include <ghoul/filesystem/filesystem.h>
 
 #include <ghoul/filesystem/file.h>
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <CoreServices/CoreServices.h>
 
 namespace {
+    constexpr const char* _loggerCat = "FileSystem";
     // the maximum latency allowed before a changed is registered
     constexpr const CFAbsoluteTime Latency = 1.0;
 
@@ -163,6 +165,7 @@ int FileSystem::addFileListener(std::filesystem::path path,
         }
     }
 
+    int idx = FileChangeInfo::NextIdentifier;
     FileChangeInfo info;
     info.identifier = idx;
     info.path = std::move(path);
