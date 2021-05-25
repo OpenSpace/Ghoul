@@ -699,6 +699,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     );
 }
 
+
+bool ModelReaderAssimp::needsCache() const {
+    return true;
+}
+
 std::vector<std::string> ModelReaderAssimp::supportedExtensions() const {
     // Taken from https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
     // (An asterisk * indicates limited support)

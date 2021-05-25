@@ -53,6 +53,13 @@ public:
         bool notifyInvisibleDropped = true) const override;
 
     /**
+     * Returns if this reader needs a cache file or not.
+     *
+     * \return a boolean for if this reader needs a cache file or not
+     */
+    bool needsCache() const override;
+
+    /**
      * Returns a list of all extensions that this ModelReaderOSModel supports.
      *
      * \return A list of all extensions that this ModelReaderOSModel supports

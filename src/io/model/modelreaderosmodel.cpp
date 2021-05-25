@@ -488,6 +488,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
     }
 }
 
+bool ModelReaderOSModel::needsCache() const {
+    return false;
+}
+
 std::vector<std::string> ModelReaderOSModel::supportedExtensions() const {
     return {
         "osmodel" // Custom OpenSpace model format

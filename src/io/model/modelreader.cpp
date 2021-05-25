@@ -76,6 +76,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         filesystem::CacheManager::Persistent::Yes
     );
 
+    if (!reader->needsCache()) {
+        LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
+        return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
+    }
+
     bool hasCachedFile = FileSys.fileExists(cachedFile);
 
     if (hasCachedFile) {
