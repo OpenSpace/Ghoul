@@ -207,8 +207,8 @@ std::unique_ptr<FontRenderer> FontRenderer::_defaultProjectionRenderer = nullptr
 
 FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
                            glm::vec2 framebufferSize)
-    : _program(std::move(program))
-    , _framebufferSize(std::move(framebufferSize))
+    : _framebufferSize(std::move(framebufferSize))
+    , _program(std::move(program))
 {
     ghoul_assert(_program, "No program provided");
 
