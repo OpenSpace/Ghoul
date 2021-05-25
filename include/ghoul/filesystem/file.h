@@ -127,7 +127,7 @@ private:
      */
     FileChangedCallback _fileChangedCallback;
 
-    int _indx;
+    int _indx = -1;
 };
 
 } // namespace ghoul::filesystem

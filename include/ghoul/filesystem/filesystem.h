@@ -227,7 +227,7 @@ private:
 
     struct FileChangeInfo {
         static int NextIdentifier;
-        int identifier;
+        int identifier = -1;
         std::filesystem::path path;
         File::FileChangedCallback callback;
     };
