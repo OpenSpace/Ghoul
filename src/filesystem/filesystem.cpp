@@ -60,7 +60,7 @@ std::filesystem::path absPath(std::string path) {
     ghoul_assert(!path.empty(), "Path must not be empty");
     std::filesystem::path expanded = FileSys.expandPathTokens(std::move(path));
     std::filesystem::path absolute = std::filesystem::absolute(std::move(expanded));
-    return absolute;
+    return absolute.lexically_normal();
 }
 
 namespace ghoul::filesystem {
