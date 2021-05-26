@@ -89,7 +89,9 @@ namespace {
 namespace ghoul::io {
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
-    std::string& filename, bool forceRenderInvisible, bool notifyInvisibleDropped) const
+                                                              const std::string& filename,
+                                                                bool forceRenderInvisible,
+                                                        bool notifyInvisibleDropped) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
