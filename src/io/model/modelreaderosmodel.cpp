@@ -242,7 +242,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
             // IsInvisible
             uint8_t inv;
             fileStream.read(reinterpret_cast<char*>(&inv), sizeof(uint8_t));
-            bool isInvisible = inv == 1;
+            bool isInvisible = (inv == 1);
 
             // Textures
             int32_t nTextures = 0;
@@ -262,7 +262,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
                 // hasTexture
                 uint8_t h;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
-                texture.hasTexture = h == 1;
+                texture.hasTexture = (h == 1);
 
                 // color
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
@@ -315,19 +315,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
         // Transform
         glm::mat4x4 transform;
         GLfloat rawTransform[16];
-        fileStream.read(
-            reinterpret_cast<char*>(rawTransform),
-            16 * sizeof(GLfloat)
-        );
+        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
         transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         glm::mat4x4 animationTransform;
         GLfloat rawAnimTransform[16];
-        fileStream.read(
-            reinterpret_cast<char*>(&rawAnimTransform),
-            16 * sizeof(GLfloat)
-        );
+        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
         animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
@@ -350,7 +344,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
         // HasAnimation
         uint8_t a;
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
-        bool hasAnimation = a == 1;
+        bool hasAnimation = (a == 1);
 
         // Create Node
         io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
@@ -366,14 +360,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
     // Animation
     uint8_t anim;
     fileStream.read(reinterpret_cast<char*>(&anim), sizeof(uint8_t));
-    bool hasAnimation = anim == 1;
+    bool hasAnimation = (anim == 1);
 
     if (hasAnimation) {
         // Name
         uint8_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(uint8_t));
         std::string name;
-        fileStream.read(reinterpret_cast<char*>(name.data()), nameSize * sizeof(char));
+        fileStream.read(name.data(), nameSize);
 
         // Duration
         double duration;
@@ -411,11 +405,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                float posX, posY, posZ;
-                fileStream.read(reinterpret_cast<char*>(&posX), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&posY), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&posZ), sizeof(float));
-                posKeyframe.position = glm::vec3(posX, posY, posZ);
+                glm::vec3 pos;
+                fileStream.read(reinterpret_cast<char*>(&pos.x), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&pos.y), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&pos.z), sizeof(float));
+                posKeyframe.position = pos;
 
                 // Time
                 double time;
@@ -432,7 +426,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
             for (uint8_t p = 0; p < nRot; ++p) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
-                // Rotition
+                // Rotation
                 float rotW, rotX, rotY, rotZ;
                 fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
@@ -455,12 +449,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
             for (uint8_t p = 0; p < nScale; ++p) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
-                // Scaleition
-                float scaleX, scaleY, scaleZ;
-                fileStream.read(reinterpret_cast<char*>(&scaleX), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scaleY), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scaleZ), sizeof(float));
-                scaleKeyframe.scale = glm::vec3(scaleX, scaleY, scaleZ);
+                // Scale
+                glm::vec3 scale;
+                fileStream.read(reinterpret_cast<char*>(&scale.x), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&scale.y), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&scale.z), sizeof(float));
+                scaleKeyframe.scale = scale;
 
                 // Time
                 double time;
@@ -478,7 +472,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
             std::move(nodeArray),
             std::move(textureStorageArray),
             std::move(animation)
-            );
+        );
     }
     else {
         // Create the ModelGeometry
@@ -486,7 +480,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
             std::move(nodeArray),
             std::move(textureStorageArray),
             nullptr
-            );
+        );
     }
 }
 

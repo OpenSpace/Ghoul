@@ -258,7 +258,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             // IsInvisible
             uint8_t inv;
             fileStream.read(reinterpret_cast<char*>(&inv), sizeof(uint8_t));
-            bool isInvisible = inv == 1;
+            bool isInvisible = (inv == 1);
 
             // Textures
             int32_t nTextures = 0;
@@ -278,7 +278,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 // hasTexture
                 uint8_t h;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
-                texture.hasTexture = h == 1;
+                texture.hasTexture = (h == 1);
 
                 // color
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
@@ -375,7 +375,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     // Animation
     uint8_t anim;
     fileStream.read(reinterpret_cast<char*>(&anim), sizeof(uint8_t));
-    bool hasAnimation = anim == 1;
+    bool hasAnimation = (anim == 1);
 
     if (hasAnimation) {
         // Name
