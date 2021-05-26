@@ -31,6 +31,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
+#include <filesystem>
 
 namespace ghoul::io {
 
@@ -62,7 +63,10 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    const std::string& extension = ghoul::filesystem::File(filename).fileExtension();
+    std::string extension = std::filesystem::path(filename).extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     TextureReaderBase* reader = readerForExtension(extension);

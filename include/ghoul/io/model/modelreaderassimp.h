@@ -57,7 +57,7 @@ public:
      * from \p filename
      * \pre \p filename must not be empty
      */
-    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(std::string& filename,
+    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename,
         bool forceRenderInvisible = false,
         bool notifyInvisibleDropped = true) const override;
 

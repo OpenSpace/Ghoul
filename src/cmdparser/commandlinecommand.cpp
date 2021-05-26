@@ -81,14 +81,14 @@ CommandlineCommand::MultipleCalls CommandlineCommand::allowsMultipleCalls() cons
 std::string CommandlineCommand::usage() const {
     std::string result = "[";
     if (!shortName().empty()) {
-        result += "<" + shortName() + "|" + name() + ">";
+        result += fmt::format("<{}|{}>", shortName(), name());
     }
     else {
         result += name();
     }
 
     if (!parameterList().empty()) {
-        result += " " + parameterList();
+        result += fmt::format(" {}", parameterList());
     }
 
     result += "]";
@@ -98,10 +98,10 @@ std::string CommandlineCommand::usage() const {
 
 std::string CommandlineCommand::help() const {
     if (!shortName().empty()) {
-        return shortName() + "|" + name() + ": \t" + infoText();
+        return fmt::format("{}|{}:\t{}", shortName(), name(), infoText());
     }
     else {
-        return name() + ": \t" + infoText();
+        return fmt::format("{}:\t{}", name(), infoText());
     }
 }
 

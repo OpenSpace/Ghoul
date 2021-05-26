@@ -31,6 +31,7 @@
 #include <ghoul/io/texture/texturewriterbase.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
+#include <filesystem>
 
 using std::string;
 
@@ -50,8 +51,10 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
     ghoul_assert(!_writers.empty(), "No writers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    ghoul::filesystem::File file = ghoul::filesystem::File(filename);
-    const std::string& extension = file.fileExtension();
+    std::string extension = std::filesystem::path(filename).extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
     TextureWriterBase* writer = writerForExtension(extension);
@@ -60,7 +63,7 @@ void TextureWriter::saveTexture(const opengl::Texture& texture, const string& fi
     }
 
     // Make sure the directory for the file exists
-    FileSys.createDirectory(file.directoryName());
+    std::filesystem::create_directory(std::filesystem::path(filename).parent_path());
     writer->saveTexture(texture, filename);
 }
 

@@ -58,7 +58,7 @@ TEMPLATE_TEST_CASE("LuaConversion", "[luaconversion]", bool, char, signed char,
     ghoul::lua::push(state, val);
 
     const T value = ghoul::lua::value<T>(state);
-    REQUIRE(value == val);
+    REQUIRE(value == Approx(val));
 
     lua_close(state);
 }
@@ -228,11 +228,11 @@ TEMPLATE_TEST_CASE("LuaConversion Float Fuzz", "[luaconversion]", float, double,
         ghoul::lua::push(state, val);
 
         const T value = ghoul::lua::value<T>(state);
-        REQUIRE(value == val);
+        REQUIRE(value == Approx(val));
 
         if (typeid(T) == typeid(long double)) {
-            if (value != std::numeric_limits<long double>::infinity()) {
-                REQUIRE(value == val);
+            if (Approx(value) != std::numeric_limits<long double>::infinity()) {
+                REQUIRE(value == Approx(val));
             }
         }
         lua_pop(state, 1);

@@ -53,7 +53,7 @@ public:
     };
 
     struct Texture {
-        opengl::Texture* texture;
+        opengl::Texture* texture = nullptr;
         TextureType type;
         bool hasTexture = false;
         bool useForcedColor = false;

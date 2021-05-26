@@ -30,6 +30,7 @@
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <functional>
 #include <map>
 #include <set>
@@ -59,16 +60,16 @@ public:
     };
 
     struct IncludeError : public ShaderPreprocessorError {
-        explicit IncludeError(std::string f);
-        const std::string file;
+        explicit IncludeError(std::filesystem::path f);
+        const std::filesystem::path file;
     };
 
     ShaderPreprocessor(std::string shaderPath = "", Dictionary dictionary = Dictionary());
 
-    const std::string& filename() const;
+    const std::filesystem::path& filename() const;
     const Dictionary& dictionary() const;
     void setDictionary(Dictionary dictionary);
-    void setFilename(const std::string& shaderPath);
+    void setFilename(std::filesystem::path shaderPath);
     void setCallback(ShaderChangedCallback changeCallback);
     void process(std::string& output);
     std::string getFileIdentifiersString() const;
@@ -85,7 +86,7 @@ public:
      * \pre \p folderPath must be an existing directory
      * \pre \p folderPath must be a path without FileSystem tokens
      */
-    static void addIncludePath(std::string folderPath);
+    static void addIncludePath(std::filesystem::path folderPath);
 
 private:
     struct Input {
@@ -128,7 +129,7 @@ private:
     // pre path not empty
     // pre path must not contain path tokens
     // throws std::ios_base::failure if error opening file
-    void includeFile(const std::string& path, TrackChanges trackChanges,
+    void includeFile(const std::filesystem::path& path, TrackChanges trackChanges,
         ShaderPreprocessor::Env& environment);
     bool parseLine(ShaderPreprocessor::Env& env);
     bool parseFor(ShaderPreprocessor::Env& env);
@@ -164,7 +165,7 @@ private:
 
     std::map<std::string, FileStruct> _includedFiles;
     static std::vector<std::string> _includePaths;
-    std::string _shaderPath;
+    std::filesystem::path _shaderPath;
     Dictionary _dictionary;
     ShaderChangedCallback _onChangeCallback;
 };

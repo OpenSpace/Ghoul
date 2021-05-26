@@ -64,9 +64,7 @@ void SingleCommand<T>::execute(const std::vector<std::string>& parameters) {
 }
 
 template<typename T>
-void SingleCommand<T>::checkParameters(
-                                         const std::vector<std::string>& parameters) const
-{
+void SingleCommand<T>::checkParameters(const std::vector<std::string>& parameters) const {
     CommandlineCommand::checkParameters(parameters);
 
     if (!is<T>(parameters[0])) {
@@ -75,9 +73,9 @@ void SingleCommand<T>::checkParameters(
 }
 
 template <typename T, typename U>
-SingleCommand<T, U>::SingleCommand(T& ptr1, U& ptr2,
-                                      std::string name, std::string shortName,
-                                      std::string infoText, std::string parameterList)
+SingleCommand<T, U>::SingleCommand(T& ptr1, U& ptr2, std::string name,
+                                   std::string shortName, std::string infoText,
+                                   std::string parameterList)
     : CommandlineCommand(
         std::move(name),
         std::move(shortName),
@@ -108,9 +106,9 @@ void SingleCommand<T, U>::checkParameters(
 }
 
 template <typename T, typename U, typename V>
-SingleCommand<T, U, V>::SingleCommand(T& ptr1, U& ptr2, V& ptr3,
-                                         std::string name, std::string shortName,
-                                         std::string infoText, std::string parameterList)
+SingleCommand<T, U, V>::SingleCommand(T& ptr1, U& ptr2, V& ptr3, std::string name,
+                                      std::string shortName, std::string infoText,
+                                      std::string parameterList)
     : CommandlineCommand(
         std::move(name),
         std::move(shortName),

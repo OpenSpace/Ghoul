@@ -59,10 +59,7 @@ TEST_CASE("CommandlineParser: Unknown Commands Unhandled", "[commandlineparser]"
     };
 
     p.setCommandLine(argv);
-    REQUIRE_THROWS_AS(
-        p.execute(),
-        ghoul::cmdparser::CommandlineParser::CommandlineException
-    );
+    REQUIRE_THROWS_AS(p.execute(), ghoul::RuntimeError);
 }
 
 TEST_CASE("CommandlineParser: Unknown Commands Handled Correctly", "[commandlineparser]")
@@ -186,10 +183,7 @@ TEST_CASE(
     };
 
     p.setCommandLine(argv);
-    REQUIRE_THROWS_AS(
-        p.execute(),
-        ghoul::cmdparser::CommandlineParser::CommandlineException
-    );
+    REQUIRE_THROWS_AS(p.execute(), ghoul::RuntimeError);
 }
 
 TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparser]") {

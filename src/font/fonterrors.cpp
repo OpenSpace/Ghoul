@@ -27,6 +27,8 @@
 
 #include <ghoul/freetype.h>
 
+// Freetype has a weird way of reporting errors, so this is the best way to do this
+
 #undef __FTERRORS_H__
 #define FT_ERRORDEF(e, v, s)  ghoul::fontrendering::Error{ e, s },
 #define FT_ERROR_START_LIST     {

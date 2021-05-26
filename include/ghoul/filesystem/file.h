@@ -26,8 +26,7 @@
 #ifndef __GHOUL___FILE___H__
 #define __GHOUL___FILE___H__
 
-#include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <functional>
 #include <string>
 
@@ -50,15 +49,8 @@ class FileSystem;
  */
 class File {
 public:
-    BooleanType(RawPath);
-
-     /// Exception that gets thrown if there is a file-related error in any of the methods
-    struct FileException : public RuntimeError {
-        explicit FileException(std::string msg);
-    };
-
     /// The type of the std::function that is used as the prototype for the callback
-    using FileChangedCallback = std::function<void (const File&)>;
+    using FileChangedCallback = std::function<void()>;
 
     /**
      * This method constructs a new File object using a given \p filename. \p isRawPath
@@ -77,8 +69,7 @@ public:
      *
      * \see FileSystem The system to register and use tokens
      */
-    File(std::string filename, RawPath isRawPath = RawPath::Yes,
-         FileChangedCallback fileChangedCallback = FileChangedCallback());
+    File(std::filesystem::path filename);
 
     /**
      * Copy constructor.
@@ -108,83 +99,11 @@ public:
     void setCallback(FileChangedCallback callback);
 
     /**
-     * Returns the currently active callback. This object might be uninitialized if no
-     * callback has been registered previously.
-     *
-     * \return The currently active callback function
-     */
-    const FileChangedCallback& callback() const;
-
-    /**
      * Returns the full path to the file as an <code>std::string</code>.
      *
      * \return The full path to the file as an <code>std::string</code>
      */
-    operator const std::string&() const;
-
-    /**
-     * Returns the full path to the file as an <code>std::string</code>.
-     *
-     * \return The full path to the file as an <code>std::string</code>
-     */
-    const std::string& path() const;
-
-    /**
-     * Returns the filename part of the full path. The filename is defined as the part of
-     * the path after the last path separator (<code>'/'</code> or <code>'\\\\'</code>)
-     * and including the extension. Example (
-     * <code>'/home/user/file.txt' -> 'file.txt'</code>)
-     *
-     * \return The filename part of the full path
-     */
-    std::string filename() const;
-
-    /**
-     * Returns the base name part of the full path. The base name is defined as the part
-     * of the path between the last path separator (<code>'/'</code> or
-     * <code>'\\\\'</code>) and the extension (separated by a '.', if existing). Example
-     * (<code>'/home/user/file.txt' -> 'file'</code>)
-     *
-     * \return The base name part of the full path
-     */
-    std::string baseName() const;
-
-    /**
-     * Returns the full base name of the path. The full base name is defined as the part
-     * of the path before the extension (if existing). Example (
-     * <code>'/home/user/file.txt' -> '/home/user/file'</code>)
-     *
-     * \return The full base name part of the path
-     */
-    std::string fullBaseName() const;
-
-    /**
-     * Returns the directory name of the path. The directory name is defined as the part
-     * of the path before the last path separator (<code>'/'</code> or
-     * <code>'\\\\'</code>) and does not include the separator itself. Example(
-     * <code>'/home/user/file.txt' -> '/home/user'</code>)
-     *
-     * \return The directory name of the path
-     */
-    std::string directoryName() const;
-
-    /**
-     * Returns the extension part of the full path. The extension is defined as the part
-     * of the path after the extension separator (<code>'.'</code>). Example (
-     * <code>'/home/user/file.txt' -> '/home/user/file'</code>).
-     *
-     * \return The extension part of the full path
-     */
-    std::string fileExtension() const;
-
-    /**
-     * This method returns the last-modified date of the file as an ISO 8601 string.
-     *
-     * \return The last-modified date of the file as an ISO 8601 string
-     *
-     * \throw FileException If there is an error accessing the file
-     */
-    std::string lastModifiedDate() const;
+    const std::filesystem::path& path() const;
 
 private:
     /**
@@ -200,13 +119,15 @@ private:
     void removeFileChangeListener();
 
     /// The filename of this File
-    std::string _filename;
+    std::filesystem::path _filename;
 
     /**
      * The callback that is called when the file changes on disk. Has no performance
      * impact when it is not used
      */
     FileChangedCallback _fileChangedCallback;
+
+    int _indx = -1;
 };
 
 } // namespace ghoul::filesystem

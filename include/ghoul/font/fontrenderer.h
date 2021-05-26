@@ -27,7 +27,6 @@
 #define __GHOUL___FONTRENDERER___H__
 
 #include <ghoul/glm.h>
-#include <ghoul/font/font.h>
 #include <ghoul/opengl/uniformcache.h>
 #include <memory>
 
@@ -276,9 +275,6 @@ public:
         std::string_view text, const ProjectedLabelsInformation& labelInfo) const;
 
 private:
-    /// Private constructor that is used in the #initialize static method
-    FontRenderer();
-
     /// The singleton instance of the default FontRenderer
     static std::unique_ptr<FontRenderer> _defaultRenderer;
 
@@ -292,14 +288,17 @@ private:
     /// The ProgramObject that is used to render the text
     std::unique_ptr<opengl::ProgramObject> _program;
 
-    /// The vertex array object holding the other OpenGL objects
-    unsigned int _vao = 0;
+    struct GpuData {
+        unsigned int vao = 0;
 
-    /// The vertex buffer object that contains the vertices for the text to be rendered
-    unsigned int _vbo = 0;
+        /// The vertex buffer object containing the vertices for the text to be rendered
+        unsigned int vbo = 0;
 
-    /// The index buffer object that allows reusing vertices to form one quad per glyph
-    unsigned int _ibo = 0;
+        /// The index buffer object allowing the reuse of glyph vertices
+        unsigned int ibo = 0;
+    };
+    GpuData _orthogonal;
+    GpuData _perspective;
 
     mutable std::vector<float> _vertexBuffer;
     mutable std::vector<GLushort> _indexBuffer;

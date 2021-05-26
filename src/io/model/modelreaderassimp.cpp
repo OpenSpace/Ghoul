@@ -50,11 +50,12 @@ namespace {
 
 namespace ghoul::io {
 
-bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
-                       const aiTextureType& type, const ModelMesh::TextureType& enumType,
-                          std::vector<ModelMesh::Texture>& textureArray,
-                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
-                          std::filesystem::path& modelDirectory)
+static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
+                                 const aiTextureType& type,
+                                 const ModelMesh::TextureType& enumType,
+                                 std::vector<ModelMesh::Texture>& textureArray,
+                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                                                    std::filesystem::path& modelDirectory)
 {
     for (unsigned int i = 0; i < material.GetTextureCount(type); ++i) {
         ModelMesh::Texture meshTexture;
@@ -65,12 +66,12 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
         // Check for duplicates
         bool shouldSkip = false;
         for (const ModelMesh::Texture& texture : textureArray) {
-            if (texture.hasTexture) {
-                if (texture.texture->name() == std::string_view(path.C_Str())) {
-                    // Texture has already been loaded for this mesh, continue to next one
-                    shouldSkip = true;
-                    break;
-                }
+            if (texture.hasTexture &&
+                texture.texture->name() == std::string_view(path.C_Str()))
+            {
+                // Texture has already been loaded for this mesh, continue to next one
+                shouldSkip = true;
+                break;
             }
         }
 
@@ -82,7 +83,7 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
         // Check if texture has already been loaded by other meshes
         for (const modelgeometry::ModelGeometry::TextureEntry& texture : textureStorage) {
             if (texture.texture->name() == std::string_view(path.C_Str())) {
-                // Texture has already been loaded. Point to that texture instead of copying
+                // Texture has already been loaded. Point to that texture instead
                 meshTexture.texture = texture.texture.get();
                 meshTexture.texture->setName(path.C_Str());
                 meshTexture.hasTexture = true;
@@ -117,8 +118,8 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
                 }
                 catch (const TextureReader::InvalidLoadException& e) {
                     LWARNING(fmt::format(
-                        "Could not load unsupported texture from '{}' with size"
-                        " '{}' : Replacing with flashy color", e._memory, e._size
+                        "Could not load unsupported texture from '{}' with size '{}': "
+                        "Replacing with flashy color", e._memory, e._size
                     ));
                     ModelMesh::generateDebugTexture(meshTexture);
                     textureArray.push_back(std::move(meshTexture));
@@ -126,7 +127,7 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
                 }
                 catch (const TextureReaderBase::TextureLoadException& e) {
                     LWARNING(fmt::format(
-                        "Failed to load texture from '{}' with error: '{}' : "
+                        "Failed to load texture from '{}' with error: '{}': "
                         "Replacing with flashy color", e.filename, e.message
                     ));
                     ModelMesh::generateDebugTexture(meshTexture);
@@ -148,22 +149,20 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
             // Local texture
             try {
                 std::string pathString(path.C_Str());
-                std::string absolutePath =
-                    ghoul::filesystem::FileSystem::ref().pathByAppendingComponent(
-                        modelDirectory.string(),
-                        pathString
-                    );
+                std::string absolutePath = fmt::format(
+                    "{}/{}", modelDirectory.string(), pathString
+                );
 
                 textureEntry.texture = TextureReader::ref().loadTexture(
-                    absPath(absolutePath)
+                    absPath(absolutePath).string()
                 );
                 meshTexture.texture = textureEntry.texture.get();
                 meshTexture.texture->setName(path.C_Str());
             }
             catch (const TextureReader::MissingReaderException& e) {
                 LWARNING(fmt::format(
-                    "Could not load unsupported texture from '{}' with extension"
-                    " '{}' : Replacing with flashy color", e.file, e.fileExtension
+                    "Could not load unsupported texture from '{}' with extension '{}': "
+                    "Replacing with flashy color", e.file, e.fileExtension
                 ));
                 ModelMesh::generateDebugTexture(meshTexture);
                 textureArray.push_back(std::move(meshTexture));
@@ -171,8 +170,8 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
             }
             catch (const TextureReaderBase::TextureLoadException& e) {
                 LWARNING(fmt::format(
-                    "Failed to load texture from '{}' with error: '{}' : "
-                    "Replacing with flashy color", e.filename, e.message
+                    "Failed to load texture from '{}' with error: '{}': Replacing with "
+                    "flashy color", e.filename, e.message
                 ));
                 ModelMesh::generateDebugTexture(meshTexture);
                 textureArray.push_back(std::move(meshTexture));
@@ -209,11 +208,11 @@ bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
     return true;
 }
 
-
-ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
-                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
-                      std::filesystem::path& modelDirectory, bool forceRenderInvisible,
-                      bool notifyInvisibleDropped)
+static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
+                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                                                    std::filesystem::path& modelDirectory,
+                                                                bool forceRenderInvisible,
+                                                              bool notifyInvisibleDropped)
 {
     std::vector<ModelMesh::Vertex> vertexArray;
     std::vector<unsigned int> indexArray;
@@ -461,11 +460,13 @@ ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
 
 // Process a node in a recursive fashion. Process each individual mesh located
 // at the node and repeats this process on its children nodes (if any)
-void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode>& nodes,
-                 int parent, std::unique_ptr<ModelAnimation>& modelAnimation,
-                 std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
-                 bool forceRenderInvisible, bool notifyInvisibleDropped,
-                 std::filesystem::path& modelDirectory)
+static void processNode(const aiNode& node, const aiScene& scene,
+                        std::vector<ModelNode>& nodes, int parent,
+                        std::unique_ptr<ModelAnimation>& modelAnimation,
+                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                                                                bool forceRenderInvisible,
+                                                              bool notifyInvisibleDropped,
+                                                    std::filesystem::path& modelDirectory)
 {
     // Convert transform matrix of the node
     // Assimp stores matrixes in row major and glm stores matrixes in column major
@@ -493,13 +494,15 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
         aiMesh* mesh = scene.mMeshes[node.mMeshes[i]];
 
         if (mesh->HasBones()) {
-            LWARNING("Detected unsupported animation type: 'Bones', "
-                "currently only keyframe animation is supported"
+            LWARNING(
+                "Detected unsupported animation type: 'Bones', currently only keyframe "
+                "animations are supported"
             );
         }
         if (mesh->mNumAnimMeshes > 0) {
-            LWARNING("Detected unsupported animation type: 'Mesh', "
-                "currently only keyframe animation is supported"
+            LWARNING(
+                "Detected unsupported animation type: 'Mesh', currently only keyframe "
+                "animations are supported"
             );
         }
 
@@ -523,7 +526,7 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
     ModelNode modelNode(nodeTransform, std::move(meshArray));
     modelNode.setParent(parent);
     nodes.push_back(std::move(modelNode));
-    int newNode = nodes.size() - 1;
+    int newNode = static_cast<int>(nodes.size() - 1);
     if (parent != -1) {
         nodes[parent].addChild(newNode);
     }
@@ -619,10 +622,10 @@ void processNode(const aiNode& node, const aiScene& scene, std::vector<ModelNode
     }
 }
 
-
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
-                                        std::string& filename, bool forceRenderInvisible,
-                                                       bool notifyInvisibleDropped) const
+                                                              const std::string& filename,
+                                                                bool forceRenderInvisible,
+                                                        bool notifyInvisibleDropped) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
@@ -631,9 +634,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
         filename,
-        aiProcess_Triangulate |         // Only triangles
-        aiProcess_GenSmoothNormals |    // Generate smooth normals
-        aiProcess_CalcTangentSpace      // Generate tangents and bitangents
+        aiProcess_Triangulate |       // Only triangles
+        aiProcess_GenSmoothNormals |  // Generate smooth normals
+        aiProcess_CalcTangentSpace    // Generate tangents and bitangents
     );
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -645,22 +648,24 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     if (scene->HasAnimations()) {
         // Do not support more than one animation
         if (scene->mNumAnimations > 1) {
-            LWARNING("Detected more than one animation, only first one will be used, "
-                "currently only one animation per model is supported"
+            LWARNING(
+                "Detected more than one animation but currently only one is supported"
             );
         }
         aiAnimation* animation = scene->mAnimations[0];
 
         // Do not support morph animation
         if (animation->mNumMorphMeshChannels > 0) {
-            LWARNING("Detected unsupported animation type: 'Morph', "
-                "currently only keyframe animation is supported"
+            LWARNING(
+                "Detected unsupported animation type: 'Morph', currently only keyframe "
+                "animations are supported"
             );
         }
         // Do not support animation that replaces the mesh for every frame
         if (animation->mNumMeshChannels > 0) {
-            LWARNING("Detected unsupported animation type: 'Mesh', "
-                "currently only keyframe animation is supported"
+            LWARNING(
+                "Detected unsupported animation type: 'Mesh', currently only keyframe "
+                "animations are supported"
             );
         }
         // Only support keyframe animation

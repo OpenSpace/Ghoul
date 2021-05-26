@@ -32,6 +32,7 @@
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/misc.h>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -224,7 +225,10 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
                                                                          lua_State* state)
 {
     ghoul_assert(!filename.empty(), "filename must not be empty");
-    ghoul_assert(FileSys.fileExists(filename), "filename must be an existing file");
+    ghoul_assert(
+        std::filesystem::is_regular_file(filename),
+        "filename must be an existing file"
+    );
 
     if (!state) {
         state = staticLuaState();
@@ -508,7 +512,10 @@ void destroyLuaState(lua_State* state) {
 void runScriptFile(lua_State* state, const std::string& filename) {
     ghoul_assert(state, "State must not be nullptr");
     ghoul_assert(!filename.empty(), "filename must not be empty");
-    ghoul_assert(FileSys.fileExists(filename), "Filename must be a file that exists");
+    ghoul_assert(
+        std::filesystem::is_regular_file(filename),
+        "Filename must be a file that exists"
+    );
 
     int status = luaL_loadfile(state, filename.c_str());
     if (status != LUA_OK) {

@@ -31,6 +31,20 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/fmt.h>
 
+namespace {
+    std::string textureTypeToString(const ghoul::io::ModelMesh::TextureType& type) {
+        using TextureType = ghoul::io::ModelMesh::TextureType;
+        switch (type) {
+            case TextureType::TextureDiffuse:  return "texture_diffuse";
+            case TextureType::TextureNormal:   return "texture_normal";
+            case TextureType::TextureSpecular: return "texture_specular";
+            case TextureType::ColorDiffuse:    return "color_diffuse";
+            case TextureType::ColorSpecular:   return "color_specular";
+            default:                           throw ghoul::MissingCaseException();
+        }
+    }
+} // namespace
+
 namespace ghoul::io {
 
 ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
@@ -119,7 +133,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
     }
 
     // Transform mesh
-    program.setUniform("meshTransform", glm::mat4(meshTransform));
+    program.setUniform("meshTransform", meshTransform);
     glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
     program.setUniform("meshNormalTransform", glm::mat4(normalTransform));
 
@@ -140,17 +154,14 @@ float ModelMesh::calculateBoundingRadius(glm::mat4x4& transform) const {
     float maximumDistanceSquared = 0.f;
     for (const Vertex& v : _vertices) {
         // Apply the transform to the vertex to get its final position
-        glm::vec4 position(
-            v.position[0],
-            v.position[1],
-            v.position[2],
-            1.f
-        );
+        glm::vec4 position(v.position[0], v.position[1], v.position[2], 1.f);
         position = transform * position;
 
-        float d = glm::pow(position.x, 2.f) +
+        const float d = glm::pow(
+            position.x, 2.f) +
             glm::pow(position.y, 2.f) +
-            glm::pow(position.z, 2.f);
+            glm::pow(position.z, 2.f
+        );
 
         maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
     }
@@ -266,9 +277,7 @@ void ModelMesh::initialize() {
 
         if (texture.hasTexture) {
             texture.texture->uploadTexture();
-            texture.texture->setFilter(
-                opengl::Texture::FilterMode::AnisotropicMipMap
-            );
+            texture.texture->setFilter(opengl::Texture::FilterMode::AnisotropicMipMap);
             texture.texture->purgeFromRAM();
         }
     }
@@ -284,10 +293,10 @@ void ModelMesh::initialize() {
 
 void ModelMesh::deinitialize() {
     glDeleteBuffers(1, &_vbo);
-    glDeleteVertexArrays(1, &_vaoID);
-    glDeleteBuffers(1, &_ibo);
     _vbo = 0;
+    glDeleteVertexArrays(1, &_vaoID);
     _vaoID = 0;
+    glDeleteBuffers(1, &_ibo);
     _ibo = 0;
 }
 
