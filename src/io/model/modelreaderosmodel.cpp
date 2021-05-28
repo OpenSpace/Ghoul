@@ -100,7 +100,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
         throw ModelLoadException(filename, "Could not open file", this);
     }
 
-    // Check the caching version
+    // Check the file format version
     int8_t version = 0;
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
     if (version != CurrentModelVersion) {
@@ -171,17 +171,16 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
         std::byte* data = new std::byte[textureSize];
         fileStream.read(reinterpret_cast<char*>(data), textureSize);
 
-        textureEntry.texture =
-            std::make_unique<opengl::Texture>(
-                dimensions,
-                format,
-                internalFormat,
-                dataType,
-                opengl::Texture::FilterMode::Linear,
-                opengl::Texture::WrappingMode::Repeat,
-                opengl::Texture::AllocateData::No,
-                opengl::Texture::TakeOwnership::Yes
-                );
+        textureEntry.texture = std::make_unique<opengl::Texture>(
+            dimensions,
+            format,
+            internalFormat,
+            dataType,
+            opengl::Texture::FilterMode::Linear,
+            opengl::Texture::WrappingMode::Repeat,
+            opengl::Texture::AllocateData::No,
+            opengl::Texture::TakeOwnership::Yes
+        );
 
         textureEntry.texture->setPixelData(data, opengl::Texture::TakeOwnership::Yes);
         textureStorageArray.push_back(std::move(textureEntry));
@@ -236,7 +235,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
             for (int32_t i = 0; i < nIndices; ++i) {
                 uint32_t index;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
-                indexArray.push_back(std::move(static_cast<unsigned int>(index)));
+                indexArray.push_back(index);
             }
 
             // IsInvisible
