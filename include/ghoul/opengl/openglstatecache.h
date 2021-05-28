@@ -60,7 +60,7 @@ public:
     void resetPolygonAndClippingState() const;
     void resetViewportState() const;
     void setDefaultFramebuffer(GLuint defaultFB);
-    void setViewportState(GLint viewportCoords[4]);
+    void setViewportState(const GLint viewportCoords[4]);
     void resetColorState() const;
     void setColorState(GLfloat clearColor[4], GLboolean clampColor = GL_FALSE);
 
