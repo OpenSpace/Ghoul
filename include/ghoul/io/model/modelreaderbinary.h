@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELREADEROSMODEL___H__
-#define __GHOUL___MODELREADEROSMODEL___H__
+#ifndef __GHOUL___MODELREADERBINARY___H__
+#define __GHOUL___MODELREADERBINARY___H__
 
 #include <ghoul/io/model/modelreaderbase.h>
 
@@ -33,7 +33,7 @@ namespace ghoul::io {
 /**
  * This model reader loads a custom OpenSpace model from the provided file.
  */
-class ModelReaderOSModel : public ModelReaderBase {
+class ModelReaderBinary : public ModelReaderBase {
 public:
     /**
      * Loads the 3D OpenSpace model file pointed to by \p filename
@@ -45,7 +45,7 @@ public:
      * \return The ModelGeometry containing the model
      *
      * \throw ModelLoadException If there was an error loading the model
-     * from \p filename
+     *        from \p filename
      * \pre \p filename must not be empty
      */
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename,
@@ -55,18 +55,18 @@ public:
     /**
      * Returns if this reader needs a cache file or not.
      *
-     * \return a boolean for if this reader needs a cache file or not
+     * \return A boolean for if this reader needs a cache file or not
      */
     bool needsCache() const override;
 
     /**
-     * Returns a list of all extensions that this ModelReaderOSModel supports.
+     * Returns a list of all extensions that this ModelReaderBinary supports.
      *
-     * \return A list of all extensions that this ModelReaderOSModel supports
+     * \return A list of all extensions that this ModelReaderBinary supports
      */
     std::vector<std::string> supportedExtensions() const override;
 };
 
 } // namespace ghoul::io
 
-#endif // __GHOUL___MODELREADEROSMODEL___H__
+#endif // __GHOUL___MODELREADERBINARY___H__

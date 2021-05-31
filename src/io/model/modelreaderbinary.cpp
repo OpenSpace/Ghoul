@@ -23,14 +23,14 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/io/model/modelreaderosmodel.h>
+#include <ghoul/io/model/modelreaderbinary.h>
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
 #include <fstream>
 
 namespace {
-    constexpr const char* _loggerCat = "ModelReaderOSModel";
+    constexpr const char* _loggerCat = "ModelReaderBinary";
     constexpr const int8_t CurrentModelVersion = 6;
     constexpr const int FormatStringSize = 4;
 
@@ -88,7 +88,7 @@ namespace {
 
 namespace ghoul::io {
 
-std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
+std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                                                               const std::string& filename,
                                                                 bool forceRenderInvisible,
                                                         bool notifyInvisibleDropped) const
@@ -483,11 +483,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderOSModel::loadModel(
     }
 }
 
-bool ModelReaderOSModel::needsCache() const {
+bool ModelReaderBinary::needsCache() const {
     return false;
 }
 
-std::vector<std::string> ModelReaderOSModel::supportedExtensions() const {
+std::vector<std::string> ModelReaderBinary::supportedExtensions() const {
     return {
         "osmodel" // Custom OpenSpace model format
     };

@@ -54,7 +54,7 @@ public:
      * \return The ModelGeometry containing the model
      *
      * \throw ModelLoadException If there was an error loading the model
-     * from \p filename
+     *        from \p filename
      * \pre \p filename must not be empty
      */
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename,
@@ -64,7 +64,7 @@ public:
     /**
      * Returns if this reader needs a cache file or not.
      *
-     * \return a boolean for if this reader needs a cache file or not
+     * \return A boolean for if this reader needs a cache file or not
      */
     bool needsCache() const override;
 

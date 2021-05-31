@@ -78,7 +78,7 @@ public:
     /**
      * Returns if this reader needs a cache file or not.
      *
-     * \return a boolean for if this reader needs a cache file or not
+     * \return A boolean for if this reader needs a cache file or not
      */
     virtual bool needsCache() const = 0;
 
