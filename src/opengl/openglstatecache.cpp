@@ -241,7 +241,7 @@ void OpenGLStateCache::setDefaultFramebuffer(GLuint defaultFB) {
     }
 }
 
-void OpenGLStateCache::setViewportState(GLint viewportCoords[4])  {
+void OpenGLStateCache::setViewportState(const GLint viewportCoords[4])  {
     ghoul_assert(viewportCoords != nullptr, "viewportCoords must not be nullptr");
 
     if (viewportCoords[0] != _viewport[0] || viewportCoords[1] != _viewport[1] ||
