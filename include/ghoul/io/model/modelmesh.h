@@ -60,8 +60,10 @@ public:
         glm::vec3 color;
     };
 
+    static void generateDebugTexture(ModelMesh::Texture& texture);
+
     ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-        std::vector<Texture> textures);
+        std::vector<Texture> textures, bool isInvisible = false);
 
     ModelMesh(ModelMesh&&) noexcept = default;
     ~ModelMesh() noexcept = default;
@@ -72,6 +74,9 @@ public:
         bool isTexturedModel = true) const;
     float calculateBoundingRadius(glm::mat4x4& transform) const;
 
+    void setInvisible(bool isInvisible);
+    bool isInvisible() const;
+
     const std::vector<Vertex>& vertices() const;
     const std::vector<unsigned int>& indices() const;
     const std::vector<Texture>& textures() const;
@@ -80,6 +85,8 @@ private:
     std::vector<Vertex> _vertices;
     std::vector<unsigned int> _indices;
     std::vector<Texture> _textures;
+
+    bool _isInvisible = false;
 
     GLuint _vaoID = 0;
     GLuint _vbo = 0;

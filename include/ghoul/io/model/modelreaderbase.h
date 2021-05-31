@@ -76,6 +76,13 @@ public:
         bool notifyInvisibleDropped = true) const = 0;
 
     /**
+     * Returns if this reader needs a cache file or not.
+     *
+     * \return A boolean for if this reader needs a cache file or not
+     */
+    virtual bool needsCache() const = 0;
+
+    /**
      * Returns a list of all extensions.
      *
      * \return The supported file extensions.

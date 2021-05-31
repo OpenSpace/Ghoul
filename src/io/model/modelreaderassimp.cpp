@@ -50,13 +50,6 @@ namespace {
 
 namespace ghoul::io {
 
-static void generateDebugTexture(ModelMesh::Texture& texture) {
-    texture.texture = nullptr;
-    texture.hasTexture = false;
-    texture.useForcedColor = true;
-    texture.type = ModelMesh::TextureType::ColorDiffuse;
-}
-
 static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
                                  const aiTextureType& type,
                                  const ModelMesh::TextureType& enumType,
@@ -128,7 +121,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                         "Could not load unsupported texture from '{}' with size '{}': "
                         "Replacing with flashy color", e._memory, e._size
                     ));
-                    generateDebugTexture(meshTexture);
+                    ModelMesh::generateDebugTexture(meshTexture);
                     textureArray.push_back(std::move(meshTexture));
                     return false;
                 }
@@ -137,7 +130,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                         "Failed to load texture from '{}' with error: '{}': "
                         "Replacing with flashy color", e.filename, e.message
                     ));
-                    generateDebugTexture(meshTexture);
+                    ModelMesh::generateDebugTexture(meshTexture);
                     textureArray.push_back(std::move(meshTexture));
                     return false;
                 }
@@ -147,7 +140,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                 LWARNING("Uncompressed embedded texture detected: Not supported! "
                     "Replacing with flashy color"
                 );
-                generateDebugTexture(meshTexture);
+                ModelMesh::generateDebugTexture(meshTexture);
                 textureArray.push_back(std::move(meshTexture));
                 return false;
             }
@@ -171,7 +164,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                     "Could not load unsupported texture from '{}' with extension '{}': "
                     "Replacing with flashy color", e.file, e.fileExtension
                 ));
-                generateDebugTexture(meshTexture);
+                ModelMesh::generateDebugTexture(meshTexture);
                 textureArray.push_back(std::move(meshTexture));
                 return false;
             }
@@ -180,7 +173,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                     "Failed to load texture from '{}' with error: '{}': Replacing with "
                     "flashy color", e.filename, e.message
                 ));
-                generateDebugTexture(meshTexture);
+                ModelMesh::generateDebugTexture(meshTexture);
                 textureArray.push_back(std::move(meshTexture));
                 return false;
             }
@@ -448,7 +441,7 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
         if (forceRenderInvisible) {
             // Force invisible mesh to render with flashy colors
             ModelMesh::Texture texture;
-            generateDebugTexture(texture);
+            ModelMesh::generateDebugTexture(texture);
             textureArray.push_back(std::move(texture));
         }
         // If not forced to render, drop invisible mesh
@@ -465,7 +458,7 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
     );
 }
 
-// Process a node in a recursive fashion. Process each individual mesh located 
+// Process a node in a recursive fashion. Process each individual mesh located
 // at the node and repeats this process on its children nodes (if any)
 static void processNode(const aiNode& node, const aiScene& scene,
                         std::vector<ModelNode>& nodes, int parent,
@@ -524,7 +517,7 @@ static void processNode(const aiNode& node, const aiScene& scene,
 
         // Don't render invisible meshes
         if (loadedMesh.textures().empty()) {
-            continue;
+            loadedMesh.setInvisible(true);
         }
 
         meshArray.push_back(std::move(loadedMesh));
@@ -612,7 +605,7 @@ static void processNode(const aiNode& node, const aiScene& scene,
         }
     }
 
-    // After we've processed all of the meshes (if any) we then recursively 
+    // After we've processed all of the meshes (if any) we then recursively
     // process each of the children nodes (if any)
     for (unsigned int i = 0; i < node.mNumChildren; i++) {
         processNode(
@@ -709,6 +702,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         std::move(textureStorage),
         std::move(modelAnimation)
     );
+}
+
+
+bool ModelReaderAssimp::needsCache() const {
+    return true;
 }
 
 std::vector<std::string> ModelReaderAssimp::supportedExtensions() const {

@@ -36,6 +36,7 @@ set(GHOUL_SOURCE
   io/model/modelnode.cpp
   io/model/modelreader.cpp
   io/model/modelreaderbase.cpp
+  io/model/modelreaderbinary.cpp
   io/socket/socket.cpp
   io/socket/tcpsocket.cpp
   io/socket/tcpsocketserver.cpp
@@ -154,6 +155,7 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelnode.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreader.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbase.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderbinary.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socket.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/socketserver.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/io/socket/sockettype.h

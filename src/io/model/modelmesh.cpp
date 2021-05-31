@@ -48,11 +48,30 @@ namespace {
 namespace ghoul::io {
 
 ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-                     std::vector<Texture> textures)
+                     std::vector<Texture> textures, bool isInvisible)
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
+    , _isInvisible(std::move(isInvisible))
 {}
+
+std::string textureTypeToString(const ModelMesh::TextureType& type) {
+    switch (type) {
+        case ModelMesh::TextureType::TextureDiffuse: return "texture_diffuse";
+        case ModelMesh::TextureType::TextureNormal: return "texture_normal";
+        case ModelMesh::TextureType::TextureSpecular: return "texture_specular";
+        case ModelMesh::TextureType::ColorDiffuse: return "color_diffuse";
+        case ModelMesh::TextureType::ColorSpecular: return "color_specular";
+        default: throw MissingCaseException();
+    }
+}
+
+void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
+    texture.texture = nullptr;
+    texture.hasTexture = false;
+    texture.useForcedColor = true;
+    texture.type = ModelMesh::TextureType::ColorDiffuse;
+}
 
 void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
                        bool isTexturedModel) const
@@ -63,6 +82,11 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
         program.setUniform("has_texture_normal", false);
         program.setUniform("has_texture_specular", false);
         program.setUniform("has_color_specular", false);
+
+        // If mesh is invisible and it has not been forced to render then don't render
+        if (_isInvisible && _textures.empty()) {
+            return;
+        }
 
         // Bind appropriate textures
         int textureCounter = 0;
@@ -142,6 +166,14 @@ float ModelMesh::calculateBoundingRadius(glm::mat4x4& transform) const {
         maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
     }
     return maximumDistanceSquared;
+}
+
+void ModelMesh::setInvisible(bool isInvisible) {
+    _isInvisible = isInvisible;
+}
+
+bool ModelMesh::isInvisible() const {
+    return _isInvisible;
 }
 
 const std::vector<ModelMesh::Vertex>& ModelMesh::vertices() const {

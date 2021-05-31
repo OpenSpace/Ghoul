@@ -76,6 +76,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         throw MissingReaderException(extension, filename);
     }
 
+    if (!reader->needsCache()) {
+        LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
+        return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
+    }
+
     std::string cachedFile = FileSys.cacheManager()->cachedFilename(filename);
     bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
@@ -85,7 +90,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
         try {
             std::unique_ptr<modelgeometry::ModelGeometry> model =
-                modelgeometry::ModelGeometry::loadCacheFile(cachedFile);
+                modelgeometry::ModelGeometry::loadCacheFile(
+                    cachedFile,
+                    forceRenderInvisible,
+                    notifyInvisibleDropped
+                );
             return model;
         }
         catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
