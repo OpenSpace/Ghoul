@@ -888,7 +888,7 @@ void ModelGeometry::calculateBoundingRadius() {
         return;
     }
 
-    glm::mat4x4 parentTransform;
+    glm::mat4x4 parentTransform = glm::mat4x4(1.f);
     float maximumDistanceSquared = 0.f;
     calculateBoundingRadiusRecursive(
         _nodes,
@@ -963,7 +963,7 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel)
         return;
     }
 
-    glm::mat4x4 parentTransform;
+    glm::mat4x4 parentTransform = glm::mat4x4(1.f);
     renderRecursive(_nodes, _nodes.data(), program, parentTransform, isTexturedModel);
 }
 
