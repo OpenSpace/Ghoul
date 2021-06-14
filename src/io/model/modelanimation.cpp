@@ -178,7 +178,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             currScale = glm::vec3(1.0);
         }
 
-        glm::mat4x4 animationTransform;
+        glm::mat4x4 animationTransform = glm::mat4x4(1.f);
         animationTransform =
             glm::translate(glm::mat4(1.0), currPos) *
             glm::toMat4(currRot) *

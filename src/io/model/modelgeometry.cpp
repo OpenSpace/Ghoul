@@ -328,13 +328,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // Transform
-        glm::mat4x4 transform;
+        glm::mat4x4 transform = glm::mat4x4(1.f);
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
         transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
-        glm::mat4x4 animationTransform;
+        glm::mat4x4 animationTransform = glm::mat4x4(1.f);
         GLfloat rawAnimTransform[16];
         fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
         animationTransform = glm::make_mat4(rawAnimTransform);
@@ -420,7 +420,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                glm::vec3 pos;
+                glm::vec3 pos = glm::vec3(1.0);
                 fileStream.read(reinterpret_cast<char*>(&pos.x), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&pos.y), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&pos.z), sizeof(float));
@@ -465,7 +465,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
-                glm::vec3 scale;
+                glm::vec3 scale = glm::vec3(1.f);
                 fileStream.read(reinterpret_cast<char*>(&scale.x), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&scale.y), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&scale.z), sizeof(float));
