@@ -35,22 +35,22 @@ namespace ghoul::io {
 class ModelAnimation {
 public:
     struct PositionKeyframe {
-        glm::vec3 position;
-        double time;
+        glm::vec3 position = glm::vec3(0.f);
+        double time = 0.0;
     };
 
     struct RotationKeyframe {
-        glm::quat rotation;
-        double time;
+        glm::quat rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
+        double time = 0.0;
     };
 
     struct ScaleKeyframe {
-        glm::vec3 scale;
-        double time;
+        glm::vec3 scale = glm::vec3(0.f);
+        double time = 0.0;
     };
 
     struct NodeAnimation {
-        int node;
+        int node = 0;
         std::vector<PositionKeyframe> positions;
         std::vector<RotationKeyframe> rotations;
         std::vector<ScaleKeyframe> scales;

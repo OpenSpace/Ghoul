@@ -1560,9 +1560,9 @@ TEST_CASE("LuaToDictionary: Vector Classes Set", "[luatodictionary]") {
     m.setValue("t.vec2", glm::vec2(5, 6));
     m.setValue("t.vec3", glm::vec3(5, 6, 7));
     m.setValue("t.vec4", glm::vec4(5, 6, 7, 8));
-    m.setValue("t.dvec2", glm::dvec2(5, 6));
-    m.setValue("t.dvec3", glm::dvec3(5, 6, 7));
-    m.setValue("t.dvec4", glm::dvec4(5, 6, 7, 8));
+    m.setValue("t.dvec2", glm::dvec2(5.0, 6.0));
+    m.setValue("t.dvec3", glm::dvec3(5.0, 6.0, 7.0));
+    m.setValue("t.dvec4", glm::dvec4(5.0, 6.0, 7.0, 8.0));
     m.setValue("t.ivec2", glm::ivec2(5, 6));
     m.setValue("t.ivec3", glm::ivec3(5, 6, 7));
     m.setValue("t.ivec4", glm::ivec4(5, 6, 7, 8));

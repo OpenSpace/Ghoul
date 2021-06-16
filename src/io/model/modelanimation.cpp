@@ -56,12 +56,12 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
         _nodeAnimations)
     {
         // Position
-        glm::vec3 currPos;
+        glm::vec3 currPos = glm::vec3(0.f);
         if (nodeAnimation.positions.size() > 1) {
             double prevPosTime = -std::numeric_limits<double>::max();
-            glm::vec3 prevPos;
+            glm::vec3 prevPos = glm::vec3(0.f);
             double nextPosTime = std::numeric_limits<double>::max();
-            glm::vec3 nextPos;
+            glm::vec3 nextPos = glm::vec3(0.f);
             bool interpolate = true;
 
             for (const io::ModelAnimation::PositionKeyframe& pos : nodeAnimation.positions) {
@@ -97,12 +97,12 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
         }
 
         // Rotation
-        glm::quat currRot;
+        glm::quat currRot = glm::quat(1.f, 0.f, 0.f, 0.f);
         if (nodeAnimation.rotations.size() > 1) {
             double prevRotTime = -std::numeric_limits<double>::max();
-            glm::quat prevRot;
+            glm::quat prevRot = glm::quat(1.f, 0.f, 0.f, 0.f);
             double nextRotTime = std::numeric_limits<double>::max();
-            glm::quat nextRot;
+            glm::quat nextRot = glm::quat(1.f, 0.f, 0.f, 0.f);
             bool interpolate = true;
 
             for (const io::ModelAnimation::RotationKeyframe& rot : nodeAnimation.rotations) {
@@ -138,12 +138,12 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
         }
 
         // Scale
-        glm::vec3 currScale;
+        glm::vec3 currScale = glm::vec3(0.f);
         if (nodeAnimation.scales.size() > 1) {
             double prevScaleTime = -std::numeric_limits<double>::max();
-            glm::vec3 prevScale;
+            glm::vec3 prevScale = glm::vec3(0.f);
             double nextScaleTime = std::numeric_limits<double>::max();
-            glm::vec3 nextScale;
+            glm::vec3 nextScale = glm::vec3(0.f);
             bool interpolate = true;
 
             for (const io::ModelAnimation::ScaleKeyframe& scale : nodeAnimation.scales) {

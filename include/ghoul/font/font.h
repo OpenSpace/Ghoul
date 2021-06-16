@@ -110,18 +110,18 @@ public:
         const float verticalAdvance;
 
         /// Normalized texture coordinate of top-left corner
-        glm::vec2 topLeft;
+        glm::vec2 topLeft = glm::vec2(0.f);
 
         /// Normalized texture coordinate of bottom-right corner
-        glm::vec2 bottomRight;
+        glm::vec2 bottomRight = glm::vec2(0.f);
 
         /// Normalized texture coordinates for the top left of the
         /// outline
-        glm::vec2 outlineTopLeft;
+        glm::vec2 outlineTopLeft = glm::vec2(0.f);
 
         /// Normalized texture coordinates for the bottom right of the
         /// outline
-        glm::vec2 outlineBottomRight;
+        glm::vec2 outlineBottomRight = glm::vec2(0.f);
 
     private:
         /// A vector of kerning pairs relative to this glyph

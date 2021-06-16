@@ -138,26 +138,26 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
     ghoul::Dictionary d;
     d.setValue("int", 1);
     d.setValue("double", 2.2);
-    d.setValue("vec2", glm::dvec2(0.f));
-    d.setValue("vec3", glm::dvec3(0.f));
-    d.setValue("vec4", glm::dvec4(0.f));
+    d.setValue("vec2", glm::dvec2(0.0));
+    d.setValue("vec3", glm::dvec3(0.0));
+    d.setValue("vec4", glm::dvec4(0.0));
     d.setValue("string", ""s);
 
     ghoul::Dictionary e;
     e.setValue("int", 1);
     e.setValue("double", 2.2);
-    e.setValue("vec2", glm::dvec2(0.f));
-    e.setValue("vec3", glm::dvec3(0.f));
-    e.setValue("vec4", glm::dvec4(0.f));
+    e.setValue("vec2", glm::dvec2(0.0));
+    e.setValue("vec3", glm::dvec3(0.0));
+    e.setValue("vec4", glm::dvec4(0.0));
     e.setValue("string", ""s);
     e.setValue("dict", d);
 
     ghoul::Dictionary f;
     f.setValue("int", 1);
     f.setValue("double", 2.2);
-    f.setValue("vec2", glm::dvec2(0.f));
-    f.setValue("vec3", glm::dvec3(0.f));
-    f.setValue("vec4", glm::dvec4(0.f));
+    f.setValue("vec2", glm::dvec2(0.0));
+    f.setValue("vec3", glm::dvec3(0.0));
+    f.setValue("vec4", glm::dvec4(0.0));
     f.setValue("string", ""s);
     f.setValue("dict", e);
 
