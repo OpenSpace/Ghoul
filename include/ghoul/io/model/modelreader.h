@@ -27,6 +27,7 @@
 #define __GHOUL___MODELREADER___H__
 
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -50,10 +51,11 @@ public:
 
     /// Exception that gets thrown when there is no reader for the provided \p extension
     struct MissingReaderException : public RuntimeError {
-        explicit MissingReaderException(std::string extension, std::string file);
+        explicit MissingReaderException(std::string extension,
+            std::filesystem::path file);
 
         const std::string fileExtension;
-        const std::string file;
+        const std::filesystem::path file;
     };
 
     /**
@@ -83,7 +85,8 @@ public:
      * \pre At least one ModelReaderBase must have been added to the ModelReader
      *      before (addReader)
      */
-    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(const std::string& filename,
+    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
+        const std::filesystem::path& filename,
         ForceRenderInvisible forceRenderInvisible = ForceRenderInvisible::No,
         NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes);
 

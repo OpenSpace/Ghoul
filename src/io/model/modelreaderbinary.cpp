@@ -89,7 +89,7 @@ namespace {
 namespace ghoul::io {
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
-                                                              const std::string& filename,
+                                                    const std::filesystem::path& filename,
                                                                 bool forceRenderInvisible,
                                                         bool notifyInvisibleDropped) const
 {

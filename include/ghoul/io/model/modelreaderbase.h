@@ -29,6 +29,7 @@
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -45,11 +46,11 @@ class ModelReaderBase {
 public:
     /// The exception that gets thrown if there was an error loading the Model from file
     struct ModelLoadException : public RuntimeError {
-        explicit ModelLoadException(std::string name, std::string msg,
+        explicit ModelLoadException(std::filesystem::path name, std::string msg,
             const ModelReaderBase* r);
 
         /// The file that caused the exception to be thrown
-        const std::string filename;
+        const std::filesystem::path filename;
 
         /// The error message that occurred
         const std::string errorMessage;
@@ -72,7 +73,7 @@ public:
      * \throw ModelLoadException If there was an error loading the model from disk
      */
     virtual std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
-        const std::string& filename, bool forceRenderInvisible = false,
+        const std::filesystem::path& filename, bool forceRenderInvisible = false,
         bool notifyInvisibleDropped = true) const = 0;
 
     /**

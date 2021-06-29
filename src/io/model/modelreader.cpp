@@ -43,9 +43,9 @@ namespace {
 namespace ghoul::io {
 
 ModelReader::MissingReaderException::MissingReaderException(std::string extension,
-                                                            std::string f)
+                                                            std::filesystem::path f)
     : RuntimeError(fmt::format(
-        "No reader was found for extension '{}' with file '{}'", extension, f
+        "No reader was found for extension '{}' with file {}", extension, f
     ))
     , fileExtension(std::move(extension))
     , file(std::move(f))
@@ -57,14 +57,14 @@ ModelReader& ModelReader::ref() {
 }
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
-                                                              const std::string& filename,
+                                                    const std::filesystem::path& filename,
                                                 ForceRenderInvisible forceRenderInvisible,
                                             NotifyInvisibleDropped notifyInvisibleDropped)
 {
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    std::string extension = std::filesystem::path(filename).extension().string();
+    std::string extension = filename.extension().string();
     if (!extension.empty()) {
         extension = extension.substr(1);
     }
@@ -77,15 +77,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
 
     if (!reader->needsCache()) {
-        LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
+        LINFO(fmt::format("Loading ModelGeometry file {}", filename));
         return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
     }
 
-    std::string cachedFile = FileSys.cacheManager()->cachedFilename(filename);
+    std::filesystem::path cachedFile = FileSys.cacheManager()->cachedFilename(filename);
     bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
         LINFO(fmt::format(
-            "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename
+            "Cached file {} used for ModelGeometry file {}", cachedFile, filename
         ));
 
         try {
@@ -109,10 +109,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
     }
     else {
-        LINFO(fmt::format("Cache for ModelGeometry file '{}' not found", filename));
+        LINFO(fmt::format("Cache for ModelGeometry file {} not found", filename));
     }
 
-    LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
+    LINFO(fmt::format("Loading ModelGeometry file {}", filename));
 
     std::unique_ptr<modelgeometry::ModelGeometry> model =
         reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
