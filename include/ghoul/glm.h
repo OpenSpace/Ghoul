@@ -70,6 +70,11 @@
 
 #include <string>
 
+namespace {
+    template <class T, class... Ts>
+    struct is_any : std::disjunction<std::is_same<T, Ts>...> {};
+} // namespace
+
 namespace glm {
 
 template <typename genType>
@@ -91,6 +96,26 @@ struct glm_components<glm::vec<L, T, Q>> :
 template <glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
 struct glm_components<glm::mat<C, R, T, Q>> :
     public std::integral_constant<glm::length_t, C * R> {};
+
+template <typename T>
+constexpr bool isGlmMatrix() {
+    return is_any<T,
+        glm::mat2x2, glm::mat2x3, glm::mat2x4,
+        glm::mat3x2, glm::mat3x3, glm::mat3x4,
+        glm::mat4x2, glm::mat4x3, glm::mat4x4,
+        glm::dmat2x2, glm::dmat2x3, glm::dmat2x4,
+        glm::dmat3x2, glm::dmat3x3, glm::dmat3x4,
+        glm::dmat4x2, glm::dmat4x3, glm::dmat4x4>::value;
+}
+
+template <typename T>
+constexpr bool isGlmVector() {
+    return is_any<T,
+        glm::vec2, glm::vec3, glm::vec4,
+        glm::ivec2, glm::ivec3, glm::ivec4,
+        glm::dvec2, glm::dvec3, glm::dvec4,
+        glm::uvec2, glm::uvec3, glm::uvec4>::value;
+}
 
 template <typename valType>
 glm::tmat2x2<valType> createFillMat2x2(valType v) {
