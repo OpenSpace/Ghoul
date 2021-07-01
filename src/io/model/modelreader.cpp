@@ -99,7 +99,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         }
         catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
             LINFO(fmt::format(
-                "Encountered problem: '{}' while loading model from cache file: '{}'. "
+                "Encountered problem: '{}' while loading model from cache file: {}. "
                 "Deleting cache", e.errorMessage, cachedFile
             ));
             FileSys.cacheManager()->removeCacheFile(filename);
@@ -123,7 +123,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
     catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
         LINFO(fmt::format(
-            "Encountered problem: '{}' while saving model to cache file:'{}'. "
+            "Encountered problem: '{}' while saving model to cache file: {}. "
             "Deleting cache", e.errorMessage, e.filename
         ));
 
