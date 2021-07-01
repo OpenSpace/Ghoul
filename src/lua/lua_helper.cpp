@@ -509,7 +509,7 @@ void destroyLuaState(lua_State* state) {
     lua_close(state);
 }
 
-void runScriptFile(lua_State* state, const std::string& filename) {
+void runScriptFile(lua_State* state, const std::filesystem::path& filename) {
     ghoul_assert(state, "State must not be nullptr");
     ghoul_assert(!filename.empty(), "filename must not be empty");
     ghoul_assert(
@@ -517,7 +517,8 @@ void runScriptFile(lua_State* state, const std::string& filename) {
         "Filename must be a file that exists"
     );
 
-    int status = luaL_loadfile(state, filename.c_str());
+    std::string fn = filename.string();
+    int status = luaL_loadfile(state, fn.c_str());
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
         throw LuaLoadingException(error);

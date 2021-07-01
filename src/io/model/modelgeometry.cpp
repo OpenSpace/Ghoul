@@ -95,9 +95,9 @@ namespace {
 
 namespace ghoul::modelgeometry {
 
-ModelGeometry::ModelCacheException::ModelCacheException(std::string file,
+ModelGeometry::ModelCacheException::ModelCacheException(std::filesystem::path file,
                                                         std::string msg)
-    : RuntimeError(fmt::format("Error: '{}' with cache file: '{}'", msg, file))
+    : RuntimeError(fmt::format("Error: '{}' with cache file: {}", msg, file))
     , filename(std::move(file))
     , errorMessage(std::move(msg))
 {}
@@ -111,7 +111,9 @@ ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
 {}
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
-    const std::string& cachedFile, bool forceRenderInvisible, bool notifyInvisibleDropped)
+                                                  const std::filesystem::path& cachedFile,
+                                                                bool forceRenderInvisible,
+                                                              bool notifyInvisibleDropped)
 {
     std::ifstream fileStream(cachedFile, std::ifstream::binary);
     if (!fileStream.good()) {
@@ -499,7 +501,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     }
 }
 
-bool ModelGeometry::saveToCacheFile(const std::string& cachedFile) const {
+bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) const {
     std::ofstream fileStream(cachedFile, std::ofstream::binary);
     if (!fileStream.good()) {
         throw ModelCacheException( cachedFile, "Could not open file");

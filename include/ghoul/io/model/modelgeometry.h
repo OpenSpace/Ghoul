@@ -30,6 +30,7 @@
 #include <ghoul/io/model/modelmesh.h>
 #include <ghoul/io/model/modelnode.h>
 #include <ghoul/opengl/ghoul_gl.h>
+#include <filesystem>
 #include <memory>
 
 namespace ghoul::opengl { class ProgramObject; }
@@ -41,10 +42,10 @@ public:
     /// The exception that gets thrown if there was an error loading the cache file or
     /// saving this model to a cache file
     struct ModelCacheException : public RuntimeError {
-        explicit ModelCacheException(std::string file, std::string msg);
+        explicit ModelCacheException(std::filesystem::path file, std::string msg);
 
         /// The file that caused the exception to be thrown
-        const std::string filename;
+        const std::filesystem::path filename;
 
         /// The error message that occurred
         const std::string errorMessage;
@@ -62,9 +63,9 @@ public:
     ~ModelGeometry() noexcept = default;
 
     static std::unique_ptr<modelgeometry::ModelGeometry> loadCacheFile(
-        const std::string& cachedFile, bool forceRenderInvisible,
+        const std::filesystem::path& cachedFile, bool forceRenderInvisible,
         bool notifyInvisibleDropped);
-    bool saveToCacheFile(const std::string& cachedFile) const;
+    bool saveToCacheFile(const std::filesystem::path& cachedFile) const;
 
     void setTimeScale(float timeScale);
     void enableAnimation(bool value);

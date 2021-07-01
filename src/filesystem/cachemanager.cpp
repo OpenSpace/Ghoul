@@ -206,8 +206,8 @@ CacheManager::~CacheManager() {
     file << CacheVersion;
 }
 
-std::string CacheManager::cachedFilename(const std::filesystem::path& file,
-                                         std::optional<std::string_view> information)
+std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& file,
+                                              std::optional<std::string_view> information)
 {
     const std::filesystem::path baseName = file.filename();
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
@@ -246,7 +246,7 @@ std::string CacheManager::cachedFilename(const std::filesystem::path& file,
     if (it != _files.cend()) {
         // If we find the hash, it has been created before and we can just return the
         // file name to the caller
-        return it->second.string();
+        return it->second;
     }
 
     // Generate and output the newly generated cache name

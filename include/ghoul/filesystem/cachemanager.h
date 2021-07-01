@@ -86,7 +86,7 @@ public:
      *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
      *        <code>\></code>, or <code>.</code>) in the \p file
      */
-    [[nodiscard]] std::string cachedFilename(const std::filesystem::path& file,
+    [[nodiscard]] std::filesystem::path cachedFilename(const std::filesystem::path& file,
         std::optional<std::string_view> information = std::nullopt);
 
     /**

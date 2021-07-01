@@ -30,6 +30,7 @@
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
+#include <filesystem>
 #include <type_traits>
 
 namespace ghoul::lua {
@@ -64,10 +65,13 @@ void push(lua_State* L, T value) {
         lua_pushstring(L, value);
     }
     else if constexpr (std::is_same_v<T, std::string>) {
-        lua_pushstring(L, value.c_str());
+        lua_pushlstring(L, value.c_str(), value.size());
     }
     else if constexpr (std::is_same_v<T, std::string_view>) {
         lua_pushlstring(L, value.data(), value.size());
+    }
+    else if constexpr (std::is_same_v<T, std::filesystem::path>) {
+        lua_pushlstring(L, value.string().c_str(), value.string().size());
     }
     else if constexpr (std::is_same_v<T, std::vector<double>>
         || std::is_same_v<T, std::vector<float>>)

@@ -28,6 +28,7 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 
 struct lua_State;
 
@@ -376,7 +377,7 @@ void destroyLuaState(lua_State* state);
  * \pre \p filename must not be empty
  * \pre \p filename must be a file that exist
  */
-void runScriptFile(lua_State* state, const std::string& filename);
+void runScriptFile(lua_State* state, const std::filesystem::path& filename);
 
 /**
  * This function executes the Lua script provided as plain text in \p script using the

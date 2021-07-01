@@ -623,17 +623,17 @@ static void processNode(const aiNode& node, const aiScene& scene,
 }
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
-                                                              const std::string& filename,
+                                                    const std::filesystem::path& filename,
                                                                 bool forceRenderInvisible,
                                                         bool notifyInvisibleDropped) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    std::filesystem::path modelDirectory = std::filesystem::path(filename).parent_path();
+    std::filesystem::path modelDirectory = filename.parent_path();
 
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
-        filename,
+        filename.string(),
         aiProcess_Triangulate |       // Only triangles
         aiProcess_GenSmoothNormals |  // Generate smooth normals
         aiProcess_CalcTangentSpace    // Generate tangents and bitangents
