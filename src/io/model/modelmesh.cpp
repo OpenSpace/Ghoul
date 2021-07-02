@@ -74,60 +74,95 @@ void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
 }
 
 void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
-                       bool isTexturedModel) const
+                       bool isFullyTexturedModel, bool isProjection) const
 {
-    if (isTexturedModel) {
-        // Reset shader
-        program.setUniform("has_texture_diffuse", false);
-        program.setUniform("has_texture_normal", false);
-        program.setUniform("has_texture_specular", false);
-        program.setUniform("has_color_specular", false);
+    if (!isProjection) {
+        if (isFullyTexturedModel) {
+            // Reset shader
+            program.setUniform("has_texture_diffuse", false);
+            program.setUniform("has_texture_normal", false);
+            program.setUniform("has_texture_specular", false);
+            program.setUniform("has_color_specular", false);
 
-        // If mesh is invisible and it has not been forced to render then don't render
-        if (_isInvisible && _textures.empty()) {
-            return;
-        }
-
-        // Bind appropriate textures
-        int textureCounter = 0;
-        for (const Texture& texture : _textures) {
-            // Tell shader wether to render invisible mesh with flashy color or not
-            program.setUniform("use_forced_color", texture.useForcedColor);
-            if (texture.useForcedColor) {
-                break;
+            // If mesh is invisible and it has not been forced to render then don't render
+            if (_isInvisible && _textures.empty()) {
+                return;
             }
 
-            std::string name = textureTypeToString(texture.type);
-            // Use texture or color
-            if (texture.hasTexture) {
-                // Active proper texture unit before binding
-                glActiveTexture(GL_TEXTURE0 + textureCounter);
-
-                // Specular special case
-                if (texture.type == TextureType::TextureSpecular) {
-                    program.setUniform("has_color_specular", false);
+            // Bind appropriate textures
+            int textureCounter = 0;
+            for (const Texture& texture : _textures) {
+                // Tell shader wether to render invisible mesh with flashy color or not
+                program.setUniform("use_forced_color", texture.useForcedColor);
+                if (texture.useForcedColor) {
+                    break;
                 }
 
-                // Tell shader to use textures and set texture unit
-                program.setUniform("has_" + name, true);
-                program.setUniform(name, textureCounter);
+                std::string name = textureTypeToString(texture.type);
+                // Use texture or color
+                if (texture.hasTexture) {
+                    // Active proper texture unit before binding
+                    glActiveTexture(GL_TEXTURE0 + textureCounter);
 
-                // And finally bind the texture
-                texture.texture->bind();
-                ++textureCounter;
-            }
-            // Use embedded simple colors instead of textures
-            else {
-                if (texture.type == TextureType::ColorDiffuse) {
-                    program.setUniform("has_texture_diffuse", false);
-                }
-                else if (texture.type == TextureType::ColorSpecular) {
-                    program.setUniform("has_texture_specular", false);
+                    // Specular special case
+                    if (texture.type == TextureType::TextureSpecular) {
+                        program.setUniform("has_color_specular", false);
+                    }
+
+                    // Tell shader to use textures and set texture unit
                     program.setUniform("has_" + name, true);
-                }
+                    program.setUniform(name, textureCounter);
 
-                // Set the color in shader
-                program.setUniform(name, texture.color);
+                    // And finally bind the texture
+                    texture.texture->bind();
+                    ++textureCounter;
+                }
+                // Use embedded simple colors instead of textures
+                else {
+                    if (texture.type == TextureType::ColorDiffuse) {
+                        program.setUniform("has_texture_diffuse", false);
+                    }
+                    else if (texture.type == TextureType::ColorSpecular) {
+                        program.setUniform("has_texture_specular", false);
+                        program.setUniform("has_" + name, true);
+                    }
+
+                    // Set the color in shader
+                    program.setUniform(name, texture.color);
+                }
+            }
+        }
+        else {
+            // Reset shader
+            program.setUniform("has_texture_diffuse", false);
+
+            // Bind appropriate textures
+            for (const Texture& texture : _textures) {
+                if (texture.type == TextureType::TextureDiffuse ||
+                    texture.type == TextureType::ColorDiffuse)
+                {
+                    // Use texture or color
+                    if (texture.hasTexture) {
+                        // Active proper texture unit before binding
+                        glActiveTexture(GL_TEXTURE1);
+
+                        // Tell shader to use textures and set texture unit
+                        program.setUniform("has_texture_diffuse", true);
+                        program.setUniform("baseTexture", 1);
+
+                        // And finally bind the texture
+                        texture.texture->bind();
+                        break;
+                    }
+                    // Use embedded simple colors instead of textures
+                    else {
+                        program.setUniform("has_texture_diffuse", false);
+
+                        // Set the color in shader
+                        program.setUniform("baseColor", texture.color);
+                        break;
+                    }
+                }
             }
         }
     }

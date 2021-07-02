@@ -933,7 +933,8 @@ const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() 
 
 static void renderRecursive(const std::vector<io::ModelNode>& nodes,
                             const io::ModelNode* node, opengl::ProgramObject& program,
-                            glm::mat4x4& parentTransform, bool isTexturedModel)
+                            glm::mat4x4& parentTransform, bool isFullyTexturedModel,
+                            bool isProjection)
 {
     if (!node) {
         LERROR("Cannot render empty node");
@@ -951,22 +952,38 @@ static void renderRecursive(const std::vector<io::ModelNode>& nodes,
     }
 
     for (const io::ModelMesh& mesh : node->meshes()) {
-        mesh.render(program, globalTransform, isTexturedModel);
+        mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
     }
 
     for (int child : node->children()) {
-        renderRecursive(nodes, &nodes[child], program, globalTransform, isTexturedModel);
+        renderRecursive(
+            nodes,
+            &nodes[child],
+            program,
+            globalTransform,
+            isFullyTexturedModel,
+            isProjection
+        );
     }
 }
 
-void ModelGeometry::render(opengl::ProgramObject& program, bool isTexturedModel) const {
+void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedModel,
+                           bool isProjection) const
+{
     if (_nodes.empty()) {
         LERROR("Cannot render empty geometry");
         return;
     }
 
     glm::mat4x4 parentTransform = glm::mat4x4(1.f);
-    renderRecursive(_nodes, _nodes.data(), program, parentTransform, isTexturedModel);
+    renderRecursive(
+        _nodes,
+        _nodes.data(),
+        program,
+        parentTransform,
+        isFullyTexturedModel,
+        isProjection
+    );
 }
 
 void ModelGeometry::update(double now) {

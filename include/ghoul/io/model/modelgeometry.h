@@ -72,7 +72,8 @@ public:
 
     void initialize();
     void deinitialize();
-    void render(opengl::ProgramObject& program, bool isTexturedModel = true) const;
+    void render(opengl::ProgramObject& program, bool isFullyTexturedModel = true,
+        bool isProjection = false) const;
     void update(double now);
 
     double boundingRadius() const;
