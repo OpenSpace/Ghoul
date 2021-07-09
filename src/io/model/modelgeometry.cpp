@@ -38,7 +38,7 @@
 
 namespace {
     constexpr const char* _loggerCat = "ModelGeometry";
-    constexpr const int8_t CurrentCacheVersion = 6;
+    constexpr const int8_t CurrentCacheVersion = 7;
     constexpr const int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -390,10 +390,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         double duration;
         fileStream.read(reinterpret_cast<char*>(&duration), sizeof(double));
 
-        // TimeScale
-        float timeScale;
-        fileStream.read(reinterpret_cast<char*>(&timeScale), sizeof(float));
-
         // Read how many NodeAnimations to read
         int32_t nNodeAnimations = 0;
         fileStream.read(reinterpret_cast<char*>(&nNodeAnimations), sizeof(int32_t));
@@ -405,7 +401,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::unique_ptr<io::ModelAnimation> animation =
             std::make_unique<io::ModelAnimation>(io::ModelAnimation(name, duration));
         animation->nodeAnimations().reserve(nNodeAnimations);
-        animation->setTimeScale(timeScale);
         for (int32_t na = 0; na < nNodeAnimations; ++na) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
@@ -415,10 +410,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             nodeAnimation.node = nodeIndex;
 
             // Positions
-            uint8_t nPos;
-            fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint8_t));
+            uint32_t nPos;
+            fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint32_t));
             nodeAnimation.positions.reserve(nPos);
-            for (uint8_t p = 0; p < nPos; ++p) {
+            for (uint32_t p = 0; p < nPos; ++p) {
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
@@ -437,10 +432,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Rotations
-            uint8_t nRot;
-            fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint8_t));
+            uint32_t nRot;
+            fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
-            for (uint8_t p = 0; p < nRot; ++p) {
+            for (uint32_t p = 0; p < nRot; ++p) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
@@ -460,10 +455,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Scales
-            uint8_t nScale;
-            fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint8_t));
+            uint32_t nScale;
+            fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
-            for (uint8_t p = 0; p < nScale; ++p) {
+            for (uint32_t p = 0; p < nScale; ++p) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
@@ -734,10 +729,6 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         double duration = _animation->duration();
         fileStream.write(reinterpret_cast<const char*>(&duration), sizeof(double));
 
-        // TimeScale
-        float timeScale = _animation->timeScale();
-        fileStream.write(reinterpret_cast<const char*>(&timeScale), sizeof(float));
-
         // Write how many NodeAnimations are to be written
         int32_t nAnimations = static_cast<int32_t>(_animation->nodeAnimations().size());
         if (nAnimations == 0) {
@@ -754,11 +745,14 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             fileStream.write(reinterpret_cast<const char*>(&nodeIndex), sizeof(int32_t));
 
             // Positions
-            if (nodeAnimation.positions.size() >= std::numeric_limits<uint8_t>::max()) {
-                LWARNING("A maximum number of 255 position keyframes are supported");
+            if (nodeAnimation.positions.size() >= std::numeric_limits<uint32_t>::max()) {
+                LWARNING(fmt::format(
+                    "A maximum number of '{}' position keyframes are supported",
+                    std::numeric_limits<uint32_t>::max())
+                );
             }
-            uint8_t nPos = static_cast<uint8_t>(nodeAnimation.positions.size());
-            fileStream.write(reinterpret_cast<const char*>(&nPos), sizeof(uint8_t));
+            uint32_t nPos = static_cast<uint32_t>(nodeAnimation.positions.size());
+            fileStream.write(reinterpret_cast<const char*>(&nPos), sizeof(uint32_t));
             for (const io::ModelAnimation::PositionKeyframe& posKeyframe :
                 nodeAnimation.positions)
             {
@@ -784,11 +778,14 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             }
 
             // Rotations
-            uint8_t nRot = static_cast<uint8_t>(nodeAnimation.rotations.size());
-            if (nodeAnimation.rotations.size() >= std::numeric_limits<uint8_t>::max()) {
-                LWARNING("A maximum number of 255 rotation keyframes are supported");
+            uint32_t nRot = static_cast<uint32_t>(nodeAnimation.rotations.size());
+            if (nodeAnimation.rotations.size() >= std::numeric_limits<uint32_t>::max()) {
+                LWARNING(fmt::format(
+                    "A maximum number of '{}' rotation keyframes are supported",
+                    std::numeric_limits<uint32_t>::max())
+                );
             }
-            fileStream.write(reinterpret_cast<const char*>(&nRot), sizeof(uint8_t));
+            fileStream.write(reinterpret_cast<const char*>(&nRot), sizeof(uint32_t));
             for (const io::ModelAnimation::RotationKeyframe& rotKeyframe :
                 nodeAnimation.rotations)
             {
@@ -818,11 +815,14 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             }
 
             // Scales
-            uint8_t nScale = static_cast<uint8_t>(nodeAnimation.scales.size());
-            if (nodeAnimation.scales.size() >= std::numeric_limits<uint8_t>::max()) {
-                LWARNING("A maximum number of 255 scale keyframes are supported");
+            uint32_t nScale = static_cast<uint32_t>(nodeAnimation.scales.size());
+            if (nodeAnimation.scales.size() >= std::numeric_limits<uint32_t>::max()) {
+                LWARNING(fmt::format(
+                    "A maximum number of '{}' scale keyframes are supported",
+                    std::numeric_limits<uint32_t>::max())
+                );
             }
-            fileStream.write(reinterpret_cast<const char*>(&nScale), sizeof(uint8_t));
+            fileStream.write(reinterpret_cast<const char*>(&nScale), sizeof(uint32_t));
             for (const io::ModelAnimation::ScaleKeyframe& scaleKeyframe :
                 nodeAnimation.scales)
             {
