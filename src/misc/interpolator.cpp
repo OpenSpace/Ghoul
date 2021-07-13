@@ -23,27 +23,20 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <array>
+#include <ghoul/misc/interpolator.h>
+
 #include <glm/gtx/quaternion.hpp>
 
 namespace ghoul {
 
-template <typename T>
-T interpolateLinear(double t, const T& p0, const T& p1) {
-    return t * p1 + (1.0 - t) * p0;
+template <>
+glm::quat interpolateLinear(double t, const glm::quat& p0, const glm::quat& p1) {
+    return glm::slerp(p0, p1, static_cast<float>(t));
 }
 
-template <typename T>
-T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    const double t2 = t * t;
-    const double t3 = t2 * t;
-
-    return 0.5 * (
-        2.0 * p1 +
-        t * (p2 - p0) +
-        t2 * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) +
-        t3 * (3.0 * p1 - p0  - 3.0 * p2 + p3)
-    );
+template <>
+glm::dquat interpolateLinear(double t, const glm::dquat& p0, const glm::dquat& p1) {
+    return glm::slerp(p0, p1, t);
 }
 
 } // namespace ghoul
