@@ -39,4 +39,37 @@ glm::dquat interpolateLinear(double t, const glm::dquat& p0, const glm::dquat& p
     return glm::slerp(p0, p1, t);
 }
 
+// Based on implementation by Mika Rantanen, but without tension
+// https://qroph.github.io/2018/07/30/smooth-paths-using-catmull-rom-splines.html
+glm::dvec3 interpolateCatmullRom(double t, const glm::dvec3& p0, const glm::dvec3& p1,
+                                 const glm::dvec3& p2, const glm::dvec3& p3, double alpha)
+{
+    ghoul_assert(t >= 0 && t <= 1.0, "Interpolation variable must be in range [0,1]");
+    ghoul_assert(alpha >= 0 && alpha <= 1.0, "Alpha must be in range [0,1]");
+
+    const double t01 = std::pow(glm::distance(p0, p1), alpha);
+    const double t12 = std::pow(glm::distance(p1, p2), alpha);
+    const double t23 = std::pow(glm::distance(p2, p3), alpha);
+
+    constexpr const double Epsilon = 1E-7;
+    const glm::dvec3 zero = glm::dvec3(0.0);
+    const glm::dvec3 m01 = (t01 > Epsilon) ? (p1 - p0) / t01 : zero;
+    const glm::dvec3 m23 = (t23 > Epsilon) ? (p3 - p2) / t23 : zero;
+    const glm::dvec3 m02 = (t01 + t12 > Epsilon) ? (p2 - p0) / (t01 + t12) : zero;
+    const glm::dvec3 m13 = (t12 + t23 > Epsilon) ? (p3 - p1) / (t12 + t23) : zero;
+
+    const glm::dvec3 m1 = p2 - p1 + t12 * (m01 - m02);
+    const glm::dvec3 m2 = p2 - p1 + t12 * (m23 - m13);
+
+    const glm::dvec3 a = 2.0 * (p1 - p2) + m1 + m2;
+    const glm::dvec3 b = -3.0 * (p1 - p2) - m1 - m1 - m2;
+    const glm::dvec3 c = m1;
+    const glm::dvec3 d = p1;
+
+    return a * t * t * t
+        + b * t * t
+        + c * t
+        + d;
+}
+
 } // namespace ghoul

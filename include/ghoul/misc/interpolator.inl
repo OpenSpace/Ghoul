@@ -34,6 +34,15 @@ T interpolateLinear(double t, const T& p0, const T& p1) {
 }
 
 template <typename T>
+T interpolateCubicBezier(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
+    double a = 1.0 - t;
+    return p0 * a * a * a
+        + p1 * t * a * a * 3.0
+        + p2 * t * t * a * 3.0
+        + p3 * t * t * t;
+}
+
+template <typename T>
 T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
     const double t2 = t * t;
     const double t3 = t2 * t;
