@@ -55,12 +55,12 @@ double integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f) {
 
 template <typename T>
 T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
-    struct GaussLengendreCoefficient {
+    struct GaussLegendreCoefficient {
         double abscissa; // xi
         double weight;   // wi
     };
 
-    static constexpr GaussLengendreCoefficient coefficients[] = {
+    static constexpr GaussLegendreCoefficient coefficients[] = {
         { 0.0, 0.5688889 },
         { -0.5384693, 0.47862867 },
         { 0.5384693, 0.47862867 },
@@ -71,7 +71,7 @@ T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
     const double a = t0;
     const double b = t1;
     T sum = 0.0;
-    for (auto coefficient : coefficients) {
+    for (const GaussLegendreCoefficient& coefficient : coefficients) {
         // change of interval from [-1, 1]  to [a, b] (also 0.5 * (b - a) below)
         double const t = 0.5 * ((b - a) * coefficient.abscissa + (b + a));
         sum += f(t) * coefficient.weight;

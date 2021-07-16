@@ -44,8 +44,8 @@ glm::dquat interpolateLinear(double t, const glm::dquat& p0, const glm::dquat& p
 glm::dvec3 interpolateCatmullRom(double t, const glm::dvec3& p0, const glm::dvec3& p1,
                                  const glm::dvec3& p2, const glm::dvec3& p3, double alpha)
 {
-    ghoul_assert(t >= 0 && t <= 1.0, "Interpolation variable must be in range [0,1]");
-    ghoul_assert(alpha >= 0 && alpha <= 1.0, "Alpha must be in range [0,1]");
+    ghoul_assert(t >= 0.0 && t <= 1.0, "Interpolation variable must be in range [0,1]");
+    ghoul_assert(alpha >= 0.0 && alpha <= 1.0, "Alpha must be in range [0,1]");
 
     const double t01 = std::pow(glm::distance(p0, p1), alpha);
     const double t12 = std::pow(glm::distance(p1, p2), alpha);

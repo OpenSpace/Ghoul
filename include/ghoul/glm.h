@@ -117,19 +117,20 @@ constexpr bool isGlmVector() {
         glm::uvec2, glm::uvec3, glm::uvec4>::value;
 }
 
-/*
+/**
  * Compute a quaternion that represents the rotation looking from \p eye to
  * \p target, with the specified \p up direction
  */
 template <typename valType>
-glm::tquat<valType> lookAtQuaternion(glm::tvec3<valType> eye, glm::tvec3<valType> target,
-                                     glm::tvec3<valType> up)
+glm::tquat<valType> lookAtQuaternion(const glm::tvec3<valType> eye,
+                                     const glm::tvec3<valType> target,
+                                     const glm::tvec3<valType> up)
 {
     const glm::tmat4x4<valType> lookAtMat = glm::lookAt(eye, target, up);
     return glm::normalize(glm::inverse(glm::quat_cast(lookAtMat)));
 }
 
-/*
+/**
  * Compute a view direction vector from a quaternion representing a rotation
  */
 inline glm::dvec3 viewDirection(const glm::dquat& q) {
