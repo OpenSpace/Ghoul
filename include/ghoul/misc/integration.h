@@ -23,36 +23,44 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <array>
-#include <glm/gtx/quaternion.hpp>
+#ifndef __GHOUL___INTEGRATION___H__
+#define __GHOUL___INTEGRATION___H__
+
+#include <functional>
 
 namespace ghoul {
 
-template <typename T>
-T interpolateLinear(double t, const T& p0, const T& p1) {
-    return t * p1 + (1.0 - t) * p0;
-}
+template <typename T> using Integrand = std::function<T(double)>;
 
+/**
+ * Compute the approximate integral of integrand \p f numerially using Simpson's Rule.
+ * The interval for the integration is given by \p t0 and \p t1.
+ *
+ * \param t0 The lower bound for the integration interval
+ * \param t1 The upper bound for the integration interval
+ * \param n The resolution for the integration. Should be an even number
+ * \param f The integrand for the integration, as a function of t (double)
+ * \return The approximated integral of function \p f over the interval [t0, t1]
+ */
 template <typename T>
-T interpolateCubicBezier(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    double a = 1.0 - t;
-    return p0 * a * a * a
-        + p1 * t * a * a * 3.0
-        + p2 * t * t * a * 3.0
-        + p3 * t * t * t;
-}
+T integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f);
 
+/**
+ * Compute the approximate integral of integrand \p f numerially using 5-point Gaussian
+ * quadrature with Legendre points. This should be exact for polyniomial functions of
+ * degree 9 or less. https://en.wikipedia.org/wiki/Gaussian_quadrature
+ * The interval for the integration is given by \p t0 and \p t1.
+ *
+ * \param t0 The lower bound for the integration interval
+ * \param t1 The upper bound for the integration interval
+ * \param f The integrand for the integration, as a function of t (double)
+ * \return The approximated integral of function \p f over the interval [t0, t1]
+ */
 template <typename T>
-T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    const double t2 = t * t;
-    const double t3 = t2 * t;
-
-    return 0.5 * (
-        2.0 * p1 +
-        t * (p2 - p0) +
-        t2 * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) +
-        t3 * (3.0 * p1 - p0  - 3.0 * p2 + p3)
-    );
-}
+T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f);
 
 } // namespace ghoul
+
+#include "integration.inl"
+
+#endif // __GHOUL___INTEGRATION___H__

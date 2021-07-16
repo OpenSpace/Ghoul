@@ -23,36 +23,60 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <array>
-#include <glm/gtx/quaternion.hpp>
-
 namespace ghoul {
 
 template <typename T>
-T interpolateLinear(double t, const T& p0, const T& p1) {
-    return t * p1 + (1.0 - t) * p0;
+double integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f) {
+    ghoul_assert(n >= 2, "Number of partitions, n, must be at least 2");
+
+    if (n % 2 != 0) {
+        n += 1; // n must be an even number
+    }
+
+    const double h = (t1 - t0) / static_cast<double>(n);
+    const T endpoints = f(t0) + f(t1);
+    T times4 = T(0);
+    T times2 = T(0);
+
+    // weight 4
+    for (int i = 1; i < n; i += 2) {
+        double t = t0 + static_cast<double>(i) * h;
+        times4 += f(t);
+    }
+
+    // weight 2
+    for (int i = 2; i < n; i += 2) {
+        double t = t0 + static_cast<double>(i) * h;
+        times2 += f(t);
+    }
+
+    return (h / 3.0) * (endpoints + 4.0 * times4 + 2.0 * times2);
 }
 
 template <typename T>
-T interpolateCubicBezier(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    double a = 1.0 - t;
-    return p0 * a * a * a
-        + p1 * t * a * a * 3.0
-        + p2 * t * t * a * 3.0
-        + p3 * t * t * t;
-}
+T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
+    struct GaussLegendreCoefficient {
+        double abscissa; // xi
+        double weight;   // wi
+    };
 
-template <typename T>
-T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    const double t2 = t * t;
-    const double t3 = t2 * t;
+    static constexpr GaussLegendreCoefficient coefficients[] = {
+        { 0.0, 0.5688889 },
+        { -0.5384693, 0.47862867 },
+        { 0.5384693, 0.47862867 },
+        { -0.90617985, 0.23692688 },
+        { 0.90617985, 0.23692688 }
+    };
 
-    return 0.5 * (
-        2.0 * p1 +
-        t * (p2 - p0) +
-        t2 * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) +
-        t3 * (3.0 * p1 - p0  - 3.0 * p2 + p3)
-    );
+    const double a = t0;
+    const double b = t1;
+    T sum = 0.0;
+    for (const GaussLegendreCoefficient& coefficient : coefficients) {
+        // change of interval from [-1, 1]  to [a, b] (also 0.5 * (b - a) below)
+        double const t = 0.5 * ((b - a) * coefficient.abscissa + (b + a));
+        sum += f(t) * coefficient.weight;
+    }
+    return 0.5 * (b - a) * sum;
 }
 
 } // namespace ghoul
