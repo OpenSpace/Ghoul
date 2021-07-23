@@ -54,7 +54,7 @@ public:
 
     struct Texture {
         opengl::Texture* texture = nullptr;
-        TextureType type;
+        TextureType type = TextureType::TextureDiffuse;
         bool hasTexture = false;
         bool useForcedColor = false;
         glm::vec3 color;
