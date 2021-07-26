@@ -30,6 +30,7 @@
 #include <ghoul/font/fonterrors.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/defer.h>
 #include <ghoul/misc/misc.h>
 #include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/textureatlas.h>
@@ -151,14 +152,19 @@ Font::Font(std::filesystem::path filename, float pointSize, opengl::TextureAtlas
     // Get font metrics at higher resolution for increased accuracy
     constexpr const float HighFaceResolutionFactor = 100.f;
 
-    FT_Library library;
-    FT_Face face;
+    FT_Library library = nullptr;
+    FT_Face face = nullptr;
+    defer {
+        if (face) {
+            FT_Done_Face(face);
+        }
+        if (library) {
+            FT_Done_FreeType(library);
+        }
+    };
     loadFace(_name, _pointSize * HighFaceResolutionFactor, library, face);
 
     _height = (face->size->metrics.height >> 6) / HighFaceResolutionFactor;
-
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
 
     _glyphs.reserve(128);
 
@@ -252,11 +258,27 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
 
     FT_Library library = nullptr;
     FT_Face face = nullptr;
+    defer {
+        if (face) {
+            FT_Done_Face(face);
+        }
+        if (library) {
+            FT_Done_FreeType(library);
+        }
+    };
     loadFace(_name, _pointSize, library, face);
 
     constexpr const float HighResolutionFactor = 10.f;
     FT_Library libraryHighRes = nullptr;
     FT_Face faceHighRes = nullptr;
+    defer {
+        if (face) {
+            FT_Done_Face(faceHighRes);
+        }
+        if (library) {
+            FT_Done_FreeType(libraryHighRes);
+        }
+    };
     loadFace(_name, _pointSize * HighResolutionFactor, libraryHighRes, faceHighRes);
 
     // check for invalid glyph codes first
@@ -452,15 +474,21 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         );
     }
 
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
     _atlas.upload();
     generateKerning();
 }
 
 void Font::generateKerning() {
-    FT_Library library;
-    FT_Face face;
+    FT_Library library = nullptr;
+    FT_Face face = nullptr;
+    defer {
+        if (face) {
+            FT_Done_Face(face);
+        }
+        if (library) {
+            FT_Done_FreeType(library);
+        }
+    };
     loadFace(_name, _pointSize, library, face);
 
     const bool hasKerning = FT_HAS_KERNING(face);
@@ -485,9 +513,6 @@ void Font::generateKerning() {
             }
         }
     }
-
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
 }
 
 } // namespace ghoul::fontrendering
