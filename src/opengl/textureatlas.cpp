@@ -47,6 +47,12 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
     ghoul_assert(_size.z >= 1, "Depth has to be positive");
     ghoul_assert(_size.z <= 4, "Depth has to be smaller or equal to 4");
 
+    // Since we are using uint16 as the index type in the handle type, we can't support
+    // textures with a bigger size than 65535 (which would be a big texture *anyway*)
+    ghoul_assert(_size.x <= std::numeric_limits<uint16_t>::max(), "Texture.x too large");
+    ghoul_assert(_size.y <= std::numeric_limits<uint16_t>::max(), "Texture.y too large");
+    ghoul_assert(_size.z <= std::numeric_limits<uint16_t>::max(), "Texture.z too large");
+
     _nodes.emplace_back(1, 1, _size.x - 2);
     _data.resize(_size.x * _size.y * _size.z);
     std::fill(_data.begin(), _data.end(), static_cast<unsigned char>(0));
@@ -105,17 +111,7 @@ void TextureAtlas::initialize() {
         }
     }(_size.z);
     GLenum internalFormat = GLenum(format);
-
-    // Normally, we want to store data as single bytes, but if the reversed format is
-    // supported, we can use that for depth==4 atlasses
     GLenum dataType = GL_UNSIGNED_BYTE;
-
-#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-    if (_size.z == 4) {
-        internalFormat = GL_BGRA;
-        dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
-    }
-#endif
 
     _texture = std::make_unique<Texture>(
         _size,
@@ -223,7 +219,11 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     region.w -= 1;
 
     // Make the location information retrievable
-    _handleInformation.push_back(region);
+
+    ghoul_assert(glm::all(glm::greaterThanEqual(region, glm::ivec4(0))), "Invalid region");
+    ghoul_assert(glm::all(glm::lessThan(region, glm::ivec4(std::numeric_limits<uint16_t>::max()))), "Invalid region");
+
+    _handleInformation.push_back(glm::u16vec4(region));
 
     // Since we push_back the region, the current handle is the last valid array index
     RegionHandle handle = static_cast<RegionHandle>(_handleInformation.size() - 1);
@@ -234,12 +234,12 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
     ghoul_assert(data, "Data must not be a nullptr");
     ghoul_assert(_texture, "TextureAtlas has not been initialized");
 
-    glm::ivec4 region = _handleInformation[handle];
+    const glm::u16vec4& region = _handleInformation[handle];
 
-    const int x = region.x;
-    const int y = region.y;
-    const int width = region.z;
-    const int height = region.w;
+    const uint16_t x = region.x;
+    const uint16_t y = region.y;
+    const uint16_t width = region.z;
+    const uint16_t height = region.w;
 
     ghoul_assert(x > 0, "x argument out of bounds");
     ghoul_assert(x < (_size.x - 1), "x argument out of bounds");
@@ -269,7 +269,7 @@ TextureAtlas::TextureCoordinatesResult TextureAtlas::textureCoordinates(
 {
     ghoul_assert(_texture, "TextureAtlas has not been initialized");
 
-    const glm::ivec4& region = _handleInformation[handle];
+    const glm::u16vec4& region = _handleInformation[handle];
 
     // Offset the location to the pixel center
     const int topLeftX = region.x + windowing.x;
@@ -287,7 +287,7 @@ TextureAtlas::TextureCoordinatesResult TextureAtlas::textureCoordinates(
     return res;
 }
 
-int TextureAtlas::atlasFit(size_t index, int width, int height) {
+int TextureAtlas::atlasFit(size_t index, int width, int height) const {
     const int x = _nodes[index].x;
     int y = _nodes[index].y;
 
