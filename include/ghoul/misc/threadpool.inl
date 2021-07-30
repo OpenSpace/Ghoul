@@ -31,7 +31,7 @@ template <typename F, typename... Arg>
 auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> {
     using ReturnType = decltype(f(arg...));
 
-    std::lock_guard<std::mutex> guard(_queueMutex);
+    std::lock_guard guard(_queueMutex);
     // We wrap the packaged_task into a shared pointer so that we can store it in the
     // lambda expression below. The capture of the lambda expression will keep this
     // packaged_task alive
@@ -60,7 +60,7 @@ template <typename T, typename... Args>
 auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... arguments)
     -> decltype(task.get_future())
 {
-    std::lock_guard<std::mutex> guard(_queueMutex);
+    std::lock_guard guard(_queueMutex);
 
     std::shared_ptr<std::packaged_task<T>> pck =
         std::make_shared<std::packaged_task<T>>(std::move(task));

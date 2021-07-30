@@ -314,7 +314,7 @@ void TcpSocket::streamInput() {
             return;
         }
 
-        std::lock_guard<std::mutex> lock(_inputInterceptionMutex);
+        std::lock_guard lock(_inputInterceptionMutex);
 
         if (_inputInterceptor) {
             _inputInterceptor(_inputBuffer.data(), nReadBytes);
