@@ -1,7 +1,7 @@
 * text=auto
 
 # No need to index any external files
-ext/* linguist-vendored
+*ext/* linguist-vendored
 # No C allowed
 *.h linguist-language=C++
 
