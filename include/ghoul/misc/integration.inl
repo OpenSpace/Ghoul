@@ -23,76 +23,60 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELMESH___H__
-#define __GHOUL___MODELMESH___H__
+namespace ghoul {
 
-#include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/opengl/texture.h>
-#include <ghoul/glm.h>
-#include <vector>
+template <typename T>
+double integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f) {
+    ghoul_assert(n >= 2, "Number of partitions, n, must be at least 2");
 
-namespace ghoul::opengl { class ProgramObject; }
+    if (n % 2 != 0) {
+        n += 1; // n must be an even number
+    }
 
-namespace ghoul::io {
+    const double h = (t1 - t0) / static_cast<double>(n);
+    const T endpoints = f(t0) + f(t1);
+    T times4 = T(0);
+    T times2 = T(0);
 
-class ModelMesh {
-public:
-    enum class TextureType : uint8_t {
-        TextureDiffuse = 0,
-        TextureNormal,
-        TextureSpecular,
-        ColorDiffuse,
-        ColorSpecular
+    // weight 4
+    for (int i = 1; i < n; i += 2) {
+        double t = t0 + static_cast<double>(i) * h;
+        times4 += f(t);
+    }
+
+    // weight 2
+    for (int i = 2; i < n; i += 2) {
+        double t = t0 + static_cast<double>(i) * h;
+        times2 += f(t);
+    }
+
+    return (h / 3.0) * (endpoints + 4.0 * times4 + 2.0 * times2);
+}
+
+template <typename T>
+T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
+    struct GaussLegendreCoefficient {
+        double abscissa; // xi
+        double weight;   // wi
     };
 
-    struct Vertex {
-        GLfloat position[3];
-        GLfloat tex[2];
-        GLfloat normal[3];
-        GLfloat tangent[3];
+    static constexpr GaussLegendreCoefficient coefficients[] = {
+        { 0.0, 0.5688889 },
+        { -0.5384693, 0.47862867 },
+        { 0.5384693, 0.47862867 },
+        { -0.90617985, 0.23692688 },
+        { 0.90617985, 0.23692688 }
     };
 
-    struct Texture {
-        opengl::Texture* texture = nullptr;
-        TextureType type = TextureType::TextureDiffuse;
-        bool hasTexture = false;
-        bool useForcedColor = false;
-        glm::vec3 color;
-    };
+    const double a = t0;
+    const double b = t1;
+    T sum = 0.0;
+    for (const GaussLegendreCoefficient& coefficient : coefficients) {
+        // change of interval from [-1, 1]  to [a, b] (also 0.5 * (b - a) below)
+        double const t = 0.5 * ((b - a) * coefficient.abscissa + (b + a));
+        sum += f(t) * coefficient.weight;
+    }
+    return 0.5 * (b - a) * sum;
+}
 
-    static void generateDebugTexture(ModelMesh::Texture& texture);
-
-    ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-        std::vector<Texture> textures, bool isInvisible = false);
-
-    ModelMesh(ModelMesh&&) noexcept = default;
-    ~ModelMesh() noexcept = default;
-
-    void initialize();
-    void deinitialize();
-    void render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
-        bool isFullyTexturedModel = true, bool isProjection = false) const;
-    float calculateBoundingRadius(glm::mat4x4& transform) const;
-
-    void setInvisible(bool isInvisible);
-    bool isInvisible() const;
-
-    const std::vector<Vertex>& vertices() const;
-    const std::vector<unsigned int>& indices() const;
-    const std::vector<Texture>& textures() const;
-
-private:
-    std::vector<Vertex> _vertices;
-    std::vector<unsigned int> _indices;
-    std::vector<Texture> _textures;
-
-    bool _isInvisible = false;
-
-    GLuint _vaoID = 0;
-    GLuint _vbo = 0;
-    GLuint _ibo = 0;
-};
-
-} // namespace ghoul::io
-
-#endif // __GHOUL___MODELMESH___H__
+} // namespace ghoul

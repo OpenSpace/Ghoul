@@ -23,76 +23,44 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELMESH___H__
-#define __GHOUL___MODELMESH___H__
+#ifndef __GHOUL___INTEGRATION___H__
+#define __GHOUL___INTEGRATION___H__
 
-#include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/opengl/texture.h>
-#include <ghoul/glm.h>
-#include <vector>
+#include <functional>
 
-namespace ghoul::opengl { class ProgramObject; }
+namespace ghoul {
 
-namespace ghoul::io {
+template <typename T> using Integrand = std::function<T(double)>;
 
-class ModelMesh {
-public:
-    enum class TextureType : uint8_t {
-        TextureDiffuse = 0,
-        TextureNormal,
-        TextureSpecular,
-        ColorDiffuse,
-        ColorSpecular
-    };
+/**
+ * Compute the approximate integral of integrand \p f numerially using Simpson's Rule.
+ * The interval for the integration is given by \p t0 and \p t1.
+ *
+ * \param t0 The lower bound for the integration interval
+ * \param t1 The upper bound for the integration interval
+ * \param n The resolution for the integration. Should be an even number
+ * \param f The integrand for the integration, as a function of t (double)
+ * \return The approximated integral of function \p f over the interval [t0, t1]
+ */
+template <typename T>
+T integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f);
 
-    struct Vertex {
-        GLfloat position[3];
-        GLfloat tex[2];
-        GLfloat normal[3];
-        GLfloat tangent[3];
-    };
+/**
+ * Compute the approximate integral of integrand \p f numerially using 5-point Gaussian
+ * quadrature with Legendre points. This should be exact for polyniomial functions of
+ * degree 9 or less. https://en.wikipedia.org/wiki/Gaussian_quadrature
+ * The interval for the integration is given by \p t0 and \p t1.
+ *
+ * \param t0 The lower bound for the integration interval
+ * \param t1 The upper bound for the integration interval
+ * \param f The integrand for the integration, as a function of t (double)
+ * \return The approximated integral of function \p f over the interval [t0, t1]
+ */
+template <typename T>
+T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f);
 
-    struct Texture {
-        opengl::Texture* texture = nullptr;
-        TextureType type = TextureType::TextureDiffuse;
-        bool hasTexture = false;
-        bool useForcedColor = false;
-        glm::vec3 color;
-    };
+} // namespace ghoul
 
-    static void generateDebugTexture(ModelMesh::Texture& texture);
+#include "integration.inl"
 
-    ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-        std::vector<Texture> textures, bool isInvisible = false);
-
-    ModelMesh(ModelMesh&&) noexcept = default;
-    ~ModelMesh() noexcept = default;
-
-    void initialize();
-    void deinitialize();
-    void render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
-        bool isFullyTexturedModel = true, bool isProjection = false) const;
-    float calculateBoundingRadius(glm::mat4x4& transform) const;
-
-    void setInvisible(bool isInvisible);
-    bool isInvisible() const;
-
-    const std::vector<Vertex>& vertices() const;
-    const std::vector<unsigned int>& indices() const;
-    const std::vector<Texture>& textures() const;
-
-private:
-    std::vector<Vertex> _vertices;
-    std::vector<unsigned int> _indices;
-    std::vector<Texture> _textures;
-
-    bool _isInvisible = false;
-
-    GLuint _vaoID = 0;
-    GLuint _vbo = 0;
-    GLuint _ibo = 0;
-};
-
-} // namespace ghoul::io
-
-#endif // __GHOUL___MODELMESH___H__
+#endif // __GHOUL___INTEGRATION___H__

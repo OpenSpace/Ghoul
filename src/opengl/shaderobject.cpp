@@ -233,7 +233,13 @@ void ShaderObject::rebuildFromFile() {
 #ifdef GHL_DEBUG
     std::filesystem::path generatedFilename;
 
-    std::filesystem::path base = _shaderName.empty() ? filename().stem() : _shaderName;
+    std::filesystem::path base;
+    if (_shaderName.empty()) {
+        base = filename().stem();
+    } else {
+        base = _shaderName;
+    }
+
     if (FileSys.cacheManager()) {
         // we use the .baseName() version because otherwise we get a new file
         // every time we reload the shader

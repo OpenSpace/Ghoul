@@ -247,13 +247,13 @@ public:
     const Texture& texture() const;
 
 private:
-    int atlasFit(size_t index, int width, int height);
+    int atlasFit(size_t index, int width, int height) const;
     void atlasMerge();
 
     std::vector<glm::ivec3> _nodes;
 
     /// All of the individual elements that are stored in the atlas
-    std::vector<glm::ivec4> _handleInformation;
+    std::vector<glm::u16vec4> _handleInformation;
 
     /// Size of the texture
     glm::ivec3 _size = glm::ivec3(0);

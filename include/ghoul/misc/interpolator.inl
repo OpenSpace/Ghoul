@@ -33,14 +33,13 @@ T interpolateLinear(double t, const T& p0, const T& p1) {
     return t * p1 + (1.0 - t) * p0;
 }
 
-template <>
-glm::quat interpolateLinear(double t, const glm::quat& p0, const glm::quat& p1) {
-    return glm::slerp(p0, p1, static_cast<float>(t));
-}
-
-template <>
-glm::dquat interpolateLinear(double t, const glm::dquat& p0, const glm::dquat& p1) {
-    return glm::slerp(p0, p1, t);
+template <typename T>
+T interpolateCubicBezier(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
+    double a = 1.0 - t;
+    return p0 * a * a * a
+        + p1 * t * a * a * 3.0
+        + p2 * t * t * a * 3.0
+        + p3 * t * t * t;
 }
 
 template <typename T>

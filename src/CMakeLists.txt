@@ -23,7 +23,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-set(GHOUL_SOURCE 
+set(GHOUL_SOURCE
   filesystem/cachemanager.cpp
   filesystem/file.cpp
   filesystem/filesystem.cpp
@@ -61,6 +61,7 @@ set(GHOUL_SOURCE
   misc/dictionaryluaformatter.cpp
   misc/easing.cpp
   misc/exception.cpp
+  misc/interpolator.cpp
   misc/misc.cpp
   misc/sharedmemory.cpp
   misc/stacktrace.cpp
@@ -194,6 +195,8 @@ set(GHOUL_HEADER
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/easing.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/easing.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/exception.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/integration.h
+  ${PROJECT_SOURCE_DIR}/include/ghoul/misc/integration.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
   ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
@@ -330,7 +333,7 @@ endif ()
 
 # Place files into source_group
 foreach (file ${GHOUL_SOURCE} ${GHOUL_HEADER})
-  # Remove prefixes from the files 
+  # Remove prefixes from the files
   set(original_file ${file})
   string(REPLACE "${PROJECT_SOURCE_DIR}/src/" "" file ${file})
   string(REPLACE "${PROJECT_SOURCE_DIR}/include/ghoul/" "" file ${file})
