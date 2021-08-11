@@ -31,7 +31,7 @@
 
 namespace {
     constexpr const char* _loggerCat = "ModelReaderBinary";
-    constexpr const int8_t CurrentModelVersion = 6;
+    constexpr const int8_t CurrentModelVersion = 7;
     constexpr const int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -372,10 +372,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         double duration;
         fileStream.read(reinterpret_cast<char*>(&duration), sizeof(double));
 
-        // TimeScale
-        float timeScale;
-        fileStream.read(reinterpret_cast<char*>(&timeScale), sizeof(float));
-
         // Read how many NodeAnimations to read
         int32_t nNodeAnimations = 0;
         fileStream.read(reinterpret_cast<char*>(&nNodeAnimations), sizeof(int32_t));
@@ -387,7 +383,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         std::unique_ptr<io::ModelAnimation> animation =
             std::make_unique<io::ModelAnimation>(io::ModelAnimation(name, duration));
         animation->nodeAnimations().reserve(nNodeAnimations);
-        animation->setTimeScale(timeScale);
         for (int32_t na = 0; na < nNodeAnimations; ++na) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
@@ -397,10 +392,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             nodeAnimation.node = nodeIndex;
 
             // Positions
-            uint8_t nPos;
-            fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint8_t));
+            uint32_t nPos;
+            fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint32_t));
             nodeAnimation.positions.reserve(nPos);
-            for (uint8_t p = 0; p < nPos; ++p) {
+            for (uint32_t p = 0; p < nPos; ++p) {
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
@@ -419,10 +414,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             }
 
             // Rotations
-            uint8_t nRot;
-            fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint8_t));
+            uint32_t nRot;
+            fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
-            for (uint8_t p = 0; p < nRot; ++p) {
+            for (uint32_t p = 0; p < nRot; ++p) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
@@ -442,10 +437,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             }
 
             // Scales
-            uint8_t nScale;
-            fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint8_t));
+            uint32_t nScale;
+            fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
-            for (uint8_t p = 0; p < nScale; ++p) {
+            for (uint32_t p = 0; p < nScale; ++p) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale

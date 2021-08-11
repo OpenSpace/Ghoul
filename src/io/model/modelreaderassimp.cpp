@@ -464,9 +464,8 @@ static void processNode(const aiNode& node, const aiScene& scene,
                         std::vector<ModelNode>& nodes, int parent,
                         std::unique_ptr<ModelAnimation>& modelAnimation,
                   std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
-                                                                bool forceRenderInvisible,
-                                                              bool notifyInvisibleDropped,
-                                                    std::filesystem::path& modelDirectory)
+                        bool forceRenderInvisible, bool notifyInvisibleDropped,
+                        std::filesystem::path& modelDirectory)
 {
     // Convert transform matrix of the node
     // Assimp stores matrixes in row major and glm stores matrixes in column major
