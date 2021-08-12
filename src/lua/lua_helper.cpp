@@ -577,7 +577,7 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
 int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* component)
 {
     const int nArguments = lua_gettop(L);
-    if ((nArguments < range.first) && (nArguments > range.second)) {
+    if ((nArguments < range.first) || (nArguments > range.second)) {
         std::string s = fmt::format(
             "Expected {}-{} arguments, got {}", range.first, range.second, nArguments
         );
