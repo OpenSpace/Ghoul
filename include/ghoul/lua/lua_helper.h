@@ -29,6 +29,7 @@
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <filesystem>
+#include <tuple>
 
 struct lua_State;
 
@@ -495,6 +496,9 @@ T value(lua_State* L, int location = -1, PopValue shouldPopValue = PopValue::No)
  */
 template <typename T>
 T value(lua_State* L, const char* name, PopValue shouldPopValue = PopValue::No);
+
+template <typename... Ts>
+constexpr void values(lua_State* L, std::tuple<Ts...>& tuple, int location = 1);
 
 /**
  * Pushes the passed parameters \p args onto the provided stack \p L in the order that

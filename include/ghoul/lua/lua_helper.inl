@@ -31,11 +31,73 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 #include <filesystem>
+#include <optional>
 #include <type_traits>
 
 namespace ghoul::lua {
 
 namespace internal {
+
+template <typename T>
+struct is_optional : std::false_type {};
+
+template <typename T>
+struct is_optional<std::optional<T>> : std::true_type {};
+
+template <size_t I = 0, typename... Ts>
+constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLocation,
+                             int nArguments)
+{
+    using T = std::tuple_element_t<I, std::tuple<Ts...>>;
+
+    if constexpr (is_optional<T>::value) {
+        if (baseLocation + I > nArguments) {
+            // We have reached the end of the arguments and only have optional now, so we
+            // can bail out
+            return;
+        }
+        else {
+            // We are looking at an optional parameter that is provided
+            std::get<I>(tuple) = value<T::value_type>(L, baseLocation + I, PopValue::No);
+        }
+    }
+    else {
+        std::get<I>(tuple) = value<T>(L, baseLocation + I, PopValue::No);
+    }
+
+    if constexpr (I+1 != sizeof...(Ts)) {
+        extractValues<I+1>(L, tuple, baseLocation, nArguments);
+    }
+}
+
+enum class Phase {
+    Mandatory,
+    Optional
+};
+
+template <size_t I = 0, typename... Ts>
+constexpr bool verifyParameters(Phase phase = Phase::Mandatory) {
+    using T = std::tuple_element_t<I, std::tuple<Ts...>>;
+
+    if constexpr (is_optional<T>::value) {
+        phase = Phase::Optional;
+    }
+    else {
+        if (phase == Phase::Optional) {
+            // We are currently in the optional phase, but we have a non-optional type,
+            // which is not allowed
+            return false;
+        }
+    }
+
+    if constexpr (I+1 != sizeof...(Ts)) {
+        return verifyParameters<I+1, Ts...>(phase);
+    }
+    else {
+        // We have reached the end without a single failure -> success
+        return true;
+    }
+}
 
 template <typename T>
 void push(lua_State* L, T value) {
@@ -222,6 +284,23 @@ T value(lua_State* L, const char* name, PopValue shouldPopValue) {
     }
 
     return res;
+}
+
+template <typename... Ts>
+constexpr void values(lua_State* L, std::tuple<Ts...>& tuple, int location) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
+
+    // Verify that we don't have a situation where we have non-optional parameters, then
+    // optional parameters, and then non-optional parameters again as that will bork up
+    // the argument calculations
+    static_assert(
+        internal::verifyParameters<0, Ts...>(),
+        "Tuple parameters have to list all non-optional parameters first, then the "
+        "optional ones and cannot get back to non-optional parameters"
+    );
+
+    int n = lua_gettop(L);
+    internal::extractValues(L, tuple, location, n);
 }
 
 template <typename... Ts>
