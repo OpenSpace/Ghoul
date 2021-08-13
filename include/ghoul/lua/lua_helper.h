@@ -467,7 +467,7 @@ void verifyStackSize(lua_State* L, int expected = 0);
  *
  * \tparam T The type of the return value. If the value at the provided location of the
  *           stack is not T a LuaFormatException is thrown
- * \param L The stack from from which the top value is extracted
+ * \param L The stack from which the top value is extracted
  * \param location The location from which the value should be extracted
  * \param shouldPopValue If the value was successfully retrieved, should it be popped from
  *        the stack
@@ -476,29 +476,28 @@ void verifyStackSize(lua_State* L, int expected = 0);
  * \pre \L must not be nullptr
  */
 template <typename T>
-T value(lua_State* L, int location = -1, PopValue shouldPopValue = PopValue::No);
+T value(lua_State* L, int location = 1, PopValue shouldPopValue = PopValue::Yes);
+
 
 /**
- * Extracts a named value from the global variables of the provided stack and returns it.
- *
- * \tparam T The type of the return value. If the value of the variable \p name is not T
- *         a LuaFormatException is thrown
- * \param L The stack from from which the top value is extracted
- * \param name The name of the global variable that is to be extracted
- * \param shouldPopValue If the value was successfully retrieved, should it be popped from
- *        the stack
- *
- * \throw LuaFormatException If the value of \p name is not T
+ * Extracts multiple values from the provided (and subsequent locations) of the provided
+ * stack and return them as a tuple.  If at least one of the value does not exist or is of
+ * the wrong type, a LuaFormatException is thrown.  It is possible to pass
+ * std::optional<T> as arguments, which do not have to exist, but if they do, they have to
+ * be of the right type.  Furthermore, first all non-optional arguments must be listed
+ * before any std::optional arguments are listed
+ * 
+ * \param L The stack from which the values are extracted
+ * \param location The base location fro mwhich the values are extracted
+ * \param shouldPopValue If the values were successfully retrieved, should they be removed
+ *        from the stack
+ * 
+ * \throw LuaFormatException If the value at the provided stack location is not T
  * \pre \L must not be nullptr
- * \pre The stack of \p L must not be empty
- * \pre \p name must not be nullptr
- * \pre \p name must not be empty
  */
-template <typename T>
-T value(lua_State* L, const char* name, PopValue shouldPopValue = PopValue::No);
-
 template <typename... Ts>
-constexpr void values(lua_State* L, std::tuple<Ts...>& tuple, int location = 1);
+constexpr std::tuple<Ts...> values(lua_State* L, int location = 1,
+    PopValue shouldPopValue = PopValue::Yes);
 
 /**
  * Pushes the passed parameters \p args onto the provided stack \p L in the order that

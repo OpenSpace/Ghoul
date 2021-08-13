@@ -62,6 +62,10 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
         }
     }
     else {
+        if (baseLocation + I > nArguments) {
+            throw LuaExecutionException("Too few arguments to Lua function call");
+        }
+
         std::get<I>(tuple) = value<T>(L, baseLocation + I, PopValue::No);
     }
 
@@ -262,32 +266,31 @@ template <typename T>
 T value(lua_State* L, int location, PopValue shouldPopValue) {
     ghoul_precondition(L != nullptr, "L must not be nullptr");
 
-    T res = internal::value<T>(L, location);
-    if (shouldPopValue) {
-        lua_pop(L, 1);
+    if constexpr (internal::is_optional<T>::value) {
+        const int n = lua_gettop(L);
+        if (n < location) {
+            // We tried to access an optional value for which no parameter was provided
+            return std::nullopt;
+        }
+        else {
+            T res = internal::value<T::value_type>(L, location);
+            if (shouldPopValue) {
+                lua_remove(L, location);
+            }
+            return res;
+        }
     }
-    return res;
-}
-
-template <typename T>
-T value(lua_State* L, const char* name, PopValue shouldPopValue) {
-    ghoul_precondition(L != nullptr, "L must not be nullptr");
-    ghoul_precondition(name != nullptr, "name must not be nullptr");
-    ghoul_precondition(strlen(name) > 0, "name must not be empty");
-
-    lua_getglobal(L, name);
-
-    T res = value<T>(L);
-
-    if (shouldPopValue) {
-        lua_pop(L, 1);
+    else {
+        T res = internal::value<T>(L, location);
+        if (shouldPopValue) {
+            lua_remove(L, location);
+        }
+        return res;
     }
-
-    return res;
 }
 
 template <typename... Ts>
-constexpr void values(lua_State* L, std::tuple<Ts...>& tuple, int location) {
+constexpr std::tuple<Ts...> values(lua_State* L, int location, PopValue shouldPopValue) {
     ghoul_precondition(L != nullptr, "L must not be nullptr");
 
     // Verify that we don't have a situation where we have non-optional parameters, then
@@ -300,7 +303,15 @@ constexpr void values(lua_State* L, std::tuple<Ts...>& tuple, int location) {
     );
 
     int n = lua_gettop(L);
-    internal::extractValues(L, tuple, location, n);
+    std::tuple<Ts...> result;
+    internal::extractValues(L, result, location, n);
+
+    if (shouldPopValue) {
+        for (int i = 0; i < static_cast<int>(sizeof...(Ts)); ++i) {
+            lua_remove(L, location);
+        }
+    }
+    return result;
 }
 
 template <typename... Ts>
