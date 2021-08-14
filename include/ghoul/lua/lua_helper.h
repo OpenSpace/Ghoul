@@ -463,11 +463,27 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
 void verifyStackSize(lua_State* L, int expected = 0);
 
 /**
+ * Checks whether a value of the requested type exists at the provided location of the
+ * stack.
+ *
+ * \tparam T The type of the return value.
+ * \param L The stack from which the value is checked
+ * \param location The location at which the value is checked
+ *
+ * \return \c true if the value at location exists and has the requested type \tparam T
+ *         \c false otherwise
+ *
+ * \pre \L must not be nullptr
+ */
+template <typename T>
+bool hasValue(lua_State* L, int location = 1);
+
+/**
  * Extracts a value from the provided location of the provided stack and returns it.
  *
  * \tparam T The type of the return value. If the value at the provided location of the
  *           stack is not T a LuaFormatException is thrown
- * \param L The stack from which the top value is extracted
+ * \param L The stack from which the value is extracted
  * \param location The location from which the value should be extracted
  * \param shouldPopValue If the value was successfully retrieved, should it be popped from
  *        the stack
