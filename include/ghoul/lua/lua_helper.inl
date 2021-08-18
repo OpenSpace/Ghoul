@@ -31,11 +31,130 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 #include <filesystem>
+#include <optional>
 #include <type_traits>
+#include <variant>
 
 namespace ghoul::lua {
 
 namespace internal {
+
+template <typename T> struct is_optional : std::false_type {};
+template <typename T> struct is_optional<std::optional<T>> : std::true_type {};
+
+template <typename... Ts> struct is_variant : std::false_type {};
+template <typename... Ts> struct is_variant<std::variant<Ts...>> : std::true_type {};
+
+// Boolean constant used to check whether a value T is part of a parameter pack Ts
+template <typename T, typename U> struct is_one_of;
+template <typename T, typename... Ts>
+struct is_one_of<T, std::variant<Ts...>> :
+    std::bool_constant<(std::is_same_v<T, Ts> || ...)>
+{};
+
+template <size_t I = 0, typename... Ts>
+constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLocation,
+                             int nArguments)
+{
+    using T = std::tuple_element_t<I, std::tuple<Ts...>>;
+
+    if constexpr (is_optional<T>::value) {
+        if (baseLocation + I > nArguments) {
+            // We have reached the end of the arguments and only have optional now, so we
+            // can bail out
+            return;
+        }
+        else {
+            // We are looking at an optional parameter that is provided
+            std::get<I>(tuple) = value<T::value_type>(L, baseLocation + I, PopValue::No);
+        }
+    }
+    else {
+        if (baseLocation + I > nArguments) {
+            throw LuaExecutionException("Too few arguments to Lua function call");
+        }
+
+        std::get<I>(tuple) = value<T>(L, baseLocation + I, PopValue::No);
+    }
+
+    if constexpr (I+1 != sizeof...(Ts)) {
+        extractValues<I+1>(L, tuple, baseLocation, nArguments);
+    }
+}
+
+enum class Phase {
+    Mandatory,
+    Optional
+};
+
+template <size_t I = 0, typename... Ts>
+constexpr bool verifyParameters(Phase phase = Phase::Mandatory) {
+    using T = std::tuple_element_t<I, std::tuple<Ts...>>;
+
+    if constexpr (is_optional<T>::value) {
+        phase = Phase::Optional;
+    }
+    else {
+        if (phase == Phase::Optional) {
+            // We are currently in the optional phase, but we have a non-optional type,
+            // which is not allowed
+            return false;
+        }
+    }
+
+    if constexpr (I+1 != sizeof...(Ts)) {
+        return verifyParameters<I+1, Ts...>(phase);
+    }
+    else {
+        // We have reached the end without a single failure -> success
+        return true;
+    }
+}
+
+template <size_t I = 0, typename Variant>
+constexpr bool hasVariantValue(lua_State* L, int location) {
+    using T = std::variant_alternative_t<I, Variant>;
+
+    bool res = hasValue<T>(L, location);
+    if (res) {
+        // We found the type, so we succeeded
+        return true;
+    }
+
+    if constexpr (I+1 != std::variant_size_v<Variant>) {
+        // We haven't finished with all of the types yes, so we got to continue
+        return hasVariantValue<I+1, Variant>(L, location);
+    }
+    else {
+        // We have reached the end of the variant list and haven't found the type in
+        // here, so we're done
+        return false;
+    }
+}
+
+template <size_t I = 0, typename Variant>
+constexpr Variant variantValue(lua_State* L, int location) {
+    using T = std::variant_alternative_t<I, Variant>;
+
+    if (hasValue<T>(L, location)) {
+        return value<T>(L, location);
+    }
+
+    if constexpr (I+1 != std::variant_size_v<Variant>) {
+        // We haven't finished with all of the types yes, so we got to continue
+        return variantValue<I+1, Variant>(L, location);
+    }
+    else {
+        // We have reached the end of the variant list and haven't found the type in
+        // here, so we're done
+        std::string error = fmt::format(
+            "Unable to extract requested value '{}' out of the variant with type '{}' at "
+            "parameter {}", typeid(T).name(), typeid(Variant).name(), location
+        );
+        ghoul_assert(false, error);
+        throw LuaFormatException(std::move(error));
+    }
+}
 
 template <typename T>
 void push(lua_State* L, T value) {
@@ -137,91 +256,133 @@ void push(lua_State* L, T value) {
 
 template <typename T>
 T value(lua_State* L, int location) {
+    if (!hasValue<T>(L, location)) {
+        // If we get this far, none of the previous return statements were hit
+        std::string error = fmt::format(
+            "Requested type {} for parameter {} was not the expected type {}",
+            typeid(T).name(), location, luaTypeToString(lua_type(L, location))
+        );
+        ghoul_assert(false, error);
+        throw LuaFormatException(std::move(error));
+    }
+
     if constexpr (std::is_same_v<T, bool>) {
-        if (lua_isboolean(L, location)) {
-            return lua_toboolean(L, location) == 1;
-        }
+        return lua_toboolean(L, location) == 1;
     }
     else if constexpr (std::is_same_v<T, lua_Number>) {
-        if (lua_isnumber(L, location)) {
-            return lua_tonumber(L, location);
-        }
+        return lua_tonumber(L, location);
     }
     else if constexpr (std::is_same_v<T, lua_Integer>) {
-        if (lua_isinteger(L, location)) {
-            return lua_tointeger(L, location);
-        }
+        return lua_tointeger(L, location);
     }
     else if constexpr (std::is_integral_v<T>) {
-        if (lua_isinteger(L, location)) {
-            return static_cast<T>(lua_tointeger(L, location));
-        }
+        return static_cast<T>(lua_tointeger(L, location));
     }
     else if constexpr (std::is_floating_point_v<T>) {
-        if (lua_isnumber(L, location)) {
-            return static_cast<T>(lua_tonumber(L, location));
-        }
+        return static_cast<T>(lua_tonumber(L, location));
     }
     else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string>) {
-        if (lua_isstring(L, location)) {
-            return lua_tostring(L, location);
-        }
+        return lua_tostring(L, location);
     }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
-        if (lua_istable(L, location)) {
-            lua_pushvalue(L, location);
-            defer { lua_pop(L, 1); };
+        lua_pushvalue(L, location);
+        defer { lua_pop(L, 1); };
 
-            ghoul::Dictionary d;
-            ghoul::lua::luaDictionaryFromState(L, d);
-
-            return d;
-        }
+        ghoul::Dictionary d;
+        ghoul::lua::luaDictionaryFromState(L, d);
+        return d;
+    }
+    else if constexpr (is_variant<T>::value) {
+        return variantValue<0, T>(L, location);
     }
     else {
         static_assert(sizeof(T) == 0, "Unhandled type T");
     }
-
-    std::string error = fmt::format(
-        "Requested type {} for parameter {} was not the expected type {}",
-        typeid(T).name(),
-        location,
-        luaTypeToString(lua_type(L, location))
-    );
-
-    ghoul_assert(false, error);
-    // If we get this far, none of the previous return statements were hit
-    throw LuaFormatException(std::move(error));
 }
 
 } // namespace internal
 
 template <typename T>
-T value(lua_State* L, int location, PopValue shouldPopValue) {
-    ghoul_precondition(L != nullptr, "L must not be nullptr");
-
-    T res = internal::value<T>(L, location);
-    if (shouldPopValue) {
-        lua_pop(L, 1);
+bool hasValue(lua_State* L, int location) {
+    if constexpr (std::is_same_v<T, bool>) {
+        return lua_isboolean(L, location);
     }
-    return res;
+    else if constexpr (std::is_same_v<T, lua_Number>) {
+        return lua_isnumber(L, location);
+    }
+    else if constexpr (std::is_same_v<T, lua_Integer>) {
+        return lua_isinteger(L, location);
+    }
+    else if constexpr (std::is_integral_v<T>) {
+        return lua_isinteger(L, location);
+    }
+    else if constexpr (std::is_floating_point_v<T>) {
+        return lua_isnumber(L, location);
+    }
+    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string>) {
+        return lua_isstring(L, location);
+    }
+    else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
+        return lua_istable(L, location);
+    }
+    else if constexpr (internal::is_variant<T>::value) {
+        return internal::hasVariantValue<0, T>(L, location);
+    }
+    else {
+        static_assert(sizeof(T) == 0, "Unhandled type T");
+    }
 }
 
 template <typename T>
-T value(lua_State* L, const char* name, PopValue shouldPopValue) {
+T value(lua_State* L, int location, PopValue shouldPopValue) {
     ghoul_precondition(L != nullptr, "L must not be nullptr");
-    ghoul_precondition(name != nullptr, "name must not be nullptr");
-    ghoul_precondition(strlen(name) > 0, "name must not be empty");
 
-    lua_getglobal(L, name);
+    if constexpr (internal::is_optional<T>::value) {
+        const int n = lua_gettop(L);
+        if (n < location) {
+            // We tried to access an optional value for which no parameter was provided
+            return std::nullopt;
+        }
+        else {
+            T res = internal::value<T::value_type>(L, location);
+            if (shouldPopValue) {
+                lua_remove(L, location);
+            }
+            return res;
+        }
+    }
+    else {
+        T res = internal::value<T>(L, location);
+        if (shouldPopValue) {
+            lua_remove(L, location);
+        }
+        return res;
+    }
+}
 
-    T res = value<T>(L);
+template <typename... Ts>
+constexpr std::tuple<Ts...> values(lua_State* L, int location, PopValue shouldPopValue) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
+
+    // Verify that we don't have a situation where we have non-optional parameters, then
+    // optional parameters, and then non-optional parameters again as that will bork up
+    // the argument calculations
+    static_assert(
+        internal::verifyParameters<0, Ts...>(),
+        "Tuple parameters have to list all non-optional parameters first, then the "
+        "optional ones and cannot get back to non-optional parameters"
+    );
+
+    int n = lua_gettop(L);
+    std::tuple<Ts...> result;
+    internal::extractValues(L, result, location, n);
 
     if (shouldPopValue) {
-        lua_pop(L, 1);
+        for (int i = 0; i < static_cast<int>(sizeof...(Ts)); ++i) {
+            lua_remove(L, location);
+        }
     }
-
-    return res;
+    return result;
 }
 
 template <typename... Ts>
