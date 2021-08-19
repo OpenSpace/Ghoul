@@ -254,15 +254,54 @@ void push(lua_State* L, T value) {
     }
 }
 
+template <size_t I = 0, typename Variant>
+std::string VariantName() {
+    using T = std::variant_alternative_t<I, Variant>;
+
+    if constexpr (I + 1 != std::variant_size_v<Variant>) {
+        return Name<T>() + " or " + VariantName<I + 1, Variant>();
+    }
+    else {
+        return Name<T>();
+    }
+}
+
+template <typename T>
+std::string Name() {
+    if constexpr (std::is_same_v<T, bool>) {
+        return "Boolean";
+    }
+    else if constexpr (std::is_floating_point_v<T> || std::is_integral_v<T>) {
+        return "Number";
+    }
+    else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
+        return "Table";
+    }
+    else if constexpr (is_variant<T>::value) {
+        return internal::VariantName<0, T>();
+    }
+    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string>) {
+        return "String";
+    }
+    else if constexpr (is_optional<T>::value) {
+        return "[" + Name<T::value_type>() + "]";
+    }
+    else {
+        static_assert(sizeof(T) == 0, "Missing case for T");
+    }
+}
+
 template <typename T>
 T value(lua_State* L, int location) {
     if (!hasValue<T>(L, location)) {
+        std::string name = Name<T>();
         // If we get this far, none of the previous return statements were hit
         std::string error = fmt::format(
-            "Requested type {} for parameter {} was not the expected type {}",
-            typeid(T).name(), location, luaTypeToString(lua_type(L, location))
+            "Expected type '{}' for parameter {} but got wrong type '{}' instead",
+            name, location, luaTypeToString(lua_type(L, location))
         );
-        ghoul_assert(false, error);
+        // This function won't actually return, but C++ doesn't know that, so 
+        ghoul::lua::luaError(L, error.c_str());
         throw LuaFormatException(std::move(error));
     }
 
