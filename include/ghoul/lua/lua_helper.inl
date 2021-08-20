@@ -66,7 +66,11 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
         }
         else {
             // We are looking at an optional parameter that is provided
-            std::get<I>(tuple) = value<T::value_type>(L, baseLocation + I, PopValue::No);
+            std::get<I>(tuple) = value<typename T::value_type>(
+                L,
+                baseLocation + I,
+                PopValue::No
+            );
         }
     }
     else {
@@ -192,8 +196,8 @@ void push(lua_State* L, T value) {
     else if constexpr (std::is_same_v<T, std::filesystem::path>) {
         lua_pushlstring(L, value.string().c_str(), value.string().size());
     }
-    else if constexpr (std::is_same_v<T, std::vector<double>>
-        || std::is_same_v<T, std::vector<float>>)
+    else if constexpr (std::is_same_v<T, std::vector<double>> ||
+                       std::is_same_v<T, std::vector<float>>)
     {
         lua_newtable(L);
         for (size_t i = 0; i < value.size(); ++i) {
@@ -254,6 +258,9 @@ void push(lua_State* L, T value) {
     }
 }
 
+template <typename T>
+std::string Name();
+
 template <size_t I = 0, typename Variant>
 std::string VariantName() {
     using T = std::variant_alternative_t<I, Variant>;
@@ -284,7 +291,7 @@ std::string Name() {
         return "String";
     }
     else if constexpr (is_optional<T>::value) {
-        return "[" + Name<T::value_type>() + "]";
+        return "[" + Name<typename T::value_type>() + "]";
     }
     else {
         static_assert(sizeof(T) == 0, "Missing case for T");
@@ -383,7 +390,7 @@ T value(lua_State* L, int location, PopValue shouldPopValue) {
             return std::nullopt;
         }
         else {
-            T res = internal::value<T::value_type>(L, location);
+            T res = internal::value<typename T::value_type>(L, location);
             if (shouldPopValue) {
                 lua_remove(L, location);
             }

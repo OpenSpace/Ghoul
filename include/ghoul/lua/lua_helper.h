@@ -89,7 +89,7 @@ BooleanType(PopValue);
  *
  * \pre \p state must not be nullptr
  */
-[[nodiscard]] int luaError(lua_State* state, const std::string& message);
+int luaError(lua_State* state, const std::string& message);
 
 /**
  * Returns a string describing the \p state's value at location \p location. Supported
