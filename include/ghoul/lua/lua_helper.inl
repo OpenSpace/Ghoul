@@ -74,7 +74,7 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
         }
     }
     else {
-        if (baseLocation + I > nArguments) {
+        if (baseLocation + I > static_cast<size_t>(nArguments)) {
             throw LuaExecutionException("Too few arguments to Lua function call");
         }
 
