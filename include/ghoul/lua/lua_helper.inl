@@ -59,7 +59,7 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
     using T = std::tuple_element_t<I, std::tuple<Ts...>>;
 
     if constexpr (is_optional<T>::value) {
-        if (baseLocation + I > nArguments) {
+        if (baseLocation + I > static_cast<size_t>(nArguments)) {
             // We have reached the end of the arguments and only have optional now, so we
             // can bail out
             return;
