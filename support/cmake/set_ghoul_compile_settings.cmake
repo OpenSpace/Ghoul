@@ -155,6 +155,7 @@ function (set_ghoul_compile_settings target)
     "-Wno-deprecated-copy"
     "-Wno-float-equal"
     "-Wno-long-long"
+    "-Wno-suggest-attribute=const"
     "-Wno-write-strings"
     "-Wnon-virtual-dtor"
     "-Wold-style-cast"
