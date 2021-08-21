@@ -46,19 +46,6 @@ namespace {
         else { throw ghoul::MissingCaseException(); }
     }
 
-    std::string formatToString(ghoul::opengl::Texture::Format format) {
-        switch (format) {
-        case ghoul::opengl::Texture::Format::Red: return "Red ";
-        case ghoul::opengl::Texture::Format::RG: return "RG  ";
-        case ghoul::opengl::Texture::Format::RGB: return "RGB ";
-        case ghoul::opengl::Texture::Format::BGR: return "BGR ";
-        case ghoul::opengl::Texture::Format::RGBA: return "RGBA";
-        case ghoul::opengl::Texture::Format::BGRA: return "BGRA";
-        case ghoul::opengl::Texture::Format::DepthComponent: return "Dept";
-        default: throw ghoul::MissingCaseException();
-        }
-    }
-
     GLenum stringToDataType(std::string_view dataType) {
         if (dataType == "byte") { return GL_BYTE; }
         else if (dataType == "ubyt") { return GL_UNSIGNED_BYTE; }
@@ -69,20 +56,6 @@ namespace {
         else if (dataType == "floa") { return GL_FLOAT; }
         else if (dataType == "doub") { return GL_DOUBLE; }
         else { throw ghoul::MissingCaseException(); }
-    }
-
-    std::string dataTypeToString(GLenum dataType) {
-        switch (dataType) {
-        case GL_BYTE: return "byte";
-        case GL_UNSIGNED_BYTE: return "ubyt";
-        case GL_SHORT: return "shor";
-        case GL_UNSIGNED_SHORT: return "usho";
-        case GL_INT: return "int ";
-        case GL_UNSIGNED_INT: return "uint";
-        case GL_FLOAT: return "floa";
-        case GL_DOUBLE: return "doub";
-        default: throw ghoul::MissingCaseException();
-        }
     }
 } // namespace
 

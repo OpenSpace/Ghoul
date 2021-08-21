@@ -55,17 +55,6 @@ ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> ind
     , _isInvisible(std::move(isInvisible))
 {}
 
-std::string textureTypeToString(const ModelMesh::TextureType& type) {
-    switch (type) {
-        case ModelMesh::TextureType::TextureDiffuse: return "texture_diffuse";
-        case ModelMesh::TextureType::TextureNormal: return "texture_normal";
-        case ModelMesh::TextureType::TextureSpecular: return "texture_specular";
-        case ModelMesh::TextureType::ColorDiffuse: return "color_diffuse";
-        case ModelMesh::TextureType::ColorSpecular: return "color_specular";
-        default: throw MissingCaseException();
-    }
-}
-
 void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
     texture.texture = nullptr;
     texture.hasTexture = false;
