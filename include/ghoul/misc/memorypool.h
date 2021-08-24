@@ -62,7 +62,7 @@ public:
  *
  * \tparam BucketSize The size of each bucket in bytes
  */
-template <int BucketSize = 4096, bool InjectDebugMemory = false>
+template <int BucketSize = 4096, bool InjectDebugMemory = false, bool NoDealloc = false>
 class MemoryPool : public MemoryPoolBase {
 public:
     const static int _bucketSize = BucketSize;

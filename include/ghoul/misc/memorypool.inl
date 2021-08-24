@@ -43,8 +43,8 @@ namespace {
 
 namespace ghoul {
 
-template <int BucketSize, bool InjectDebugMemory>
-MemoryPool<BucketSize, InjectDebugMemory>::MemoryPool(int nBuckets)
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::MemoryPool(int nBuckets)
     : _originalBucketSize(nBuckets)
 {
     _buckets.reserve(nBuckets);
@@ -59,8 +59,8 @@ MemoryPool<BucketSize, InjectDebugMemory>::MemoryPool(int nBuckets)
     _emptyList.reserve(10);
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-void MemoryPool<BucketSize, InjectDebugMemory>::reset() {
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::reset() {
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         b->usage = 0;
 
@@ -73,8 +73,8 @@ void MemoryPool<BucketSize, InjectDebugMemory>::reset() {
     _emptyList.clear();
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-void MemoryPool<BucketSize, InjectDebugMemory>::housekeeping() {
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::housekeeping() {
     ZoneScoped
 
     if (_emptyList.empty()) {
@@ -106,9 +106,9 @@ void MemoryPool<BucketSize, InjectDebugMemory>::housekeeping() {
     }
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
-                                                             std::size_t alignment)
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(std::size_t bytes,
+                                                                    std::size_t alignment)
 {
     ZoneScoped
 
@@ -162,19 +162,24 @@ void* MemoryPool<BucketSize, InjectDebugMemory>::do_allocate(std::size_t bytes,
     return ptr;
 }
 
-template <int BucketSize, bool InjectDebugMemory>
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
 template <typename T, class... Types>
-T* MemoryPool<BucketSize, InjectDebugMemory>::alloc(Types&&... args) {
+T* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::alloc(Types&&... args) {
     void* ptr = do_allocate(sizeof(T), alignof(T));
     T* obj = new (ptr) T(std::forward<Types>(args)...);
     return obj;
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size_t bytes,
-                                                              std::size_t /*alignment*/)
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p,
+                                                                        std::size_t bytes,
+                                                                std::size_t /*alignment*/)
 {
     ZoneScoped
+
+    if (NoDealloc) {
+        return;
+    }
 
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         const std::array<std::byte, BucketSize>& bp = b->payload;
@@ -191,20 +196,21 @@ void MemoryPool<BucketSize, InjectDebugMemory>::do_deallocate(void* p, std::size
     throw std::runtime_error("Returned pointer must have been from this MemoryPool");
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-bool MemoryPool<BucketSize, InjectDebugMemory>::do_is_equal(
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+bool MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_is_equal(
                                     const pmr::memory_resource& other) const noexcept
 {
     return this == &other;
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-int MemoryPool<BucketSize, InjectDebugMemory>::nBuckets() const {
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+int MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::nBuckets() const {
     return static_cast<int>(_buckets.size());
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-std::vector<int> MemoryPool<BucketSize, InjectDebugMemory>::occupancies() const {
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+std::vector<int> MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::occupancies() const
+{
     std::vector<int> res;
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         res.push_back(static_cast<int>(b->usage));
@@ -212,8 +218,8 @@ std::vector<int> MemoryPool<BucketSize, InjectDebugMemory>::occupancies() const 
     return res;
 }
 
-template <int BucketSize, bool InjectDebugMemory>
-int MemoryPool<BucketSize, InjectDebugMemory>::totalOccupancy() const {
+template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
+int MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::totalOccupancy() const {
     return std::accumulate(
         _buckets.begin(), _buckets.end(),
         0,
