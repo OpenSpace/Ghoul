@@ -102,6 +102,10 @@ mt.__index = function (t, n)
     error("variable '"..n.."' is not declared", 2)
   end
   return rawget(t, n)
+end
+
+is_declared = function(a)
+  return mt.__declared[a] and what() ~= "C";
 end)";
 
 } // namespace
