@@ -255,6 +255,18 @@ size_t Dictionary::size() const {
     return _storage.size();
 }
 
+bool Dictionary::isSubset(const ghoul::Dictionary& dict) const {
+    for (const std::pair<const std::string, StorageTypes>& kv : dict._storage) {
+        auto it = _storage.find(kv.first);
+        if (it == _storage.end() || it->second != kv.second) {
+            return false;
+        }
+    }
+
+    // If we get this far, we didn't fail so we have a subset
+    return true;
+}
+
 template void Dictionary::setValue(std::string, Dictionary value);
 template void Dictionary::setValue(std::string, bool value);
 template void Dictionary::setValue(std::string, double);

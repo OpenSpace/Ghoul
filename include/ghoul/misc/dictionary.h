@@ -189,6 +189,16 @@ public:
      */
     size_t size() const;
 
+    /**
+     * Checks if the \p dict Dictionary is a subset of this dictionary, meaning that all
+     * values contained in \p dict also exist in this dictionary. This dictionary might
+     * contain additional values though.
+     * 
+     * \p dict The subset dictionary 
+     * \return \c true if the \p dict is a subset, \c false otherwise
+     */
+    bool isSubset(const ghoul::Dictionary& dict) const;
+
 private:
     using StorageTypes = std::variant<
         bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>,
@@ -197,7 +207,7 @@ private:
     std::map<std::string, StorageTypes, std::less<>> _storage;
 };
 
-// Just a few helper functions  to make the error message a bit more palatable
+// Just a few helper functions to make the error message a bit more palatable
 template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int>>
 void Dictionary::setValue(std::string, T) {
     static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
