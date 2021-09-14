@@ -54,7 +54,7 @@ struct is_one_of<T, std::variant<Ts...>> :
 
 template <size_t I = 0, typename... Ts>
 constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLocation,
-                             int nArguments)
+                             int nArguments, int& argumentsFound)
 {
     using T = std::tuple_element_t<I, std::tuple<Ts...>>;
 
@@ -71,6 +71,7 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
                 baseLocation + I,
                 PopValue::No
             );
+            argumentsFound += 1;
         }
     }
     else {
@@ -79,10 +80,11 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
         }
 
         std::get<I>(tuple) = value<T>(L, baseLocation + I, PopValue::No);
+        argumentsFound += 1;
     }
 
     if constexpr (I+1 != sizeof...(Ts)) {
-        extractValues<I+1>(L, tuple, baseLocation, nArguments);
+        extractValues<I+1>(L, tuple, baseLocation, nArguments, argumentsFound);
     }
 }
 
@@ -421,10 +423,11 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location, PopValue shouldPo
 
     int n = lua_gettop(L);
     std::tuple<Ts...> result;
-    internal::extractValues(L, result, location, n);
+    int argumentsFound = 0;
+    internal::extractValues(L, result, location, n, argumentsFound);
 
     if (shouldPopValue) {
-        for (int i = 0; i < static_cast<int>(sizeof...(Ts)); ++i) {
+        for (int i = 0; i < argumentsFound; ++i) {
             lua_remove(L, location);
         }
     }
