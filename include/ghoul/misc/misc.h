@@ -61,6 +61,16 @@ std::string join(std::vector<std::string> input, const std::string& separator = 
  */
 void trimWhitespace(std::string& value);
 
+/**
+ * Removes a specific character from both the beginning and ending of a string. Any number
+ * of the character(s) (if repeating) will be removed. Useful for strings that are
+ * surrounded by unwanted characters such as quotes, brackets, etc.
+ *
+ * \param valueString The string from which to remove the unwanted characters.
+ * \param charToRemove The character to remove from both the beginning & end of string
+ */
+void trimSurroundingCharacters(std::string& valueString, const char charToRemove);
+
 } // namespace ghoul
 
 #endif // __GHOUL___MISC___H__

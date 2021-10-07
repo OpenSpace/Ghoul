@@ -75,4 +75,14 @@ void trimWhitespace(std::string& value) {
     );
 }
 
+void trimSurroundingCharacters(std::string& valueString, const char charToRemove) {
+    while (valueString.front() == charToRemove) {
+        valueString.erase(0, 1);
+    }
+    while (valueString.back() == charToRemove) {
+        valueString.pop_back();
+    }
+}
+
+
 } // namespace ghoul
