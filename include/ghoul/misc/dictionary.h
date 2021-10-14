@@ -71,7 +71,7 @@ public:
     using Types = std::variant<
         bool, int, double, std::string, Dictionary, std::vector<int>, std::vector<double>,
         std::vector<std::string>, glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2,
-        glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2, 
+        glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
         glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
     >;
 
@@ -193,8 +193,8 @@ public:
      * Checks if the \p dict Dictionary is a subset of this dictionary, meaning that all
      * values contained in \p dict also exist in this dictionary. This dictionary might
      * contain additional values though.
-     * 
-     * \p dict The subset dictionary 
+     *
+     * \p dict The subset dictionary
      * \return \c true if the \p dict is a subset, \c false otherwise
      */
     bool isSubset(const ghoul::Dictionary& dict) const;

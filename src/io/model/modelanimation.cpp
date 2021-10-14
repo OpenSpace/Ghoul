@@ -64,23 +64,24 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             glm::vec3 nextPos = glm::vec3(0.f);
             bool interpolate = true;
 
-            for (const io::ModelAnimation::PositionKeyframe& pos : nodeAnimation.positions) {
-                double diff = (pos.time * _timeScale) - now;
+            for (const io::ModelAnimation::PositionKeyframe& kf : nodeAnimation.positions)
+            {
+                double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
                 if (abs(diff) < std::numeric_limits<double>::epsilon()) {
-                    currPos = pos.position;
+                    currPos = kf.position;
                     interpolate = false;
                 }
                 // Prev keyframe
                 else if (diff < 0.0 && diff > (prevPosTime - now)) {
-                    prevPosTime = pos.time * _timeScale;
-                    prevPos = pos.position;
+                    prevPosTime = kf.time * _timeScale;
+                    prevPos = kf.position;
                 }
                 // Next keyframe
                 else if (diff > 0.0 && diff < (nextPosTime - now)) {
-                    nextPosTime = pos.time * _timeScale;
-                    nextPos = pos.position;
+                    nextPosTime = kf.time * _timeScale;
+                    nextPos = kf.position;
                 }
             }
 
@@ -105,23 +106,24 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             glm::quat nextRot = glm::quat(1.f, 0.f, 0.f, 0.f);
             bool interpolate = true;
 
-            for (const io::ModelAnimation::RotationKeyframe& rot : nodeAnimation.rotations) {
-                double diff = (rot.time * _timeScale) - now;
+            for (const io::ModelAnimation::RotationKeyframe& kf : nodeAnimation.rotations)
+            {
+                double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
                 if (abs(diff) < std::numeric_limits<double>::epsilon()) {
-                    currRot = rot.rotation;
+                    currRot = kf.rotation;
                     interpolate = false;
                 }
                 // Prev keyframe
                 else if (diff < 0.0 && diff > (prevRotTime - now)) {
-                    prevRotTime = rot.time * _timeScale;
-                    prevRot = rot.rotation;
+                    prevRotTime = kf.time * _timeScale;
+                    prevRot = kf.rotation;
                 }
                 // Next keyframe
                 else if (diff > 0.0 && diff < (nextRotTime - now)) {
-                    nextRotTime = rot.time * _timeScale;
-                    nextRot = rot.rotation;
+                    nextRotTime = kf.time * _timeScale;
+                    nextRot = kf.rotation;
                 }
             }
 

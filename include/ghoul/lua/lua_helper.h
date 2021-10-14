@@ -502,12 +502,12 @@ T value(lua_State* L, int location = 1, PopValue shouldPopValue = PopValue::Yes)
  * std::optional<T> as arguments, which do not have to exist, but if they do, they have to
  * be of the right type.  Furthermore, first all non-optional arguments must be listed
  * before any std::optional arguments are listed
- * 
+ *
  * \param L The stack from which the values are extracted
  * \param location The base location fro mwhich the values are extracted
  * \param shouldPopValue If the values were successfully retrieved, should they be removed
  *        from the stack
- * 
+ *
  * \throw LuaFormatException If the value at the provided stack location is not T
  * \pre \L must not be nullptr
  */

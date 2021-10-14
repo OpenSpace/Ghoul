@@ -220,8 +220,14 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
 
     // Make the location information retrievable
 
-    ghoul_assert(glm::all(glm::greaterThanEqual(region, glm::ivec4(0))), "Invalid region");
-    ghoul_assert(glm::all(glm::lessThan(region, glm::ivec4(std::numeric_limits<uint16_t>::max()))), "Invalid region");
+    ghoul_assert(
+        glm::all(glm::greaterThanEqual(region, glm::ivec4(0))),
+        "Invalid region"
+    );
+    ghoul_assert(
+        glm::all(glm::lessThan(region, glm::ivec4(std::numeric_limits<uint16_t>::max()))),
+        "Invalid region"
+    );
 
     _handleInformation.push_back(glm::u16vec4(region));
 

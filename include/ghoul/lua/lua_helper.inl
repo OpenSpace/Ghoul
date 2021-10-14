@@ -309,7 +309,7 @@ T value(lua_State* L, int location) {
             "Expected type '{}' for parameter {} but got wrong type '{}' instead",
             name, location, luaTypeToString(lua_type(L, location))
         );
-        // This function won't actually return, but C++ doesn't know that, so 
+        // This function won't actually return, but C++ doesn't know that, so
         ghoul::lua::luaError(L, error.c_str());
         throw LuaFormatException(std::move(error));
     }
