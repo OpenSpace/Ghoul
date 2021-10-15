@@ -143,7 +143,7 @@ constexpr Variant variantValue(lua_State* L, int location) {
     using T = std::variant_alternative_t<I, Variant>;
 
     if (hasValue<T>(L, location)) {
-        return value<T>(L, location);
+        return valueInner<T>(L, location);
     }
 
     if constexpr (I+1 != std::variant_size_v<Variant>) {
@@ -301,7 +301,7 @@ std::string Name() {
 }
 
 template <typename T>
-T value(lua_State* L, int location) {
+T valueInner(lua_State* L, int location) {
     if (!hasValue<T>(L, location)) {
         std::string name = Name<T>();
         // If we get this far, none of the previous return statements were hit
@@ -392,7 +392,7 @@ T value(lua_State* L, int location, PopValue shouldPopValue) {
             return std::nullopt;
         }
         else {
-            T res = internal::value<typename T::value_type>(L, location);
+            T res = internal::valueInner<typename T::value_type>(L, location);
             if (shouldPopValue) {
                 lua_remove(L, location);
             }
@@ -400,7 +400,7 @@ T value(lua_State* L, int location, PopValue shouldPopValue) {
         }
     }
     else {
-        T res = internal::value<T>(L, location);
+        T res = internal::valueInner<T>(L, location);
         if (shouldPopValue) {
             lua_remove(L, location);
         }
