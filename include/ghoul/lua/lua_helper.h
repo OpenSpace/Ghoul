@@ -494,7 +494,6 @@ bool hasValue(lua_State* L, int location = 1);
 template <typename T>
 T value(lua_State* L, int location = 1, PopValue shouldPopValue = PopValue::Yes);
 
-
 /**
  * Extracts multiple values from the provided (and subsequent locations) of the provided
  * stack and return them as a tuple.  If at least one of the value does not exist or is of
@@ -562,6 +561,22 @@ T tryGetValue(lua_State* L, bool& success);
 
 namespace internal {
     void deinitializeGlobalState();
+
+    /**
+     * Handles the extraction of the value, considering the various possible types. The
+     * function value() handles the optional variable case, but calls this function to do
+     * the actual extraction.
+     *
+     * \tparam T The type of the return value. If the value at the provided location of the
+     *           stack is not T a LuaFormatException is thrown
+     * \param L The stack from which the value is extracted
+     * \param location The location from which the value should be extracted
+     *
+     * \throw LuaFormatException If the value at the provided stack location is not T
+     * \pre \L must not be nullptr
+     */
+    template <typename T>
+    T valueInner(lua_State* L, int location = 1);
 } // namespace internal
 
 } // namespace ghoul::lua
