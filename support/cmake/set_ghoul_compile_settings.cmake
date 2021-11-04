@@ -195,9 +195,11 @@ function (set_ghoul_compile_settings target)
             "/GL" # Whole program optimization
         )
     else ()
-        target_compile_options(${target} PRIVATE
+        if (GHOUL_ENABLE_EDIT_CONTINUE)
+          target_compile_options(${target} PRIVATE
             "/ZI"       # Edit and continue support
-        )
+          )
+        endif ()
     endif ()
   elseif (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})

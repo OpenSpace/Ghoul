@@ -298,6 +298,15 @@ if (GHOUL_PROFILING_ENABLE_TRACY)
 endif ()
 end_dependency("Profiling")
 
+if (WIN32)
+  option(GHOUL_ENABLE_EDIT_CONTINUE "Enable Edit&Continue" ON)
+
+  if (GHOUL_PROFILING_ENABLE_TRACY)
+    message(WARNING "Tracy does not support compiling with Edit&Continue, so we have to disable that feature")
+    set(GHOUL_ENABLE_EDIT_CONTINUE OFF CACHE BOOL "" FORCE)
+  endif ()
+endif ()
+
 # Other applications
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
