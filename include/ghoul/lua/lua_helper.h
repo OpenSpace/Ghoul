@@ -473,7 +473,7 @@ void verifyStackSize(lua_State* L, int expected = 0);
  * \return \c true if the value at location exists and has the requested type \tparam T
  *         \c false otherwise
  *
- * \pre \L must not be nullptr
+ * \pre L must not be nullptr
  */
 template <typename T>
 bool hasValue(lua_State* L, int location = 1);
@@ -489,7 +489,7 @@ bool hasValue(lua_State* L, int location = 1);
  *        the stack
  *
  * \throw LuaFormatException If the value at the provided stack location is not T
- * \pre \L must not be nullptr
+ * \pre L must not be nullptr
  */
 template <typename T>
 T value(lua_State* L, int location = 1, PopValue shouldPopValue = PopValue::Yes);
@@ -508,11 +508,29 @@ T value(lua_State* L, int location = 1, PopValue shouldPopValue = PopValue::Yes)
  *        from the stack
  *
  * \throw LuaFormatException If the value at the provided stack location is not T
- * \pre \L must not be nullptr
+ * \pre L must not be nullptr
  */
 template <typename... Ts>
 constexpr std::tuple<Ts...> values(lua_State* L, int location = 1,
     PopValue shouldPopValue = PopValue::Yes);
+
+/**
+ * Extracts a userdata pointer of the specified type T from the Lua state and returns it
+ * to the caller. The value will be returned as the specfied type and it is up to the
+ * caller to verify that the user data is, in fact, of the correct type, or else a pointer
+ * that is invalid will be returned from this function.
+ * 
+ * This function is equivalent to:
+ * \verbatim
+ * reinterpret_cast<T*>(lua_touserdata(L, lua_upvalueindex(i)));
+ *
+ * \param L The stack from which the user data is extracted
+ * \param location The location on the registry where the user data is stored
+ * \return A pointer to the user data at the specified location
+ * \pre L must not be nullptr
+ */
+template <typename T>
+T* userData(lua_State* L, int location = 1);
 
 /**
  * Pushes the passed parameters \p args onto the provided stack \p L in the order that

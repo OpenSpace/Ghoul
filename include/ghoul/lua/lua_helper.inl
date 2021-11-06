@@ -434,6 +434,12 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location, PopValue shouldPo
     return result;
 }
 
+template <typename T>
+T* userData(lua_State* L, int location) {
+    ghoul_precondition(L != nullptr, "L must not be nullptr");
+    return reinterpret_cast<T*>(lua_touserdata(L, lua_upvalueindex(location)));
+}
+
 template <typename... Ts>
 void push(lua_State* L, Ts... arguments) {
     ghoul_precondition(L != nullptr, "L must not be nullptr");
