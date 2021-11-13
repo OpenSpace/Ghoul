@@ -362,6 +362,11 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
         throw LuaFormatException("Tried to load Dictionary from empty state");
     }
     const int topType = lua_type(state, size);
+    if (topType == LUA_TNIL) {
+        // There was no able specified, so we can return an empty Dictionary to the caller
+        dictionary = ghoul::Dictionary();
+        return;
+    }
     if (topType != LUA_TTABLE) {
         throw LuaFormatException("Tried to load Dictionary from wrong parameter type");
     }
@@ -429,6 +434,12 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
     //            crashes --- abock(2018-02-15)
     //            Affected: navigationhandler_lua.inl::setCameraState
     //ghoul_assert(lua_gettop(state) == 0, "Incorrect number of items left on stack");
+}
+
+ghoul::Dictionary luaDictionaryFromState(lua_State* state, int location) {
+    ghoul::Dictionary res;
+    luaDictionaryFromState(state, res, location);
+    return res;
 }
 
 void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {

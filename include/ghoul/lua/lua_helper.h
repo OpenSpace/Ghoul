@@ -307,6 +307,24 @@ void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary,
     int location = -1);
 
 /**
+ * Uses the Lua \p state to populate the return ghoul::Dictionary%. The \p state must have
+ * a single table object at the top of the stack. The table can only contain a pure
+ * array-style table (= only indexed by numbers) or a pure dictionary-style table (= no
+ * numbering indices).
+ *
+ * \param state The Lua state that is used to populate the \p dictionary
+ * \param dictionary 
+ * \param location The stack index of the item to extract. Defaults to -1 (topmost item).
+ *
+ * \return The #ghoul::Dictionary into which the values from the stack are added
+ * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
+ *        <code>string</code> and type <code>number</code>
+ * \pre \p state must not be nullptr
+ * \post \p state%'s stack is unchanged
+ */
+ghoul::Dictionary luaDictionaryFromState(lua_State* state, int location = -1);
+
+/**
  * Uses the Lua \p state to populate the provided ghoul::Dictionary%, extending the passed
  * \p dictionary with numeric keys based on the values indices on the stack. This method
  * will overwrite values with the same keys, but will not remove any other keys from the
