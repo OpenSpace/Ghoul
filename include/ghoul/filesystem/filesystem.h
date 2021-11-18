@@ -298,12 +298,36 @@ private:
  * token resolving
  *
  * \param path The path that should be converted into an absolute path
- * \param ignoredTokens All tokens contained in this list are ignored during the
- *        resolving of path tokens
  * \return The absolute path to the passed \p path
  *
  * \pre \p path must not be empty
  */
 std::filesystem::path absPath(std::string path);
+
+/**
+ * Returns the absolute path to the passed \p path, resolving any tokens (if present)
+ * in the process. The current working directory (#currentDirectory) is used as a base
+ * path for this. All tokens contained in the \p ignoredTokens are ignored from the
+ * token resolving
+ *
+ * \param path The path that should be converted into an absolute path
+ * \return The absolute path to the passed \p path
+ *
+ * \pre \p path must not be empty
+ */
+std::filesystem::path absPath(std::filesystem::path path);
+
+/**
+ * Returns the absolute path to the passed \p path, resolving any tokens (if present)
+ * in the process. The current working directory (#currentDirectory) is used as a base
+ * path for this. All tokens contained in the \p ignoredTokens are ignored from the
+ * token resolving
+ *
+ * \param path The path that should be converted into an absolute path
+ * \return The absolute path to the passed \p path
+ *
+ * \pre \p path must not be empty
+ */
+std::filesystem::path absPath(const char* path);
 
 #endif // __GHOUL___FILESYSTEM___H__

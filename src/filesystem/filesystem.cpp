@@ -63,6 +63,15 @@ std::filesystem::path absPath(std::string path) {
     return absolute.lexically_normal();
 }
 
+std::filesystem::path absPath(std::filesystem::path path) {
+    return absPath(path.string());
+}
+
+std::filesystem::path absPath(const char* path) {
+    return absPath(std::string(path));
+}
+
+
 namespace ghoul::filesystem {
 
 FileSystem* FileSystem::_instance = nullptr;
