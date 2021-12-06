@@ -167,11 +167,20 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
     lua_pushvalue(state, tableLocation);
     lua_pushnil(state);
 
+    auto getKey = [](lua_State* L) {
+        const int keyType = lua_type(L, KeyTableIndex);
+        switch (keyType) {
+            case LUA_TNUMBER: return fmt::format("[{}]", lua_tonumber(L, KeyTableIndex));
+            case LUA_TSTRING: return std::string(lua_tostring(L, KeyTableIndex));
+            default:          return std::string(ghoul::lua::luaTypeToString(keyType));
+        }
+    };
+
     std::vector<std::string> values;
     while (lua_next(state, -2) != 0) {
         values.push_back(fmt::format(
             "{} = {}",
-            luaValueToString(state, KeyTableIndex),
+            getKey(state),
             luaValueToString(state, ValueTableIndex)
         ));
         lua_pop(state, 1);
