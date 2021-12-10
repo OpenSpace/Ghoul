@@ -313,7 +313,6 @@ void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary,
  * numbering indices).
  *
  * \param state The Lua state that is used to populate the \p dictionary
- * \param dictionary 
  * \param location The stack index of the item to extract. Defaults to -1 (topmost item).
  *
  * \return The #ghoul::Dictionary into which the values from the stack are added
@@ -537,7 +536,7 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location = 1,
  * to the caller. The value will be returned as the specfied type and it is up to the
  * caller to verify that the user data is, in fact, of the correct type, or else a pointer
  * that is invalid will be returned from this function.
- * 
+ *
  * This function is equivalent to:
  * \verbatim
  * reinterpret_cast<T*>(lua_touserdata(L, lua_upvalueindex(i)));
@@ -603,8 +602,8 @@ namespace internal {
      * function value() handles the optional variable case, but calls this function to do
      * the actual extraction.
      *
-     * \tparam T The type of the return value. If the value at the provided location of the
-     *           stack is not T a LuaFormatException is thrown
+     * \tparam T The type of the return value. If the value at the provided location of
+     *           the stack is not T a LuaFormatException is thrown
      * \param L The stack from which the value is extracted
      * \param location The location from which the value should be extracted
      *
