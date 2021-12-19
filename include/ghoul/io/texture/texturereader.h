@@ -73,15 +73,22 @@ public:
      * TextureReaderBase is determined by the extension of the \p filename.
      *
      * \param filename The name of the file which should be loaded into a texture
+     * \param nDimensions The number of dimensions of the texture that are returned when
+     *        using this function. This parameter is necessary as it is not always
+     *        possible to automatically detect this based on the image information. For
+     *        example, someone might want to load a 128x1 texture but use it as a 2D
+     *        texture instead.
      *
      * \throw TextureLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p filename must not be empty
      * \pre \p filename must have an extension
+     * \pre \p nDimensions The number of texture dimension must be 1, 2, or 3
      * \pre At least one TextureReaderBase must have been added to the TextureReader
      *      before (addReader)
      */
-    std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename);
+    std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename,
+        int nDimensions);
 
     /**
      * Loads a Texture from the memory pointed at by \p memory. The memory block must
@@ -93,6 +100,11 @@ public:
      *
      * \param memory The memory that contains the bytes of the Texture to be loaded
      * \param size The number of bytes contained in \p memory
+     * \param nDimensions The number of dimensions of the texture that are returned when
+     *        using this function. This parameter is necessary as it is not always
+     *        possible to automatically detect this based on the image information. For
+     *        example, someone might want to load a 128x1 texture but use it as a 2D
+     *        texture instead.
      * \param format The format of the image pointed to by \p memory. This parameter
      *        should be the same as the usual file extension for the image. However, this
      *        parameter is only used to determine which TextureReader is used for this
@@ -102,9 +114,10 @@ public:
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p memory must not be <code>nullptr</code>
      * \pre \p size must be > 0
+     * \pre \p nDimensions The number of texture dimension must be 1, 2, or 3
      */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
-        const std::string& format = "");
+        int nDimensions, const std::string& format = "");
 
     /**
      * Returns a list of all the extensions that are supported by registered readers. If

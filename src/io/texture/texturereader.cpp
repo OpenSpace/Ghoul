@@ -59,9 +59,12 @@ TextureReader& TextureReader::ref() {
     return textureReader;
 }
 
-std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& filename) {
+std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& filename,
+                                                            int nDimensions)
+{
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
+    ghoul_assert(nDimensions >= 1 && nDimensions <= 4, "nDimensions must be 1, 2, or 3");
 
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
@@ -74,10 +77,11 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
         throw MissingReaderException(extension, filename);
     }
 
-    return reader->loadTexture(filename);
+    return reader->loadTexture(filename, nDimensions);
 }
 
 std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t size,
+                                                            int nDimension,
                                                             const std::string& format)
 {
     ghoul_assert(memory, "Memory must not be nullptr");
@@ -89,7 +93,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
         throw InvalidLoadException(memory, size);
     }
 
-    return reader->loadTexture(memory, size);
+    return reader->loadTexture(memory, size, nDimension);
 }
 
 std::vector<std::string> TextureReader::supportedExtensions() {

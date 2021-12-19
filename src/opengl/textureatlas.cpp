@@ -51,7 +51,6 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
     // textures with a bigger size than 65535 (which would be a big texture *anyway*)
     ghoul_assert(_size.x <= std::numeric_limits<uint16_t>::max(), "Texture.x too large");
     ghoul_assert(_size.y <= std::numeric_limits<uint16_t>::max(), "Texture.y too large");
-    ghoul_assert(_size.z <= std::numeric_limits<uint16_t>::max(), "Texture.z too large");
 
     _nodes.emplace_back(1, 1, _size.x - 2);
     _data.resize(_size.x * _size.y * _size.z);
@@ -114,7 +113,8 @@ void TextureAtlas::initialize() {
     GLenum dataType = GL_UNSIGNED_BYTE;
 
     _texture = std::make_unique<Texture>(
-        _size,
+        glm::uvec3(glm::ivec2(_size), 1),
+        GL_TEXTURE_2D,
         format,
         internalFormat,
         dataType,

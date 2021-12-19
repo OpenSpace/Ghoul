@@ -73,6 +73,7 @@ std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filena
     return std::make_unique<opengl::Texture>(
         data,
         glm::size3_t(_hints._dimensions),
+        GL_TEXTURE_3D,
         _hints._format,
         _hints._internalFormat,
         GL_UNSIGNED_BYTE,
