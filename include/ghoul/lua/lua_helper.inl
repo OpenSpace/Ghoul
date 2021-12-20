@@ -153,12 +153,10 @@ constexpr Variant variantValue(lua_State* L, int location) {
     else {
         // We have reached the end of the variant list and haven't found the type in
         // here, so we're done
-        std::string error = fmt::format(
+        throw LuaFormatException(fmt::format(
             "Unable to extract requested value '{}' out of the variant with type '{}' at "
             "parameter {}", typeid(T).name(), typeid(Variant).name(), location
-        );
-        ghoul_assert(false, error);
-        throw LuaFormatException(std::move(error));
+        ));
     }
 }
 
