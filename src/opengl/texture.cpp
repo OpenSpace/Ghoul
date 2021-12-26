@@ -111,19 +111,6 @@ Texture::~Texture() {
 }
 
 void Texture::initialize(bool allocateData) {
-    // Determine texture type
-    //if (_dimensions.z == 1) {
-    //    if (_dimensions.y == 1) {
-    //        _type = GL_TEXTURE_1D;
-    //    }
-    //    else {
-    //        _type = GL_TEXTURE_2D;
-    //    }
-    //}
-    //else {
-    //    _type = GL_TEXTURE_3D;
-    //}
-
     calculateBytesPerPixel();
     generateId();
     if (allocateData) {
