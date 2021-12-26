@@ -115,6 +115,8 @@ public:
      *        created if the <code>z</code> component is equal to <code>1</code>, while a
      *        1D texture is created if the <code>y</code> and <code>z</code> component is
      *        equal to <code>1</code>
+     * \param type The type of the texture. Must be one of GL_TEXTURE_1D, GL_TEXTURE_2D,
+     *        or GL_TEXTURE_3D
      * \param format Specifies the format of the data
      * \param internalFormat The internal format for the texture. See
      *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3
@@ -136,7 +138,7 @@ public:
      *
      * \pre Element of \p dimensions must be bigger or equal <code>1</code>
      */
-    Texture(glm::uvec3 dimensions, Format format = Format::RGBA,
+    Texture(glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
         FilterMode filter = FilterMode::Linear,
         WrappingMode wrapping = WrappingMode::Repeat,
@@ -160,6 +162,8 @@ public:
      *        created if the <code>z</code> component is equal to <code>1</code>, while a
      *        1D texture is created if the <code>y</code> and <code>z</code> component is
      *        equal to <code>1</code>
+     * \param type The type of the texture. Must be one of GL_TEXTURE_1D, GL_TEXTURE_2D,
+     *        or GL_TEXTURE_3D
      * \param format Specifies the format of the data
      * \param internalFormat The internal format for the texture. See
      *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2, and 3
@@ -176,7 +180,7 @@ public:
      * \param takeOwnership Sets whether or not the Texture object should take ownership
      *        of the data.
      */
-    Texture(void* data, glm::uvec3 dimensions, Format format = Format::RGBA,
+    Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
         FilterMode filter = FilterMode::Linear,
         WrappingMode wrapping = WrappingMode::Repeat);

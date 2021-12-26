@@ -38,7 +38,8 @@
 namespace {
     std::unique_ptr<ghoul::opengl::Texture> load(unsigned char* data, int x, int y,
                                                  int n, const std::string& message,
-                                                 const ghoul::io::TextureReaderBase* r)
+                                                 const ghoul::io::TextureReaderBase* r,
+                                                 int nDimensions)
     {
         if (!data) {
             throw ghoul::io::TextureReaderBase::TextureLoadException(
@@ -91,14 +92,25 @@ namespace {
                 break;
         }
 
-        GLenum type = GL_UNSIGNED_BYTE;
+        GLenum type = [](int d) {
+            switch (d) {
+                case 1: return GL_TEXTURE_1D;
+                case 2: return GL_TEXTURE_2D;
+                case 3: return GL_TEXTURE_3D;
+                default:
+                    throw ghoul::RuntimeError(fmt::format(
+                        "Unsupported dimensionality {}", d
+                    ));
+            }
+        }(nDimensions);
 
         return std::make_unique<ghoul::opengl::Texture>(
             newData,
             glm::uvec3(x, y, 1),
+            type,
             format,
             internalFormat,
-            type
+            GL_UNSIGNED_BYTE
         );
     }
 } // namespace
@@ -106,18 +118,19 @@ namespace {
 namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(
-                                                        const std::string& filename) const
+                                                              const std::string& filename,
+                                                                    int nDimensions) const
 {
     int x;
     int y;
     int n;
     unsigned char* data = stbi_load(filename.c_str(), &x, &y, &n, 0);
 
-    return load(data, x, y, n, filename, this);
+    return load(data, x, y, n, filename, this, nDimensions);
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory,
-                                                               size_t size) const
+std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory, size_t size,
+                                                               int nDimensions) const
 {
     int x;
     int y;
@@ -131,7 +144,7 @@ std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory,
         0
     );
 
-    return load(data, x, y, n, "Memory", this);
+    return load(data, x, y, n, "Memory", this, nDimensions);
 
 }
 

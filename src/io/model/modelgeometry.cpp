@@ -192,6 +192,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 
         textureEntry.texture = std::make_unique<opengl::Texture>(
             dimensions,
+            GL_TEXTURE_2D,
             format,
             internalFormat,
             dataType,

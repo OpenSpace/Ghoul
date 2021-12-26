@@ -43,7 +43,7 @@ namespace ghoul::opengl {
 int Texture::nextIndex = 0;
 #endif // Debugging_Ghoul_Textures_Indices
 
-Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
+Texture::Texture(glm::uvec3 dimensions, GLenum type, Format format, GLenum internalFormat,
                  GLenum dataType, FilterMode filter, WrappingMode wrapping,
                  AllocateData allocate, TakeOwnership takeOwnership)
     : _dimensions(std::move(dimensions))
@@ -52,6 +52,7 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
     , _dataType(dataType)
     , _filter(filter)
     , _wrapping({ wrapping })
+    , _type(type)
     , _hasOwnershipOfData(takeOwnership)
 {
 #ifdef Debugging_Ghoul_Textures_Indices
@@ -61,6 +62,10 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(
+        _type == GL_TEXTURE_1D || _type == GL_TEXTURE_2D || _type == GL_TEXTURE_3D,
+        "Type must be one of GL_TEXTURE_1D, GL_TEXTURE_2D, or GL_TEXTURE_3D"
+    );
 
     if (!allocate && takeOwnership) {
         _hasOwnershipOfData = TakeOwnership::No;
@@ -69,14 +74,16 @@ Texture::Texture(glm::uvec3 dimensions, Format format, GLenum internalFormat,
     initialize(allocate);
 }
 
-Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLenum internalFormat,
-                 GLenum dataType, FilterMode filter, WrappingMode wrapping)
+Texture::Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format,
+                 GLenum internalFormat, GLenum dataType, FilterMode filter,
+                 WrappingMode wrapping)
     : _dimensions(std::move(dimensions))
     , _format(format)
     , _internalFormat(internalFormat)
     , _dataType(dataType)
     , _filter(filter)
     , _wrapping({ wrapping })
+    , _type(type)
     , _hasOwnershipOfData(true)
     , _pixels(data)
 {
@@ -87,6 +94,10 @@ Texture::Texture(void* data, glm::uvec3 dimensions, Format format, GLenum intern
     ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
     ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(
+        _type == GL_TEXTURE_1D || _type == GL_TEXTURE_2D || _type == GL_TEXTURE_3D,
+        "Type must be one of GL_TEXTURE_1D, GL_TEXTURE_2D, or GL_TEXTURE_3D"
+    );
 
     initialize(false);
 }
@@ -100,19 +111,6 @@ Texture::~Texture() {
 }
 
 void Texture::initialize(bool allocateData) {
-    // Determine texture type
-    if (_dimensions.z == 1) {
-        if (_dimensions.y == 1) {
-            _type = GL_TEXTURE_1D;
-        }
-        else {
-            _type = GL_TEXTURE_2D;
-        }
-    }
-    else {
-        _type = GL_TEXTURE_3D;
-    }
-
     calculateBytesPerPixel();
     generateId();
     if (allocateData) {

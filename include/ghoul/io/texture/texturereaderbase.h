@@ -64,29 +64,33 @@ public:
      * Loads the texture \p filename from disk and returns the loaded Texture.
      *
      * \param filename The texture that should be loaded from the hard disk
+     * \param nDimensions The number of dimensions of the texture that is created
      * \return The loaded Texture object
      *
      * \throw TextureLoadException If there was an error loading the texture
      * \pre \p filename must not be empty
      * \pre The extension of \p filename must be among the supported extensions as
      *      reported by supportedExtensions
+     * \pre \p nDimensions must be 1, 2, or 3
      */
     virtual std::unique_ptr<opengl::Texture> loadTexture(
-        const std::string& filename) const = 0;
+        const std::string& filename, int nDimensions) const = 0;
 
     /**
-    * Loads a Texture from the memory pointed at by \p memory. The memory block must
-    * contain at least \p size number of bytes.
+     * Loads a Texture from the memory pointed at by \p memory. The memory block must
+     * contain at least \p size number of bytes.
      *
-    * \param memory The memory that contains the bytes of the Texture to be loaded
-    * \param size The number of bytes contained in \p memory
-    *
-    * \throw TextureLoadException If there was an error reading the \p memory
-    * \pre \p memory must not be <code>nullptr</code>
-    * \pre \p size must be > 0
-    */
+     * \param memory The memory that contains the bytes of the Texture to be loaded
+     * \param size The number of bytes contained in \p memory
+     * \param nDimensions The number of dimensions of the texture that is created
+     *
+     * \throw TextureLoadException If there was an error reading the \p memory
+     * \pre \p memory must not be <code>nullptr</code>
+     * \pre \p size must be > 0
+     * \pre \p nDimensions must be 1, 2, or 3
+     */
     virtual std::unique_ptr<opengl::Texture> loadTexture(void* memory,
-        size_t size) const = 0;
+        size_t size, int nDimensions) const = 0;
 
     /**
      * Returns a list of all extensions that this TextureReaderBase supports.

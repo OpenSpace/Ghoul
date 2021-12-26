@@ -35,9 +35,16 @@
 namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
-                                                        const std::string& filename) const
+                                                              const std::string& filename,
+                                                                    int nDimensions) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
+
+    if (nDimensions != 1) {
+        throw ghoul::RuntimeError(fmt::format(
+            "The number of dimensions for {} must be 1, but was {}", filename, nDimensions
+        ));
+    }
 
     std::ifstream file;
     file.exceptions(std::ifstream::failbit);
@@ -105,14 +112,28 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         );
     }
 
+    GLenum type = [](int d) {
+        switch (d) {
+            case 1: return GL_TEXTURE_1D;
+            case 2: return GL_TEXTURE_2D;
+            case 3: return GL_TEXTURE_3D;
+            default:
+                throw ghoul::RuntimeError(fmt::format(
+                    "Unsupported dimensionality {}", d
+                ));
+        }
+    }(nDimensions);
+
     return std::make_unique<opengl::Texture>(
         values,
         glm::size3_t(width, 1, 1),
+        type,
         opengl::Texture::Format::RGBA
     );
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void*, size_t) const {
+std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void*, size_t, int) const
+{
     ghoul_assert(false, "Implementation missing");
     return nullptr;
 }

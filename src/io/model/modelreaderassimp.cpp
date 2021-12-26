@@ -111,6 +111,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                     textureEntry.texture = TextureReader::ref().loadTexture(
                         static_cast<void*>(texture->pcData),
                         texture->mWidth,
+                        2,
                         texture->achFormatHint
                     );
                     meshTexture.texture = textureEntry.texture.get();
@@ -154,7 +155,8 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                 );
 
                 textureEntry.texture = TextureReader::ref().loadTexture(
-                    absPath(absolutePath).string()
+                    absPath(absolutePath).string(),
+                    2
                 );
                 meshTexture.texture = textureEntry.texture.get();
                 meshTexture.texture->setName(path.C_Str());
