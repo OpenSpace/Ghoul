@@ -58,7 +58,7 @@ linux_gcc_ninja: {
           compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
       }
       stage('linux-gcc-ninja/test') {
-        testHelper.runUnitTests('build-make/tests/GhoulTest');
+        testHelper.runUnitTests('build-ninja/tests/GhoulTest');
       }
       cleanWs()
     } // node('linux')
@@ -93,7 +93,7 @@ linux_clang_ninja: {
           compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
       }
       stage('linux-clang-ninja/test') {
-        testHelper.runUnitTests('build-make/tests/GhoulTest');
+        testHelper.runUnitTests('build-ninja/tests/GhoulTest');
       }
       cleanWs()
     } // node('linux')
@@ -128,7 +128,7 @@ windows_ninja: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
       }
       stage('windows-ninja/test') {
-        testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
+        testHelper.runUnitTests('build-ninja\\tests\\Debug\\GhoulTest')
       }
       cleanWs()
     } // node('windows')
@@ -145,7 +145,7 @@ macos_make: {
           compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
       }
       stage('macos-make/test') {
-        testHelper.runUnitTests('build/tests/GhoulTest')
+        testHelper.runUnitTests('build-make/tests/GhoulTest')
       }
       cleanWs()
     } // node('osx')
@@ -162,7 +162,7 @@ macos_ninja: {
           compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
       }
       stage('macos-xcode/test') {
-        testHelper.runUnitTests('build/tests/GhoulTest')
+        testHelper.runUnitTests('build-xcode/tests/GhoulTest')
       }
       cleanWs()
     } // node('osx')
