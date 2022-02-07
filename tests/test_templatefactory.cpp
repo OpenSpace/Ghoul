@@ -119,7 +119,7 @@ TEST_CASE("TemplateFactory: Correctness Direct Subclass", "[templatefactory]") {
     REQUIRE(obj != nullptr);
 
     SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj.get());
-    REQUIRE(derived != nullptr);
+    CHECK(derived != nullptr);
 }
 
 TEST_CASE("TemplateFactory: Correctness Deep SubClass", "[templatefactory]") {
@@ -133,7 +133,7 @@ TEST_CASE("TemplateFactory: Correctness Deep SubClass", "[templatefactory]") {
     REQUIRE(obj != nullptr);
 
     SubClassMultipleLayers* derived = dynamic_cast<SubClassMultipleLayers*>(obj.get());
-    REQUIRE(derived != nullptr);
+    CHECK(derived != nullptr);
 }
 
 TEST_CASE("TemplateFactory: Non Interference", "[templatefactory]") {
@@ -151,13 +151,13 @@ TEST_CASE("TemplateFactory: Non Interference", "[templatefactory]") {
         factory.create("SubClassDefault2")
     );
     REQUIRE(obj2 != nullptr);
-    REQUIRE(obj != obj2);
+    CHECK(obj != obj2);
 
     SubClassDefault* derived = dynamic_cast<SubClassDefault*>(obj.get());
-    REQUIRE(derived != nullptr);
+    CHECK(derived != nullptr);
 
     SubClassDefault2* derived2 = dynamic_cast<SubClassDefault2*>(obj2.get());
-    REQUIRE(derived2 != nullptr);
+    CHECK(derived2 != nullptr);
 }
 
 TEST_CASE("TemplateFactory: Default Constructor", "[templatefactory]") {
@@ -169,9 +169,8 @@ TEST_CASE("TemplateFactory: Default Constructor", "[templatefactory]") {
         factory.create("SubClassDefault")
     );
     REQUIRE(obj != nullptr);
-
-    REQUIRE(obj->value1 == 1);
-    REQUIRE(obj->value2 == 2);
+    CHECK(obj->value1 == 1);
+    CHECK(obj->value2 == 2);
 }
 
 TEST_CASE("TemplateFactory: No Default Constructor Exists", "[templatefactory]") {
@@ -179,7 +178,7 @@ TEST_CASE("TemplateFactory: No Default Constructor Exists", "[templatefactory]")
 
     factory.registerClass<SubClassDictionary>("SubClassDictionary");
 
-    REQUIRE_THROWS_AS(
+    CHECK_THROWS_AS(
         factory.create("SubClassDictionary"),
         ghoul::TemplateConstructionError
     );
@@ -198,9 +197,8 @@ TEST_CASE("TemplateFactory: Dictionary Constructor", "[templatefactory]") {
         factory.create("SubClassDictionary", dict)
     );
     REQUIRE(obj != nullptr);
-
-    REQUIRE(obj->value1 == 100);
-    REQUIRE(obj->value2 == 200);
+    CHECK(obj->value1 == 100);
+    CHECK(obj->value2 == 200);
 }
 
 TEST_CASE("TemplateFactory: No Dictionary Constructor Exists", "[templatefactory]") {
@@ -212,7 +210,7 @@ TEST_CASE("TemplateFactory: No Dictionary Constructor Exists", "[templatefactory
     dict.setValue("value1", 100);
     dict.setValue("value2", 200);
 
-    REQUIRE_THROWS_AS(
+    CHECK_THROWS_AS(
         factory.create("SubClassDefault", dict),
         ghoul::TemplateConstructionError
     );
@@ -226,9 +224,9 @@ TEST_CASE("TemplateFactory: Class Does Not Exist", "[templatefactory]") {
     ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
         factory.create("SubClassDefault")
     );
-    REQUIRE(obj != nullptr);
+    CHECK(obj != nullptr);
 
-    REQUIRE_THROWS_AS(
+    CHECK_THROWS_AS(
         factory.create("DoesNotExist"),
         ghoul::TemplateClassNotFoundError
     );
@@ -244,8 +242,8 @@ TEST_CASE("TemplateFactory: Default Dictionary Constructor", "[templatefactory]"
         factory.create("class")
     );
     REQUIRE(obj != nullptr);
-    REQUIRE(obj->value1 == 31);
-    REQUIRE(obj->value2 == 32);
+    CHECK(obj->value1 == 31);
+    CHECK(obj->value2 == 32);
 
     ghoul::Dictionary dict;
     dict.setValue("value1", 41);
@@ -255,8 +253,8 @@ TEST_CASE("TemplateFactory: Default Dictionary Constructor", "[templatefactory]"
         factory.create("class", dict)
     );
     REQUIRE(obj2 != nullptr);
-    REQUIRE(obj2->value1 == 41);
-    REQUIRE(obj2->value2 == 42);
+    CHECK(obj2->value1 == 41);
+    CHECK(obj2->value2 == 42);
 }
 
 TEST_CASE("TemplateFactory: Correctness For HasClass", "[templatefactory]") {
@@ -264,8 +262,8 @@ TEST_CASE("TemplateFactory: Correctness For HasClass", "[templatefactory]") {
 
     factory.registerClass<SubClassDictionary>("SubClassDictionary");
 
-    REQUIRE(factory.hasClass("SubClassDictionary"));
-    REQUIRE_FALSE(factory.hasClass("DoesNotExist"));
+    CHECK(factory.hasClass("SubClassDictionary"));
+    CHECK_FALSE(factory.hasClass("DoesNotExist"));
 }
 
 TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
@@ -280,12 +278,12 @@ TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
     ghoul::mm_unique_ptr<BaseClass> obj = ghoul::mm_unique_ptr<BaseClass>(
         factory.create("ptr")
     );
-    REQUIRE(obj == nullptr);
+    CHECK(obj == nullptr);
 
     ghoul::mm_unique_ptr<BaseClass> obj2 = ghoul::mm_unique_ptr<BaseClass>(
         factory.create("ptr", ghoul::Dictionary())
     );
-    REQUIRE(obj2 != nullptr);
+    CHECK(obj2 != nullptr);
 }
 
 TEST_CASE("TemplateFactory: MemoryPool construction", "[templatefactory]") {
@@ -296,9 +294,9 @@ TEST_CASE("TemplateFactory: MemoryPool construction", "[templatefactory]") {
 
     factory.create("sc", &pool);
     REQUIRE(pool.nBuckets() == 1);
-    REQUIRE(pool.occupancies()[0] == 16);
+    CHECK(pool.occupancies()[0] == 16);
 
     factory.create("sc", &pool);
     REQUIRE(pool.nBuckets() == 1);
-    REQUIRE(pool.occupancies()[0] == 32);
+    CHECK(pool.occupancies()[0] == 32);
 }

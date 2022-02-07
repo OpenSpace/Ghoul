@@ -32,7 +32,7 @@
 TEST_CASE("DictionaryJsonFormatter: Empty Dictionary", "[dictionaryjsonformatter]") {
     ghoul::Dictionary d;
     std::string res = ghoul::formatJson(d);
-    REQUIRE(res == "{}");
+    CHECK(res == "{}");
 }
 
 TEST_CASE("DictionaryJsonFormatter: Simple Dictionary", "[dictionaryjsonformatter]") {
@@ -48,7 +48,7 @@ TEST_CASE("DictionaryJsonFormatter: Simple Dictionary", "[dictionaryjsonformatte
     d.setValue("string", ""s);
 
     std::string res = ghoul::formatJson(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{\"boolFalse\":false,\"boolTrue\":true,"
         "\"double\":2.2,\"int\":1,\"string\":\"\","
@@ -65,7 +65,7 @@ TEST_CASE("DictionaryJsonFormatter: Dictionary with Ivec", "[dictionaryjsonforma
     d.setValue("ivec4", glm::ivec4(0));
 
     std::string res = ghoul::formatJson(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{\"ivec2\":[0,0],\"ivec3\":[0,0,0],"
         "\"ivec4\":[0,0,0,0]}"
@@ -80,7 +80,7 @@ TEST_CASE("DictionaryJsonFormatter: std::vectors", "[dictionaryjsonformatter]") 
     d.setValue("empty", std::vector<double>{});
 
     std::string res = ghoul::formatJson(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{\"dVector\":[0.1,0.2,0.3,0.4,0.5],"
         "\"empty\":[],"
@@ -104,7 +104,7 @@ TEST_CASE("DictionaryJsonFormatter: Matrices", "[dictionaryjsonformatter]") {
     d.setValue("dmat4x3", glm::dmat4x3(0.0));
 
     std::string res = ghoul::formatJson(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{\"dmat2x2\":[0,0,0,0],\"dmat2x3\":[0,0,0,0,0,0],\"dmat2x4\":[0,0,0,0,0,0,0,0],"
         "\"dmat3x2\":[0,0,0,0,0,0],\"dmat3x3\":[0,0,0,0,0,0,0,0,0],"
@@ -119,7 +119,7 @@ TEST_CASE("DictionaryJsonFormatter: Dictionary with nan", "[dictionaryjsonformat
     d.setValue("nanValue", std::numeric_limits<double>::quiet_NaN());
 
     std::string res = ghoul::formatJson(d);
-    REQUIRE(res == "{\"nanValue\":null}");
+    CHECK(res == "{\"nanValue\":null}");
 }
 
 TEST_CASE("DictionaryJsonFormatter: Dictionary with infinity",
@@ -129,7 +129,7 @@ TEST_CASE("DictionaryJsonFormatter: Dictionary with infinity",
     d.setValue("infinity", std::numeric_limits<double>::infinity());
 
     std::string res = ghoul::formatJson(d);
-    REQUIRE(res == "{\"infinity\":null}");
+    CHECK(res == "{\"infinity\":null}");
 }
 
 TEST_CASE("DictionaryJsonFormatter: Nested Dictionary", "[dictionaryjsonformatter]") {
@@ -174,7 +174,7 @@ TEST_CASE("DictionaryJsonFormatter: Nested Dictionary", "[dictionaryjsonformatte
 
     std::string res = ghoul::formatJson(g);
 
-    REQUIRE(
+    CHECK(
         res ==
         "{\"dict\":{\"dict\":{\"dict\":{\"double\":2.2,\"int\":1,"
         "\"string\":\"\",\"vec2\":[0,0],"

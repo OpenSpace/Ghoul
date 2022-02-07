@@ -41,9 +41,9 @@ TEST_CASE("Buffer: String", "[buffer]") {
     b.deserialize(s5);
     b.deserialize(s6);
 
-    REQUIRE(s1 == s4);
-    REQUIRE(s2 == s5);
-    REQUIRE(s6 == "third");
+    CHECK(s1 == s4);
+    CHECK(s2 == s5);
+    CHECK(s6 == "third");
 }
 
 TEST_CASE("Buffer: MixedTypes", "[buffer]") {
@@ -67,10 +67,10 @@ TEST_CASE("Buffer: MixedTypes", "[buffer]") {
     unsigned long long u2;
     b.deserialize(u2);
 
-    REQUIRE(s1 == s2);
-    REQUIRE(i1 == i2);
-    REQUIRE(std::equal_to<>()(d1, d2));
-    REQUIRE(u1 == u2);
+    CHECK(s1 == s2);
+    CHECK(i1 == i2);
+    CHECK(std::equal_to<>()(d1, d2));
+    CHECK(u1 == u2);
 }
 
 TEST_CASE("Buffer: Copy", "[buffer]") {
@@ -98,10 +98,10 @@ TEST_CASE("Buffer: Copy", "[buffer]") {
     unsigned long long u2;
     b2.deserialize(u2);
 
-    REQUIRE(s1 == s2);
-    REQUIRE(i1 == i2);
-    REQUIRE(std::equal_to<>()(d1, d2));
-    REQUIRE(u1 == u2);
+    CHECK(s1 == s2);
+    CHECK(i1 == i2);
+    CHECK(std::equal_to<>()(d1, d2));
+    CHECK(u1 == u2);
 }
 
 TEST_CASE("Buffer: Move", "[buffer]") {
@@ -129,10 +129,10 @@ TEST_CASE("Buffer: Move", "[buffer]") {
     unsigned long long u2;
     b2.deserialize(u2);
 
-    REQUIRE(s1 == s2);
-    REQUIRE(i1 == i2);
-    REQUIRE(std::equal_to<>()(d1, d2));
-    REQUIRE(u1 == u2);
+    CHECK(s1 == s2);
+    CHECK(i1 == i2);
+    CHECK(std::equal_to<>()(d1, d2));
+    CHECK(u1 == u2);
 }
 
 TEST_CASE("Buffer: Store", "[buffer]") {
@@ -160,10 +160,10 @@ TEST_CASE("Buffer: Store", "[buffer]") {
     unsigned long long u2;
     b2.deserialize(u2);
 
-    REQUIRE(s1 == s2);
-    REQUIRE(i1 == i2);
-    REQUIRE(std::equal_to<>()(d1, d2));
-    REQUIRE(u1 == u2);
+    CHECK(s1 == s2);
+    CHECK(i1 == i2);
+    CHECK(std::equal_to<>()(d1, d2));
+    CHECK(u1 == u2);
 }
 
 TEST_CASE("Buffer: Store Compress", "[buffer]") {
@@ -191,10 +191,10 @@ TEST_CASE("Buffer: Store Compress", "[buffer]") {
     unsigned long long u2;
     b2.deserialize(u2);
 
-    REQUIRE(s1 == s2);
-    REQUIRE(i1 == i2);
-    REQUIRE(std::equal_to<>()(d1, d2));
-    REQUIRE(u1 == u2);
+    CHECK(s1 == s2);
+    CHECK(i1 == i2);
+    CHECK(std::equal_to<>()(d1, d2));
+    CHECK(u1 == u2);
 }
 
 TEST_CASE("Buffer: Capacity", "[buffer]") {
@@ -218,10 +218,10 @@ TEST_CASE("Buffer: Capacity", "[buffer]") {
     unsigned long long u2;
     b.deserialize(u2);
 
-    REQUIRE(s1 == s2);
-    REQUIRE(i1 == i2);
-    REQUIRE(std::equal_to<>()(d1, d2));
-    REQUIRE(u1 == u2);
+    CHECK(s1 == s2);
+    CHECK(i1 == i2);
+    CHECK(std::equal_to<>()(d1, d2));
+    CHECK(u1 == u2);
 }
 
 TEST_CASE("Buffer: Vector", "[buffer]") {
@@ -245,6 +245,6 @@ TEST_CASE("Buffer: Vector", "[buffer]") {
     std::vector<std::string> sv2;
     b.deserialize(sv2);
 
-    REQUIRE(fv == fv2);
-    REQUIRE(sv == sv2);
+    CHECK(fv == fv2);
+    CHECK(sv == sv2);
 }

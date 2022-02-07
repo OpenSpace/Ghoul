@@ -31,160 +31,166 @@ TEST_CASE("MemoryPool: MemoryPool Default", "[memorypool]") {
     ghoul::MemoryPool<> pool;
     void* p1 = pool.allocate(1024);
     std::memset(p1, 0xB0, 1024);
-    REQUIRE(p1);
-    REQUIRE(pool.nBuckets() == 1);
+    CHECK(p1);
+    CHECK(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 1024);
-    REQUIRE(pool.totalOccupancy() == 1024);
+    CHECK(pool.occupancies()[0] == 1024);
+    CHECK(pool.totalOccupancy() == 1024);
 
     void* p2 = pool.allocate(1024);
     std::memset(p2, 0xB1, 1024);
-    REQUIRE(p2);
-    REQUIRE(p2 != p1);
-    REQUIRE(pool.nBuckets() == 1);
+    CHECK(p2);
+    CHECK(p2 != p1);
+    CHECK(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 2048);
-    REQUIRE(pool.totalOccupancy() == 2048);
+    CHECK(pool.occupancies()[0] == 2048);
+    CHECK(pool.totalOccupancy() == 2048);
 
     void* p3 = pool.allocate(1024);
     std::memset(p3, 0xB2, 1024);
-    REQUIRE(p3);
-    REQUIRE(p3 != p1);
-    REQUIRE(p3 != p2);
-    REQUIRE(pool.nBuckets() == 1);
+    CHECK(p3);
+    CHECK(p3 != p1);
+    CHECK(p3 != p2);
+    CHECK(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 3072);
-    REQUIRE(pool.totalOccupancy() == 3072);
+    CHECK(pool.occupancies()[0] == 3072);
+    CHECK(pool.totalOccupancy() == 3072);
 
     void* p4 = pool.allocate(1024);
     std::memset(p4, 0xB3, 1024);
-    REQUIRE(p4);
-    REQUIRE(p4 != p1);
-    REQUIRE(p4 != p2);
-    REQUIRE(p4 != p3);
-    REQUIRE(pool.nBuckets() == 1);
+    CHECK(p4);
+    CHECK(p4 != p1);
+    CHECK(p4 != p2);
+    CHECK(p4 != p3);
+    CHECK(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 4096);
-    REQUIRE(pool.totalOccupancy() == 4096);
+    CHECK(pool.occupancies()[0] == 4096);
+    CHECK(pool.totalOccupancy() == 4096);
 }
 
 TEST_CASE("MemoryPool: MemoryPool 2048 Bucket", "[memorypool]") {
     ghoul::MemoryPool<2048> pool;
     void* p1 = pool.allocate(1024);
     std::memset(p1, 0xB0, 1024);
-    REQUIRE(p1);
-    REQUIRE(pool.nBuckets() == 1);
+    CHECK(p1);
+    CHECK(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 1024);
-    REQUIRE(pool.totalOccupancy() == 1024);
+    CHECK(pool.occupancies()[0] == 1024);
+    CHECK(pool.totalOccupancy() == 1024);
 
     void* p2 = pool.allocate(1024);
     std::memset(p2, 0xB1, 1024);
-    REQUIRE(p2);
-    REQUIRE(p2 != p1);
-    REQUIRE(pool.nBuckets() == 1);
+    CHECK(p2);
+    CHECK(p2 != p1);
+    CHECK(pool.nBuckets() == 1);
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 2048);
-    REQUIRE(pool.totalOccupancy() == 2048);
+    CHECK(pool.occupancies()[0] == 2048);
+    CHECK(pool.totalOccupancy() == 2048);
 
     void* p3 = pool.allocate(1024);
     std::memset(p3, 0xB2, 1024);
-    REQUIRE(p3);
-    REQUIRE(p3 != p1);
-    REQUIRE(p3 != p2);
-    REQUIRE(pool.nBuckets() == 2);
+    CHECK(p3);
+    CHECK(p3 != p1);
+    CHECK(p3 != p2);
+    CHECK(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
-    REQUIRE(pool.occupancies()[0] == 2048);
-    REQUIRE(pool.occupancies()[1] == 1024);
-    REQUIRE(pool.totalOccupancy() == 2048 + 1024);
+    CHECK(pool.occupancies()[0] == 2048);
+    CHECK(pool.occupancies()[1] == 1024);
+    CHECK(pool.totalOccupancy() == 2048 + 1024);
 
     void* p4 = pool.allocate(1024);
     std::memset(p4, 0xB3, 1024);
-    REQUIRE(p4);
-    REQUIRE(p4 != p1);
-    REQUIRE(p4 != p2);
-    REQUIRE(p4 != p3);
-    REQUIRE(pool.nBuckets() == 2);
+    CHECK(p4);
+    CHECK(p4 != p1);
+    CHECK(p4 != p2);
+    CHECK(p4 != p3);
+    CHECK(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
-    REQUIRE(pool.occupancies()[0] == 2048);
-    REQUIRE(pool.occupancies()[1] == 2048);
-    REQUIRE(pool.totalOccupancy() == 2048 + 2048);
+    CHECK(pool.occupancies()[0] == 2048);
+    CHECK(pool.occupancies()[1] == 2048);
+    CHECK(pool.totalOccupancy() == 2048 + 2048);
 }
 
 TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
     ghoul::MemoryPool<2048> pool(2);
     void* p1 = pool.allocate(1024);
     std::memset(p1, 0xB0, 1024);
-    REQUIRE(p1);
-    REQUIRE(pool.nBuckets() == 2);
+    CHECK(p1);
+    CHECK(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
-    REQUIRE(pool.occupancies()[0] == 1024);
-    REQUIRE(pool.occupancies()[1] == 0);
-    REQUIRE(pool.totalOccupancy() == 1024);
+    CHECK(pool.occupancies()[0] == 1024);
+    CHECK(pool.occupancies()[1] == 0);
+    CHECK(pool.totalOccupancy() == 1024);
 
     void* p2 = pool.allocate(1024);
     std::memset(p2, 0xB1, 1024);
-    REQUIRE(p2);
-    REQUIRE(p2 != p1);
-    REQUIRE(pool.nBuckets() == 2);
+    CHECK(p2);
+    CHECK(p2 != p1);
+    CHECK(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
-    REQUIRE(pool.occupancies()[0] == 2048);
-    REQUIRE(pool.occupancies()[1] == 0);
-    REQUIRE(pool.totalOccupancy() == 2048);
+    CHECK(pool.occupancies()[0] == 2048);
+    CHECK(pool.occupancies()[1] == 0);
+    CHECK(pool.totalOccupancy() == 2048);
 
     void* p3 = pool.allocate(1024);
     std::memset(p3, 0xB2, 1024);
-    REQUIRE(p3);
-    REQUIRE(p3 != p1);
-    REQUIRE(p3 != p2);
-    REQUIRE(pool.nBuckets() == 2);
+    CHECK(p3);
+    CHECK(p3 != p1);
+    CHECK(p3 != p2);
+    CHECK(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
-    REQUIRE(pool.occupancies()[0] == 2048);
-    REQUIRE(pool.occupancies()[1] == 1024);
-    REQUIRE(pool.totalOccupancy() == 2048 + 1024);
+    CHECK(pool.occupancies()[0] == 2048);
+    CHECK(pool.occupancies()[1] == 1024);
+    CHECK(pool.totalOccupancy() == 2048 + 1024);
 
     void* p4 = pool.allocate(1024);
     std::memset(p4, 0xB3, 1024);
-    REQUIRE(p4);
-    REQUIRE(p4 != p1);
-    REQUIRE(p4 != p2);
-    REQUIRE(p4 != p3);
-    REQUIRE(pool.nBuckets() == 2);
+    CHECK(p4);
+    CHECK(p4 != p1);
+    CHECK(p4 != p2);
+    CHECK(p4 != p3);
+    CHECK(pool.nBuckets() == 2);
     REQUIRE(pool.occupancies().size() == 2);
-    REQUIRE(pool.occupancies()[0] == 2048);
-    REQUIRE(pool.occupancies()[1] == 2048);
-    REQUIRE(pool.totalOccupancy() == 2048 + 2048);
+    CHECK(pool.occupancies()[0] == 2048);
+    CHECK(pool.occupancies()[1] == 2048);
+    CHECK(pool.totalOccupancy() == 2048 + 2048);
 }
 
 TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
     ghoul::MemoryPool<2048> pool;
 
+    CHECK(pool.totalOccupancy() == 0);
     void* p1 = pool.allocate(16);
+    CHECK(pool.totalOccupancy() == 16);
     void* p2 = pool.allocate(8);
+    CHECK(pool.totalOccupancy() == 24);
 
     pool.deallocate(p1, 16);
+    CHECK(pool.totalOccupancy() == 24);
     void* p3 = pool.allocate(8);
+    CHECK(pool.totalOccupancy() == 24);
     void* p4 = pool.allocate(8);
+    CHECK(pool.totalOccupancy() == 24);
 
     void* p5 = pool.allocate(8);
-
-    REQUIRE(pool.totalOccupancy() == 32);
-    REQUIRE(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p3));
-    REQUIRE(reinterpret_cast<intptr_t>(p4) == reinterpret_cast<intptr_t>(p3) + 8);
-    REQUIRE(reinterpret_cast<intptr_t>(p2) > reinterpret_cast<intptr_t>(p4));
-    REQUIRE(reinterpret_cast<intptr_t>(p5) > reinterpret_cast<intptr_t>(p2));
+    CHECK(pool.totalOccupancy() == 32);
+    
+    CHECK(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p3));
+    CHECK(reinterpret_cast<intptr_t>(p4) == reinterpret_cast<intptr_t>(p3) + 8);
+    CHECK(reinterpret_cast<intptr_t>(p2) > reinterpret_cast<intptr_t>(p4));
+    CHECK(reinterpret_cast<intptr_t>(p5) > reinterpret_cast<intptr_t>(p2));
 }
 
 TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memorypool]") {
     ghoul::MemoryPool<32> pool;
 
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 0);
+    CHECK(pool.occupancies()[0] == 0);
     void* p1 = pool.allocate(8);
     void* p2 = pool.allocate(8);
     [[ maybe_unused ]] void* p3 = pool.allocate(16);
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 32);
+    CHECK(pool.occupancies()[0] == 32);
 
     pool.deallocate(p1, 8);
     pool.deallocate(p2, 8);
@@ -194,28 +200,28 @@ TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memoryp
     pool.housekeeping();
 
     void* p5 = pool.allocate(16);
-    REQUIRE(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p5));
+    CHECK(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p5));
     REQUIRE(pool.occupancies().size() == 1);
-    REQUIRE(pool.occupancies()[0] == 32);
+    CHECK(pool.occupancies()[0] == 32);
 }
 
 TEST_CASE("MemoryPool: Reusable Typed MemoryPool", "[memorypool]") {
     ghoul::ReusableTypedMemoryPool<int> pool;
     std::vector<void*> p1 = pool.allocate(2);
     REQUIRE(p1.size() == 2);
-    REQUIRE(p1[0] != p1[1]);
+    CHECK(p1[0] != p1[1]);
 
     std::vector<void*> p2 = pool.allocate(2);
     REQUIRE(p2.size() == 2);
-    REQUIRE(p2[0] != p2[1]);
+    CHECK(p2[0] != p2[1]);
 
     std::vector<void*> p3 = pool.allocate(2);
     REQUIRE(p3.size() == 2);
-    REQUIRE(p3[0] != p3[1]);
+    CHECK(p3[0] != p3[1]);
 
     std::vector<void*> p4 = pool.allocate(2);
     REQUIRE(p4.size() == 2);
-    REQUIRE(p4[0] != p4[1]);
+    CHECK(p4[0] != p4[1]);
 
     pool.free(reinterpret_cast<int*>(p1[0]));
 }
@@ -224,11 +230,11 @@ TEST_CASE("MemoryPool: Reusable Typed MemoryPool Reuse", "[memorypool]") {
     ghoul::ReusableTypedMemoryPool<int> pool;
     std::vector<void*> p1 = pool.allocate(2);
     REQUIRE(p1.size() == 2);
-    REQUIRE(p1[0] != p1[1]);
+    CHECK(p1[0] != p1[1]);
 
     std::vector<void*> p2 = pool.allocate(2);
     REQUIRE(p2.size() == 2);
-    REQUIRE(p2[0] != p2[1]);
+    CHECK(p2[0] != p2[1]);
 
     pool.free(reinterpret_cast<int*>(p1[0]));
     pool.free(reinterpret_cast<int*>(p1[1]));
@@ -237,14 +243,14 @@ TEST_CASE("MemoryPool: Reusable Typed MemoryPool Reuse", "[memorypool]") {
 
     std::vector<void*> p3 = pool.allocate(2);
     REQUIRE(p3.size() == 2);
-    REQUIRE(p3[0] != p3[1]);
+    CHECK(p3[0] != p3[1]);
 
     std::vector<void*> p4 = pool.allocate(2);
     REQUIRE(p4.size() == 2);
-    REQUIRE(p4[0] != p4[1]);
+    CHECK(p4[0] != p4[1]);
 
-    REQUIRE(p3[0] == p2[0]);
-    REQUIRE(p3[1] == p2[1]);
-    REQUIRE(p4[0] == p1[0]);
-    REQUIRE(p4[1] == p1[1]);
+    CHECK(p3[0] == p2[0]);
+    CHECK(p3[1] == p2[1]);
+    CHECK(p4[0] == p1[0]);
+    CHECK(p4[1] == p1[1]);
 }

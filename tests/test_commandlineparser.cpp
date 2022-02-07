@@ -106,12 +106,12 @@ TEST_CASE("CommandlineParser: Unknown Commands Interspersed", "[commandlineparse
     REQUIRE_NOTHROW(p.execute());
 
     REQUIRE(arguments.size() == 4);
-    REQUIRE(arguments.at(0) == "-cmd1");
-    REQUIRE(arguments.at(1) == "arg");
-    REQUIRE(arguments.at(2) == "-cmd3");
-    REQUIRE(arguments.at(3) == "arg4");
-    REQUIRE(v1 == "arg2");
-    REQUIRE(v2 == "arg3");
+    CHECK(arguments[0] == "-cmd1");
+    CHECK(arguments[1] == "arg");
+    CHECK(arguments[2] == "-cmd3");
+    CHECK(arguments[3] == "arg4");
+    CHECK(v1 == "arg2");
+    CHECK(v2 == "arg3");
 }
 
 TEST_CASE("CommandlineParser: Single Zero Command Arguments", "[commandlineparser]") {
@@ -128,7 +128,7 @@ TEST_CASE("CommandlineParser: Single Zero Command Arguments", "[commandlineparse
 
     p.setCommandLine(argv);
     REQUIRE_NOTHROW(p.execute());
-    REQUIRE(v);
+    CHECK(v);
 }
 
 TEST_CASE("CommandlineParser: Single Command One Argument Bool", "[commandlineparser]") {
@@ -148,7 +148,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Bool", "[commandlinepa
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v);
+        CHECK_FALSE(v);
     }
     SECTION("true") {
         std::vector<std::string> argv = {
@@ -159,7 +159,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Bool", "[commandlinepa
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v);
+        CHECK(v);
     }
 }
 
@@ -212,9 +212,9 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == 2);
-        REQUIRE(v3 == 3);
+        CHECK(v1 == 1);
+        CHECK(v2 == 2);
+        CHECK(v3 == 3);
     }
 
     SECTION("213") {
@@ -230,9 +230,9 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == 2);
-        REQUIRE(v3 == 3);
+        CHECK(v1 == 1);
+        CHECK(v2 == 2);
+        CHECK(v3 == 3);
     }
 
     SECTION("321") {
@@ -248,9 +248,9 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == 2);
-        REQUIRE(v3 == 3);
+        CHECK(v1 == 1);
+        CHECK(v2 == 2);
+        CHECK(v3 == 3);
     }
 
     SECTION("312") {
@@ -266,9 +266,9 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == 2);
-        REQUIRE(v3 == 3);
+        CHECK(v1 == 1);
+        CHECK(v2 == 2);
+        CHECK(v3 == 3);
     }
 }
 
@@ -288,7 +288,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Int", "[commandlinepar
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v == 1);
+        CHECK(v == 1);
     }
     SECTION("2") {
         std::vector<std::string> argv = {
@@ -299,7 +299,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Int", "[commandlinepar
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v == 0);
+        CHECK(v == 0);
     }
 }
 
@@ -320,7 +320,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument String", "[commandline
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v == "foo");
+        CHECK(v == "foo");
     }
 
     SECTION("bar") {
@@ -332,7 +332,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument String", "[commandline
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v == "bar");
+        CHECK(v == "bar");
     }
 }
 
@@ -357,8 +357,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE_FALSE(v2);
+        CHECK_FALSE(v1);
+        CHECK_FALSE(v2);
     }
     SECTION("10") {
         std::vector<std::string> argv = {
@@ -370,8 +370,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE_FALSE(v2);
+        CHECK(v1);
+        CHECK_FALSE(v2);
     }
     SECTION("01") {
         std::vector<std::string> argv = {
@@ -383,8 +383,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2);
+        CHECK_FALSE(v1);
+        CHECK(v2);
     }
     SECTION("11") {
         std::vector<std::string> argv = {
@@ -396,8 +396,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2);
+        CHECK(v1);
+        CHECK(v2);
     }
 }
 
@@ -421,8 +421,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 0);
-        REQUIRE(v2 == 0);
+        CHECK(v1 == 0);
+        CHECK(v2 == 0);
     }
     SECTION("10") {
         std::vector<std::string> argv = {
@@ -434,8 +434,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == 0);
+        CHECK(v1 == 1);
+        CHECK(v2 == 0);
     }
     SECTION("01") {
         std::vector<std::string> argv = {
@@ -447,8 +447,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 0);
-        REQUIRE(v2 == 1);
+        CHECK(v1 == 0);
+        CHECK(v2 == 1);
     }
     SECTION("11") {
         std::vector<std::string> argv = {
@@ -460,8 +460,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == 1);
+        CHECK(v1 == 1);
+        CHECK(v2 == 1);
     }
 }
 
@@ -486,8 +486,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "0");
-        REQUIRE(v2 == "0");
+        CHECK(v1 == "0");
+        CHECK(v2 == "0");
     }
     
     SECTION("10") {
@@ -500,8 +500,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "1");
-        REQUIRE(v2 == "0");
+        CHECK(v1 == "1");
+        CHECK(v2 == "0");
     }
     SECTION("01") {
         std::vector<std::string> argv = {
@@ -513,8 +513,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "0");
-        REQUIRE(v2 == "1");
+        CHECK(v1 == "0");
+        CHECK(v2 == "1");
     }
     SECTION("11") {
         std::vector<std::string> argv = {
@@ -526,8 +526,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "1");
-        REQUIRE(v2 == "1");
+        CHECK(v1 == "1");
+        CHECK(v2 == "1");
     }
 }
 
@@ -552,8 +552,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 0);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 0);
     }
     SECTION("10") {
         std::vector<std::string> argv = {
@@ -565,8 +565,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 0);
+        CHECK(v1);
+        CHECK(v2 == 0);
     }
     SECTION("01") {
         std::vector<std::string> argv = {
@@ -578,8 +578,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 1);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 1);
     }
     SECTION("11") {
         std::vector<std::string> argv = {
@@ -591,8 +591,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 1);
+        CHECK(v1);
+        CHECK(v2 == 1);
     }
 }
 
@@ -616,8 +616,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 0);
-        REQUIRE_FALSE(v2);
+        CHECK(v1 == 0);
+        CHECK_FALSE(v2);
     }
     SECTION("10") {
         std::vector<std::string> argv = {
@@ -629,8 +629,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE_FALSE(v2);
+        CHECK(v1 == 1);
+        CHECK_FALSE(v2);
     }
     SECTION("01") {
         std::vector<std::string> argv = {
@@ -642,8 +642,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 0);
-        REQUIRE(v2);
+        CHECK(v1 == 0);
+        CHECK(v2);
     }
     SECTION("11") {
         std::vector<std::string> argv = {
@@ -655,8 +655,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2);
+        CHECK(v1 == 1);
+        CHECK(v2);
     }
 }
 
@@ -681,8 +681,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 0);
-        REQUIRE(v2 == "0");
+        CHECK(v1 == 0);
+        CHECK(v2 == "0");
     }
     SECTION("10") {
         std::vector<std::string> argv = {
@@ -694,8 +694,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == "0");
+        CHECK(v1 == 1);
+        CHECK(v2 == "0");
     }
     SECTION("01") {
         std::vector<std::string> argv = {
@@ -707,8 +707,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 0);
-        REQUIRE(v2 == "1");
+        CHECK(v1 == 0);
+        CHECK(v2 == "1");
     }
     SECTION("11") {
         std::vector<std::string> argv = {
@@ -720,8 +720,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == 1);
-        REQUIRE(v2 == "1");
+        CHECK(v1 == 1);
+        CHECK(v2 == "1");
     }
 }
 
@@ -746,8 +746,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "0");
-        REQUIRE(v2 == 0);
+        CHECK(v1 == "0");
+        CHECK(v2 == 0);
     }
     SECTION("10") {
         std::vector<std::string> argv = {
@@ -759,8 +759,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "1");
-        REQUIRE(v2 == 0);
+        CHECK(v1 == "1");
+        CHECK(v2 == 0);
     }
     SECTION("01") {
         std::vector<std::string> argv = {
@@ -772,8 +772,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "0");
-        REQUIRE(v2 == 1);
+        CHECK(v1 == "0");
+        CHECK(v2 == 1);
     }
     SECTION("11") {
         std::vector<std::string> argv = {
@@ -785,8 +785,8 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1 == "1");
-        REQUIRE(v2 == 1);
+        CHECK(v1 == "1");
+        CHECK(v2 == 1);
     }
 }
 
@@ -813,9 +813,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "0");
+        CHECK_FALSE(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "0");
     }
     SECTION("100") {
         std::vector<std::string> argv = {
@@ -828,9 +828,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "0");
+        CHECK(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "0");
     }
     SECTION("010") {
         std::vector<std::string> argv = {
@@ -843,9 +843,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "0");
+        CHECK_FALSE(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "0");
     }
     SECTION("110") {
         std::vector<std::string> argv = {
@@ -858,9 +858,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "0");
+        CHECK(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "0");
     }
 
     SECTION("001") {
@@ -874,9 +874,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "1");
+        CHECK_FALSE(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "1");
     }
     SECTION("101") {
         std::vector<std::string> argv = {
@@ -889,9 +889,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "1");
+        CHECK(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "1");
     }
     SECTION("011") {
         std::vector<std::string> argv = {
@@ -904,9 +904,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "1");
+        CHECK_FALSE(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "1");
     }
     SECTION("111") {
         std::vector<std::string> argv = {
@@ -919,9 +919,9 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "1");
+        CHECK(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "1");
     }
 }
 
@@ -951,10 +951,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 0.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "0");
+        CHECK(v4 == 0.f);
     }
     SECTION("1000") {
         std::vector<std::string> argv = {
@@ -968,10 +968,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 0.f);
+        CHECK(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "0");
+        CHECK(v4 == 0.f);
     }
     SECTION("0100") {
         std::vector<std::string> argv = {
@@ -985,10 +985,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 0.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "0");
+        CHECK(v4 == 0.f);
     }
     SECTION("1100") {
         std::vector<std::string> argv = {
@@ -1002,10 +1002,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 0.f);
+        CHECK(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "0");
+        CHECK(v4 == 0.f);
     }
 
     SECTION("0010") {
@@ -1020,10 +1020,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 0.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "1");
+        CHECK(v4 == 0.f);
     }
     SECTION("1010") {
         std::vector<std::string> argv = {
@@ -1037,10 +1037,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 0.f);
+        CHECK(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "1");
+        CHECK(v4 == 0.f);
     }
     SECTION("0110") {
         std::vector<std::string> argv = {
@@ -1054,10 +1054,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 0.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "1");
+        CHECK(v4 == 0.f);
     }
     SECTION("1110") {
         std::vector<std::string> argv = {
@@ -1071,10 +1071,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 0.f);
+        CHECK(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "1");
+        CHECK(v4 == 0.f);
     }
 
     SECTION("0001") {
@@ -1089,10 +1089,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 1.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "0");
+        CHECK(v4 == 1.f);
     }
     SECTION("1001") {
         std::vector<std::string> argv = {
@@ -1106,10 +1106,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 1.f);
+        CHECK(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "0");
+        CHECK(v4 == 1.f);
     }
     SECTION("0101") {
         std::vector<std::string> argv = {
@@ -1123,10 +1123,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 1.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "0");
+        CHECK(v4 == 1.f);
     }
     SECTION("1101") {
         std::vector<std::string> argv = {
@@ -1140,10 +1140,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "0");
-        REQUIRE(v4 == 1.f);
+        CHECK(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "0");
+        CHECK(v4 == 1.f);
     }
 
     SECTION("0011") {
@@ -1158,10 +1158,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 1.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "1");
+        CHECK(v4 == 1.f);
     }
     SECTION("1011") {
         std::vector<std::string> argv = {
@@ -1175,10 +1175,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 0);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 1.f);
+        CHECK(v1);
+        CHECK(v2 == 0);
+        CHECK(v3 == "1");
+        CHECK(v4 == 1.f);
     }
     SECTION("0111") {
         std::vector<std::string> argv = {
@@ -1192,10 +1192,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE_FALSE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 1.f);
+        CHECK_FALSE(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "1");
+        CHECK(v4 == 1.f);
     }
     SECTION("1111") {
         std::vector<std::string> argv = {
@@ -1209,10 +1209,10 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v1);
-        REQUIRE(v2 == 1);
-        REQUIRE(v3 == "1");
-        REQUIRE(v4 == 1.f);
+        CHECK(v1);
+        CHECK(v2 == 1);
+        CHECK(v3 == "1");
+        CHECK(v4 == 1.f);
     }
 }
 
@@ -1235,7 +1235,7 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v == 2);
+        CHECK(v == 2);
     }
 
     SECTION("6x zero") {
@@ -1251,7 +1251,7 @@ TEST_CASE(
 
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
-        REQUIRE(v == 6);
+        CHECK(v == 6);
     }
 }
 
@@ -1273,7 +1273,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 1);
-        REQUIRE_FALSE(v[0]);
+        CHECK_FALSE(v[0]);
     }
 
     SECTION("1") {
@@ -1286,7 +1286,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 1);
-        REQUIRE(v[0]);
+        CHECK(v[0]);
     }
 
     SECTION("00") {
@@ -1301,8 +1301,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE_FALSE(v[0]);
-        REQUIRE_FALSE(v[1]);
+        CHECK_FALSE(v[0]);
+        CHECK_FALSE(v[1]);
     }
 
     SECTION("10") {
@@ -1317,8 +1317,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0]);
-        REQUIRE_FALSE(v[1]);
+        CHECK(v[0]);
+        CHECK_FALSE(v[1]);
     }
 
     SECTION("01") {
@@ -1333,8 +1333,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE_FALSE(v[0]);
-        REQUIRE(v[1]);
+        CHECK_FALSE(v[0]);
+        CHECK(v[1]);
     }
 
     SECTION("10") {
@@ -1349,8 +1349,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0]);
-        REQUIRE_FALSE(v[1]);
+        CHECK(v[0]);
+        CHECK_FALSE(v[1]);
     }
 }
 
@@ -1371,7 +1371,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 1);
-        REQUIRE(v[0] == 1);
+        CHECK(v[0] == 1);
     }
 
     SECTION("0") {
@@ -1384,7 +1384,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 1);
-        REQUIRE(v[0] == 0);
+        CHECK(v[0] == 0);
     }
 
     SECTION("10") {
@@ -1399,8 +1399,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == 1);
-        REQUIRE(v[1] == 0);
+        CHECK(v[0] == 1);
+        CHECK(v[1] == 0);
     }
 
     SECTION("00") {
@@ -1415,8 +1415,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == 0);
-        REQUIRE(v[1] == 0);
+        CHECK(v[0] == 0);
+        CHECK(v[1] == 0);
     }
 
     SECTION("11") {
@@ -1431,8 +1431,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == 1);
-        REQUIRE(v[1] == 1);
+        CHECK(v[0] == 1);
+        CHECK(v[1] == 1);
     }
 
     SECTION("01") {
@@ -1447,8 +1447,8 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == 0);
-        REQUIRE(v[1] == 1);
+        CHECK(v[0] == 0);
+        CHECK(v[1] == 1);
     }
 }
 
@@ -1472,7 +1472,7 @@ TEST_CASE(
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 1);
-        REQUIRE(v[0] == "foo");
+        CHECK(v[0] == "foo");
     }
 
     SECTION("bar") {
@@ -1485,7 +1485,7 @@ TEST_CASE(
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 1);
-        REQUIRE(v[0] == "bar");
+        CHECK(v[0] == "bar");
     }
 
     SECTION("foo foo") {
@@ -1500,8 +1500,8 @@ TEST_CASE(
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == "foo");
-        REQUIRE(v[1] == "foo");
+        CHECK(v[0] == "foo");
+        CHECK(v[1] == "foo");
     }
 
     SECTION("bar foo") {
@@ -1516,8 +1516,8 @@ TEST_CASE(
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == "bar");
-        REQUIRE(v[1] == "foo");
+        CHECK(v[0] == "bar");
+        CHECK(v[1] == "foo");
     }
 
     SECTION("foo bar") {
@@ -1532,8 +1532,8 @@ TEST_CASE(
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == "foo");
-        REQUIRE(v[1] == "bar");
+        CHECK(v[0] == "foo");
+        CHECK(v[1] == "bar");
     }
 
     SECTION("bar bar") {
@@ -1548,8 +1548,8 @@ TEST_CASE(
         p.setCommandLine(argv);
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v.size() == 2);
-        REQUIRE(v[0] == "bar");
-        REQUIRE(v[1] == "bar");
+        CHECK(v[0] == "bar");
+        CHECK(v[1] == "bar");
     }
 }
 
@@ -1576,8 +1576,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE_FALSE(v2[0]);
+        CHECK_FALSE(v1[0]);
+        CHECK_FALSE(v2[0]);
     }
 
     SECTION("10") {
@@ -1592,8 +1592,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE_FALSE(v2[0]);
+        CHECK(v1[0]);
+        CHECK_FALSE(v2[0]);
     }
 
     SECTION("01") {
@@ -1608,8 +1608,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0]);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0]);
     }
 
     SECTION("11") {
@@ -1624,8 +1624,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0]);
+        CHECK(v1[0]);
+        CHECK(v2[0]);
     }
 
     SECTION("00 00") {
@@ -1643,10 +1643,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE_FALSE(v2[1]);
+        CHECK_FALSE(v1[0]);
+        CHECK_FALSE(v2[0]);
+        CHECK_FALSE(v1[1]);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("10 00") {
@@ -1664,10 +1664,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE_FALSE(v2[1]);
+        CHECK(v1[0]);
+        CHECK_FALSE(v2[0]);
+        CHECK_FALSE(v1[1]);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("01 00") {
@@ -1685,10 +1685,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0]);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE_FALSE(v2[1]);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0]);
+        CHECK_FALSE(v1[1]);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("11 00") {
@@ -1706,10 +1706,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0]);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE_FALSE(v2[1]);
+        CHECK(v1[0]);
+        CHECK(v2[0]);
+        CHECK_FALSE(v1[1]);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("00 11") {
@@ -1727,10 +1727,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1]);
+        CHECK_FALSE(v1[0]);
+        CHECK_FALSE(v2[0]);
+        CHECK(v1[1]);
+        CHECK(v2[1]);
     }
 
     SECTION("10 11") {
@@ -1748,10 +1748,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1]);
+        CHECK(v1[0]);
+        CHECK_FALSE(v2[0]);
+        CHECK(v1[1]);
+        CHECK(v2[1]);
     }
 
     SECTION("01 11") {
@@ -1769,10 +1769,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0]);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1]);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0]);
+        CHECK(v1[1]);
+        CHECK(v2[1]);
     }
 
     SECTION("11 11") {
@@ -1790,10 +1790,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0]);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1]);
+        CHECK(v1[0]);
+        CHECK(v2[0]);
+        CHECK(v1[1]);
+        CHECK(v2[1]);
     }
 }
 
@@ -1821,8 +1821,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == 0);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == 0);
     }
 
     SECTION("10") {
@@ -1837,8 +1837,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == 0);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == 0);
     }
 
     SECTION("01") {
@@ -1853,8 +1853,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == 1);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == 1);
     }
 
     SECTION("11") {
@@ -1869,8 +1869,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == 1);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == 1);
     }
 
     SECTION("00 00") {
@@ -1888,10 +1888,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("10 00") {
@@ -1909,10 +1909,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("01 00") {
@@ -1930,10 +1930,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("11 00") {
@@ -1951,10 +1951,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("00 11") {
@@ -1972,10 +1972,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == 1);
     }
 
     SECTION("10 11") {
@@ -1993,10 +1993,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == 1);
     }
 
     SECTION("01 11"){
@@ -2014,10 +2014,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == 1);
     }
 
     SECTION("11 11") {
@@ -2035,10 +2035,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == 1);
     }
 }
 
@@ -2066,8 +2066,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == "0");
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == "0");
     }
 
     SECTION("10") {
@@ -2082,8 +2082,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == "0");
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == "0");
     }
 
     SECTION("01") {
@@ -2098,8 +2098,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == "1");
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == "1");
     }
 
     SECTION("11") {
@@ -2114,8 +2114,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == "1");
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == "1");
     }
 
     SECTION("00 00") {
@@ -2133,10 +2133,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == "0");
     }
 
     SECTION("10 00") {
@@ -2154,10 +2154,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == "0");
     }
 
     SECTION("01 00") {
@@ -2175,10 +2175,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == "0");
     }
 
     SECTION("11 00") {
@@ -2196,10 +2196,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == "0");
     }
 
     SECTION("00 11") {
@@ -2217,10 +2217,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == "1");
     }
 
     SECTION("10 11") {
@@ -2238,10 +2238,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == "1");
     }
 
     SECTION("01 11") {
@@ -2259,10 +2259,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == "1");
     }
 
     SECTION("11 11") {
@@ -2280,10 +2280,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == "1");
     }
 }
 
@@ -2311,8 +2311,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
     }
 
     SECTION("10") {
@@ -2327,8 +2327,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
     }
 
     SECTION("01") {
@@ -2343,8 +2343,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
     }
 
     SECTION("11") {
@@ -2359,8 +2359,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
     }
 
     SECTION("00 00") {
@@ -2378,10 +2378,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("10 00") {
@@ -2399,10 +2399,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("01 00") {
@@ -2420,10 +2420,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("11 00") {
@@ -2441,10 +2441,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
     }
 
     SECTION("00 11") {
@@ -2462,10 +2462,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
     }
 
     SECTION("10 11") {
@@ -2483,10 +2483,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
     }
 
     SECTION("01 11") {
@@ -2504,10 +2504,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
     }
 
     SECTION("11 11") {
@@ -2525,10 +2525,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
     }
 }
 
@@ -2556,8 +2556,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 0);
-        REQUIRE_FALSE(v2[0]);
+        CHECK(v1[0] == 0);
+        CHECK_FALSE(v2[0]);
     }
 
     SECTION("10") {
@@ -2572,8 +2572,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 1);
-        REQUIRE_FALSE(v2[0]);
+        CHECK(v1[0] == 1);
+        CHECK_FALSE(v2[0]);
     }
 
     SECTION("01") {
@@ -2588,8 +2588,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0]);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0]);
     }
 
     SECTION("11") {
@@ -2604,8 +2604,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0]);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0]);
     }
 
     SECTION("00 00") {
@@ -2623,10 +2623,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE(v1[1] == 0);
-        REQUIRE_FALSE(v2[1]);
+        CHECK(v1[0] == 0);
+        CHECK_FALSE(v2[0]);
+        CHECK(v1[1] == 0);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("10 00") {
@@ -2644,10 +2644,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE(v1[1] == 0);
-        REQUIRE_FALSE(v2[1]);
+        CHECK(v1[0] == 1);
+        CHECK_FALSE(v2[0]);
+        CHECK(v1[1] == 0);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("01 00") {
@@ -2665,10 +2665,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0]);
-        REQUIRE(v1[1] == 0);
-        REQUIRE_FALSE(v2[1]);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0]);
+        CHECK(v1[1] == 0);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("11 00") {
@@ -2686,10 +2686,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0]);
-        REQUIRE(v1[1] == 0);
-        REQUIRE_FALSE(v2[1]);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0]);
+        CHECK(v1[1] == 0);
+        CHECK_FALSE(v2[1]);
     }
 
     SECTION("00 11") {
@@ -2707,10 +2707,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1]);
+        CHECK(v1[0] == 0);
+        CHECK_FALSE(v2[0]);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1]);
     }
 
     SECTION("10 11") {
@@ -2728,10 +2728,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE_FALSE(v2[0]);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1]);
+        CHECK(v1[0] == 1);
+        CHECK_FALSE(v2[0]);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1]);
     }
 
     SECTION("01 11") {
@@ -2749,10 +2749,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0]);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1]);
+        CHECK(v1[0] == 0);
+        CHECK(v2[0]);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1]);
     }
 
     SECTION("11 11") {
@@ -2770,10 +2770,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0]);
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1]);
+        CHECK(v1[0] == 1);
+        CHECK(v2[0]);
+        CHECK(v1[1] == 1);
+        CHECK(v2[1]);
     }
 }
 
@@ -2801,8 +2801,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == "0");
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == "0");
     }
 
     SECTION("10") {
@@ -2817,8 +2817,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == "0");
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == "0");
     }
 
     SECTION("01") {
@@ -2833,8 +2833,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == "1");
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == "1");
     }
 
     SECTION("11") {
@@ -2849,8 +2849,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == "1");
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == "1");
     }
 
     SECTION("00 00") {
@@ -2868,10 +2868,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == "0");
     }
 
     SECTION("10 00") {
@@ -2889,10 +2889,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == "0");
     }
 
     SECTION("01 00") {
@@ -2910,10 +2910,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == "0");
     }
 
     SECTION("11 00") {
@@ -2931,10 +2931,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == 0);
-        REQUIRE(v2[1] == "0");
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == 0);
+        CHECK(v2[1] == "0");
     }
 
     SECTION("00 11") {
@@ -2952,10 +2952,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == "1");
     }
 
     SECTION("10 11") {
@@ -2973,10 +2973,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == "0");
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == "0");
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == "1");
     }
 
     SECTION("01 11") {
@@ -2994,10 +2994,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 0);
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == 0);
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == "1");
     }
 
     SECTION("11 11") {
@@ -3015,10 +3015,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == 1);
-        REQUIRE(v2[0] == "1");
-        REQUIRE(v1[1] == 1);
-        REQUIRE(v2[1] == "1");
+        CHECK(v1[0] == 1);
+        CHECK(v2[0] == "1");
+        CHECK(v1[1] == 1);
+        CHECK(v2[1] == "1");
     }
 }
 
@@ -3046,8 +3046,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == 0);
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == 0);
     }
 
     SECTION("10") {
@@ -3062,8 +3062,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == 0);
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == 0);
     }
 
     SECTION("01") {
@@ -3078,8 +3078,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == 1);
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == 1);
     }
 
     SECTION("11") {
@@ -3094,8 +3094,8 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == 1);
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == 1);
     }
 
     SECTION("00 00") {
@@ -3113,10 +3113,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == 0);
     }
 
     SECTION("10 00") {
@@ -3134,10 +3134,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == 0);
     }
 
     SECTION("01 00") {
@@ -3155,10 +3155,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == 0);
     }
 
     SECTION("11 00") {
@@ -3176,10 +3176,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == "0");
-        REQUIRE(v2[1] == 0);
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == "0");
+        CHECK(v2[1] == 0);
     }
 
     SECTION("00 11") {
@@ -3197,10 +3197,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == 1);
     }
 
     SECTION("10 11") {
@@ -3218,10 +3218,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == 0);
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == 1);
     }
 
     SECTION("01 11") {
@@ -3239,10 +3239,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "0");
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == "0");
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == 1);
     }
 
     SECTION("11 11") {
@@ -3260,10 +3260,10 @@ TEST_CASE(
         REQUIRE_NOTHROW(p.execute());
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
-        REQUIRE(v1[0] == "1");
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v1[1] == "1");
-        REQUIRE(v2[1] == 1);
+        CHECK(v1[0] == "1");
+        CHECK(v2[0] == 1);
+        CHECK(v1[1] == "1");
+        CHECK(v2[1] == 1);
     }
 }
 
@@ -3294,9 +3294,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
     }
 
     SECTION("100") {
@@ -3313,9 +3313,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
     }
 
     SECTION("010") {
@@ -3332,9 +3332,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
     }
 
     SECTION("110") {
@@ -3351,9 +3351,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
     }
 
     SECTION("001") {
@@ -3370,9 +3370,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
     }
 
     SECTION("101") {
@@ -3389,9 +3389,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
     }
 
     SECTION("011") {
@@ -3408,9 +3408,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
     }
 
     SECTION("111") {
@@ -3427,9 +3427,9 @@ TEST_CASE(
         REQUIRE(v1.size() == 1);
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
     }
 
     SECTION("000 000") {
@@ -3450,12 +3450,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("100 000") {
@@ -3476,12 +3476,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("010 000") {
@@ -3502,12 +3502,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("110 000") {
@@ -3528,12 +3528,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("001 000") {
@@ -3554,12 +3554,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("101 000") {
@@ -3580,12 +3580,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("011 000") {
@@ -3606,12 +3606,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("111 000") {
@@ -3632,12 +3632,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
     }
 
     SECTION("000 111") {
@@ -3658,12 +3658,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 
     SECTION("100 111") {
@@ -3684,12 +3684,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 
     SECTION("010 111") {
@@ -3710,12 +3710,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 
     SECTION("110 111") {
@@ -3736,12 +3736,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 
     SECTION("001 111") {
@@ -3762,12 +3762,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 
     SECTION("101 111") {
@@ -3788,12 +3788,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 
     SECTION("011 111") {
@@ -3814,12 +3814,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 
     SECTION("111 111") {
@@ -3840,12 +3840,12 @@ TEST_CASE(
         REQUIRE(v1.size() == 2);
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
     }
 }
 
@@ -3879,10 +3879,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("1000") {
@@ -3901,10 +3901,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("0100") {
@@ -3923,10 +3923,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("1100") {
@@ -3945,10 +3945,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("0010") {
@@ -3967,10 +3967,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("1010") {
@@ -3989,10 +3989,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("0110") {
@@ -4011,10 +4011,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("1110") {
@@ -4033,10 +4033,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
     }
 
     SECTION("0001") {
@@ -4055,10 +4055,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("1001") {
@@ -4077,10 +4077,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("0101") {
@@ -4099,10 +4099,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("1101") {
@@ -4121,10 +4121,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("0011") {
@@ -4143,10 +4143,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("1011") {
@@ -4165,10 +4165,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("0111") {
@@ -4187,10 +4187,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("1111") {
@@ -4209,10 +4209,10 @@ TEST_CASE(
         REQUIRE(v2.size() == 1);
         REQUIRE(v3.size() == 1);
         REQUIRE(v4.size() == 1);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
     }
 
     SECTION("0000 0000") {
@@ -4236,14 +4236,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1000 0000") {
@@ -4267,14 +4267,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0100 0000") {
@@ -4298,14 +4298,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1100 0000") {
@@ -4329,14 +4329,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0010 0000") {
@@ -4360,14 +4360,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1010 0000") {
@@ -4391,14 +4391,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0110 0000") {
@@ -4422,14 +4422,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1110 0000") {
@@ -4453,14 +4453,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0001 0000") {
@@ -4484,14 +4484,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1001 0000") {
@@ -4515,14 +4515,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0101 0000") {
@@ -4546,14 +4546,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1101 0000") {
@@ -4577,14 +4577,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0011 0000") {
@@ -4608,14 +4608,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1011 0000") {
@@ -4639,14 +4639,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0111 0000") {
@@ -4670,14 +4670,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("1111 0000") {
@@ -4701,14 +4701,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE_FALSE(v1[1]);
-        REQUIRE(v2[1] == 0);
-        REQUIRE(v3[1] == "0");
-        REQUIRE(v4[1] == 0.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK_FALSE(v1[1]);
+        CHECK(v2[1] == 0);
+        CHECK(v3[1] == "0");
+        CHECK(v4[1] == 0.f);
     }
 
     SECTION("0000 1111") {
@@ -4732,14 +4732,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1000 1111") {
@@ -4763,14 +4763,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("0100 1111") {
@@ -4794,14 +4794,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1100 1111") {
@@ -4825,14 +4825,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("0010 1111") {
@@ -4856,14 +4856,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1010 1111") {
@@ -4887,14 +4887,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("0110 1111") {
@@ -4918,14 +4918,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1110 1111") {
@@ -4949,14 +4949,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 0.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 0.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("0001 1111") {
@@ -4980,14 +4980,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1001 1111") {
@@ -5011,14 +5011,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("0101 1111") {
@@ -5042,14 +5042,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1101 1111") {
@@ -5073,14 +5073,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "0");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "0");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("0011 1111") {
@@ -5104,14 +5104,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1011 1111") {
@@ -5135,14 +5135,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 0);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 0);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("0111 1111") {
@@ -5166,14 +5166,14 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE_FALSE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK_FALSE(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 
     SECTION("1111 1111") {
@@ -5197,13 +5197,13 @@ TEST_CASE(
         REQUIRE(v2.size() == 2);
         REQUIRE(v3.size() == 2);
         REQUIRE(v4.size() == 2);
-        REQUIRE(v1[0]);
-        REQUIRE(v2[0] == 1);
-        REQUIRE(v3[0] == "1");
-        REQUIRE(v4[0] == 1.f);
-        REQUIRE(v1[1]);
-        REQUIRE(v2[1] == 1);
-        REQUIRE(v3[1] == "1");
-        REQUIRE(v4[1] == 1.f);
+        CHECK(v1[0]);
+        CHECK(v2[0] == 1);
+        CHECK(v3[0] == "1");
+        CHECK(v4[0] == 1.f);
+        CHECK(v1[1]);
+        CHECK(v2[1] == 1);
+        CHECK(v3[1] == "1");
+        CHECK(v4[1] == 1.f);
     }
 }
