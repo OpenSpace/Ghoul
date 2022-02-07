@@ -200,27 +200,56 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
 }
 
 TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memorypool]") {
-    ghoul::MemoryPool<32> pool;
+    unsigned long long alignment = alignof(max_align_t);
+    if (alignment == 8) {
+        ghoul::MemoryPool<32> pool;
+        REQUIRE(pool.occupancies().size() == 1);
+        CHECK(pool.occupancies()[0] == 0);
+        void* p1 = pool.allocate(8);
+        void* p2 = pool.allocate(8);
+        [[ maybe_unused ]] void* p3 = pool.allocate(16);
+        REQUIRE(pool.occupancies().size() == 1);
+        CHECK(pool.occupancies()[0] == 32);
 
-    REQUIRE(pool.occupancies().size() == 1);
-    CHECK(pool.occupancies()[0] == 0);
-    void* p1 = pool.allocate(8);
-    void* p2 = pool.allocate(8);
-    [[ maybe_unused ]] void* p3 = pool.allocate(16);
-    REQUIRE(pool.occupancies().size() == 1);
-    CHECK(pool.occupancies()[0] == 32);
+        pool.deallocate(p1, 8);
+        pool.deallocate(p2, 8);
 
-    pool.deallocate(p1, 8);
-    pool.deallocate(p2, 8);
+        // The call to housekeeping will merge those two deallocated and make it possible
+        // to allocate a 16 byte block in the place of the 2 8-byte blocks
+        pool.housekeeping();
 
-    // The call to housekeeping will merge those two deallocated and make it possible to
-    // allocate a 16 byte block in the place of the 2 8-byte blocks
-    pool.housekeeping();
+        void* p5 = pool.allocate(16);
+        CHECK(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p5));
+        REQUIRE(pool.occupancies().size() == 1);
+        CHECK(pool.occupancies()[0] == 32);
+    }
+    else if (alignment == 16) {
+        // Exactly the same test setup as the alignment == 8 part, but with doubled sizes
 
-    void* p5 = pool.allocate(16);
-    CHECK(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p5));
-    REQUIRE(pool.occupancies().size() == 1);
-    CHECK(pool.occupancies()[0] == 32);
+        ghoul::MemoryPool<64> pool;
+        REQUIRE(pool.occupancies().size() == 1);
+        CHECK(pool.occupancies()[0] == 0);
+        void* p1 = pool.allocate(16);
+        void* p2 = pool.allocate(16);
+        [[ maybe_unused ]] void* p3 = pool.allocate(32);
+        REQUIRE(pool.occupancies().size() == 1);
+        CHECK(pool.occupancies()[0] == 64);
+
+        pool.deallocate(p1, 16);
+        pool.deallocate(p2, 16);
+
+        // The call to housekeeping will merge those two deallocated and make it possible
+        // to allocate a 32 byte block in the place of the 2 16-byte blocks
+        pool.housekeeping();
+
+        void* p5 = pool.allocate(32);
+        CHECK(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p5));
+        REQUIRE(pool.occupancies().size() == 1);
+        CHECK(pool.occupancies()[0] == 64);
+    }
+    else {
+        throw std::logic_error("Unsupported alignment");
+    }
 }
 
 TEST_CASE("MemoryPool: Reusable Typed MemoryPool", "[memorypool]") {
