@@ -41,7 +41,7 @@ linux_gcc_make: {
         compileHelper.recordCompileIssues(compileHelper.Gcc());
       }
       stage('linux-gcc-make/test') {
-        // testHelper.runUnitTests('build-make/tests/GhoulTest');
+        testHelper.runUnitTests('build-make/tests/GhoulTest');
       }
       cleanWs()
     } // node('linux')
@@ -58,7 +58,7 @@ linux_gcc_ninja: {
           compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
       }
       stage('linux-gcc-ninja/test') {
-        // testHelper.runUnitTests('build-make/tests/GhoulTest');
+        testHelper.runUnitTests('build-make/tests/GhoulTest');
       }
       cleanWs()
     } // node('linux')
@@ -76,7 +76,7 @@ linux_clang_make: {
         compileHelper.recordCompileIssues(compileHelper.Clang());
       }
       stage('linux-clang-make/test') {
-        // testHelper.runUnitTests('build-make/tests/GhoulTest');
+        testHelper.runUnitTests('build-make/tests/GhoulTest');
       }
       cleanWs()
     } // node('linux')
@@ -93,7 +93,7 @@ linux_clang_ninja: {
           compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
       }
       stage('linux-clang-ninja/test') {
-        // testHelper.runUnitTests('build-make/tests/GhoulTest');
+        testHelper.runUnitTests('build-make/tests/GhoulTest');
       }
       cleanWs()
     } // node('linux')
@@ -111,8 +111,7 @@ windows_msvc: {
         compileHelper.recordCompileIssues(compileHelper.VisualStudio());
       }
       stage('wiwindows-msvcndows/test') {
-        // Currently, the unit tests are failing on Windows
-        // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
+        testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
       }
       cleanWs()
     } // node('windows')
@@ -129,8 +128,7 @@ windows_ninja: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
       }
       stage('windows-ninja/test') {
-        // Currently, the unit tests are failing on Windows
-        // testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
+        testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
       }
       cleanWs()
     } // node('windows')
@@ -147,8 +145,7 @@ macos_make: {
           compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
       }
       stage('macos-make/test') {
-        // Currently, the unit tests are crashing on OS X
-        // testHelper.runUnitTests('build/tests/GhoulTest')
+        testHelper.runUnitTests('build/tests/GhoulTest')
       }
       cleanWs()
     } // node('osx')
@@ -165,8 +162,7 @@ macos_ninja: {
           compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
       }
       stage('macos-xcode/test') {
-        // Currently, the unit tests are crashing on OS X
-        // testHelper.runUnitTests('build/tests/GhoulTest')
+        testHelper.runUnitTests('build/tests/GhoulTest')
       }
       cleanWs()
     } // node('osx')

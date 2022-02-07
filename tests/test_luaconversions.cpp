@@ -119,8 +119,6 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz <short", "[luaconversion]", char, signed 
 
         const T value = ghoul::lua::value<T>(state);
         REQUIRE(value == val);
-
-        lua_pop(state, 1);
     }
 
     lua_close(state);
@@ -146,8 +144,6 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz >short", "[luaconversion]", short, unsign
 
         const T value = ghoul::lua::value<T>(state);
         REQUIRE(value == val);
-
-        lua_pop(state, 1);
     }
 
     lua_close(state);
@@ -174,8 +170,6 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz Limited Signed", "[luaconversion]", long,
 
         const T value = ghoul::lua::value<T>(state);
         REQUIRE(value == val);
-
-        lua_pop(state, 1);
     }
 
     lua_close(state);
@@ -202,8 +196,6 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz Limited Unsigned", "[luaconversion]",
 
         const T value = ghoul::lua::value<T>(state);
         REQUIRE(value == val);
-
-        lua_pop(state, 1);
     }
 
     lua_close(state);
@@ -235,7 +227,6 @@ TEMPLATE_TEST_CASE("LuaConversion Float Fuzz", "[luaconversion]", float, double,
                 REQUIRE(value == Approx(val));
             }
         }
-        lua_pop(state, 1);
     }
 
     lua_close(state);
