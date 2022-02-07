@@ -159,21 +159,39 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
 TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
     ghoul::MemoryPool<2048> pool;
 
+    unsigned long long alignment = alignof(max_align_t);
+    // For the rest:  X used memory; O memory allocated due to alignment; F free memory
+
     CHECK(pool.totalOccupancy() == 0);
     void* p1 = pool.allocate(16);
+    //   8 byte alignment:   XXXXXXXX|XXXXXXXX                                      -> 16
+    //  16 byte alignment:   XXXXXXXX XXXXXXXX                                      -> 16
     CHECK(pool.totalOccupancy() == 16);
+    
     void* p2 = pool.allocate(8);
-    CHECK(pool.totalOccupancy() == 24);
+    //   8 byte alignment:   XXXXXXXX|XXXXXXXX|XXXXXXXX                             -> 24
+    //  16 byte alignment:   OOOOOOOO XXXXXXXX|XXXXXXXX XXXXXXXX                    -> 32
+    CHECK(pool.totalOccupancy() == (alignment == 8 ? 24 : 32));
 
     pool.deallocate(p1, 16);
-    CHECK(pool.totalOccupancy() == 24);
+    //   8 byte alignment:   FFFFFFFF|FFFFFFFF|XXXXXXXX                             -> 24
+    //  16 byte alignment:   FFFFFFFF FFFFFFFF|FFFFFFFF XXXXXXXX                    -> 32
+    CHECK(pool.totalOccupancy() == (alignment == 8 ? 24 : 32));
+
     void* p3 = pool.allocate(8);
-    CHECK(pool.totalOccupancy() == 24);
+    //   8 byte alignment:   FFFFFFFF|XXXXXXXX|XXXXXXXX                             -> 24
+    //  16 byte alignment:   FFFFFFFF FFFFFFFF|XXXXXXXX XXXXXXXX                    -> 32
+    CHECK(pool.totalOccupancy() == (alignment == 8 ? 24 : 32));
+
     void* p4 = pool.allocate(8);
-    CHECK(pool.totalOccupancy() == 24);
+    //   8 byte alignment:   XXXXXXXX|XXXXXXXX|XXXXXXXX                             -> 24
+    //  16 byte alignment:   OOOOOOOO XXXXXXXX|XXXXXXXX XXXXXXXX                    -> 32
+    CHECK(pool.totalOccupancy() == (alignment == 8 ? 24 : 32));
 
     void* p5 = pool.allocate(8);
-    CHECK(pool.totalOccupancy() == 32);
+    //   8 byte alignment:   XXXXXXXX|XXXXXXXX|XXXXXXXX|XXXXXXXX                    -> 24
+    //  16 byte alignment:   OOOOOOOO XXXXXXXX|OOOOOOOO XXXXXXXX|XXXXXXXX XXXXXXXX  -> 48
+    CHECK(pool.totalOccupancy() == (alignment == 8 ? 32 : 48));
     
     CHECK(reinterpret_cast<intptr_t>(p1) == reinterpret_cast<intptr_t>(p3));
     CHECK(reinterpret_cast<intptr_t>(p4) == reinterpret_cast<intptr_t>(p3) + 8);
