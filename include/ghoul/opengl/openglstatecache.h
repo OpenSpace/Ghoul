@@ -83,11 +83,11 @@ private:
     GLuint _defaultFramebuffer = std::numeric_limits<GLuint>::max();
 
     // ViewPort
-    std::array<GLint, 4> _viewport = {0, 0, 0, 0};
+    std::array<GLint, 4> _viewport = { 0, 0, 0, 0 };
 
     // Polygon and Culling
     GLboolean _faceCullingEnabled = false;
-    GLenum _faceToCull;
+    GLenum _faceToCull = GL_BACK;
 
     struct {
         GLboolean enabled = false;

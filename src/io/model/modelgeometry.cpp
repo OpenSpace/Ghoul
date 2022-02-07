@@ -331,16 +331,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // Transform
-        glm::mat4x4 transform = glm::mat4x4(1.f);
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        transform = glm::make_mat4(rawTransform);
+        glm::mat4x4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
-        glm::mat4x4 animationTransform = glm::mat4x4(1.f);
         GLfloat rawAnimTransform[16];
         fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
-        animationTransform = glm::make_mat4(rawAnimTransform);
+        glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
         int32_t parent = 0;

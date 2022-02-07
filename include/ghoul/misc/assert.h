@@ -54,8 +54,8 @@ struct MissingCaseException : public std::logic_error {
  * \param function The function in which the assertion triggered
  * \param line The line in the \p file that triggered the assertion
  */
-[[noreturn]] void internal_assert(std::string expression, std::string message,
-    std::string file, std::string function, int line);
+void internal_assert(std::string expression, std::string message, std::string file,
+    std::string function, int line);
 
 } // namespace ghoul
 

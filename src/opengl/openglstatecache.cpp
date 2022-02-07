@@ -236,9 +236,7 @@ void OpenGLStateCache::setDefaultFramebuffer(GLuint defaultFB) {
         "The default Framebuffer must be a valid number"
     );
 
-    if (_defaultFramebuffer != defaultFB) {
-        _defaultFramebuffer = defaultFB;
-    }
+    _defaultFramebuffer = defaultFB;
 }
 
 void OpenGLStateCache::setViewportState(const GLint viewportCoords[4])  {
