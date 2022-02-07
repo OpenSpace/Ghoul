@@ -107,9 +107,9 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
 
 TEST_CASE("FileSystem: TokenDefaultState", "[filesystem]") {
     REQUIRE(FileSys.tokens().size() == 3);
-    REQUIRE(FileSys.tokens()[0] == "${TEMPORARY}");
-    REQUIRE(FileSys.tokens()[1] == "${UNIT_SCRIPT}");
-    REQUIRE(FileSys.tokens()[2] == "${UNIT_TEST}");
+    CHECK(FileSys.tokens()[0] == "${TEMPORARY}");
+    CHECK(FileSys.tokens()[1] == "${UNIT_SCRIPT}");
+    CHECK(FileSys.tokens()[2] == "${UNIT_TEST}");
 }
 
 TEST_CASE("FileSystem: Override Non Existing Path Token", "[filesystem]") {
@@ -117,7 +117,7 @@ TEST_CASE("FileSystem: Override Non Existing Path Token", "[filesystem]") {
     // global state of other tests
     return;
 
-    REQUIRE_NOTHROW(
+    CHECK_NOTHROW(
         FileSys.registerPathToken(
             "${AddExistingPathToken}",
             absPath("${TEMPORARY}"),
@@ -126,170 +126,7 @@ TEST_CASE("FileSystem: Override Non Existing Path Token", "[filesystem]") {
     );
 }
 
-TEST_CASE("FileSystem: OverrideExistingPathToken", "[filesystem]") {
-    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
-    // global state of other tests
-
-    //FileSys.registerPathToken("${A}", "a");
-
-    //{
-    //    std::string p = "${A}";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "a");
-    //}
-
-    //REQUIRE_NOTHROW(
-    //    FileSys.registerPathToken(
-    //        "${A}",
-    //        "b",
-    //        ghoul::filesystem::FileSystem::Override::Yes
-    //    )
-    //);
-
-    //{
-    //    std::string p = "${A}";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "b");
-    //}
-}
-
 TEST_CASE("FileSystem: ExpandingTokensNonExistingToken", "[filesystem]") {
     std::string p = "${NOTFOUND}";
     REQUIRE_THROWS_AS(FileSys.expandPathTokens(p), ghoul::RuntimeError);
-}
-
-TEST_CASE("FileSystem: ExpandingTokens", "[filesystem]") {
-    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
-    // global state of other tests
-
-    //FileSys.registerPathToken("${A}", "${B}/bar");
-    //FileSys.registerPathToken("${B}", "${C}/foo");
-    //FileSys.registerPathToken("${C}", "${D}/fob");
-    //FileSys.registerPathToken("${D}", "foobar");
-
-    //{
-    //    std::string p = "${D}";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "foobar");
-    //}
-
-    //{
-    //    std::string p = "${C}/fob";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "foobar/fob/fob");
-    //}
-
-    //{
-    //    std::string p = "${B}/final";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "foobar/fob/foo/final");
-    //}
-
-    //{
-    //    std::string p = "${A}/final";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "foobar/fob/foo/bar/final");
-    //}
-
-    //{
-    //    std::string p = "initial/${A}";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "initial/foobar/fob/foo/bar");
-    //}
-
-    //{
-    //    std::string p = "initial/${B}/barbar";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "initial/foobar/fob/foo/barbar");
-    //}
-
-    //{
-    //    std::string p = "initial/${C}/middle/${B}/barbar";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "initial/foobar/fob/middle/foobar/fob/foo/barbar");
-    //}
-
-    //{
-    //    std::string p = "${D}/a/${D}/b/${D}/c/${D}";
-    //    FileSys.expandPathTokens(p);
-    //    REQUIRE(p == "foobar/a/foobar/b/foobar/c/foobar");
-    //}
-}
-
-TEST_CASE("FileSystem: ExpandingTokensIgnoredRegistered", "[filesystem]") {
-    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
-    // global state of other tests
-
-    //FileSys.registerPathToken("${B}", "${C}/foo");
-    //FileSys.registerPathToken("${C}", "${D}/fob");
-    //FileSys.registerPathToken("${D}", "foobar");
-
-    //{
-    //    std::string p = "${D}";
-    //    FileSys.expandPathTokens(p, { "${D}" });
-    //    REQUIRE(p == "${D}");
-    //}
-
-    //{
-    //    std::string p = "${C}";
-    //    FileSys.expandPathTokens(p, { "${D}" });
-    //    REQUIRE(p == "${D}/fob");
-    //}
-
-    //{
-    //    std::string p = "${B}";
-    //    FileSys.expandPathTokens(p, { "${D}" });
-    //    REQUIRE(p == "${D}/fob/foo");
-    //}
-
-    //{
-    //    std::string p = "1/${D}/2";
-    //    FileSys.expandPathTokens(p, { "${D}" });
-    //    REQUIRE(p == "1/${D}/2");
-    //}
-
-    //{
-    //    std::string p = "1/${C}/2";
-    //    FileSys.expandPathTokens(p, { "${D}" });
-    //    REQUIRE(p == "1/${D}/fob/2");
-    //}
-
-    //{
-    //    std::string p = "1/${B}/2";
-    //    FileSys.expandPathTokens(p, { "${D}" });
-    //    REQUIRE(p == "1/${D}/fob/foo/2");
-    //}
-}
-
-TEST_CASE("FileSystem: Expanding Tokens Ignored Unregistered", "[filesystem]") {
-    // @TODO (abock, 2019-12-29) This test needs to be rewritten to not mess with the
-    // global state of other tests
-
-    //FileSys.registerPathToken("${B}", "${C}/foo");
-    //FileSys.registerPathToken("${C}", "${D}/fob");
-    //FileSys.registerPathToken("${D}", "foobar");
-
-    //{
-    //    std::string p = "${X}";
-    //    REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}" }));
-    //    REQUIRE(p == "${X}");
-    //}
-
-    //{
-    //    std::string p = "${D}/${X}/${C}";
-    //    REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}" }));
-    //    REQUIRE(p == "foobar/${X}/foobar/fob");
-    //}
-
-    //{
-    //    std::string p = "${X}${Y}";
-    //    REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
-    //    REQUIRE(p == "${X}${Y}");
-    //}
-
-    //{
-    //    std::string p = "${D}/${X}/${C}/${Y}/${B}";
-    //    REQUIRE_NOTHROW(FileSys.expandPathTokens(p, { "${X}", "${Y}" }));
-    //    REQUIRE(p == "foobar/${X}/foobar/fob/${Y}/foobar/fob/foo");
-    //}
 }

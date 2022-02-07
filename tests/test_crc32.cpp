@@ -218,9 +218,9 @@ TEST_CASE("HashFixedEquality", "[crc32]") {
             d.string,
             static_cast<unsigned int>(strlen(d.string))
         );
-        REQUIRE(stringHash == d.hash);
-        REQUIRE(stringHash == charHash);
-        REQUIRE(stringHash == bufferHash);
+        CHECK(stringHash == d.hash);
+        CHECK(stringHash == charHash);
+        CHECK(stringHash == bufferHash);
     }
 }
 
@@ -261,8 +261,8 @@ TEST_CASE("CRC32: HashRandomEquality", "[crc32]") {
             unsigned int stringHash = ghoul::hashCRC32(string);
             unsigned int charHash = ghoul::hashCRC32(string.data());
             unsigned int bufferHash = ghoul::hashCRC32(data.data(), j);
-            REQUIRE(stringHash == charHash);
-            REQUIRE(stringHash == bufferHash);
+            CHECK(stringHash == charHash);
+            CHECK(stringHash == bufferHash);
         }
     }
 }

@@ -48,10 +48,10 @@ TEST_CASE("CSVReader: Full Load", "[csvreader]") {
         REQUIRE(noHeader[i - 1] == header[i]);
     }
 
-    REQUIRE(header[1][2] == "flora");
-    REQUIRE(header[93][10] == "303.82211");
-    REQUIRE(header[177][13] == "0.19090799");
-    REQUIRE(header[283][2] == "eduarda");
+    CHECK(header[1][2] == "flora");
+    CHECK(header[93][10] == "303.82211");
+    CHECK(header[177][13] == "0.19090799");
+    CHECK(header[283][2] == "eduarda");
 }
 
 TEST_CASE("CSVReader: Column Number", "[csvreader]") {
@@ -76,10 +76,10 @@ TEST_CASE("CSVReader: Column Number", "[csvreader]") {
         REQUIRE(noHeader[i - 1] == header[i]);
     }
 
-    REQUIRE(header[73][0] == "106");
-    REQUIRE(header[227][0] == "279");
-    REQUIRE(header[65][2] == "0.15");
-    REQUIRE(header[65][3] == "53849");
+    CHECK(header[73][0] == "106");
+    CHECK(header[227][0] == "279");
+    CHECK(header[65][2] == "0.15");
+    CHECK(header[65][3] == "53849");
 }
 
 TEST_CASE("CSVReader: Column Name", "[csvreader]") {
@@ -99,7 +99,7 @@ TEST_CASE("CSVReader: Column Name", "[csvreader]") {
         REQUIRE(noHeader[i - 1] == header[i]);
 }
 
-    REQUIRE(header[84][0] == "0.15");
-    REQUIRE(header[261][1] == "2142");
-    REQUIRE(header[84][2] == "peitho");
+    CHECK(header[84][0] == "0.15");
+    CHECK(header[261][1] == "2142");
+    CHECK(header[84][2] == "peitho");
 }

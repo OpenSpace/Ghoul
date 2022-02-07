@@ -39,7 +39,7 @@ TEST_CASE("LuaConversion: LuaExecution", "[luaconversion]") {
     luaL_openlibs(state);
 
     const int status = luaL_loadstring(state, "");
-    REQUIRE(status == LUA_OK);
+    CHECK(status == LUA_OK);
 
     lua_close(state);
 }
@@ -58,7 +58,7 @@ TEMPLATE_TEST_CASE("LuaConversion", "[luaconversion]", bool, char, signed char,
     ghoul::lua::push(state, val);
 
     const T value = ghoul::lua::value<T>(state);
-    REQUIRE(value == Approx(val));
+    CHECK(value == Approx(val));
 
     lua_close(state);
 }
@@ -69,7 +69,7 @@ TEST_CASE("LuaConversion: String", "[luaconversion]") {
     ghoul::lua::push(state, "value");
 
     const std::string value = ghoul::lua::value<std::string>(state);
-    REQUIRE(value == "value");
+    CHECK(value == "value");
 
     lua_close(state);
 }
@@ -92,9 +92,9 @@ TEMPLATE_TEST_CASE("LuaConversion - Glm Types", "[luaconversion]", glm::vec2, gl
 
     bool success = false;
     const T value = ghoul::lua::tryGetValue<T>(state, success);
-    REQUIRE(success == true);
-    REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-    REQUIRE(value == val);
+    CHECK(success == true);
+    CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+    CHECK(value == val);
 
     lua_close(state);
 }
@@ -118,9 +118,7 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz <short", "[luaconversion]", char, signed 
         ghoul::lua::push(state, val);
 
         const T value = ghoul::lua::value<T>(state);
-        REQUIRE(value == val);
-
-        lua_pop(state, 1);
+        CHECK(value == val);
     }
 
     lua_close(state);
@@ -145,9 +143,7 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz >short", "[luaconversion]", short, unsign
         ghoul::lua::push(state, val);
 
         const T value = ghoul::lua::value<T>(state);
-        REQUIRE(value == val);
-
-        lua_pop(state, 1);
+        CHECK(value == val);
     }
 
     lua_close(state);
@@ -173,9 +169,7 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz Limited Signed", "[luaconversion]", long,
         ghoul::lua::push(state, val);
 
         const T value = ghoul::lua::value<T>(state);
-        REQUIRE(value == val);
-
-        lua_pop(state, 1);
+        CHECK(value == val);
     }
 
     lua_close(state);
@@ -201,9 +195,7 @@ TEMPLATE_TEST_CASE("LuaConversion Fuzz Limited Unsigned", "[luaconversion]",
         ghoul::lua::push(state, val);
 
         const T value = ghoul::lua::value<T>(state);
-        REQUIRE(value == val);
-
-        lua_pop(state, 1);
+        CHECK(value == val);
     }
 
     lua_close(state);
@@ -228,14 +220,13 @@ TEMPLATE_TEST_CASE("LuaConversion Float Fuzz", "[luaconversion]", float, double,
         ghoul::lua::push(state, val);
 
         const T value = ghoul::lua::value<T>(state);
-        REQUIRE(value == Approx(val));
+        CHECK(value == Approx(val));
 
         if (typeid(T) == typeid(long double)) {
             if (Approx(value) != std::numeric_limits<long double>::infinity()) {
-                REQUIRE(value == Approx(val));
+                CHECK(value == Approx(val));
             }
         }
-        lua_pop(state, 1);
     }
 
     lua_close(state);
@@ -262,9 +253,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Vec2 Float Fuzz", "[luaconversion]", glm::vec
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -291,9 +282,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Vec2 Fuzz", "[luaconversion]", glm::ivec2, gl
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -321,9 +312,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Vec3 Float Fuzz", "[luaconversion]", glm::vec
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -350,9 +341,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Vec3 Fuzz", "[luaconversion]", glm::ivec3, gl
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -380,9 +371,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Vec4 Float Fuzz", "[luaconversion]", glm::vec
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -409,9 +400,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Vec4 Fuzz", "[luaconversion]", glm::ivec4, gl
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -439,9 +430,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Mat2x2 Fuzz", "[luaconversion]", glm::mat2x2,
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -470,9 +461,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Mat3x3 Fuzz", "[luaconversion]", glm::mat3x3,
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -502,9 +493,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Mat4x4 Fuzz", "[luaconversion]", glm::mat4x4,
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -532,9 +523,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Mat2x3 & Mat3x2 Fuzz", "[luaconversion]", glm
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -563,9 +554,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Mat3x4 & Mat4x3 Fuzz", "[luaconversion]", glm
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }
@@ -594,9 +585,9 @@ TEMPLATE_TEST_CASE("LuaConversion: Mat2x4 & Mat4x2 Fuzz", "[luaconversion]", glm
 
         bool success = false;
         const T value = ghoul::lua::tryGetValue<T>(state, success);
-        REQUIRE(success == true);
-        REQUIRE(ghoul::to_string(value) == ghoul::to_string(val));
-        REQUIRE(value == val);
+        CHECK(success == true);
+        CHECK(ghoul::to_string(value) == ghoul::to_string(val));
+        CHECK(value == val);
 
         lua_pop(state, 1);
     }

@@ -32,7 +32,7 @@
 TEST_CASE("DictionaryLuaFormatter: Empty Dictionary", "[dictionaryluaformatter]") {
     ghoul::Dictionary d;
     std::string res = ghoul::formatLua(d);
-    REQUIRE(res == "{}");
+    CHECK(res == "{}");
 }
 
 TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]") {
@@ -48,7 +48,7 @@ TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]
     d.setValue("string", ""s);
 
     std::string res = ghoul::formatLua(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{boolFalse=false,boolTrue=true,"
         "double=2.2,int=1,string=\"\","
@@ -65,7 +65,7 @@ TEST_CASE("DictionaryLuaFormatter: Dictionary with Ivec", "[dictionaryluaformatt
     d.setValue("ivec4", glm::ivec4(0));
 
     std::string res = ghoul::formatLua(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{ivec2={0,0},ivec3={0,0,0},"
         "ivec4={0,0,0,0}}"
@@ -80,7 +80,7 @@ TEST_CASE("DictionaryLuaFormatter: std::vectors", "[dictionaryluaformatter]") {
     d.setValue("empty", std::vector<double>{});
 
     std::string res = ghoul::formatLua(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{dVector={0.1,0.2,0.3,0.4,0.5},"
         "empty={},"
@@ -104,7 +104,7 @@ TEST_CASE("DictionaryLuaFormatter: Matrices", "[dictionaryluaformatter]") {
     d.setValue("dmat4x3", glm::dmat4x3(0.0));
 
     std::string res = ghoul::formatLua(d);
-    REQUIRE(
+    CHECK(
         res ==
         "{dmat2x2={0,0,0,0},dmat2x3={0,0,0,0,0,0},dmat2x4={0,0,0,0,0,0,0,0},"
         "dmat3x2={0,0,0,0,0,0},dmat3x3={0,0,0,0,0,0,0,0,0},"
@@ -120,7 +120,7 @@ TEST_CASE("DictionaryLuaFormatter: Dictionary with nan", "[dictionaryluaformatte
     d.setValue("nanValue", std::numeric_limits<double>::quiet_NaN());
 
     std::string res = ghoul::formatLua(d);
-    REQUIRE(res == "{nanValue=nan}");
+    CHECK(res == "{nanValue=nan}");
 }
 
 TEST_CASE("DictionaryLuaFormatter: Dictionary with infinity", "[dictionaryluaformatter]") {
@@ -129,7 +129,7 @@ TEST_CASE("DictionaryLuaFormatter: Dictionary with infinity", "[dictionaryluafor
     d.setValue("infinity", std::numeric_limits<double>::infinity());
 
     std::string res = ghoul::formatLua(d);
-    REQUIRE(res == "{infinity=inf}");
+    CHECK(res == "{infinity=inf}");
 }
 
 TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]") {
@@ -174,7 +174,7 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
 
     std::string res = ghoul::formatLua(g);
 
-    REQUIRE(
+    CHECK(
         res ==
         "{dict={dict={dict={double=2.2,int=1,"
         "string=\"\",vec2={0,0},"

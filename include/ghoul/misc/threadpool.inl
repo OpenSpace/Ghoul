@@ -64,7 +64,7 @@ auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... arguments)
 
     std::shared_ptr<std::packaged_task<T>> pck =
         std::make_shared<std::packaged_task<T>>(std::move(task));
-    _taskQueue->push([pck, a = std::move(arguments)]() { (*pck)(a); });
+    _taskQueue->push([pck]() { (*pck)(); });
 
     std::future<T> future = pck->get_future();
 
