@@ -128,7 +128,7 @@ windows_ninja: {
         compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
       }
       stage('windows-ninja/test') {
-        testHelper.runUnitTests('build-ninja\\tests\\Debug\\GhoulTest')
+        testHelper.runUnitTests('build-ninja\\tests\\GhoulTest')
       }
       cleanWs()
     } // node('windows')
