@@ -138,7 +138,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     }
 
     // If we get this far, it's a new font that has to be created
-    std::shared_ptr<Font> f = std::make_shared<Font>(
+    auto f = std::make_shared<Font>(
         _fontPaths[hashName],
         fontSize,
         _textureAtlas,

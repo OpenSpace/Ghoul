@@ -295,9 +295,9 @@ void ThreadPool::activateWorker(Worker& worker) {
 
     // We create the thread running our worker loop. It will start immediately, but that
     // is not a problem
-    std::unique_ptr<std::thread> thread = std::make_unique<std::thread>(workerLoop);
+    auto thread = std::make_unique<std::thread>(workerLoop);
 
-    // Set the threa priority to the desired class and level
+    // Set the thread priority to the desired class and level
     thread::setPriority(*thread, _threadPriorityClass, _threadPriorityLevel);
 
     // And move the thread to a background priority if desired and supported

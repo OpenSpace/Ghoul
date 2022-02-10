@@ -49,7 +49,7 @@ MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::MemoryPool(int nBuckets)
 {
     _buckets.reserve(nBuckets);
     for (int i = 0; i < nBuckets; ++i) {
-        std::unique_ptr<Bucket> b = std::make_unique<Bucket>();
+        auto b = std::make_unique<Bucket>();
         if (InjectDebugMemory) {
             std::memset(b->payload.data(), DebugByte, BucketSize);
         }

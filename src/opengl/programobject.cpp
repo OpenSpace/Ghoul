@@ -134,7 +134,7 @@ ProgramObject::ProgramObject(const ProgramObject& cpy)
     }
 
     for (const std::shared_ptr<ShaderObject>& obj : cpy._shaderObjects) {
-        std::shared_ptr<ShaderObject> shaderCopy = std::make_shared<ShaderObject>(*obj);
+        auto shaderCopy = std::make_shared<ShaderObject>(*obj);
         glAttachShader(_id, *shaderCopy);
         _shaderObjects.push_back(shaderCopy);
     }
@@ -183,8 +183,7 @@ ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
         }
 
         for (const std::shared_ptr<ShaderObject>& obj : rhs._shaderObjects) {
-            std::shared_ptr<ShaderObject> shaderCopy =
-                std::make_shared<ShaderObject>(*obj);
+            auto shaderCopy = std::make_shared<ShaderObject>(*obj);
             glAttachShader(_id, *shaderCopy);
             _shaderObjects.push_back(shaderCopy);
         }
@@ -348,7 +347,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
         "FragmentShaderPath file must exist"
     );
 
-    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
+    auto program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
         vertexShaderPath,
@@ -389,7 +388,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
         "GeometryShaderPath file must exist"
     );
 
-    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
+    auto program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
         vertexShaderPath,
@@ -454,7 +453,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
         "Tessellation control shader file must exist"
     );
 
-    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>(name);
+    auto program = std::make_unique<ProgramObject>(name);
     program->attachObject(std::make_unique<ShaderObject>(
         ShaderObject::ShaderType::Vertex,
         vertexShaderPath,

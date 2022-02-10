@@ -336,7 +336,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
         file << DefaultFragmentShaderSource;
     }
     using namespace opengl;
-    std::unique_ptr<ProgramObject> program = std::make_unique<ProgramObject>("Font");
+    auto program = std::make_unique<ProgramObject>("Font");
     program->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
     );
@@ -350,10 +350,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     LDEBUG("Link default font shader");
     program->linkProgramObject();
 
-    std::unique_ptr<FontRenderer> fr = std::make_unique<FontRenderer>(
-        std::move(program),
-        glm::vec2(0.f)
-    );
+    auto fr = std::make_unique<FontRenderer>(std::move(program), glm::vec2(0.f));
     ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache, UniformNames);
     return fr;
 }
@@ -379,7 +376,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
         file << ProjectionFragmentShaderSource;
     }
     using namespace opengl;
-    std::unique_ptr<ProgramObject> pg = std::make_unique<ProgramObject>("ProjectionFont");
+    auto pg = std::make_unique<ProgramObject>("ProjectionFont");
     pg->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
     );
@@ -394,18 +391,13 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     pg->linkProgramObject();
 
     // Can't create a unique_ptr directly here as the FontRenderer is not private
-    std::unique_ptr<FontRenderer> fr = std::make_unique<FontRenderer>(
-        std::move(pg),
-        glm::vec2(0.f)
-    );
-
+    auto fr = std::make_unique<FontRenderer>(std::move(pg), glm::vec2(0.f));
     ghoul::opengl::updateUniformLocations(
         *fr->_program,
         fr->_uniformCacheProjection,
         UniformNamesProjection
     );
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
-
     return fr;
 }
 
