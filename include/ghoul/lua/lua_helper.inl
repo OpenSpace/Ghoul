@@ -254,6 +254,7 @@ void push(lua_State* L, T value) {
         }
     }
     else {
+        (void) value; // Suppress an unused variable warning
         static_assert(sizeof(T) == 0, "Unable to push type T onto the Lua stack");
     }
 }
