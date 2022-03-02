@@ -55,7 +55,8 @@ namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
                                                                 const std::string& source,
-                                                                      FIBITMAP* dib) const
+                                                                      FIBITMAP* dib,
+                                                                    int nDimensions) const
 {
     //retrieve the image data
     BYTE* bits = FreeImage_GetBits(dib);
@@ -169,9 +170,20 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
     );
     FreeImage_Unload(dib);
 
+    GLenum dimType = [](int d) {
+        switch (d) {
+            case 1:  return GL_TEXTURE_1D;
+            case 2:  return GL_TEXTURE_2D;
+            case 3:  return GL_TEXTURE_3D;
+            default:
+            throw ghoul::RuntimeError(fmt::format("Unsupported dimensionality {}", d));
+        }
+    }(nDimensions);
+
     return std::make_unique<opengl::Texture>(
         reinterpret_cast<void*>(data),
         imageSize,
+        dimType,
         format,
         static_cast<GLenum>(format),
         type
@@ -179,7 +191,8 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTextureInternal(
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
-                                                        const std::string& filename) const
+                                                              const std::string& filename,
+                                                                    int nDimensions) const
 {
     // Pointer to the image, once loaded
     FIBITMAP* dib = nullptr;
@@ -213,11 +226,12 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(
         );
     }
 
-    return loadTextureInternal(filename, dib);
+    return loadTextureInternal(filename, dib, nDimensions);
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memory,
-                                                                     size_t size) const
+                                                                     size_t size,
+                                                                    int nDimensions) const
 {
     // Pointer to the image, once loaded
     FIBITMAP* dib = nullptr;
@@ -247,7 +261,7 @@ std::unique_ptr<opengl::Texture> TextureReaderFreeImage::loadTexture(void* memor
     //close the memory stream
     FreeImage_CloseMemory(stream);
 
-    return loadTextureInternal("Memory", dib);
+    return loadTextureInternal("Memory", dib, nDimensions);
 }
 
 std::vector<std::string> TextureReaderFreeImage::supportedExtensions() const {

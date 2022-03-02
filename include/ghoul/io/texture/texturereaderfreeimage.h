@@ -50,6 +50,7 @@ public:
     * loaded Texture.
     *
     * \param filename The texture that should be loaded from the hard disk
+    * \param nDimensions The number of dimensions of the image to be loaded
     * \return The loaded Texture object
     *
     * \throw TextureLoadException If there was an error loading the texture
@@ -58,7 +59,7 @@ public:
     *      reported by supportedExtensions
     */
     std::unique_ptr<opengl::Texture> loadTexture(
-        const std::string& filename) const override;
+        const std::string& filename, int nDimensions) const override;
 
 
     /**
@@ -66,6 +67,7 @@ public:
      * library. The memory block must contain at least \p size number of bytes.
      *
      * \param memory The memory that contains the bytes of the Texture to be loaded
+     * \param nDimensions The number of dimensions of the image to be loaded
      * \param size The number of bytes contained in \p memory
      *
      * \throw TextureLoadException If there was an error reading the \p memory
@@ -73,7 +75,7 @@ public:
      * \pre \p size must be > 0
      */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory,
-        size_t size) const override;
+        size_t size, int nDimensions) const override;
 
     /**
      * Returns the supported extensions (<code>bmp</code>, <code>cut</code>,
@@ -94,7 +96,7 @@ public:
 
 private:
     std::unique_ptr<opengl::Texture> loadTextureInternal(const std::string& source,
-        FIBITMAP* dib) const;
+        FIBITMAP* dib, int nDimensions) const;
 };
 
 #endif // GHOUL_USE_FREEIMAGE
