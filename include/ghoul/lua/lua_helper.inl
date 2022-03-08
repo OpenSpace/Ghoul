@@ -376,9 +376,8 @@ T valueInner(lua_State* L, int location) {
         ghoul::Dictionary d = ghoul::lua::luaDictionaryFromState(L);
         return d;
     }
-    else if constexpr (std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
-                       std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::dvec2> ||
-                       std::is_same_v<T, glm::dvec3> || std::is_same_v<T, glm::dvec4> ||
+    else if constexpr (std::is_same_v<T, glm::dvec2> || std::is_same_v<T, glm::dvec3> ||
+                       std::is_same_v<T, glm::dvec4> ||
                        std::is_same_v<T, glm::dmat2x2> ||
                        std::is_same_v<T, glm::dmat2x3> ||
                        std::is_same_v<T, glm::dmat2x4> ||
@@ -396,19 +395,33 @@ T valueInner(lua_State* L, int location) {
         ghoul::Dictionary holder;
         holder.setValue("value", value);
         return holder.value<T>("value");
+    }
+    else if constexpr (std::is_same_v<T, glm::ivec2>) {
+        lua_pushvalue(L, location);
+        defer{ lua_pop(L, 1); };
 
-        //if (!d.hasValue<int>("1") || !d.hasValue<int>("2")) {
-        //    std::string error = "Expected table with two keys";
-        //    // This function won't actually return, but C++ doesn't know that, so
-        //    ghoul::lua::luaError(L, error.c_str());
-        //    throw LuaFormatException(std::move(error));
-        //}
+        ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
+        ghoul::Dictionary holder;
+        holder.setValue("value", value);
+        return holder.value<glm::dvec2>("value");
+    }
+    else if constexpr (std::is_same_v<T, glm::ivec3>) {
+        lua_pushvalue(L, location);
+        defer{ lua_pop(L, 1); };
 
-        //return glm::ivec2(
-        //    d.value<int>("1"),
-        //    d.value<int>("2")
-        //);
+        ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
+        ghoul::Dictionary holder;
+        holder.setValue("value", value);
+        return holder.value<glm::dvec3>("value");
+    }
+    else if constexpr (std::is_same_v<T, glm::ivec4>) {
+        lua_pushvalue(L, location);
+        defer{ lua_pop(L, 1); };
 
+        ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
+        ghoul::Dictionary holder;
+        holder.setValue("value", value);
+        return holder.value<glm::dvec4>("value");
     }
     else if constexpr (std::is_same_v<T, glm::vec2>) {
         return valueInner<glm::dvec2>(L, location);
@@ -487,6 +500,18 @@ T valueInner(lua_State* L, int location) {
                     T::mapped_type value = d.value<glm::dvec4>(k);
                     res[std::string(k)] = std::move(value);
                 }
+                else if constexpr (std::is_same_v<typename T::mapped_type, glm::ivec2>) {
+                    T::mapped_type value = d.value<glm::dvec2>(k);
+                    res[std::string(k)] = std::move(value);
+                }
+                else if constexpr (std::is_same_v<typename T::mapped_type, glm::ivec3>) {
+                    T::mapped_type value = d.value<glm::dvec3>(k);
+                    res[std::string(k)] = std::move(value);
+                }
+                else if constexpr (std::is_same_v<typename T::mapped_type, glm::ivec4>) {
+                    T::mapped_type value = d.value<glm::dvec4>(k);
+                    res[std::string(k)] = std::move(value);
+                }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat2x2>) {
                     T::mapped_type value = d.value<glm::dmat2x2>(k);
                     res[std::string(k)] = std::move(value);
@@ -521,6 +546,10 @@ T valueInner(lua_State* L, int location) {
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat4x4>) {
                     T::mapped_type value = d.value<glm::dmat4x4>(k);
+                    res[std::string(k)] = std::move(value);
+                }
+                else if constexpr (std::is_same_v<typename T::mapped_type, int>) {
+                    T::mapped_type value = static_cast<int>(d.value<double>(k));
                     res[std::string(k)] = std::move(value);
                 }
                 else {
@@ -575,6 +604,18 @@ T valueInner(lua_State* L, int location) {
                 T::value_type value = d.value<glm::dvec4>(k);
                 res.push_back(std::move(value));
             }
+            else if constexpr (std::is_same_v<typename T::value_type, glm::ivec2>) {
+                T::value_type value = d.value<glm::dvec2>(k);
+                res.push_back(std::move(value));
+            }
+            else if constexpr (std::is_same_v<typename T::value_type, glm::ivec3>) {
+                T::value_type value = d.value<glm::dvec3>(k);
+                res.push_back(std::move(value));
+            }
+            else if constexpr (std::is_same_v<typename T::value_type, glm::ivec4>) {
+                T::value_type value = d.value<glm::dvec4>(k);
+                res.push_back(std::move(value));
+            }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat2x2>) {
                 T::value_type value = d.value<glm::dmat2x2>(k);
                 res.push_back(std::move(value));
@@ -609,6 +650,10 @@ T valueInner(lua_State* L, int location) {
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat4x4>) {
                 T::value_type value = d.value<glm::dmat4x4>(k);
+                res.push_back(std::move(value));
+            }
+            else if constexpr (std::is_same_v<typename T::value_type, int>) {
+                T::value_type value = static_cast<int>(d.value<double>(k));
                 res.push_back(std::move(value));
             }
             else {
