@@ -279,6 +279,9 @@ void push(lua_State* L, T value) {
             lua_settable(L, -3);
         }
     }
+    else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
+        
+    }
     else {
         (void) value; // Suppress an unused variable warning
         static_assert(sizeof(T) == 0, "Unable to push type T onto the Lua stack");
