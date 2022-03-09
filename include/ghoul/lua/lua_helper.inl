@@ -260,6 +260,25 @@ void push(lua_State* L, T value) {
             }
         }
     }
+    else if constexpr (is_string_map<T>::value) {
+        lua_newtable(L);
+        for (const std::pair<const std::string, T::mapped_type>& p : value) {
+            ghoul::lua::push(L, p.first, p.second);
+            lua_settable(L, -3);
+        }
+    }
+    else if constexpr (is_vector<T>::value) {
+        lua_newtable(L);
+        for (size_t i = 0; i < value.size(); i++) {
+            if constexpr (std::is_same_v<T::value_type, bool>) {
+                ghoul::lua::push(L, static_cast<int>(i), static_cast<bool>(value[i]));
+            }
+            else {
+                ghoul::lua::push(L, static_cast<int>(i), value[i]);
+            }
+            lua_settable(L, -3);
+        }
+    }
     else {
         (void) value; // Suppress an unused variable warning
         static_assert(sizeof(T) == 0, "Unable to push type T onto the Lua stack");
