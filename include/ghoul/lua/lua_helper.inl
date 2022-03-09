@@ -167,6 +167,22 @@ constexpr Variant variantValue(lua_State* L, int location) {
     }
 }
 
+template <size_t I = 0>
+void pushDictionaryHelper(lua_State* L, const ghoul::Dictionary& d, std::string_view key)
+{
+    if constexpr (I < std::variant_size_v<Dictionary::Types>) {
+        using T = std::variant_alternative_t<I, Dictionary::Types>;
+        bool has = d.hasValue<T>(key);
+        if (has) {
+            ghoul::lua::push(L, d.value<T>(key));
+            return;
+        }
+        else {
+            pushDictionaryHelper<I + 1>(L, d, key);
+        }
+    }
+}
+
 template <typename T>
 void push(lua_State* L, T value) {
     // We have to handle the floating point types first in this as floats are able to be
@@ -280,7 +296,12 @@ void push(lua_State* L, T value) {
         }
     }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
-        
+        lua_newtable(L);
+        for (std::string_view key : value.keys()) {
+            ghoul::lua::push(L, key);
+            pushDictionaryHelper(L, value, key);
+            lua_settable(L, -3);
+        }
     }
     else {
         (void) value; // Suppress an unused variable warning
