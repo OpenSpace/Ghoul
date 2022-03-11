@@ -37,6 +37,10 @@ namespace ghoul { class Dictionary; }
 
 namespace ghoul::lua {
 
+struct LuaError : public RuntimeError {
+    explicit LuaError(std::string msg);
+};
+
 struct LuaRuntimeException : public RuntimeError {
     explicit LuaRuntimeException(std::string msg);
 };
