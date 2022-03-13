@@ -324,6 +324,7 @@ template bool Dictionary::hasValue<int>(std::string_view) const;
 template bool Dictionary::hasValue<std::string>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<int>>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<double>>(std::string_view) const;
+template bool Dictionary::hasValue<std::vector<std::string>>(std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec2>(std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec3>(std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec4>(std::string_view) const;

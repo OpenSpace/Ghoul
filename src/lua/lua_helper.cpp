@@ -112,6 +112,10 @@ end)";
 
 namespace ghoul::lua {
 
+LuaError::LuaError(std::string msg)
+    : RuntimeError(std::move(msg))
+{}
+
 LuaRuntimeException::LuaRuntimeException(std::string msg)
     : RuntimeError(std::move(msg), "Lua")
 {}
