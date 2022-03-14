@@ -278,7 +278,7 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (is_string_map<T>::value) {
         lua_newtable(L);
-        for (const std::pair<const std::string, T::mapped_type>& p : value) {
+        for (const std::pair<const std::string, typename T::mapped_type>& p : value) {
             ghoul::lua::push(L, p.first, p.second);
             lua_settable(L, -3);
         }
@@ -506,11 +506,11 @@ T valueInner(lua_State* L, int location) {
         return variantValue<0, T>(L, location);
     }
     else if constexpr (is_string_map<T>::value) {
-        using value_type = T::mapped_type;
+        using value_type = typename T::mapped_type;
         if constexpr (std::is_same_v<value_type, float>) {
             auto res = valueInner<std::map<std::string, double>>(L, location);
             std::map<std::string, float> res2;
-            for (const std::pair<std::string, double>& p : res) {
+            for (const std::pair<const std::string, double>& p : res) {
                 res2[p.first] = static_cast<float>(p.second);
             }
             return res2;
@@ -528,75 +528,75 @@ T valueInner(lua_State* L, int location) {
                                 typename T::mapped_type, std::filesystem::path
                               >)
                 {
-                    T::mapped_type value = d.value<std::string>(k);
+                    typename T::mapped_type value = d.value<std::string>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::vec2>) {
-                    T::mapped_type value = d.value<glm::dvec2>(k);
+                    typename T::mapped_type value = d.value<glm::dvec2>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::vec3>) {
-                    T::mapped_type value = d.value<glm::dvec3>(k);
+                    typename T::mapped_type value = d.value<glm::dvec3>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::vec4>) {
-                    T::mapped_type value = d.value<glm::dvec4>(k);
+                    typename T::mapped_type value = d.value<glm::dvec4>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::ivec2>) {
-                    T::mapped_type value = d.value<glm::dvec2>(k);
+                    typename T::mapped_type value = d.value<glm::dvec2>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::ivec3>) {
-                    T::mapped_type value = d.value<glm::dvec3>(k);
+                    typename T::mapped_type value = d.value<glm::dvec3>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::ivec4>) {
-                    T::mapped_type value = d.value<glm::dvec4>(k);
+                    typename T::mapped_type value = d.value<glm::dvec4>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat2x2>) {
-                    T::mapped_type value = d.value<glm::dmat2x2>(k);
+                    typename T::mapped_type value = d.value<glm::dmat2x2>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat2x3>) {
-                    T::mapped_type value = d.value<glm::dmat2x3>(k);
+                    typename T::mapped_type value = d.value<glm::dmat2x3>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat2x4>) {
-                    T::mapped_type value = d.value<glm::dmat2x4>(k);
+                    typename T::mapped_type value = d.value<glm::dmat2x4>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat3x2>) {
-                    T::mapped_type value = d.value<glm::dmat3x2>(k);
+                    typename T::mapped_type value = d.value<glm::dmat3x2>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat3x3>) {
-                    T::mapped_type value = d.value<glm::dmat3x3>(k);
+                    typename T::mapped_type value = d.value<glm::dmat3x3>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat3x4>) {
-                    T::mapped_type value = d.value<glm::dmat3x4>(k);
+                    typename T::mapped_type value = d.value<glm::dmat3x4>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat4x2>) {
-                    T::mapped_type value = d.value<glm::dmat4x2>(k);
+                    typename T::mapped_type value = d.value<glm::dmat4x2>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat4x3>) {
-                    T::mapped_type value = d.value<glm::dmat4x3>(k);
+                    typename T::mapped_type value = d.value<glm::dmat4x3>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, glm::mat4x4>) {
-                    T::mapped_type value = d.value<glm::dmat4x4>(k);
+                    typename T::mapped_type value = d.value<glm::dmat4x4>(k);
                     res[std::string(k)] = std::move(value);
                 }
                 else if constexpr (std::is_same_v<typename T::mapped_type, int>) {
-                    T::mapped_type value = static_cast<int>(d.value<double>(k));
+                    typename T::mapped_type value = static_cast<int>(d.value<double>(k));
                     res[std::string(k)] = std::move(value);
                 }
                 else {
-                    T::mapped_type value = d.value<typename T::mapped_type>(k);
+                    typename T::mapped_type value = d.value<typename T::mapped_type>(k);
                     res[std::string(k)] = std::move(value);
                 }
             }
@@ -604,16 +604,6 @@ T valueInner(lua_State* L, int location) {
         }
     }
     else if constexpr (is_vector<T>::value) {
-        //if constexpr (std::is_same_v<typename T::value_type, float>) {
-        //    auto res = valueInner<std::vector<double>>(L, location);
-        //    std::vector<float> res2;
-        //    res2.reserve(res.size());
-        //    for (double d : res) {
-        //        res2.push_back(static_cast<float>(d));
-        //    }
-        //    return res2;
-        //}
-
         // First get the state as a Dictionary which is then converted into the vector
         lua_pushvalue(L, location);
         defer{ lua_pop(L, 1); };
@@ -624,7 +614,7 @@ T valueInner(lua_State* L, int location) {
         res.reserve(keys.size());
         for (std::string_view k : keys) {
             if constexpr (std::is_same_v<typename T::value_type, float>) {
-                T::value_type value = static_cast<float>(d.value<double>(k));
+                typename T::value_type value = static_cast<float>(d.value<double>(k));
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<
@@ -632,75 +622,75 @@ T valueInner(lua_State* L, int location) {
                                    std::filesystem::path
                                >)
             {
-                T::value_type value = d.value<std::string>(k);
+                typename T::value_type value = d.value<std::string>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::vec2>) {
-                T::value_type value = d.value<glm::dvec2>(k);
+                typename T::value_type value = d.value<glm::dvec2>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::vec3>) {
-                T::value_type value = d.value<glm::dvec3>(k);
+                typename T::value_type value = d.value<glm::dvec3>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::vec4>) {
-                T::value_type value = d.value<glm::dvec4>(k);
+                typename T::value_type value = d.value<glm::dvec4>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::ivec2>) {
-                T::value_type value = d.value<glm::dvec2>(k);
+                typename T::value_type value = d.value<glm::dvec2>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::ivec3>) {
-                T::value_type value = d.value<glm::dvec3>(k);
+                typename T::value_type value = d.value<glm::dvec3>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::ivec4>) {
-                T::value_type value = d.value<glm::dvec4>(k);
+                typename T::value_type value = d.value<glm::dvec4>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat2x2>) {
-                T::value_type value = d.value<glm::dmat2x2>(k);
+                typename T::value_type value = d.value<glm::dmat2x2>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat2x3>) {
-                T::value_type value = d.value<glm::dmat2x3>(k);
+                typename T::value_type value = d.value<glm::dmat2x3>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat2x4>) {
-                T::value_type value = d.value<glm::dmat2x4>(k);
+                typename T::value_type value = d.value<glm::dmat2x4>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat3x2>) {
-                T::value_type value = d.value<glm::dmat3x2>(k);
+                typename T::value_type value = d.value<glm::dmat3x2>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat3x3>) {
-                T::value_type value = d.value<glm::dmat3x3>(k);
+                typename T::value_type value = d.value<glm::dmat3x3>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat3x4>) {
-                T::value_type value = d.value<glm::dmat3x4>(k);
+                typename T::value_type value = d.value<glm::dmat3x4>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat4x2>) {
-                T::value_type value = d.value<glm::dmat4x2>(k);
+                typename T::value_type value = d.value<glm::dmat4x2>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat4x3>) {
-                T::value_type value = d.value<glm::dmat4x3>(k);
+                typename T::value_type value = d.value<glm::dmat4x3>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat4x4>) {
-                T::value_type value = d.value<glm::dmat4x4>(k);
+                typename T::value_type value = d.value<glm::dmat4x4>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, int>) {
-                T::value_type value = static_cast<int>(d.value<double>(k));
+                typename T::value_type value = static_cast<int>(d.value<double>(k));
                 res.push_back(std::move(value));
             }
             else {
-                T::value_type value = d.value<typename T::value_type>(k);
+                typename T::value_type value = d.value<typename T::value_type>(k);
                 res.push_back(std::move(value));
             }
         }
