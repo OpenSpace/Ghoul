@@ -286,7 +286,7 @@ void push(lua_State* L, T value) {
     else if constexpr (is_vector<T>::value) {
         lua_newtable(L);
         for (size_t i = 0; i < value.size(); i++) {
-            if constexpr (std::is_same_v<T::value_type, bool>) {
+            if constexpr (std::is_same_v<typename T::value_type, bool>) {
                 ghoul::lua::push(L, static_cast<int>(i), static_cast<bool>(value[i]));
             }
             else {
