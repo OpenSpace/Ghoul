@@ -622,7 +622,7 @@ T valueInner(lua_State* L, int location) {
                                    std::filesystem::path
                                >)
             {
-                T::value_type value = d.value<std::string>(k);
+                typename T::value_type value = d.value<std::string>(k);
                 res.push_back(std::move(value));
             }
             else if constexpr (std::is_same_v<typename T::value_type, glm::vec2>) {
