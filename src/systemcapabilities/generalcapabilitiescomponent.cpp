@@ -625,7 +625,12 @@ GeneralCapabilitiesComponent::operatingSystem() const
 }
 
 std::string GeneralCapabilitiesComponent::operatingSystemString() const {
-    return ghoul::to_string(_operatingSystem) + " " + _operatingSystemExtra;
+    if (_operatingSystemExtra.empty()) {
+        return ghoul::to_string(_operatingSystem);
+    }
+    else {
+        return ghoul::to_string(_operatingSystem) + " " + _operatingSystemExtra;
+    }
 }
 
 const std::string& GeneralCapabilitiesComponent::fullOperatingSystem() const {
