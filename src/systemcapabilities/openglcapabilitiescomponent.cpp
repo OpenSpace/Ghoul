@@ -91,8 +91,10 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
     if (_glslCompiler.find("NVIDIA") != std::string::npos) {
         _vendor = Vendor::Nvidia;
     }
-    else if (_glslCompiler.find("ATI") != std::string::npos) {
-        _vendor = Vendor::ATI;
+    else if ((_glslCompiler.find("ATI") != std::string::npos) ||
+            (_glslCompiler.find("AMD") != std::string::npos))
+    {
+        _vendor = Vendor::AmdATI;
     }
     else if ((_glslCompiler.find("INTEL") != std::string::npos) ||
              (_glslCompiler.find("Intel") != std::string::npos))
@@ -262,7 +264,7 @@ int OpenGLCapabilitiesComponent::maxUniformBufferBindings() const {
 std::string_view OpenGLCapabilitiesComponent::gpuVendorString() const {
     switch (_vendor) {
         case Vendor::Nvidia: return "Nvidia";
-        case Vendor::ATI:    return "ATI";
+        case Vendor::AmdATI: return "AMD/ATI";
         case Vendor::Intel:  return "Intel";
         default:             return "other";
     }

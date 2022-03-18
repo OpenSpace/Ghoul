@@ -55,7 +55,7 @@ public:
     /// This enum stores the possible vendors of graphics cards that can be detected
     enum class Vendor {
         Nvidia, ///< Nvidia
-        ATI, ///< AMD/ATI
+        AmdATI, ///< AMD/ATI
         Intel, ///< Intel
         Other ///< vendor could not be detected
     };
