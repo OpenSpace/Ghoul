@@ -67,7 +67,7 @@ public:
 
     /// This enum stores the possible operating systems that can be detected
     enum class OperatingSystem {
-        Windows10,
+        Windows10or11,
         WindowsServer2016,
         WindowsVista,
         WindowsServer2008,

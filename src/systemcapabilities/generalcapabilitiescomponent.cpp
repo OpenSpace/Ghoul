@@ -63,7 +63,7 @@ std::string to_string(
 {
     using OS = ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
     switch (value) {
-        case OS::Windows10:                   return "Windows 10";
+        case OS::Windows10or11:               return "Windows 10/11";
         case OS::WindowsServer2016:           return "Windows Server 2016";
         case OS::WindowsVista:                return "Windows Vista";
         case OS::WindowsServer2008:           return "Windows Server 2008";
@@ -227,7 +227,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         if (osVersionInfo.dwMajorVersion == 10) {
             if (osVersionInfo.dwMinorVersion == 0) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
-                    _operatingSystem = OperatingSystem::Windows10;
+                    _operatingSystem = OperatingSystem::Windows10or11;
                 }
                 else {
                     _operatingSystem = OperatingSystem::WindowsServer2016;
