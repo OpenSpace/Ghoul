@@ -190,17 +190,17 @@ protected:
     void detectDriverInformation();
 
     /// OpenGL Version
-    Version _glVersion;
+    Version _glVersion = { 0, 0, 0};
     /// GPU vendor
     std::string _glslCompiler;
     /// GPU vendor
-    Vendor _vendor;
+    Vendor _vendor = Vendor::Other;
     /// GL_RENDERER
     std::string _glRenderer;
     /// supported GLSL extensions
     std::vector<std::string> _extensions;
     /// GLEW Version
-    Version _glewVersion;
+    Version _glewVersion = { 0, 0, 0 };
 
     /// The maximum supported texture size can have
     int _maxTextureSize = -1;

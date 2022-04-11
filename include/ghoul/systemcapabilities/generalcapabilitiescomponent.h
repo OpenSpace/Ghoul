@@ -206,7 +206,7 @@ protected:
     void detectCPU();
 
     /// Information about the operating system
-    OperatingSystem _operatingSystem;
+    OperatingSystem _operatingSystem = OperatingSystem::Unknown;
     std::string _operatingSystemExtra;
     std::string _fullOperatingSystem;
 

@@ -218,9 +218,14 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
         );
     }
 
+    std::string lmd;
+    if (!information.has_value()) {
+        lmd = lastModifiedDate(file);
+    }
+
     const unsigned int hash = generateHash(
         baseName,
-        information.has_value() ? *information : lastModifiedDate(file)
+        information.has_value() ? *information : lmd
     );
 
     // If we couldn't find the file, we have to generate a directory with the name of the
@@ -269,9 +274,14 @@ bool CacheManager::hasCachedFile(const std::filesystem::path& file,
         );
     }
 
+    std::string lmd;
+    if (!information.has_value()) {
+        lmd = lastModifiedDate(file);
+    }
+
     const unsigned long hash = generateHash(
         baseName,
-        information.has_value() ? *information : lastModifiedDate(file)
+        information.has_value() ? *information : lmd
     );
     return _files.find(hash) != _files.end();
 }
@@ -288,9 +298,14 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
         );
     }
 
+    std::string lmd;
+    if (!information.has_value()) {
+        lmd = lastModifiedDate(file);
+    }
+
     const unsigned int hash = generateHash(
         baseName,
-        information.has_value() ? *information : lastModifiedDate(file)
+        information.has_value() ? *information : lmd
     );
     const auto it = _files.find(hash);
     if (it != _files.end()) {

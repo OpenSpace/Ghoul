@@ -116,7 +116,7 @@ public:
 private:
     struct Bucket {
         size_t usage = 0; ///< The number of bytes that have been used in this Bucket
-        std::array<std::byte, BucketSize> payload; ///< The data storage of this bucket
+        std::array<std::byte, BucketSize> payload; ///< The bucket's data storage
     };
 
     struct EmptyPair {
