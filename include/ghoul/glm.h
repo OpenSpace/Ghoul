@@ -131,6 +131,17 @@ glm::tquat<valType> lookAtQuaternion(const glm::tvec3<valType> eye,
 }
 
 /**
+ * Check if quaternion \p q1 and \q2 represent the same spatial orientation.
+ * The precision of the check can be controlled using the \p precision parameter
+ */
+template <typename valType>
+bool isSameOrientation(const glm::tquat<valType> q1, const glm::tquat<valType> q2,
+                       const valType precision)
+{
+    return 1.0 - std::abs(glm::dot(q1, q2)) < precision;
+}
+
+/**
  * Compute a view direction vector from a quaternion representing a rotation
  */
 inline glm::dvec3 viewDirection(const glm::dquat& q) {
