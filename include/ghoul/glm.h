@@ -146,7 +146,7 @@ bool isSameOrientation(const glm::tquat<valType> q1, const glm::tquat<valType> q
  */
 inline glm::dvec3 viewDirection(const glm::dquat& q) {
     return glm::normalize(q * glm::dvec3(0.0, 0.0, -1.0));
-};
+}
 
 template <typename valType>
 glm::tmat2x2<valType> createFillMat2x2(valType v) {

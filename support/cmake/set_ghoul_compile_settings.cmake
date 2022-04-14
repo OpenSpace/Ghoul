@@ -29,43 +29,10 @@ function (set_ghoul_compile_settings target)
   set(MSVC_WARNINGS
     "/MP"       # Multi-threading support
     "/W4"       # Highest warning level
-    "/w44062"   # enumerator 'identifier' in a switch of enum 'enumeration' is not handled
-    "/wd4127"   # conditional expression is constant
-    "/wd4201"   # nonstandard extension used : nameless struct/union
-    "/w44255"   # 'function': no function prototype given: converting '()' to '(void)'
-    "/w44263"   # 'function': member function does not override any base class virtual member function
-    "/w44264"   # 'virtual_function': no override available for virtual member function from base 'class'; function is hidden
-    "/w44265"   # 'class': class has virtual functions, but destructor is not virtual
-    "/w44266"   # 'function': no override available for virtual member function from base 'type'; function is hidden
-    "/w44289"   # nonstandard extension used : 'var' : loop control variable declared in the for-loop is used outside the for-loop scope
-    "/w44296"   # 'operator': expression is always false
-    "/w44311"   # 'variable' : pointer truncation from 'type' to 'type'
-    "/w44339"   # 'type' : use of undefined type detected in CLR meta-data - use of this type may lead to a runtime exception
-    "/w44342"   # behavior change: 'function' called, but a member operator was called in previous versions
-    "/w44350"   # behavior change: 'member1' called instead of 'member2'
-    "/w44431"   # missing type specifier - int assumed. Note: C no longer supports default-int
-    "/w44471"   # a forward declaration of an unscoped enumeration must have an underlying type (int assumed)
-    "/w44545"   # expression before comma evaluates to a function which is missing an argument list
-    "/w44546"   # function call before comma missing argument list
-    "/w44547"   # 'operator': operator before comma has no effect; expected operator with side-effect
-    "/w44548"   # expression before comma has no effect; expected expression with side-effect
-    "/w44549"   # 'operator': operator before comma has no effect; did you intend 'operator'?
-    "/w44555"   # expression has no effect; expected expression with side-effect
-    # This is disabled until GLM is updated to version 0.9.9 that removes occurrance of this warning
-    # "/w44574"   # 'identifier' is defined to be '0': did you mean to use '#if identifier'?
-    "/w44608"   # 'symbol1' has already been initialized by another union member in the initializer list, 'symbol2'
-    "/w44628"   # digraphs not supported with -Ze. Character sequence 'digraph' not interpreted as alternate token for 'char'
-    "/w44640"   # 'instance': construction of local static object is not thread-safe
-    "/w44905"   # wide string literal cast to 'LPSTR'
-    "/w44906"   # string literal cast to 'LPWSTR'
-    "/w44986"   # 'symbol': exception specification does not match previous declaration
-    "/w44988"   # 'symbol': variable declared outside class/function scope
+    "/wd4201" # nonstandard extension used : nameless struct/union  [raised by:  GLM]
+    "/wd4127" # conditional expression is constant [raised by:  websocketpp]
     "/std:c++latest" # Latest C++ standard
     "/permissive-"   # Enable conformance mode
-    "/Zc:twoPhase-"  # Used to prevent C:\Program Files (x86)\Windows Kits\8.1\Include\um\combaseapi.h(229): error C2187: syntax error: 'identifier' was unexpected here
-                    # This is a bug in Visual Studio 15.3 and can be removed with the next version:
-                    # https://developercommunity.visualstudio.com/content/problem/94419/vs-2017-153-with-permissive-shows-error-c2187-in-c.html
-    "/Zc:strictStrings-"    # Windows header don't adhere to this
     "/Zc:__cplusplus" # Correctly set the __cplusplus macro
   )
 
@@ -73,73 +40,92 @@ function (set_ghoul_compile_settings target)
     "-stdlib=libc++"
     "-Wall"
     "-Wextra"
-    # "-Wpedantic"
+    "-Wmost"
+    "-Wpedantic"
+    
     "-Wabstract-vbase-init"
+    "-Walloca"
+    "-Wanon-enum-enum-conversion"
     "-Warray-bounds-pointer-arithmetic"
     "-Wassign-enum"
-    "-Wauto-import"
     "-Wbad-function-cast"
+    "-Wbinary-literal"
+    "-Wbind-to-temporary-copy"
     "-Wbitfield-constant-conversion"
-    "-Wcast-calling-convention"
+    "-Wbool-conversions"
+    "-Wcast-align"
+    "-Wcast-function-type"
     "-Wcast-qual"
     "-Wcomma"
-    "-Wcomplex-component-init"
     "-Wconditional-uninitialized"
     "-Wdate-time"
-    "-Wdeprecated-implementations"
-    "-Wdollar-in-identifier-extension"
+    "-Wdeprecated-copy-dtor"
+    "-Wdeprecated-dynamic-exception-spec"
+    "-Wdeprecated-this-capture"
+    "-Wdivision-by-zero"
+    "-Wdtor-name"
+    "-Wduplicate-decl-specifier"
     "-Wduplicate-enum"
+    "-Wduplicate-method-arg"
     "-Wduplicate-method-match"
-    "-Wempty-body"
+    "-Wextra-semi"
+    "-Wextra-semi-stmt"
     "-Wfloat-equal"
+    "-Wfloat-overflow-conversion"
+    "-Wfloat-zero-conversion"
+    "-Wformat"
+    "-Wformat-non-iso"
+    "-Wformat-nonliteral"
     "-Wformat-pedantic"
+    "-Wformat-type-confusion"
     "-Wheader-hygiene"
     "-Widiomatic-parentheses"
+    "-Wimplicit"
     "-Wimplicit-fallthrough"
-    "-Wimport-preprocessor-directive-pedantic"
-    "-Winconsistent-missing-override"
-    "-Wkeyword-macro"
-    "-Wlanguage-extension-token"
     "-Wloop-analysis"
+    "-Wmain"
     "-Wmethod-signatures"
-    "-Wmicrosoft-end-of-file"
-    "-Wmicrosoft-enum-forward-reference"
-    "-Wmicrosoft-fixed-enum"
-    "-Wmicrosoft-flexible-array"
     "-Wmissing-noreturn"
     "-Wmissing-prototypes"
-    "-Wno-missing-braces"
+    "-Wmove"
     "-Wnon-virtual-dtor"
     "-Wold-style-cast"
-    "-Wpessimizing-move"
     "-Wpointer-arith"
     "-Wpragmas"
-    "-Wredundant-move"
+    "-Wrange-loop-analysis"
+    "-Wreorder"
     "-Wshadow-all"
     "-Wshift-sign-overflow"
     "-Wshorten-64-to-32"
+    "-Wsometimes-uninitialized"
     "-Wstring-conversion"
+    "-Wsuggest-destructor-override"
+    "-Wsuggest-override"
     "-Wtautological-compare"
+    "-Wtautological-constant-in-range-compare"
+    "-Wtautological-constant-out-of-range-compare"
     "-Wthread-safety"
+    "-Wtype-limits"
     "-Wundef"
     "-Wundefined-reinterpret-cast"
+    "-Wuninitialized-const-reference"
     "-Wunneeded-internal-declaration"
     "-Wunneeded-member-function"
+    "-Wunreachable-code"
     "-Wunreachable-code-break"
-    "-Wunreachable-code-loop-increment"
     "-Wunreachable-code-return"
+    "-Wunused"
+    "-Wunused-const-variable"
     "-Wunused-exception-parameter"
-    "-Wunused-label"
-    "-Wunused-local-typedef"
     "-Wunused-macros"
-    "-Wunused-private-field"
     "-Wunused-result"
-    "-Wunused-variable"
     "-Wused-but-marked-unused"
     "-Wvariadic-macros"
     "-Wvla"
     "-Wweak-template-vtables"
-    "-Wzero-length-array"  
+    "-Wzero-as-null-pointer-constant"
+    
+    "-Wno-missing-braces"
   )
 
   set(GCC_WARNINGS
@@ -147,11 +133,16 @@ function (set_ghoul_compile_settings target)
     "-Wall"
     "-Wextra"
     "-Wpedantic"
+
     "-Walloc-zero"
     "-Wcast-qual"
     "-Wdate-time"
+    "-Wduplicated-branches"
     "-Wduplicated-cond"
+    "-Wfloat-equal"
+    "-Wformat"
     "-Wlogical-op"
+    "-Wmain"
     "-Wno-deprecated-copy"
     "-Wno-float-equal"
     "-Wno-long-long"
@@ -161,8 +152,12 @@ function (set_ghoul_compile_settings target)
     "-Woverloaded-virtual"
     "-Wshadow"
     "-Wsuggest-override"
+    "-Wtautological-compare"
+    "-Wtype-limits"
     "-Wundef"
-    "-Wuseless-cast"
+    "-Wunused"
+    "-Wuninitialized"
+    "-Wvla"
     "-Wzero-as-null-pointer-constant"
   )
 

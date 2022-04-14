@@ -557,9 +557,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
         // data
         _textureStorage[te].texture->downloadTexture();
-        int32_t pixelSize = static_cast<int32_t>(
-            _textureStorage[te].texture->expectedPixelDataSize()
-        );
+        int32_t pixelSize = _textureStorage[te].texture->expectedPixelDataSize();
         if (pixelSize == 0) {
             throw ModelCacheException(cachedFile, "No texture size was loaded");
         }
@@ -691,7 +689,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         );
 
         // Parent
-        int32_t parent = static_cast<int32_t>(node.parent());
+        int32_t parent = node.parent();
         fileStream.write(reinterpret_cast<const char*>(&parent), sizeof(int32_t));
 
         // Write how many children are to be written
