@@ -42,6 +42,7 @@ function (set_ghoul_compile_settings target)
     "-Wextra"
     "-Wmost"
     "-Wpedantic"
+    
     "-Wabstract-vbase-init"
     "-Walloca"
     "-Wanon-enum-enum-conversion"
@@ -123,6 +124,7 @@ function (set_ghoul_compile_settings target)
     "-Wvla"
     "-Wweak-template-vtables"
     "-Wzero-as-null-pointer-constant"
+    
     "-Wno-missing-braces"
   )
 
@@ -131,11 +133,16 @@ function (set_ghoul_compile_settings target)
     "-Wall"
     "-Wextra"
     "-Wpedantic"
+
     "-Walloc-zero"
     "-Wcast-qual"
     "-Wdate-time"
+    "-Wduplicated-branches"
     "-Wduplicated-cond"
+    "-Wfloat-equal"
+    "-Wformat"
     "-Wlogical-op"
+    "-Wmain"
     "-Wno-deprecated-copy"
     "-Wno-float-equal"
     "-Wno-long-long"
@@ -145,7 +152,13 @@ function (set_ghoul_compile_settings target)
     "-Woverloaded-virtual"
     "-Wshadow"
     "-Wsuggest-override"
+    "-Wtautological-compare"
+    "-Wtype-limits"
     "-Wundef"
+    "-Wunused"
+    "-Wuninitialized"
+    "-Wvla"
+    "-Wzero-length-bounds"
     "-Wzero-as-null-pointer-constant"
   )
 
