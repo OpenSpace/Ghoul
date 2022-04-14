@@ -130,29 +130,14 @@ std::vector<std::string> stackTrace() {
 
         constexpr const int MaxStackFrameSize = 4096;
         char stackFrame[MaxStackFrameSize] = {};
-        if (isValidCppName == 0) {
-            // success
-            sprintf(
-                stackFrame,
-                "(%s)\t0x%s — %s + %d",
-                moduleName.data(),
-                addr.data(),
-                functionName,
-                offset
-            );
-        }
-        else {
-            // in the above traceback (in comments) last entry is not from C++ binary,
-            // last frame, libdyld.dylib, is printed from here
-            sprintf(
-                stackFrame,
-                "(%s)\t0x%s — %s + %d",
-                moduleName.data(),
-                addr.data(),
-                functionName,
-                offset
-            );
-        }
+        sprintf(
+            stackFrame,
+            "(%s)\t0x%s — %s + %d",
+            moduleName.data(),
+            addr.data(),
+            functionName,
+            offset
+        );
 
         if (functionName) {
             free(functionName);
