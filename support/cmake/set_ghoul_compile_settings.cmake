@@ -100,7 +100,6 @@ function (set_ghoul_compile_settings target)
     "-Wstring-conversion"
     "-Wsuggest-destructor-override"
     "-Wsuggest-override"
-    "-Wswitch-enum"
     "-Wtautological-compare"
     "-Wtautological-constant-in-range-compare"
     "-Wtautological-constant-out-of-range-compare"
@@ -147,7 +146,6 @@ function (set_ghoul_compile_settings target)
     "-Wshadow"
     "-Wsuggest-override"
     "-Wundef"
-    "-Wuseless-cast"
     "-Wzero-as-null-pointer-constant"
   )
 
