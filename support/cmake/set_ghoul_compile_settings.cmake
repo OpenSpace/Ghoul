@@ -89,7 +89,6 @@ function (set_ghoul_compile_settings target)
     "-Wmissing-prototypes"
     "-Wmove"
     "-Wnewline-eof"
-    "-Wno-missing-braces"
     "-Wnon-virtual-dtor"
     "-Wold-style-cast"
     "-Wpointer-arith"
@@ -128,6 +127,9 @@ function (set_ghoul_compile_settings target)
     "-Wvla"
     "-Wweak-template-vtables"
     "-Wzero-as-null-pointer-constant"
+  
+    "-Wno-missing-braces"
+    "-Wno-useless-cast"
   )
 
   set(GCC_WARNINGS
