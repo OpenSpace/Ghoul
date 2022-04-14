@@ -158,7 +158,6 @@ function (set_ghoul_compile_settings target)
     "-Wunused"
     "-Wuninitialized"
     "-Wvla"
-    "-Wzero-length-bounds"
     "-Wzero-as-null-pointer-constant"
   )
 
