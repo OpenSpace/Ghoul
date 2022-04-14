@@ -42,7 +42,6 @@ function (set_ghoul_compile_settings target)
     "-Wextra"
     "-Wmost"
     "-Wpedantic"
-
     "-Wabstract-vbase-init"
     "-Walloca"
     "-Wanon-enum-enum-conversion"
@@ -88,7 +87,6 @@ function (set_ghoul_compile_settings target)
     "-Wmissing-noreturn"
     "-Wmissing-prototypes"
     "-Wmove"
-    "-Wnewline-eof"
     "-Wnon-virtual-dtor"
     "-Wold-style-cast"
     "-Wpointer-arith"
@@ -98,7 +96,6 @@ function (set_ghoul_compile_settings target)
     "-Wshadow-all"
     "-Wshift-sign-overflow"
     "-Wshorten-64-to-32"
-    "-Wsigned-enum-bitfield"
     "-Wsometimes-uninitialized"
     "-Wstring-conversion"
     "-Wsuggest-destructor-override"
@@ -127,7 +124,6 @@ function (set_ghoul_compile_settings target)
     "-Wvla"
     "-Wweak-template-vtables"
     "-Wzero-as-null-pointer-constant"
-  
     "-Wno-missing-braces"
     "-Wno-useless-cast"
   )
