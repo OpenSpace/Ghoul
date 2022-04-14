@@ -125,7 +125,6 @@ function (set_ghoul_compile_settings target)
     "-Wweak-template-vtables"
     "-Wzero-as-null-pointer-constant"
     "-Wno-missing-braces"
-    "-Wno-useless-cast"
   )
 
   set(GCC_WARNINGS
