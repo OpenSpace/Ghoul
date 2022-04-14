@@ -175,41 +175,39 @@ function (set_ghoul_compile_settings target)
     )
 
     if (GHOUL_OPTIMIZATION_ENABLE_AVX)
-        target_compile_options(${target} PRIVATE "/arch:AVX")
+      target_compile_options(${target} PRIVATE "/arch:AVX")
     endif ()
     if (GHOUL_OPTIMIZATION_ENABLE_AVX2)
-        target_compile_options(${target} PRIVATE "/arch:AVX2")
+      target_compile_options(${target} PRIVATE "/arch:AVX2")
     endif ()
     if (GHOUL_OPTIMIZATION_ENABLE_AVX512)
-        target_compile_options(${target} PRIVATE "/arch:AVX512")
+      target_compile_options(${target} PRIVATE "/arch:AVX512")
     endif ()
 
     if (GHOUL_OPTIMIZATION_ENABLE_OTHER_OPTIMIZATIONS)
-        target_compile_options(${target} PRIVATE
-            "/Oi" # usage of intrinsic functions
-            "/GL" # Whole program optimization
-        )
+      target_compile_options(${target} PRIVATE
+        "/Oi" # usage of intrinsic functions
+        "/GL" # Whole program optimization
+      )
     else ()
-        if (GHOUL_ENABLE_EDIT_CONTINUE)
-          target_compile_options(${target} PRIVATE
-            "/ZI"       # Edit and continue support
-          )
-        endif ()
+      if (GHOUL_ENABLE_EDIT_CONTINUE)
+        target_compile_options(${target} PRIVATE
+          "/ZI"       # Edit and continue support
+        )
+      endif ()
     endif ()
   elseif (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})
 
     if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(${target} PRIVATE "-Werror")
+      target_compile_options(${target} PRIVATE "-Werror")
     endif ()
-
   elseif (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})
-    
     target_link_libraries(${target} PRIVATE "c++" "c++abi")
     
     if (GHOUL_WARNINGS_AS_ERRORS)
-        target_compile_options(${target} PRIVATE "-Werror")
+      target_compile_options(${target} PRIVATE "-Werror")
     endif ()
   elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_compile_options(${target} PRIVATE ${GCC_WARNINGS})
