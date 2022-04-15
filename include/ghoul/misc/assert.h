@@ -59,7 +59,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
 
 } // namespace ghoul
 
-#if !(defined(NDEBUG) || defined(DEBUG))
+#if !(defined(NDEBUG) || defined(DEBUG) || defined(GHOUL_ASSERT))
 /**
 * @defgroup ASSERT_MACRO_GROUP Assertion Macros
 *
