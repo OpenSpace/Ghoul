@@ -130,16 +130,16 @@ std::vector<std::string> stackTrace() {
 
         constexpr const int MaxStackFrameSize = 4096;
         char stackFrame[MaxStackFrameSize] = {};
-        sprintf(
-            stackFrame,
-            "(%s)\t0x%s — %s + %d",
-            moduleName.data(),
-            addr.data(),
-            functionName,
-            offset
-        );
 
         if (functionName) {
+            sprintf(
+                stackFrame,
+                "(%s)\t0x%s — %s + %d",
+                moduleName.data(),
+                addr.data(),
+                functionName,
+                offset
+            );
             free(functionName);
         }
 

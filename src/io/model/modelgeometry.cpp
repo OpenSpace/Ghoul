@@ -91,6 +91,72 @@ namespace {
             default: throw ghoul::MissingCaseException();
         }
     }
+
+
+    void calculateBoundingRadiusRecursive(const std::vector<ghoul::io::ModelNode>& nodes,
+                                          const ghoul::io::ModelNode* node,
+                                          const glm::mat4x4& parentTransform,
+                                          float& maximumDistanceSquared)
+    {
+        if (!node) {
+            LERROR("Cannot calculate bounding radius for empty node");
+            return;
+        }
+
+        // NOTE: The bounding radius will not change along with an animation
+        glm::mat4x4 globalTransform = parentTransform * node->transform();
+
+        for (const ghoul::io::ModelMesh& mesh : node->meshes()) {
+            float d = mesh.calculateBoundingRadius(globalTransform);
+            maximumDistanceSquared = std::max(d, maximumDistanceSquared);
+        }
+
+        for (int child : node->children()) {
+            calculateBoundingRadiusRecursive(
+                nodes,
+                &nodes[child],
+                globalTransform,
+                maximumDistanceSquared
+            );
+        }
+    }
+
+    void renderRecursive(const std::vector<ghoul::io::ModelNode>& nodes,
+                         const ghoul::io::ModelNode* node,
+                         ghoul::opengl::ProgramObject& program,
+                         const glm::mat4x4& parentTransform, bool isFullyTexturedModel,
+                         bool isProjection)
+    {
+        if (!node) {
+            LERROR("Cannot render empty node");
+            return;
+        }
+
+        glm::mat4x4 globalTransform;
+        if (node->hasAnimation()) {
+            // Animation is given by Assimp in absolute format
+            // i.e. animation replaces old transform
+            globalTransform = parentTransform * node->animationTransform();
+        }
+        else {
+            globalTransform = parentTransform * node->transform();
+        }
+
+        for (const ghoul::io::ModelMesh& mesh : node->meshes()) {
+            mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
+        }
+
+        for (int child : node->children()) {
+            renderRecursive(
+                nodes,
+                &nodes[child],
+                program,
+                globalTransform,
+                isFullyTexturedModel,
+                isProjection
+            );
+        }
+    }
 } // namespace
 
 namespace ghoul::modelgeometry {
@@ -853,34 +919,6 @@ double ModelGeometry::boundingRadius() const {
     return _boundingRadius;
 }
 
-static void calculateBoundingRadiusRecursive(const std::vector<io::ModelNode>& nodes,
-                                      const io::ModelNode* node,
-                                      glm::mat4x4& parentTransform,
-                                      float& maximumDistanceSquared)
-{
-    if (!node) {
-        LERROR("Cannot calculate bounding radius for empty node");
-        return;
-    }
-
-    // NOTE: The bounding radius will not change along with an animation
-    glm::mat4x4 globalTransform = parentTransform * node->transform();
-
-    for (const io::ModelMesh& mesh : node->meshes()) {
-        float d = mesh.calculateBoundingRadius(globalTransform);
-        maximumDistanceSquared = std::max(d, maximumDistanceSquared);
-    }
-
-    for (int child : node->children()) {
-        calculateBoundingRadiusRecursive(
-            nodes,
-            &nodes[child],
-            globalTransform,
-            maximumDistanceSquared
-        );
-    }
-}
-
 void ModelGeometry::calculateBoundingRadius() {
     if (_nodes.empty()) {
         LERROR("Cannot calculate bounding radius for empty geometry");
@@ -926,42 +964,6 @@ std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() {
 
 const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() const {
     return _textureStorage;
-}
-
-static void renderRecursive(const std::vector<io::ModelNode>& nodes,
-                            const io::ModelNode* node, opengl::ProgramObject& program,
-                            glm::mat4x4& parentTransform, bool isFullyTexturedModel,
-                            bool isProjection)
-{
-    if (!node) {
-        LERROR("Cannot render empty node");
-        return;
-    }
-
-    glm::mat4x4 globalTransform;
-    if (node->hasAnimation()) {
-        // Animation is given by Assimp in absolute format
-        // i.e. animation replaces old transform
-        globalTransform = parentTransform * node->animationTransform();
-    }
-    else {
-        globalTransform = parentTransform * node->transform();
-    }
-
-    for (const io::ModelMesh& mesh : node->meshes()) {
-        mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
-    }
-
-    for (int child : node->children()) {
-        renderRecursive(
-            nodes,
-            &nodes[child],
-            program,
-            globalTransform,
-            isFullyTexturedModel,
-            isProjection
-        );
-    }
 }
 
 void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedModel,

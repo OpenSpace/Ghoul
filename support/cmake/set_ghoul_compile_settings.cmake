@@ -59,7 +59,6 @@ function (set_ghoul_compile_settings target)
     "-Wcomma"
     "-Wconditional-uninitialized"
     "-Wdate-time"
-    "-Wdeprecated-copy-dtor"
     "-Wdeprecated-dynamic-exception-spec"
     "-Wdeprecated-this-capture"
     "-Wdivision-by-zero"
