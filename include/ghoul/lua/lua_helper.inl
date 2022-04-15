@@ -205,6 +205,7 @@ void push(lua_State* L, T value) {
         lua_pushinteger(L, static_cast<lua_Integer&&>(std::move(value)));
     }
     else if constexpr (std::is_same_v<T, nil_t>) {
+        (void)value; // Suppress an unused variable warning
         lua_pushnil(L);
     }
     else if constexpr (std::is_same_v<T, const char*>) {
