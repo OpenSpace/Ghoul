@@ -225,11 +225,11 @@ bool TcpSocket::getMessage(std::string& message) {
 }
 
 bool TcpSocket::putMessage(const std::string& message) {
-    if (!putBytes(message.data(), message.size())) {
+    std::string messageWithDelim = message;
+    messageWithDelim.push_back(_delimiter);
+    if (!putBytes(messageWithDelim.data(), messageWithDelim.size())) {
         return false;
     }
-    char delimiter = _delimiter;
-    return putBytes(&delimiter);
 }
 
 void TcpSocket::setDelimiter(char delimiter) {
