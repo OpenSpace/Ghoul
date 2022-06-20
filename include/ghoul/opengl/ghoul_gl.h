@@ -65,4 +65,27 @@ using namespace gl;
 #pragma clang diagnostic pop
 #endif // __clang__
 
+namespace ghoul {
+
+struct GLDebugGroup {
+    explicit GLDebugGroup(std::string_view name) {
+        if (glbinding::Binding::PushDebugGroup.isResolved()) {
+            glPushDebugGroup(
+                GL_DEBUG_SOURCE_APPLICATION,
+                0,
+                static_cast<GLsizei>(name.length()),
+                name.data()
+            );
+        }
+    }
+
+    ~GLDebugGroup() {
+        if (glbinding::Binding::PopDebugGroup.isResolved()) {
+            glPopDebugGroup();
+        }
+    }
+};
+
+} // namespace ghoul
+
 #endif // __GHOUL___GHOUL_GL___H__
