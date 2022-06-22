@@ -363,9 +363,9 @@ void GeneralCapabilitiesComponent::detectMemory() {
 #elif defined(__APPLE__)
     int mib[2] = { CTL_HW, HW_MEMSIZE };
     size_t len;
-    sysctl(mib, 2, NULL, &len, NULL, 0);
+    sysctl(mib, 2, nullptr, &len, nullptr, 0);
     std::vector<char> p(len);
-    sysctl(mib, 2, p.data(), &len, NULL, 0);
+    sysctl(mib, 2, p.data(), &len, nullptr, 0);
 
     int64_t value;
     std::memcpy(&value, p.data(), sizeof(int64_t));
@@ -498,7 +498,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctlbyname("machdep.cpu.brand_string", NULL, &len, NULL, 0);
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctlbyname("machdep.cpu.brand_string", p, &len, NULL, 0);
+    sysctlbyname("machdep.cpu.brand_string", p, &len, nullptr, 0);
     _cpu = p;
 //    delete[] p;
 
@@ -506,7 +506,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctlbyname( "machdep.cpu.features", NULL, &len, NULL, 0 );
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctlbyname("machdep.cpu.features", p, &len, NULL, 0);
+    sysctlbyname("machdep.cpu.features", p, &len, nullptr, 0);
     _extensions = p;
 //    delete[] p;
 
@@ -521,7 +521,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctl(mib, 2, NULL, &len, NULL, 0);
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctl(mib, 2, p, &len, NULL, 0);
+    sysctl(mib, 2, p, &len, nullptr, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _cores = static_cast<unsigned int>(intValue);
 //    delete[] p;
@@ -532,7 +532,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctl(mib, 2, NULL, &len, NULL, 0);
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctl(mib, 2, p, &len, NULL, 0);
+    sysctl(mib, 2, p, &len, nullptr, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _cacheLineSize = static_cast<unsigned int>(intValue);
 //    delete[] p;
@@ -543,7 +543,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctl(mib, 2, NULL, &len, NULL, 0);
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctl(mib, 2, p, &len, NULL, 0);
+    sysctl(mib, 2, p, &len, nullptr, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _cacheSize = static_cast<unsigned int>(intValue);
 //    delete[] p;
@@ -552,7 +552,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    sysctlbyname( "machdep.cpu.cache.L2_associativity", NULL, &len, NULL, 0 );
 //    p = new char[len];
     std::memset(p, 0, 512);
-    sysctlbyname("machdep.cpu.cache.L2_associativity", p, &len, NULL, 0);
+    sysctlbyname("machdep.cpu.cache.L2_associativity", p, &len, nullptr, 0);
     std::memcpy(&intValue, p, sizeof(int));
     _L2Associativity = static_cast<unsigned int>(intValue);
 //    delete[] p;

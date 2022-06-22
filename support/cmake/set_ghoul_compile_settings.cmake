@@ -54,7 +54,6 @@ function (set_ghoul_compile_settings target)
     "-Wbitfield-constant-conversion"
     "-Wbool-conversions"
     "-Wcast-align"
-    "-Wcast-function-type"
     "-Wcast-qual"
     "-Wcomma"
     "-Wconditional-uninitialized"

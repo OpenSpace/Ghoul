@@ -124,26 +124,26 @@ int FileSystem::addFileListener(std::filesystem::path path,
 
             // Create the FSEventStream responsible for this directory (Apple's callback
             // system only works on the granularity of the directory)
-            CFStringRef path = CFStringCreateWithCString(
-                NULL,
+            CFStringRef p = CFStringCreateWithCString(
+                nullptr,
                 d.c_str(),
                 kCFStringEncodingASCII
             );
             CFArrayRef pathsToWatch = CFArrayCreate(
-                NULL,
-                reinterpret_cast<const void**>(&path),
+                nullptr,
+                reinterpret_cast<const void**>(&p),
                 1,
-                NULL
+                nullptr
             );
             FSEventStreamContext callbackInfo;
             callbackInfo.version = 0;
             callbackInfo.info = nullptr;
-            callbackInfo.release = NULL;
-            callbackInfo.retain = NULL;
-            callbackInfo.copyDescription = NULL;
+            callbackInfo.release = nullptr;
+            callbackInfo.retain = nullptr;
+            callbackInfo.copyDescription = nullptr;
 
             handle->_eventStream = FSEventStreamCreate(
-                NULL,
+                nullptr,
                 &completionHandler,
                 &callbackInfo,
                 pathsToWatch,

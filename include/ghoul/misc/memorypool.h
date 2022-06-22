@@ -46,7 +46,7 @@ namespace ghoul {
 
 class MemoryPoolBase : public pmr::memory_resource {
 public:
-    virtual ~MemoryPoolBase() = default;
+    virtual ~MemoryPoolBase() override = default;
 
     virtual void reset() = 0;
 };

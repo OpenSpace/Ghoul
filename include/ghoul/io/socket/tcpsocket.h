@@ -55,7 +55,7 @@ public:
 
     TcpSocket(std::string address, int port);
     TcpSocket(std::string address, int port, _SOCKET socket);
-    virtual ~TcpSocket();
+    virtual ~TcpSocket() override;
     void connect();
     void startStreams() override;
     void disconnect(int reason = 0) override;

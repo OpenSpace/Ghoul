@@ -82,7 +82,7 @@ public:
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /// Destructor closing and releasing the file handle
-    ~TextLog();
+    virtual ~TextLog() override;
 
     /**
      * Method that logs a <code>message</code> with a given <code>level</code> and
