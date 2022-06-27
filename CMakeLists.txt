@@ -172,6 +172,10 @@ if (GHOUL_MODULE_ASSIMP)
   set(ASSIMP_NO_EXPORTER ON CACHE BOOL "")
   set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 
+  if (UNIX)
+    set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "Set to have assimp build minizip" FORCE)
+  endif ()
+
   include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp)
 
   # We need to include this to be able to find the assimp/config.h file
