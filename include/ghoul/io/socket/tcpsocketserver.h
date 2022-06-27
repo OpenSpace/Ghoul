@@ -42,7 +42,7 @@ class TcpSocket;
 
 class TcpSocketServer : public SocketServer {
 public:
-    virtual ~TcpSocketServer();
+    virtual ~TcpSocketServer() override;
 
     int port() const override;
     void close() override;

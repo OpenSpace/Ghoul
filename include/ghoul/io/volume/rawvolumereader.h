@@ -45,7 +45,7 @@ public:
 
     RawVolumeReader() = default;
     RawVolumeReader(ReadHints hints);
-    ~RawVolumeReader() = default;
+    virtual ~RawVolumeReader() override = default;
 
     void setReadHints(glm::ivec3 dimension);
     void setReadHints(ReadHints hints);

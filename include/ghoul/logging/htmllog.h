@@ -78,7 +78,7 @@ public:
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /// Destructor that closes and finalizes the HTML file
-    virtual ~HTMLLog();
+    virtual ~HTMLLog() override;
 
     /**
      * Method that logs a message with a given <code>level</code> and
