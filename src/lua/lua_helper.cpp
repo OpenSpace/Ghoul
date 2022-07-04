@@ -157,7 +157,7 @@ std::string luaValueToString(lua_State* state, int location) {
     const int type = lua_type(state, location);
     switch (type) {
         case LUA_TBOOLEAN: return lua_toboolean(state, location) == 1 ? "true" : "false";
-        case LUA_TNUMBER:  return std::to_string(lua_tonumber(state, location));
+        case LUA_TNUMBER:  return fmt::format("{}", lua_tonumber(state, location));
         case LUA_TSTRING:  return fmt::format("\"{}\"", lua_tostring(state, location));
         case LUA_TTABLE:   return luaTableToString(state, location);
         default:           return std::string(ghoul::lua::luaTypeToString(type));
