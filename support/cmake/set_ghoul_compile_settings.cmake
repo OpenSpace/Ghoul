@@ -27,10 +27,11 @@ function (set_ghoul_compile_settings target)
   target_compile_features(${target} PRIVATE cxx_std_17)
 
   set(MSVC_WARNINGS
-    "/MP"       # Multi-threading support
-    "/W4"       # Highest warning level
-    "/wd4201"   # nonstandard extension used : nameless struct/union  [raised by: GLM]
-    "/wd4127"   # conditional expression is constant [raised by: websocketpp]
+    "/MP"           # Multi-threading support
+    "/W4"           # Highest warning level
+    "/wd4068"       # unknown pragma
+    "/wd4127"       # conditional expression is constant [raised by: websocketpp]
+    "/wd4201"       # nonstandard extension used : nameless struct/union  [raised by: GLM]
     "/std:c++latest" # Latest C++ standard
     "/permissive-"   # Enable conformance mode
     "/Zc:__cplusplus" # Correctly set the __cplusplus macro
@@ -124,6 +125,7 @@ function (set_ghoul_compile_settings target)
     "-Wzero-as-null-pointer-constant"
     
     "-Wno-missing-braces"
+    "-Wno-unknown-pragmas"
   )
 
   set(GCC_WARNINGS
@@ -157,6 +159,8 @@ function (set_ghoul_compile_settings target)
     "-Wuninitialized"
     "-Wvla"
     "-Wzero-as-null-pointer-constant"
+
+    "-Wno-unknown-pragmas"
   )
 
   if (MSVC)

@@ -50,9 +50,9 @@
 #elif defined __GNUC__
 // We are running GCC.  Requires GCC support 4.4 or higher
 #define DISABLE_OPTIMIZATION                                                             \
-    #pragma GCC push_options                                                             \
-    #pragma GCC optimize("O0")
-#define RESTORE_OPTIMIZATION #pragma GCC pop_options
+    #pragma gcc push_options                                                             \
+    #pragma gcc optimize("O0")
+#define RESTORE_OPTIMIZATION #pragma gcc pop_options
 #endif
 
 #endif // __GHOUL___SUPPORTMACROS___H__
