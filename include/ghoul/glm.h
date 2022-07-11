@@ -28,13 +28,19 @@
 
 #include <ghoul/misc/stringconversion.h>
 
+#ifdef __APPLE__
 // The GLM header throw 'anonymous struct' warnings that we do not want. By marking the
 // following files as system headers, all warnings are ignored
 #pragma clang diagnostic push
 #pragma clang system_header
+#endif // __APPLE__
 
-#pragma gcc diagnostic push
-#pragma gcc diagnostic ignored "-Wpedantic"
+
+#ifdef __unix__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif // __unix__
+
 
 #ifndef GLM_META_PROG_HELPERS
 #define GLM_META_PROG_HELPERS
@@ -599,7 +605,13 @@ std::ostream& operator<<(std::ostream& out, const glm::tquat<T, P>& val) {
     return out << ghoul::to_string(val);
 }
 
+
+#ifdef __APPLE__
 #pragma clang diagnostic pop
-#pragma gcc diagnostic pop
+#endif
+
+#ifdef __unix__
+#pragma GCC diagnostic pop
+#endif // __unix__
 
 #endif // __GHOUL___GLM___H__

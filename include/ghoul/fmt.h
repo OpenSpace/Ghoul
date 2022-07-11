@@ -26,12 +26,16 @@
 #ifndef __GHOUL___FMT___H__
 #define __GHOUL___FMT___H__
 
-#pragma gcc diagnostic push
-#pragma gcc diagnostic ignored "-Wshadow"
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif // __GNUC__
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#pragma gcc diagnostic pop
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif // __GNUC__
 
 #endif // __GHOUL___FMT___H__

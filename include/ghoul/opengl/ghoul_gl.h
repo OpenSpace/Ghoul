@@ -27,34 +27,43 @@
 #define __GHOUL___GHOUL_GL___H__
 
 #ifdef __APPLE__
-#define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
-#undef __gl_h_
+    #define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+    #undef __gl_h_
 #endif
 
+#ifdef __clang__
 #pragma clang diagnostic push
 #ifndef __APPLE__
 // The Apple Clang compiler doesn't understand this warning yet
 #pragma clang diagnostic ignored "-Wdeprecated-copy"
 #endif // __APPLE__
-
+#elif defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 
 #include <glbinding/gl41core/gl.h>
 #include <glbinding/Binding.h>
 #define __GL_H__
 
+#ifdef __clang__
 #pragma clang diagnostic pop
+#elif defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif
 
 // Evil 'using namespace' in the header to make the usage of OpenGL less painful
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wheader-hygiene"
+#endif // __clang__
 
 using namespace gl;
 
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif // __clang__
 
 namespace ghoul {
 
