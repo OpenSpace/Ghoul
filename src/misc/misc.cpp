@@ -84,5 +84,54 @@ void trimSurroundingCharacters(std::string& valueString, const char charToRemove
     }
 }
 
+std::string replaceAll(std::string string, const std::string& from,
+                       const std::string& to)
+{
+    ghoul_assert(!from.empty(), "from must not be the empty string");
+
+    size_t pos = string.find(from);
+    while (pos != std::string::npos) {
+        string.replace(pos, from.length(), to);
+
+        // In case 'to' contains 'from', ex replacing 'x' with 'yx'
+        size_t offset = pos + to.length();
+        pos = string.find(from, offset);
+    }
+    return string;
+}
+
+std::string encodeUrl(const std::string& string) {
+    constexpr std::string_view WhiteSpace = "%20";
+    constexpr std::string_view HashTag = "%23";
+    constexpr std::string_view DollarSign = "%24";
+    constexpr std::string_view Ampersand = "%26";
+    constexpr std::string_view PlusSign = "%2B";
+    constexpr std::string_view Comma = "%2C";
+    constexpr std::string_view Slash = "%2F";
+    constexpr std::string_view Colon = "%3A";
+    constexpr std::string_view Semicolon = "%3B";
+    constexpr std::string_view EqualsSign = "%3D";
+    constexpr std::string_view QuestionMark = "%3F";
+    constexpr std::string_view AtSymbol = "%40";
+    constexpr std::string_view LeftSquareBracket = "%5B";
+    constexpr std::string_view RightSquareBracket = "%5D";
+
+    std::string result;
+    result = replaceAll(string, " ", "%20");
+    result = replaceAll(result, "#", "%23");
+    result = replaceAll(result, "$", "%24");
+    result = replaceAll(result, "&", "%26");
+    result = replaceAll(result, "+", "%2B");
+    result = replaceAll(result, ",", "%2C");
+    result = replaceAll(result, "/", "%2F");
+    result = replaceAll(result, ":", "%3A");
+    result = replaceAll(result, ";", "%3B");
+    result = replaceAll(result, "=", "%3D");
+    result = replaceAll(result, "?", "%3F");
+    result = replaceAll(result, "@", "%40");
+    result = replaceAll(result, "[", "%5B");
+    result = replaceAll(result, "]", "%5D");
+    return result;
+}
 
 } // namespace ghoul

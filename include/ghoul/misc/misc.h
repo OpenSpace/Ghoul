@@ -71,6 +71,29 @@ void trimWhitespace(std::string& value);
  */
 void trimSurroundingCharacters(std::string& valueString, const char charToRemove);
 
+/**
+ * Replaces all of the instances of the \p from string in the \p string with the \p to
+ * string.
+ *
+ * \param string The string that should have it's \p from%s replaced with \p to
+ * \param from The string that should be replaced with \p to
+ * \param to The string that every \p from is replaced with
+ * \return The \p string with all of the \p from%s replaced with \p to%s
+ *
+ * \pre \p from must not be an empty string
+ */
+std::string replaceAll(std::string string, const std::string& from,
+    const std::string& to);
+
+/**
+ * Replaces all of the characters in the provided \p string that cannot be represented in
+ * a URL string by their URL-safe escape characters.
+ *
+ * \param string The string that is to be sanitized
+ * \return The URL-safe version of the \p string
+ */
+std::string encodeUrl(const std::string& string);
+
 } // namespace ghoul
 
 #endif // __GHOUL___MISC___H__
