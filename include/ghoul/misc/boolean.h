@@ -78,8 +78,7 @@ struct Boolean {
 // This define can be used as a drop-in for the Boolean type to make it type-safe
 #define BooleanType(__name__)                                                            \
 struct __name__ {                                                                        \
-    enum class Value { Yes = 1, No = 0 };                                                \
-    using enum Value;                                                                    \
+    enum Value { Yes = 1, No = 0 };                                                      \
                                                                                          \
     constexpr __name__(Value v) : value(v) {}                                            \
                                                                                          \
