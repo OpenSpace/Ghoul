@@ -48,12 +48,8 @@ void foo(std::string value, AllowOverride override = AllowOverride::Yes);
  * typesafe version of the usage describe above.
  */
 struct Boolean {
-    enum Value { Yes = 1, No = 0 };
-
-    // @CPP20 (abock, 2020-08-31) This should be changed to an enum class + using enum to
-    // silence a Visual Studio Analyzer warning C26812
-    //enum class Value { Yes = 1, No = 0 };
-    //using enum Value;
+    enum class Value { Yes = 1, No = 0 };
+    using enum Value;
 
     /// Non-explicit constructor so that we can automatically convert between different
     /// aliases of Boolean
@@ -65,19 +61,31 @@ struct Boolean {
     /// This operator returns <code>true</code> if the stored value is equal to \c Yes.
     constexpr operator bool() const noexcept { return value == Yes; }
 
+    constexpr bool operator==(Boolean r) const noexcept { return value == r.value; }
+    constexpr bool operator==(Boolean::Value r) const noexcept { return value == r; }
+
+    constexpr bool operator!=(Boolean r) const noexcept { return value != r.value; }
+    constexpr bool operator!=(Boolean::Value r) const noexcept { return value != r; }
+
     const Value value;
 };
 
 // This define can be used as a drop-in for the Boolean type to make it type-safe
 #define BooleanType(__name__)                                                            \
 struct __name__ {                                                                        \
-    enum Value { Yes = 1, No = 0 };                                                      \
+    enum class Value { Yes = 1, No = 0 };                                                \
+    using enum Value;                                                                    \
                                                                                          \
     constexpr __name__(Value v) : value(v) {}                                            \
                                                                                          \
     constexpr explicit __name__(bool v) : value(v ? Yes : No) {}                         \
                                                                                          \
     constexpr operator bool() const noexcept { return value == Yes; }                    \
+                                                                                         \
+    constexpr bool operator==(__name__ r) const noexcept { return value == r.value; }    \
+    constexpr bool operator==(__name__::Value r) const noexcept { return value == r; }   \
+    constexpr bool operator!=(__name__ r) const noexcept { return value != r.value; }    \
+    constexpr bool operator!=(__name__::Value r) const noexcept { return value != r; }   \
                                                                                          \
     Value value;                                                                         \
 }

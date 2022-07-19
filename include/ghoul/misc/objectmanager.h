@@ -34,6 +34,13 @@
 
 namespace ghoul {
 
+// We need this intermediate class for the `using enum` declaration in the `BooleanType`
+// to not be a dependent type
+class Manager {
+public:
+    BooleanType(Warnings);
+};
+
 /**
  * An ObjectManager can be used to cache multiple templated objects based on a unique
  * name. Each object can be requested using the #request method. If an object with the
@@ -44,9 +51,8 @@ namespace ghoul {
  * destruction, all stored objects will automatically be released.
  */
 template <typename T>
-class ObjectManager {
+class ObjectManager : public Manager {
 public:
-    BooleanType(Warnings);
     using CreationCallback = std::function<std::unique_ptr<T>()>;
     using DestructionCallback = std::function<void(T*)>;
 

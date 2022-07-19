@@ -68,7 +68,7 @@ Texture::Texture(glm::uvec3 dimensions, GLenum type, Format format, GLenum inter
     );
 
     if (!allocate && takeOwnership) {
-        _hasOwnershipOfData = TakeOwnership::No;
+        _hasOwnershipOfData = false;
     }
 
     initialize(allocate);
