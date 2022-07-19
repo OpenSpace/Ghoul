@@ -48,8 +48,13 @@ void foo(std::string value, AllowOverride override = AllowOverride::Yes);
  * typesafe version of the usage describe above.
  */
 struct Boolean {
-    enum class Value { Yes = 1, No = 0 };
-    using enum Value;
+    enum Value { Yes = 1, No = 0 };
+
+    // Switch to this as soon as
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104398
+    // is fixed
+    //enum class Value { Yes = 1, No = 0 };
+    //using enum Value;
 
     /// Non-explicit constructor so that we can automatically convert between different
     /// aliases of Boolean
