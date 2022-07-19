@@ -39,7 +39,7 @@ public:
     Process(const std::string& command, const std::string& path,
         std::function<void(const char* bytes, size_t n)> readStdout = nullptr,
         std::function<void(const char* bytes, size_t n)> readStderr = nullptr,
-        bool openStdin = false, size_t bufferSize = 131072);
+        bool openStdin = false);
     ~Process();
 
     void kill();
