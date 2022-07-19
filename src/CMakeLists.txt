@@ -120,13 +120,9 @@ if (GHOUL_MODULE_OPENGL)
     io/texture/texturereader.cpp
     io/texture/texturereaderbase.cpp
     io/texture/texturereadercmap.cpp
-    io/texture/texturereaderdevil.cpp
-    io/texture/texturereaderfreeimage.cpp
-    io/texture/texturereadersoil.cpp
     io/texture/texturereaderstb.cpp
     io/texture/texturewriter.cpp
     io/texture/texturewriterbase.cpp
-    io/texture/texturewritersoil.cpp
   )
 endif ()
 
@@ -278,13 +274,9 @@ if (GHOUL_MODULE_OPENGL)
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderdevil.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderfreeimage.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadersoil.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderstb.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewritersoil.h
   )
 endif ()
 

@@ -195,48 +195,8 @@ set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
 include_external_library(Ghoul PUBLIC fmt ${GHOUL_ROOT_DIR}/ext/cppformat)
 end_dependency("fmt")
 
-message(STATUS "Loading image libraries")
-
-# DevIL
-find_package(DevIL QUIET)
-if (IL_FOUND)
-  begin_dependency("DevIL")
-  option(GHOUL_USE_DEVIL "Use the DevIL library" ON)
-  if (GHOUL_USE_DEVIL)
-    target_compile_definitions(Ghoul PRIVATE "GHOUL_USE_DEVIL")
-    target_link_libraries(Ghoul PRIVATE ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
-  endif ()
-  end_dependency("DevIL")
-endif ()
-
-# FreeImage
-find_package(FreeImage QUIET)
-if (FREEIMAGE_FOUND)
-  begin_dependency("FreeImage")
-  option(GHOUL_USE_FREEIMAGE "Use the FreeImage library" ON)
-  if (GHOUL_USE_FREEIMAGE)
-    target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_FREEIMAGE")
-    target_include_directories(Ghoul PUBLIC "${FREEIMAGE_INCLUDE_PATH}")
-    target_link_libraries(Ghoul PRIVATE ${FREEIMAGE_LIBRARIES})
-  endif ()
-  end_dependency("FreeImage")
-endif ()
-
-# SOIL
-find_package(SOIL QUIET)
-if (SOIL_FOUND)
-  begin_dependency("SOIL")
-  option(GHOUL_USE_SOIL "Use the SOIL library" ON)
-  if (GHOUL_USE_SOIL)
-    target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_SOIL")
-    target_link_libraries(Ghoul PRIVATE ${SOIL_LIBRARIES})
-  endif ()
-  end_dependency("SOIL")
-endif ()
-
 # stb_image
 begin_dependency("stb_image")
-target_compile_definitions(Ghoul PUBLIC "GHOUL_USE_STB_IMAGE")
 include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
 end_dependency("stb_image")
 
