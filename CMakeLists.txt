@@ -195,6 +195,11 @@ set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
 include_external_library(Ghoul PUBLIC fmt ${GHOUL_ROOT_DIR}/ext/cppformat)
 end_dependency("fmt")
 
+# scnlib
+begin_dependency("scnlib")
+include_external_library(Ghoul PUBLIC scn ${GHOUL_ROOT_DIR}/ext/scnlib)
+end_dependency("scnlib")
+
 # stb_image
 begin_dependency("stb_image")
 include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
