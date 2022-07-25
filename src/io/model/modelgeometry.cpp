@@ -564,7 +564,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) const {
     std::ofstream fileStream(cachedFile, std::ofstream::binary);
     if (!fileStream.good()) {
-        throw ModelCacheException( cachedFile, "Could not open file");
+        throw ModelCacheException(cachedFile, "Could not open file");
     }
 
     // Write which version of caching that is used
