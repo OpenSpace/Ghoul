@@ -51,7 +51,7 @@ glm::dvec3 interpolateCatmullRom(double t, const glm::dvec3& p0, const glm::dvec
     const double t12 = std::pow(glm::distance(p1, p2), alpha);
     const double t23 = std::pow(glm::distance(p2, p3), alpha);
 
-    constexpr const double Epsilon = 1E-7;
+    constexpr double Epsilon = 1E-7;
     const glm::dvec3 zero = glm::dvec3(0.0);
     const glm::dvec3 m01 = (t01 > Epsilon) ? (p1 - p0) / t01 : zero;
     const glm::dvec3 m23 = (t23 > Epsilon) ? (p3 - p2) / t23 : zero;

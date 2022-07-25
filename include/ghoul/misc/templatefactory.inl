@@ -49,8 +49,8 @@ namespace {
  * std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
  */
 
-constexpr const int DEFAULT_CONSTRUCTOR = 1;
-constexpr const int DICTIONARY_CONSTRUCTOR = 2;
+constexpr int DEFAULT_CONSTRUCTOR = 1;
+constexpr int DICTIONARY_CONSTRUCTOR = 2;
 
 /// Create Class using only the default constructor
 template <typename BaseClass, typename Class>
@@ -162,14 +162,14 @@ struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
 } // namespace
 
 template <typename BaseClass>
-BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
+BaseClass* TemplateFactory<BaseClass>::create(std::string_view className,
                                               MemoryPoolBase* pool) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
     const auto it = _map.find(className);
     if (it == _map.cend()) {
-        throw TemplateClassNotFoundError(className);
+        throw TemplateClassNotFoundError(std::string(className));
     }
     else {
         // If 'className' is a valid name, we can use the stored function pointer to
@@ -180,7 +180,7 @@ BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
 }
 
 template <typename BaseClass>
-BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
+BaseClass* TemplateFactory<BaseClass>::create(std::string_view className,
                                               const Dictionary& dictionary,
                                               MemoryPoolBase* pool) const
 {
@@ -188,7 +188,7 @@ BaseClass* TemplateFactory<BaseClass>::create(const std::string& className,
 
     const auto it = _map.find(className);
     if (it == _map.end()) {
-        throw TemplateClassNotFoundError(className);
+        throw TemplateClassNotFoundError(std::string(className));
     }
     else {
         // If 'className' is a valid name, we can use the stored function pointer to

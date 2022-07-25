@@ -33,9 +33,9 @@
 #include <CoreServices/CoreServices.h>
 
 namespace {
-    constexpr const char* _loggerCat = "FileSystem";
+    constexpr std::string_view _loggerCat = "FileSystem";
     // the maximum latency allowed before a changed is registered
-    constexpr const CFAbsoluteTime Latency = 1.0;
+    constexpr CFAbsoluteTime Latency = 1.0;
 
     enum Events {
         kFSEventStreamEventFlagNone = 0x00000000,

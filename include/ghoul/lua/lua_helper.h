@@ -414,6 +414,18 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename);
 void runScript(lua_State* state, const std::string& script);
 
 /**
+ * This function executes the Lua script provided as plain text in \p script using the
+ * passed <code>lua_State</code> \p state.
+ *
+ * \throw LuaLoadingException If there was an error loading the script
+ * \throw LuaExecutionError If there was an error executing the script
+ *
+ * \pre \p state must not be nullptr
+ * \pre \p script must not be empty
+ */
+void runScript(lua_State* state, std::string_view script);
+
+/**
  * Checks the number of arguments on the Lua stack against the \p expected number of
  * parameters. If the numbers do not agree, an error is logged and a
  * ghoul::lua::LuaExecutionException is raised.

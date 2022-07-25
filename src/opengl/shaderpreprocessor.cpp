@@ -580,13 +580,13 @@ bool ShaderPreprocessor::parseOs(ShaderPreprocessor::Env& env) {
         line.substr(0, osString.length()) == osString)
     {
 #ifdef WIN32
-        constexpr const char* os = "WIN32";
+        constexpr std::string_view os = "WIN32";
 #endif
 #ifdef __APPLE__
-        constexpr const char* os = "APPLE";
+        constexpr std::string_view os = "APPLE";
 #endif
 #ifdef __linux__
-        constexpr const char* os = "linux";
+        constexpr std::string_view os = "linux";
 #endif
         env.output << fmt::format(
             "#ifndef __OS__\n"

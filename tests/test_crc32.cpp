@@ -242,7 +242,7 @@ TEST_CASE("CRC32: HashRandomEquality", "[crc32]") {
         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
     };
 
-    constexpr const int nTests = 100;
+    constexpr int nTests = 100;
 
     std::random_device r;
     std::default_random_engine e(r());

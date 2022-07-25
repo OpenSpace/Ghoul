@@ -32,7 +32,7 @@
 #include <vector>
 
 namespace {
-    constexpr const bool AlwaysAssert = false;
+    constexpr bool AlwaysAssert = false;
 
     std::vector<std::string> PermanentlyIgnoredAsserts;
 

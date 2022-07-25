@@ -37,9 +37,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace {
-    constexpr const char* _loggerCat = "ModelGeometry";
-    constexpr const int8_t CurrentCacheVersion = 7;
-    constexpr const int FormatStringSize = 4;
+    constexpr std::string_view _loggerCat = "ModelGeometry";
+    constexpr int8_t CurrentCacheVersion = 7;
+    constexpr int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
         using Format = ghoul::opengl::Texture::Format;

@@ -37,7 +37,7 @@
 #include <filesystem>
 
 namespace {
-    constexpr const char* _loggerCat = "ModelReader";
+    constexpr std::string_view _loggerCat = "ModelReader";
 } // namespace
 
 namespace ghoul::io {

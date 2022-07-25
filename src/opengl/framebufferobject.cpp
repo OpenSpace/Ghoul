@@ -29,7 +29,7 @@
 #include <ghoul/misc/constmap.h>
 
 namespace {
-    constexpr const char* _loggerCat = "ghoul.opengl.FramebufferObject";
+    constexpr std::string_view _loggerCat = "ghoul.opengl.FramebufferObject";
 } // namespace
 
 namespace ghoul::opengl {

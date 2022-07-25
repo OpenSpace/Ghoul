@@ -42,27 +42,27 @@
 #include <numeric>
 
 namespace {
-    constexpr const char* _loggerCat = "FontRenderer";
+    constexpr std::string_view _loggerCat = "FontRenderer";
 
-    constexpr const std::array<const char*, 5> UniformNames = {
+    constexpr std::array<const char*, 5> UniformNames = {
         "baseColor", "outlineColor", "tex", "hasOutline", "projection"
     };
 
-    constexpr const std::array<const char*, 7> UniformNamesProjection = {
+    constexpr std::array<const char*, 7> UniformNamesProjection = {
         "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform",
         "enableFalseDepth", "disableTransmittance"
     };
 
-    constexpr const char* DefaultVertexShaderPath =
+    constexpr std::string_view DefaultVertexShaderPath =
         "${TEMPORARY}/defaultfontrenderer_vs.glsl";
-    constexpr const char* DefaultFragmentShaderPath =
+    constexpr std::string_view DefaultFragmentShaderPath =
         "${TEMPORARY}/defaultfontrenderer_fs.glsl";
-    constexpr const char* ProjectionVertexShaderPath =
+    constexpr std::string_view ProjectionVertexShaderPath =
         "${TEMPORARY}/projectionfontrenderer_vs.glsl";
-    constexpr const char* ProjectionFragmentShaderPath =
+    constexpr std::string_view ProjectionFragmentShaderPath =
         "${TEMPORARY}/projectionfontrenderer_fs.glsl";
 
-    constexpr const char* DefaultVertexShaderSource = R"(
+    constexpr std::string_view DefaultVertexShaderSource = R"(
     #version __CONTEXT__
 
     layout (location = 0) in vec2 in_position;
@@ -80,7 +80,7 @@ namespace {
         gl_Position = projection * vec4(in_position, 0.0, 1.0);
     })";
 
-    constexpr const char* DefaultFragmentShaderSource = R"(
+    constexpr std::string_view DefaultFragmentShaderSource = R"(
     #version __CONTEXT__
 
     in vec2 texCoords;
@@ -105,7 +105,7 @@ namespace {
         }
     })";
 
-    constexpr const char* ProjectionVertexShaderSource = R"(
+    constexpr std::string_view ProjectionVertexShaderSource = R"(
     #version __CONTEXT__
 
     layout (location = 0) in vec3 in_position;
@@ -130,7 +130,7 @@ namespace {
         gl_Position = finalPos;
     })";
 
-    constexpr const char* ProjectionFragmentShaderSource = R"(
+    constexpr std::string_view ProjectionFragmentShaderSource = R"(
     #version __CONTEXT__
 
     in vec2 texCoords;
@@ -798,8 +798,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           std::string_view text,
                                         const ProjectedLabelsInformation& labelInfo) const
 {
-    constexpr const glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
-    constexpr const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    constexpr glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    constexpr glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
     return render(font, pos, text, color, outlineColor, labelInfo);
 }
 

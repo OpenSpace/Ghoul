@@ -35,7 +35,7 @@
 #include <iostream>
 
 TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
-    constexpr const char* TestString = R"(
+    constexpr std::string_view TestString = R"(
         glob = {
             A = {
                 B = {
@@ -84,7 +84,7 @@ TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
 }
 
 TEST_CASE("LuaToDictionary: Nested Tables 2", "[luatodictionary]") {
-    constexpr const char* TestString = R"(
+    constexpr std::string_view TestString = R"(
         ModuleConfigurations = {
             Server = {
                 Interfaces = {

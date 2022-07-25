@@ -31,7 +31,7 @@
 #include <fstream>
 
 namespace {
-    constexpr const char* _loggerCat = "RawVolumeReader";
+    constexpr std::string_view _loggerCat = "RawVolumeReader";
 } // namespace
 
 namespace ghoul::io {

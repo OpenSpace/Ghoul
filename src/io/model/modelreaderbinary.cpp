@@ -30,9 +30,9 @@
 #include <fstream>
 
 namespace {
-    constexpr const char* _loggerCat = "ModelReaderBinary";
-    constexpr const int8_t CurrentModelVersion = 7;
-    constexpr const int FormatStringSize = 4;
+    constexpr std::string_view _loggerCat = "ModelReaderBinary";
+    constexpr int8_t CurrentModelVersion = 7;
+    constexpr int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
         using Format = ghoul::opengl::Texture::Format;

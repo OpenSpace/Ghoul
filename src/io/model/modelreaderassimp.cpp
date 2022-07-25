@@ -45,7 +45,7 @@
 #include <vector>
 
 namespace {
-    constexpr const char* _loggerCat = "ModelReaderAssimp";
+    constexpr std::string_view _loggerCat = "ModelReaderAssimp";
 } // namespace
 
 namespace ghoul::io {

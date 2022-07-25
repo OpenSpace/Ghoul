@@ -45,11 +45,11 @@
 #include <sys/types.h>
 
 namespace {
-    constexpr const char* _loggerCat = "FileSystem";
+    constexpr std::string_view _loggerCat = "FileSystem";
     const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
                           IN_UNMOUNT | IN_ISDIR;
-    constexpr const int EventSize = sizeof(struct inotify_event);
-    constexpr const int BufferLength = 1024 * (EventSize + 16);
+    constexpr int EventSize = sizeof(struct inotify_event);
+    constexpr int BufferLength = 1024 * (EventSize + 16);
 } // namespace
 
 namespace ghoul::filesystem {

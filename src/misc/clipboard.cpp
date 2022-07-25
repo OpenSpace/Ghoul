@@ -47,7 +47,7 @@ namespace {
             return false;
         }
 
-        constexpr const int BufferSize = 1024;
+        constexpr int BufferSize = 1024;
         char buffer[BufferSize];
         value.clear();
         while (!feof(pipe)) {

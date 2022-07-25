@@ -31,7 +31,7 @@
 
 namespace {
     /// The default set of glyphs that are loaded when a new Font is initialized
-    constexpr const std::array<wchar_t, 94> DefaultCharacterSet = {
+    constexpr std::array<wchar_t, 94> DefaultCharacterSet = {
         L' ', L'!', L'\\', L'"', L'#', L'$', L'%', L'&', L'\'', L'(',
         L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2',
         L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':', L';', L'<',
@@ -86,7 +86,7 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
     return hash;
 }
 
-std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
+std::shared_ptr<Font> FontManager::font(std::string_view name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
     ZoneScoped

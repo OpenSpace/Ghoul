@@ -36,9 +36,9 @@ namespace pmr = std::pmr;
 #endif
 
 namespace {
-    constexpr const int DebugByte = 0x0F;
-    constexpr const int AlignmentByte = 0x1F;
-    constexpr const int ClearByte = 0xF0;
+    constexpr int DebugByte = 0x0F;
+    constexpr int AlignmentByte = 0x1F;
+    constexpr int ClearByte = 0xF0;
 } // namespace
 
 namespace ghoul {

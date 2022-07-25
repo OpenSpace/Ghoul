@@ -102,7 +102,7 @@ SystemCapabilitiesComponent::~SystemCapabilitiesComponent() {
 
 #ifdef WIN32
 void SystemCapabilitiesComponent::initializeWMI() {
-    constexpr const char* _loggerCat = "SystemCapabilitiesComponent.WMI";
+    constexpr std::string_view _loggerCat = "SystemCapabilitiesComponent.WMI";
 
     ghoul_assert(!isWMIInitialized(), "WMI must not have been initialized");
 

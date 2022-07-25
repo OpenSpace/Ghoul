@@ -31,6 +31,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace ghoul {
@@ -143,7 +144,7 @@ public:
      *        not have a default constructor
      * \pre \p className must not be empty
      */
-    BaseClass* create(const std::string& className, MemoryPoolBase* pool = nullptr) const;
+    BaseClass* create(std::string_view className, MemoryPoolBase* pool = nullptr) const;
 
     /**
      * Creates an instance of the class which was registered under the provided
@@ -167,7 +168,7 @@ public:
      *        not have a constructor using a Dictionary object
      * \pre \p className must not be empty
      */
-    BaseClass* create(const std::string& className, const Dictionary& dictionary,
+    BaseClass* create(std::string_view className, const Dictionary& dictionary,
         MemoryPoolBase* pool = nullptr) const;
 
     /**
@@ -244,7 +245,7 @@ public:
 
 private:
     /// The map storing all the associations from <code>className</code> to classes
-    std::map<std::string, FactoryFunction> _map;
+    std::map<std::string, FactoryFunction, std::less<>> _map;
 };
 
 } // namespace ghoul

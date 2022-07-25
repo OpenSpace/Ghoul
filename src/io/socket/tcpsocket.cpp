@@ -77,8 +77,8 @@
 #endif // !WIN32
 
 namespace {
-    constexpr const char* _loggerCat = "TcpSocket";
-    constexpr const char DefaultDelimiter = '\n';
+    constexpr std::string_view _loggerCat = "TcpSocket";
+    constexpr char DefaultDelimiter = '\n';
 } // namespace
 
 namespace ghoul::io {

@@ -31,7 +31,7 @@
 #include <iostream>
 
 namespace {
-    constexpr const int NumberFuzzTests = 1000;
+    constexpr int NumberFuzzTests = 1000;
 } // namespace
 
 TEST_CASE("LuaConversion: LuaExecution", "[luaconversion]") {
