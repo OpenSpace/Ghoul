@@ -33,7 +33,7 @@
 
 namespace {
     constexpr const char* _loggerCat = "WebSocket";
-    constexpr const std::chrono::milliseconds MaxWaitDuration(1000);
+    constexpr std::chrono::milliseconds MaxWaitDuration(1000);
 } // namespace
 
 using websocketpp::lib::placeholders::_1;

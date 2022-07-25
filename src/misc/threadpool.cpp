@@ -32,7 +32,7 @@
 
 namespace {
     // The wait-out time for the condition_variable inside the worker threads
-    constexpr const std::chrono::seconds WaitTime(1);
+    constexpr std::chrono::seconds WaitTime(1);
 }  // namespace
 
 namespace ghoul {

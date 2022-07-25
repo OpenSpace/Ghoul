@@ -40,8 +40,8 @@ static lua_State* _state = nullptr;
 
 namespace {
 
-constexpr const int KeyTableIndex = -2;
-constexpr const int ValueTableIndex = -1;
+constexpr int KeyTableIndex = -2;
+constexpr int ValueTableIndex = -1;
 
 int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
     if (relativeLocation >= 0) {

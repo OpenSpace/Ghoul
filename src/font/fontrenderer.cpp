@@ -44,11 +44,11 @@
 namespace {
     constexpr const char* _loggerCat = "FontRenderer";
 
-    constexpr const std::array<const char*, 5> UniformNames = {
+    constexpr std::array<const char*, 5> UniformNames = {
         "baseColor", "outlineColor", "tex", "hasOutline", "projection"
     };
 
-    constexpr const std::array<const char*, 7> UniformNamesProjection = {
+    constexpr std::array<const char*, 7> UniformNamesProjection = {
         "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform",
         "enableFalseDepth", "disableTransmittance"
     };
@@ -798,8 +798,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           std::string_view text,
                                         const ProjectedLabelsInformation& labelInfo) const
 {
-    constexpr const glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
-    constexpr const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    constexpr glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    constexpr glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
     return render(font, pos, text, color, outlineColor, labelInfo);
 }
 

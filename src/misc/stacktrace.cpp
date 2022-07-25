@@ -128,7 +128,7 @@ std::vector<std::string> stackTrace() {
             &isValidCppName
         );
 
-        constexpr const int MaxStackFrameSize = 4096;
+        constexpr int MaxStackFrameSize = 4096;
         char stackFrame[MaxStackFrameSize] = {};
 
         if (functionName) {

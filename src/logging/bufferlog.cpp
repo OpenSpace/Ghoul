@@ -32,7 +32,7 @@
 #include <fstream>
 
 namespace {
-    constexpr const uint8_t CURRENT_VERSION = 1;
+    constexpr uint8_t CURRENT_VERSION = 1;
 
     struct Header {
         /**

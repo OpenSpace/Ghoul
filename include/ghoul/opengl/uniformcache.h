@@ -303,7 +303,7 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
     // Make the error message a bit nicer if the
     static_assert(std::is_base_of_v<UniformCacheBase, T>);
 
-    constexpr const int nValues = sizeof(T) / sizeof(int);
+    constexpr int nValues = sizeof(T) / sizeof(int);
 
     int* uniformLocations = reinterpret_cast<int*>(&uniformCache);
     for (int i = 0; i < nValues; ++i) {

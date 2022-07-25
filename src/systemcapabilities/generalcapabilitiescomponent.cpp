@@ -380,7 +380,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
 void GeneralCapabilitiesComponent::detectCPU() {
     // @TODO This function needs cleanup ---abock
 #ifdef WIN32
-    constexpr const std::array<std::string_view, 32> szFeatures = {
+    constexpr std::array<std::string_view, 32> szFeatures = {
         "fpu", "vme", "de", "pse", "tsc", "msr", "pae", "mce", "cx8", "apic", "Unknown1",
         "sep", "mtrr", "pge", "mca", "cmov", "pat", "pse36", "psn", "clflush", "Unknown2",
         "ds", "acpi", "mmx", "fxsr", "sse", "sse2", "ss", "ht", "tm", "Unknown4", "pbe"

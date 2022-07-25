@@ -44,7 +44,7 @@
 namespace {
     constexpr const char* _loggerCat = "CacheManager";
     const std::filesystem::path CacheFile = "cache";
-    constexpr const int CacheVersion = 2;
+    constexpr int CacheVersion = 2;
 
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;
 

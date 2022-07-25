@@ -80,8 +80,8 @@ ConsoleLog::ConsoleLog(ColorOutput colorOutput, LogLevel minimumLogLevel)
 {}
 
 void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view msg) {
-    constexpr const int CategoryLength = 20;
-    constexpr const char FillerCharacter = ' ';
+    constexpr int CategoryLength = 20;
+    constexpr char FillerCharacter = ' ';
 
     if (_colorOutput) {
         setColorForLevel(level);

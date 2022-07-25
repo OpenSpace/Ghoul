@@ -40,8 +40,8 @@
 
 namespace {
     // Sizes in FT are given in 1/64th of pt
-    constexpr const float PointConversionFactor = 64.f;
-    constexpr const int DPI = 96;
+    constexpr float PointConversionFactor = 64.f;
+    constexpr int DPI = 96;
 
     void handleError(FT_Error error, FT_Library library, FT_Face face, FT_Stroker stroker,
                      const std::filesystem::path& name, float size)
@@ -150,7 +150,7 @@ Font::Font(std::filesystem::path filename, float pointSize, opengl::TextureAtlas
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
 
     // Get font metrics at higher resolution for increased accuracy
-    constexpr const float HighFaceResolutionFactor = 100.f;
+    constexpr float HighFaceResolutionFactor = 100.f;
 
     FT_Library library = nullptr;
     FT_Face face = nullptr;
@@ -268,7 +268,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
     };
     loadFace(_name, _pointSize, library, face);
 
-    constexpr const float HighResolutionFactor = 10.f;
+    constexpr float HighResolutionFactor = 10.f;
     FT_Library libraryHighRes = nullptr;
     FT_Face faceHighRes = nullptr;
     defer {

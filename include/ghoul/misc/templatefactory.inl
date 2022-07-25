@@ -49,8 +49,8 @@ namespace {
  * std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
  */
 
-constexpr const int DEFAULT_CONSTRUCTOR = 1;
-constexpr const int DICTIONARY_CONSTRUCTOR = 2;
+constexpr int DEFAULT_CONSTRUCTOR = 1;
+constexpr int DICTIONARY_CONSTRUCTOR = 2;
 
 /// Create Class using only the default constructor
 template <typename BaseClass, typename Class>

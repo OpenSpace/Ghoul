@@ -38,7 +38,7 @@
 
 namespace {
     constexpr const char* _loggerCat = "FileSystem";
-    constexpr const unsigned int ChangeBufferSize = 16384u;
+    constexpr unsigned int ChangeBufferSize = 16384u;
 } // namespace
 
 namespace ghoul::filesystem {

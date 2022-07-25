@@ -35,9 +35,9 @@ void deinitialize();
 
 std::string licenseText();
 
-constexpr const int GHOUL_MAJOR_VERSION = 0;
-constexpr const int GHOUL_MINOR_VERSION = 24;
-constexpr const int GHOUL_PATCH_VERSION = 0;
+constexpr int GHOUL_MAJOR_VERSION = 0;
+constexpr int GHOUL_MINOR_VERSION = 24;
+constexpr int GHOUL_PATCH_VERSION = 0;
 
 } // namespace ghoul
 
