@@ -170,7 +170,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
         const int y = atlasFit(i, width, height);
         if (y >= 0) {
             const glm::ivec3& node = _nodes[i];
-            if (((y + height) < bestHeight ) ||
+            if (((y + height) < bestHeight) ||
                 (((y + height) == bestHeight) && (node.z < bestWidth)))
             {
                 bestHeight = y + height;

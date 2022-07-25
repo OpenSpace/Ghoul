@@ -65,7 +65,7 @@ static bool runningInDebugger() {
     ghoul_assert(junk == 0, "sysctl call failed");
 
     // We're being debugged if the P_TRACED flag is set.
-    return ( (info.kp_proc.p_flag & P_TRACED) != 0 );
+    return ((info.kp_proc.p_flag & P_TRACED) != 0);
 }
 #endif // __APPLE__
 

@@ -221,7 +221,7 @@ VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
     ULONG returnValue = 0;
     HRESULT hr = S_OK;
     if (enumerator) {
-        hr = enumerator->Next(WBEM_INFINITE, 1, &pclsObject, &returnValue );
+        hr = enumerator->Next(WBEM_INFINITE, 1, &pclsObject, &returnValue);
         if (!FAILED(hRes) && returnValue) {
             result = new VARIANT;
             hr = pclsObject->Get(
