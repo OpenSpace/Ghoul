@@ -102,7 +102,7 @@ macro (end_dependency)
   list(LENGTH extra_macro_argv extra_macro_argc)
   if (extra_macro_argc GREATER 0)
     message(STATUS "End dependency: ${extra_macro_argv}")
-  endif()
+  endif ()
   message(STATUS "")
 endmacro ()
 
