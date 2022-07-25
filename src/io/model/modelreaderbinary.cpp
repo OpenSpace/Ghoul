@@ -30,7 +30,7 @@
 #include <fstream>
 
 namespace {
-    constexpr const char* _loggerCat = "ModelReaderBinary";
+    constexpr std::string_view _loggerCat = "ModelReaderBinary";
     constexpr int8_t CurrentModelVersion = 7;
     constexpr int FormatStringSize = 4;
 

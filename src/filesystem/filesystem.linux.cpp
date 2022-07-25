@@ -45,7 +45,7 @@
 #include <sys/types.h>
 
 namespace {
-    constexpr const char* _loggerCat = "FileSystem";
+    constexpr std::string_view _loggerCat = "FileSystem";
     const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
                           IN_UNMOUNT | IN_ISDIR;
     constexpr int EventSize = sizeof(struct inotify_event);

@@ -46,7 +46,7 @@ typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD); // NOLINT
 #endif
 
 namespace {
-    constexpr const char* _loggerCat = "OpenGLCapabilities";
+    constexpr std::string_view _loggerCat = "OpenGLCapabilities";
 } // namespace
 
 namespace ghoul::systemcapabilities {

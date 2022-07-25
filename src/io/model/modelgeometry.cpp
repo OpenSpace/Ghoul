@@ -37,7 +37,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace {
-    constexpr const char* _loggerCat = "ModelGeometry";
+    constexpr std::string_view _loggerCat = "ModelGeometry";
     constexpr int8_t CurrentCacheVersion = 7;
     constexpr int FormatStringSize = 4;
 

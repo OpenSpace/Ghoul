@@ -37,7 +37,7 @@
 #include <Windows.h>
 
 namespace {
-    constexpr const char* _loggerCat = "FileSystem";
+    constexpr std::string_view _loggerCat = "FileSystem";
     constexpr unsigned int ChangeBufferSize = 16384u;
 } // namespace
 

@@ -32,7 +32,7 @@
 #include <functional>
 
 namespace {
-    constexpr const char* _loggerCat = "WebSocket";
+    constexpr std::string_view _loggerCat = "WebSocket";
     constexpr std::chrono::milliseconds MaxWaitDuration(1000);
 } // namespace
 

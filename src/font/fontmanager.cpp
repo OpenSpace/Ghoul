@@ -86,7 +86,7 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
     return hash;
 }
 
-std::shared_ptr<Font> FontManager::font(const std::string& name, float fontSize,
+std::shared_ptr<Font> FontManager::font(std::string_view name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
     ZoneScoped

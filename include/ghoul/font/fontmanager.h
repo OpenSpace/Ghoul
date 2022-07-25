@@ -32,6 +32,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 namespace ghoul::fontrendering {
@@ -107,7 +108,7 @@ public:
      *
      * \pre \p name must not be empty
      */
-    std::shared_ptr<Font> font(const std::string& name, float fontSize,
+    std::shared_ptr<Font> font(std::string_view name, float fontSize,
         Outline withOutline = Outline::Yes, LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
 
     /**

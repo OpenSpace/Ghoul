@@ -42,7 +42,7 @@
 #endif // WIN32
 
 namespace {
-    constexpr const char* _loggerCat = "CacheManager";
+    constexpr std::string_view _loggerCat = "CacheManager";
     const std::filesystem::path CacheFile = "cache";
     constexpr int CacheVersion = 2;
 
@@ -50,7 +50,7 @@ namespace {
 
     unsigned int generateHash(std::filesystem::path file, std::string_view information) {
         // something that cannot occur in the filesystem
-        constexpr const char HashDelimiter = '|';
+        constexpr char HashDelimiter = '|';
 
         std::string s = fmt::format("{}{}{}", file.string(), HashDelimiter, information);
         unsigned int hash = ghoul::hashCRC32(s);

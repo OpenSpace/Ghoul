@@ -34,7 +34,7 @@
 
 namespace {
 
-constexpr const char* _loggerCat = "CommandlineParser";
+constexpr std::string_view _loggerCat = "CommandlineParser";
 
 /**
  * Extracts multiple arguments from a single list. <br>

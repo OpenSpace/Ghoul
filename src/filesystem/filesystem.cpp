@@ -53,7 +53,7 @@
 #endif
 
 namespace {
-    constexpr const char* _loggerCat = "FileSystem";
+    constexpr std::string_view _loggerCat = "FileSystem";
 } // namespace
 
 std::filesystem::path absPath(std::string path) {

@@ -63,7 +63,7 @@ lua_State* staticLuaState() {
 // Code snippet that causes the Lua State to strict by making it that the lookup in the
 // meta table for an unknown key causes a panic
 // Code taken originally from the Lua webpage and used under the Lua license
-constexpr const char StrictStateSource[] = R"(
+constexpr std::string_view StrictStateSource = R"(
 --[[ strict.lua
 checks uses of undeclared global variables
 All global variables must be 'declared' through a regular assignment (even assigning nil
@@ -574,6 +574,11 @@ void runScript(lua_State* state, const std::string& script) {
         std::string error = lua_tostring(state, -1);
         throw LuaExecutionException(error);
     }
+}
+
+void runScript(lua_State* state, std::string_view script) {
+    std::string s = std::string(script);
+    runScript(state, s);
 }
 
 int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
