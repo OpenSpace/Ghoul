@@ -503,7 +503,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    delete[] p;
 
     // CPU features/extensions
-//    sysctlbyname( "machdep.cpu.features", NULL, &len, NULL, 0 );
+//    sysctlbyname("machdep.cpu.features", NULL, &len, NULL, 0);
 //    p = new char[len];
     std::memset(p, 0, 512);
     sysctlbyname("machdep.cpu.features", p, &len, nullptr, 0);
@@ -549,7 +549,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 //    delete[] p;
 
     // L2 associativity
-//    sysctlbyname( "machdep.cpu.cache.L2_associativity", NULL, &len, NULL, 0 );
+//    sysctlbyname("machdep.cpu.cache.L2_associativity", NULL, &len, NULL, 0);
 //    p = new char[len];
     std::memset(p, 0, 512);
     sysctlbyname("machdep.cpu.cache.L2_associativity", p, &len, nullptr, 0);
