@@ -131,7 +131,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         );
     }
 
-    LDEBUG("IWbemLocator object successfully created.");
+    LDEBUG("IWbemLocator object successfully created");
 
     hRes = _iwbemLocator->ConnectServer(
         _bstr_t(L"ROOT\\CIMV2"), // Object path of WMI namespace

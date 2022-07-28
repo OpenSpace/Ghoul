@@ -100,7 +100,7 @@ void OpenGLStateCache::loadCurrentGLState() {
 }
 
 void OpenGLStateCache::resetCachedStates() const {
-    ghoul_assert(_cacheInitialized, "OpenGL State cache is not initialized.");
+    ghoul_assert(_cacheInitialized, "OpenGL State cache is not initialized");
 
     resetViewportState();
     resetColorState();

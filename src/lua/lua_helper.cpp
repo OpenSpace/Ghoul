@@ -90,7 +90,7 @@ mt.__newindex = function (t, n, v)
   if not mt.__declared[n] then
     local w = what()
     if w ~= "main" and w ~= "C" then
-      error("assign to undeclared variable '"..n.."'", 2)
+      error("assign to undeclared variable '" .. n .. "'", 2)
     end
     mt.__declared[n] = true
   end
@@ -99,7 +99,7 @@ end
 
 mt.__index = function (t, n)
   if not mt.__declared[n] and what() ~= "C" then
-    error("variable '"..n.."' is not declared", 2)
+    error("variable '" .. n .. "' is not declared", 2)
   end
   return rawget(t, n)
 end

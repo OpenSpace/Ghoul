@@ -61,7 +61,7 @@ void ObjectManager<T>::releaseAll(Warnings emitWarnings) {
     if (!_objects.empty()) {
         LWARNING(
             "Remaining Objects detected. There was probably some error during "
-            "deinitialization that caused this."
+            "deinitialization that caused this"
         );
     }
     for (std::pair<const std::string, Info>& p : _objects) {

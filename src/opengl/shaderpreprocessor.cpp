@@ -771,7 +771,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
 
     if (env.forStatements.empty()) {
         throw ParserError(
-            "Unexpected #endfor. No corresponding #for was found." + debugString(env)
+            "Unexpected #endfor. No corresponding #for was found" + debugString(env)
         );
     }
 

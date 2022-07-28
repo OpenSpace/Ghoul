@@ -310,7 +310,7 @@ void ModelMesh::initialize() {
         LWARNINGC(
             "ModelMesh",
             "More than one texture or color of same type cannot be used for the same "
-            "mesh. Only the latest option will be used."
+            "mesh. Only the latest option will be used"
         );
     }
 }
