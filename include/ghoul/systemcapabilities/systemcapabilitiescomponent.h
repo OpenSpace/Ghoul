@@ -33,13 +33,13 @@
 #include <string>
 #include <vector>
 
-#ifdef WIN32
-#include <wbemidl.h>
-#include <comdef.h>
-#endif // WIN32
-
 // X11 #defines 'None' in its X.h header file. We don't want it here ---abock
 #undef None
+
+#ifdef WIN32
+struct IWbemLocator;
+struct IWbemServices;
+#endif // WIN32
 
 namespace ghoul::systemcapabilities {
 
@@ -132,11 +132,11 @@ protected:
 #ifdef WIN32
     /// Exception that will be thrown if there was an error regarding Windows'
     /// Management Instrumentation
-    struct WMIError : public RuntimeError {
-        explicit WMIError(std::string msg, HRESULT code);
+    struct WMIError : public ghoul::RuntimeError {
+        explicit WMIError(std::string msg, long code);
 
         const std::string message;
-        const HRESULT errorCode;
+        const long errorCode;
     };
 
     /**
@@ -179,7 +179,7 @@ protected:
      * \pre \p attribute must not be empty
      * \pre The Windows Management Instrumentation must have been initialized
      */
-    VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute);
+    //VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute);
 
     /**
      * Helper function that queries the Windows Management Instrumentation for the

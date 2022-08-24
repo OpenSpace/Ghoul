@@ -181,6 +181,19 @@ if (GHOUL_MODULE_ASSIMP)
   # We need to include this to be able to find the assimp/config.h file
   target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
 
+  target_precompile_headers(assimp PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:istream>"
+    "$<$<COMPILE_LANGUAGE:CXX>:locale>"
+    "$<$<COMPILE_LANGUAGE:CXX>:map>"
+    "$<$<COMPILE_LANGUAGE:CXX>:ostream>"
+    "$<$<COMPILE_LANGUAGE:CXX>:set>"
+    "$<$<COMPILE_LANGUAGE:CXX>:sstream>"
+    "$<$<COMPILE_LANGUAGE:CXX>:vector>"
+    "$<$<COMPILE_LANGUAGE:CXX>:tuple>"
+    <string.h>
+    <assimp/types.h>
+  )
+
   set_folder_location(IrrXML "External")
   set_folder_location(uninstall "External")
   set_folder_location(UpdateAssimpLibsDebugSymbolsAndDLLs "External")

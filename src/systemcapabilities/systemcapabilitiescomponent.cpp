@@ -31,8 +31,26 @@
 #include <ghoul/misc/stringconversion.h>
 #include <map>
 
+#ifdef WIN32
+#include <wbemidl.h>
+#include <comdef.h>
+#endif // WIN32
+
 namespace {
 #ifdef WIN32
+    /// Exception that will be thrown if there was an error regarding Windows'
+    /// Management Instrumentation
+    struct WMIError : public ghoul::RuntimeError {
+        explicit WMIError(std::string msg, HRESULT code)
+            : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
+            , message(std::move(msg))
+            , errorCode(std::move(code))
+        {}
+
+        const std::string message;
+        const HRESULT errorCode;
+    };
+
     std::wstring str2wstr(const std::string& str) {
         const int strLen = static_cast<int>(str.length() + 1);
         const int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), strLen, nullptr, 0);
@@ -66,6 +84,61 @@ namespace {
         );
         return std::string(buf.begin(), buf.end());
     }
+
+
+    VARIANT* query(IWbemServices* services, const std::string& wmiClass,
+                   const std::string& attribute)
+    {
+        ghoul_assert(!wmiClass.empty(), "wmiClass must not be empty");
+        ghoul_assert(!attribute.empty(), "Attribute must not be empty");
+
+        VARIANT* result = nullptr;
+        IEnumWbemClassObject* enumerator = nullptr;
+        std::string query = fmt::format("SELECT {} FROM {}", attribute, wmiClass);
+        HRESULT hRes = services->ExecQuery(
+            bstr_t("WQL"),
+            bstr_t(query.c_str()),
+            WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
+            nullptr,
+            &enumerator
+        );
+        if (FAILED(hRes)) {
+            throw WMIError("WMI query failed", hRes);
+        }
+
+        IWbemClassObject* pclsObject = nullptr;
+        ULONG returnValue = 0;
+        HRESULT hr = S_OK;
+        if (enumerator) {
+            hr = enumerator->Next(WBEM_INFINITE, 1, &pclsObject, &returnValue);
+            if (!FAILED(hRes) && returnValue) {
+                result = new VARIANT;
+                hr = pclsObject->Get(
+                    LPCWSTR(str2wstr(attribute).c_str()),
+                    0,
+                    result,
+                    nullptr,
+                    nullptr
+                );
+            }
+        }
+
+        if (FAILED(hr)) {
+            if (result) {
+                VariantClear(result);
+            }
+            throw WMIError("No WMI query result", hr);
+        }
+
+        if (enumerator) {
+            enumerator->Release();
+        }
+        if (pclsObject) {
+            pclsObject->Release();
+        }
+
+        return result;
+    }
 #endif // WIN32
 } // namespace
 
@@ -75,7 +148,11 @@ namespace ghoul::systemcapabilities {
 IWbemLocator* SystemCapabilitiesComponent::_iwbemLocator = nullptr;
 IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 
-SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, HRESULT code)
+// We don't want to use HRESULT in the header as we'd need to pull in all of the Windows
+// header, which is quite heavy, so we guard here against that type not changing
+static_assert(std::is_same_v<HRESULT, long>);
+
+SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, long code)
     : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
     , message(std::move(msg))
     , errorCode(std::move(code))
@@ -196,66 +273,11 @@ bool SystemCapabilitiesComponent::isWMIInitialized() {
     return (_iwbemLocator && _iwbemServices);
 }
 
-VARIANT* SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
-                                               const std::string& attribute)
-{
-    ghoul_assert(isWMIInitialized(), "WMI must have been initialized");
-    ghoul_assert(!wmiClass.empty(), "wmiClass must not be empty");
-    ghoul_assert(!attribute.empty(), "Attribute must not be empty");
-
-    VARIANT* result = nullptr;
-    IEnumWbemClassObject* enumerator = nullptr;
-    std::string query = fmt::format("SELECT {} FROM {}", attribute, wmiClass);
-    HRESULT hRes = _iwbemServices->ExecQuery(
-        bstr_t("WQL"),
-        bstr_t(query.c_str()),
-        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
-        nullptr,
-        &enumerator
-    );
-    if (FAILED(hRes)) {
-        throw WMIError("WMI query failed", hRes);
-    }
-
-    IWbemClassObject* pclsObject = nullptr;
-    ULONG returnValue = 0;
-    HRESULT hr = S_OK;
-    if (enumerator) {
-        hr = enumerator->Next(WBEM_INFINITE, 1, &pclsObject, &returnValue);
-        if (!FAILED(hRes) && returnValue) {
-            result = new VARIANT;
-            hr = pclsObject->Get(
-                LPCWSTR(str2wstr(attribute).c_str()),
-                0,
-                result,
-                nullptr,
-                nullptr
-            );
-        }
-    }
-
-    if (FAILED(hr)) {
-        if (result) {
-            VariantClear(result);
-        }
-        throw WMIError("No WMI query result", hr);
-    }
-
-    if (enumerator) {
-        enumerator->Release();
-    }
-    if (pclsObject) {
-        pclsObject->Release();
-    }
-
-    return result;
-}
-
 void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
                                            const std::string& attribute,
                                            std::string& value)
 {
-    VARIANT* variant = queryWMI(wmiClass, attribute);
+    VARIANT* variant = query(_iwbemServices, wmiClass, attribute);
     value = wstr2str(std::wstring(variant->bstrVal));
     VariantClear(variant);
 }
@@ -263,7 +285,7 @@ void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
 void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
                                            const std::string& attribute, int& value)
 {
-    VARIANT* variant = queryWMI(wmiClass, attribute);
+    VARIANT* variant = query(_iwbemServices, wmiClass, attribute);
     value = variant->intVal;
     VariantClear(variant);
 }
@@ -272,7 +294,7 @@ void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
                                            const std::string& attribute,
                                            unsigned int& value)
 {
-    VARIANT* variant = queryWMI(wmiClass, attribute);
+    VARIANT* variant = query(_iwbemServices, wmiClass, attribute);
     value = variant->uintVal;
     VariantClear(variant);
 }
@@ -281,7 +303,7 @@ void SystemCapabilitiesComponent::queryWMI(const std::string& wmiClass,
                                            const std::string& attribute,
                                            unsigned long long& value)
 {
-    VARIANT* variant = queryWMI(wmiClass, attribute);
+    VARIANT* variant = query(_iwbemServices, wmiClass, attribute);
     value = variant->ullVal;
     VariantClear(variant);
 }

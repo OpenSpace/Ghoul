@@ -23,9 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <iostream>
-#include <sstream>
-
 inline void log(ghoul::logging::LogLevel level, std::string_view category,
                 std::string_view message)
 {

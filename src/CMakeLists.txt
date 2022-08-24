@@ -296,14 +296,18 @@ target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 target_precompile_headers(Ghoul PRIVATE
   [["ghoul/fmt.h"]]
+  [["ghoul/glm.h"]]
   [["ghoul/misc/assert.h"]]
   [["ghoul/misc/boolean.h"]]
   [["ghoul/misc/exception.h"]]
   <algorithm>
   <array>
+  <chrono>
+  <filesystem>
   <map>
   <memory>
   <string>
+  <string_view>
   <vector>
 )
 
