@@ -300,6 +300,7 @@ target_precompile_headers(Ghoul PRIVATE
   [["ghoul/misc/assert.h"]]
   [["ghoul/misc/boolean.h"]]
   [["ghoul/misc/exception.h"]]
+  [["ghoul/opengl/ghoul_gl.h"]]
   <algorithm>
   <array>
   <chrono>
