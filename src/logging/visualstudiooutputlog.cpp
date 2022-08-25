@@ -27,7 +27,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#endif
+#endif // WIN32
 
 namespace ghoul::logging {
 

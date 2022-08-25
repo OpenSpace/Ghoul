@@ -31,8 +31,8 @@
 #include <string_view>
 
 #ifdef WIN32
-#include <windows.h>
-#endif
+#include <Windows.h>
+#endif // WIN32
 
 #ifdef __APPLE__
 #include <assert.h>

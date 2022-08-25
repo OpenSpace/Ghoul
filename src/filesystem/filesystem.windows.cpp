@@ -26,14 +26,7 @@
 #ifdef WIN32
 
 #include <ghoul/filesystem/filesystem.h>
-
 #include <ghoul/logging/logmanager.h>
-
-#define WIN32_LEAN_AND_MEAN
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif // NOMINMAX
-
 #include <Windows.h>
 
 namespace {

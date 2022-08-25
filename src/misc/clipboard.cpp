@@ -31,12 +31,8 @@
 #include <sstream>
 
 #ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif // NOMINMAX
 #include <Windows.h>
-#endif
+#endif // WIN32
 
 namespace {
 #ifndef WIN32

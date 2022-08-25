@@ -31,11 +31,7 @@
 #include <filesystem>
 
 #ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif // NOMINMAX
-#include <windows.h>
+#include <Windows.h>
 #else // ^^^^ WIN32 // !WIN32 vvvv
 #include <ctime>
 #include <sys/types.h>
