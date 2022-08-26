@@ -29,6 +29,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
+#include <sstream>
 
 #ifdef WIN32
 #include <Windows.h>
