@@ -193,7 +193,7 @@ if (GHOUL_MODULE_ASSIMP)
     "$<$<COMPILE_LANGUAGE:CXX>:vector>"
     "$<$<COMPILE_LANGUAGE:CXX>:tuple>"
     "$<$<COMPILE_LANGUAGE:CXX>:unordered_map>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/defaultlogger.hpp>"
+    "$<$<COMPILE_LANGUAGE:CXX>:assimp/DefaultLogger.hpp>"
     "$<$<COMPILE_LANGUAGE:CXX>:assimp/exceptional.h>"
     "$<$<COMPILE_LANGUAGE:CXX>:assimp/mesh.h>"
     "$<$<COMPILE_LANGUAGE:CXX>:assimp/scene.h>"
