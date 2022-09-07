@@ -45,10 +45,3 @@ function (ghl_copy_files target)
     endif ()
   endforeach ()
 endfunction ()
-
-macro (ghl_copy_shared_libraries target ghoul_dir)
-  # Windows DLL
-  if (WIN32)
-    ghl_copy_files(${target} $<TARGET_FILE:Lua> ${SHARED_LIBS})
-  endif (WIN32)
-endmacro ()
