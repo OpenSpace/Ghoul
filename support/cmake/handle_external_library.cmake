@@ -48,7 +48,7 @@ endfunction ()
 
 function (set_folder_location target folder)
   if (TARGET ${target})
-    set_property(TARGET ${target} PROPERTY FOLDER ${folder})
+    set_target_properties(${target} PROPERTIES FOLDER ${folder})
   endif ()
 endfunction ()
 
