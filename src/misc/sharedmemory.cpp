@@ -98,7 +98,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
     size += sizeof(Header);
 #ifdef WIN32
     HANDLE handle = CreateFileMapping(
-        INVALID_HANDLE_VALUE, // NOLINT
+        INVALID_HANDLE_VALUE,
         nullptr,
         PAGE_READWRITE,
         0,

@@ -371,7 +371,7 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
             line.length() - 1 - (beginOffset + endOffset)
         );
 
-        line = first + out + last; // NOLINT
+        line = first + out + last;
     }
     return true;
 }

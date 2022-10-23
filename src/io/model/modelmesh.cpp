@@ -252,7 +252,7 @@ void ModelMesh::initialize() {
         GL_FLOAT,
         GL_FALSE,
         sizeof(Vertex),
-        reinterpret_cast<const GLvoid*>(offsetof(Vertex, tex)) // NOLINT
+        reinterpret_cast<const GLvoid*>(offsetof(Vertex, tex))
     );
 
     // Vertex normals
@@ -263,7 +263,7 @@ void ModelMesh::initialize() {
         GL_FLOAT,
         GL_FALSE,
         sizeof(Vertex),
-        reinterpret_cast<const GLvoid*>(offsetof(Vertex, normal)) // NOLINT
+        reinterpret_cast<const GLvoid*>(offsetof(Vertex, normal))
     );
 
     // Vertex tangent (for normal mapping)
@@ -274,7 +274,7 @@ void ModelMesh::initialize() {
         GL_FLOAT,
         GL_FALSE,
         sizeof(Vertex),
-        reinterpret_cast<const GLvoid*>(offsetof(Vertex, tangent)) // NOLINT
+        reinterpret_cast<const GLvoid*>(offsetof(Vertex, tangent))
     );
 
     glBindVertexArray(0);
