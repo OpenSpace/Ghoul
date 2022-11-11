@@ -180,29 +180,29 @@ if (GHOUL_MODULE_ASSIMP)
 
   # We need to include this to be able to find the assimp/config.h file
   target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
-
-  target_precompile_headers(assimp PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:functional>"
-    "$<$<COMPILE_LANGUAGE:CXX>:istream>"
-    "$<$<COMPILE_LANGUAGE:CXX>:list>"
-    "$<$<COMPILE_LANGUAGE:CXX>:locale>"
-    "$<$<COMPILE_LANGUAGE:CXX>:map>"
-    "$<$<COMPILE_LANGUAGE:CXX>:ostream>"
-    "$<$<COMPILE_LANGUAGE:CXX>:set>"
-    "$<$<COMPILE_LANGUAGE:CXX>:sstream>"
-    "$<$<COMPILE_LANGUAGE:CXX>:vector>"
-    "$<$<COMPILE_LANGUAGE:CXX>:tuple>"
-    "$<$<COMPILE_LANGUAGE:CXX>:unordered_map>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/DefaultLogger.hpp>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/Exceptional.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/mesh.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/scene.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/StringUtils.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/types.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
-    <string.h>
-  )
-
+  if (NOT APPLE)
+    target_precompile_headers(assimp PRIVATE
+      "$<$<COMPILE_LANGUAGE:CXX>:functional>"
+      "$<$<COMPILE_LANGUAGE:CXX>:istream>"
+      "$<$<COMPILE_LANGUAGE:CXX>:list>"
+      "$<$<COMPILE_LANGUAGE:CXX>:locale>"
+      "$<$<COMPILE_LANGUAGE:CXX>:map>"
+      "$<$<COMPILE_LANGUAGE:CXX>:ostream>"
+      "$<$<COMPILE_LANGUAGE:CXX>:set>"
+      "$<$<COMPILE_LANGUAGE:CXX>:sstream>"
+      "$<$<COMPILE_LANGUAGE:CXX>:vector>"
+      "$<$<COMPILE_LANGUAGE:CXX>:tuple>"
+      "$<$<COMPILE_LANGUAGE:CXX>:unordered_map>"
+      "$<$<COMPILE_LANGUAGE:CXX>:assimp/DefaultLogger.hpp>"
+      "$<$<COMPILE_LANGUAGE:CXX>:assimp/Exceptional.h>"
+      "$<$<COMPILE_LANGUAGE:CXX>:assimp/mesh.h>"
+      "$<$<COMPILE_LANGUAGE:CXX>:assimp/scene.h>"
+      "$<$<COMPILE_LANGUAGE:CXX>:assimp/StringUtils.h>"
+      "$<$<COMPILE_LANGUAGE:CXX>:assimp/types.h>"
+      "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
+      <string.h>
+    )
+  endif ()
   set_folder_location(IrrXML "External")
   set_folder_location(uninstall "External")
   set_folder_location(UpdateAssimpLibsDebugSymbolsAndDLLs "External")
