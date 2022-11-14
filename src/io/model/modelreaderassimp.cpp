@@ -344,9 +344,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorDiffuse;
-                texture.color.x = color4.r;
-                texture.color.y = color4.g;
-                texture.color.z = color4.b;
+                texture.color.r = color4.r;
+                texture.color.g = color4.g;
+                texture.color.b = color4.b;
+                texture.color.a = color4.a;
                 textureArray.push_back(std::move(texture));
             }
         }
@@ -357,9 +358,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorDiffuse;
-                texture.color.x = color3.r;
-                texture.color.y = color3.g;
-                texture.color.z = color3.b;
+                texture.color.r = color3.r;
+                texture.color.g = color3.g;
+                texture.color.b = color3.b;
+                texture.color.a = 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }
@@ -395,9 +397,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorSpecular;
-                texture.color.x = color4.r;
-                texture.color.y = color4.g;
-                texture.color.z = color4.b;
+                texture.color.r = color4.r;
+                texture.color.g = color4.g;
+                texture.color.b = color4.b;
+                texture.color.a = color4.a;
                 textureArray.push_back(std::move(texture));
             }
         }
@@ -408,9 +411,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorSpecular;
-                texture.color.x = color3.r;
-                texture.color.y = color3.g;
-                texture.color.z = color3.b;
+                texture.color.r = color3.r;
+                texture.color.g = color3.g;
+                texture.color.b = color3.b;
+                texture.color.a = 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }

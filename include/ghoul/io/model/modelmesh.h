@@ -57,7 +57,7 @@ public:
         TextureType type = TextureType::TextureDiffuse;
         bool hasTexture = false;
         bool useForcedColor = false;
-        glm::vec3 color;
+        glm::vec4 color;
     };
 
     static void generateDebugTexture(ModelMesh::Texture& texture);
