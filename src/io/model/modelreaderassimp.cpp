@@ -50,6 +50,25 @@ namespace {
 
 namespace ghoul::io {
 
+static bool isTextureTransparent(const ModelMesh::Texture texture) {
+    int nChannels = texture.texture->numberOfChannels();
+
+    if (nChannels < 4) {
+        return false;
+    }
+
+    // Check if there is at least one pixel that is somewhat transparent
+    for (unsigned int j = 0; j < texture.texture->dimensions().x; ++j) {
+        for (unsigned int k = 0; k < texture.texture->dimensions().y; ++k) {
+            float alpha = texture.texture->texelAsFloat(glm::vec2(j, k)).a;
+            if (alpha < 1.f) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
                                  const aiTextureType& type,
                                  const ModelMesh::TextureType& enumType,
@@ -190,7 +209,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
 
             for (unsigned int k = 0; k < meshTexture.texture->dimensions().y; ++k) {
                 float alpha = meshTexture.texture->texelAsFloat(glm::vec2(j, k)).a;
-                if (alpha != 0.f) {
+                if (alpha > 0.f) {
                     isOpaque = true;
                     break;
                 }
@@ -201,6 +220,9 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
         if (!isOpaque) {
             continue;
         }
+
+        // Check if the texture is somewhat transparent
+        meshTexture.isTransparent = isTextureTransparent(meshTexture);
 
         // Add new Texture to the textureStorage and point to it in the texture array
         meshTexture.hasTexture = true;
@@ -348,6 +370,7 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 texture.color.g = color4.g;
                 texture.color.b = color4.b;
                 texture.color.a = color4.a;
+                texture.isTransparent = texture.color.a < 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }
@@ -401,6 +424,7 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 texture.color.g = color4.g;
                 texture.color.b = color4.b;
                 texture.color.a = color4.a;
+                texture.isTransparent = texture.color.a < 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }

@@ -80,6 +80,8 @@ public:
     void calculateBoundingRadius();
     bool hasAnimation() const;
     double animationDuration() const;
+    void calculateTransparency();
+    bool isTransparent() const;
 
     std::vector<io::ModelNode>& nodes();
     const std::vector<io::ModelNode>& nodes() const;
@@ -92,6 +94,8 @@ protected:
     std::vector<io::ModelNode> _nodes;
     std::vector<TextureEntry> _textureStorage;
     std::unique_ptr<io::ModelAnimation> _animation;
+    bool _hasCalcTransparency = false;
+    bool _isTransparent = false;
 };
 
 }  // namespace ghoul::modelgeometry

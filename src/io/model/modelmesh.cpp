@@ -200,6 +200,17 @@ bool ModelMesh::isInvisible() const {
     return _isInvisible;
 }
 
+bool ModelMesh::isTransparent() const {
+    for (const Texture& t : _textures) {
+        if ((t.type == TextureType::TextureDiffuse ||
+             t.type == TextureType::ColorDiffuse) && t.isTransparent)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 const std::vector<ModelMesh::Vertex>& ModelMesh::vertices() const {
     return _vertices;
 }

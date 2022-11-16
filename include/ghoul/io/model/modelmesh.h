@@ -58,6 +58,7 @@ public:
         bool hasTexture = false;
         bool useForcedColor = false;
         glm::vec4 color;
+        bool isTransparent = false;
     };
 
     static void generateDebugTexture(ModelMesh::Texture& texture);
@@ -76,6 +77,7 @@ public:
 
     void setInvisible(bool isInvisible);
     bool isInvisible() const;
+    bool isTransparent() const;
 
     const std::vector<Vertex>& vertices() const;
     const std::vector<unsigned int>& indices() const;

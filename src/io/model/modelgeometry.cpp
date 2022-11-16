@@ -38,7 +38,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 7;
+    constexpr int8_t CurrentCacheVersion = 8;
     constexpr int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -353,6 +353,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
+
+                // isTransparent
+                uint8_t isT;
+                fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+                texture.isTransparent = (isT == 1);
 
                 // texture
                 if (texture.hasTexture) {
@@ -715,6 +720,10 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                     sizeof(float)
                 );
 
+                // isTransparent
+                uint8_t isT = (mesh.textures()[t].isTransparent) ? 1 : 0;
+                fileStream.write(reinterpret_cast<const char*>(&isT), sizeof(uint8_t));
+
                 // texture
                 if (mesh.textures()[t].hasTexture) {
                     // Search the textureStorage to find the texture entry
@@ -950,6 +959,35 @@ double ModelGeometry::animationDuration() const {
     return _animation->duration();
 }
 
+void ModelGeometry::calculateTransparency() {
+    bool isTransparent = false;
+    for (const io::ModelNode& n : _nodes) {
+        if (isTransparent) {
+            break;
+        }
+
+        for (const io::ModelMesh& m : n.meshes()) {
+            if (m.isTransparent()) {
+                isTransparent = true;
+                break;
+            }
+        }
+    }
+
+    _isTransparent = isTransparent;
+    _hasCalcTransparency = true;
+}
+
+bool ModelGeometry::isTransparent() const {
+    if (!_hasCalcTransparency) {
+        LWARNING(
+            "Transparency has not been calculated for this model, value may be invalid"
+        );
+    }
+    return _isTransparent;
+}
+
+
 std::vector<io::ModelNode>& ModelGeometry::nodes() {
     return _nodes;
 }
@@ -1020,6 +1058,7 @@ void ModelGeometry::initialize() {
     }
 
     calculateBoundingRadius();
+    calculateTransparency();
 }
 
 void ModelGeometry::deinitialize() {
