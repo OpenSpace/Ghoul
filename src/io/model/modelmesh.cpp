@@ -25,11 +25,12 @@
 
 #include <ghoul/io/model/modelmesh.h>
 
-#include <ghoul/io/texture/texturereader.h>
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/opengl/programobject.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/fmt.h>
+#include <ghoul/io/texture/texturereader.h>
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/programobject.h>
+#include <ghoul/opengl/textureunit.h>
 
 namespace {
     std::string textureTypeToString(const ghoul::io::ModelMesh::TextureType& type) {
@@ -79,7 +80,6 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
             }
 
             // Bind appropriate textures
-            int textureCounter = 0;
             for (const Texture& texture : _textures) {
                 // Tell shader wether to render invisible mesh with flashy color or not
                 program.setUniform("use_forced_color", texture.useForcedColor);
@@ -90,8 +90,9 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
                 std::string name = textureTypeToString(texture.type);
                 // Use texture or color
                 if (texture.hasTexture) {
-                    // Active proper texture unit before binding
-                    glActiveTexture(GL_TEXTURE0 + textureCounter);
+                    // Activate proper texture unit before binding
+                    ghoul::opengl::TextureUnit textureUnit;
+                    textureUnit.activate();
 
                     // Specular special case
                     if (texture.type == TextureType::TextureSpecular) {
@@ -100,11 +101,10 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
 
                     // Tell shader to use textures and set texture unit
                     program.setUniform("has_" + name, true);
-                    program.setUniform(name, textureCounter);
+                    program.setUniform(name, textureUnit);
 
                     // And finally bind the texture
                     texture.texture->bind();
-                    ++textureCounter;
                 }
                 // Use embedded simple colors instead of textures
                 else {
@@ -132,12 +132,13 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
                 {
                     // Use texture or color
                     if (texture.hasTexture) {
-                        // Active proper texture unit before binding
-                        glActiveTexture(GL_TEXTURE1);
+                        // Activate proper texture unit before binding
+                        ghoul::opengl::TextureUnit textureUnit;
+                        textureUnit.activate();
 
                         // Tell shader to use textures and set texture unit
                         program.setUniform("has_texture_diffuse", true);
-                        program.setUniform("baseTexture", 1);
+                        program.setUniform("baseTexture", textureUnit);
 
                         // And finally bind the texture
                         texture.texture->bind();

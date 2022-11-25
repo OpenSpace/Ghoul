@@ -353,6 +353,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
 
                 // isTransparent
                 uint8_t isT;
@@ -717,6 +718,10 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                 );
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.textures()[t].color.b),
+                    sizeof(float)
+                );
+                fileStream.write(
+                    reinterpret_cast<const char*>(&mesh.textures()[t].color.a),
                     sizeof(float)
                 );
 
