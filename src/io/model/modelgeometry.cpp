@@ -170,11 +170,18 @@ ModelGeometry::ModelCacheException::ModelCacheException(std::filesystem::path fi
 
 ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
                              std::vector<TextureEntry> textureStorage,
-                             std::unique_ptr<io::ModelAnimation> animation)
+                             std::unique_ptr<io::ModelAnimation> animation,
+                             bool isTransparent, bool hasCalcTransparency)
     : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
     , _animation(std::move(animation))
-{}
+    , _isTransparent(std::move(isTransparent))
+    , _hasCalcTransparency(std::move(hasCalcTransparency))
+{
+    if (!_hasCalcTransparency) {
+        calculateTransparency();
+    }
+}
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                                                   const std::filesystem::path& cachedFile,
@@ -550,19 +557,43 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             animation->nodeAnimations().push_back(nodeAnimation);
         }
 
+        // _isTransparent
+        uint8_t isT;
+        fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+        bool isTransparent = (isT == 1);
+
+        // _hasCalcTransparency
+        uint8_t hasCalcT;
+        fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
+        bool hasCalcTransparency = (hasCalcT == 1);
+
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
             std::move(nodeArray),
             std::move(textureStorageArray),
-            std::move(animation)
+            std::move(animation),
+            isTransparent,
+            hasCalcTransparency
         );
     }
     else {
+        // _isTransparent
+        uint8_t isT;
+        fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+        bool isTransparent = (isT == 1);
+
+        // _hasCalcTransparency
+        uint8_t hasCalcT;
+        fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
+        bool hasCalcTransparency = (hasCalcT == 1);
+
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
             std::move(nodeArray),
             std::move(textureStorageArray),
-            nullptr
+            nullptr,
+            isTransparent,
+            hasCalcTransparency
         );
     }
 }
@@ -926,6 +957,14 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         }
     }
 
+    // _isTransparent
+    uint8_t isT = _isTransparent ? 1 : 0;
+    fileStream.write(reinterpret_cast<const char*>(&isT), sizeof(uint8_t));
+
+    // _hasCalcTransparency
+    uint8_t hasCalcT = _hasCalcTransparency ? 1 : 0;
+    fileStream.write(reinterpret_cast<const char*>(&hasCalcT), sizeof(uint8_t));
+
     return fileStream.good();
 }
 
@@ -965,6 +1004,10 @@ double ModelGeometry::animationDuration() const {
 }
 
 void ModelGeometry::calculateTransparency() {
+    if (_hasCalcTransparency) {
+        return;
+    }
+
     bool isTransparent = false;
     for (const io::ModelNode& n : _nodes) {
         if (isTransparent) {
@@ -981,6 +1024,11 @@ void ModelGeometry::calculateTransparency() {
 
     _isTransparent = isTransparent;
     _hasCalcTransparency = true;
+}
+
+void ModelGeometry::recalculateTransparency() {
+    _hasCalcTransparency = false;
+    return calculateTransparency();
 }
 
 bool ModelGeometry::isTransparent() const {

@@ -58,7 +58,8 @@ public:
 
     ModelGeometry(std::vector<io::ModelNode> nodes,
         std::vector<TextureEntry> textureStorage,
-        std::unique_ptr<io::ModelAnimation> animation);
+        std::unique_ptr<io::ModelAnimation> animation,
+        bool isTransparent = false, bool hasCalcTransparency = false);
     ModelGeometry(ModelGeometry&&) noexcept = default;
     ~ModelGeometry() noexcept = default;
 
@@ -81,6 +82,7 @@ public:
     bool hasAnimation() const;
     double animationDuration() const;
     void calculateTransparency();
+    void recalculateTransparency();
     bool isTransparent() const;
 
     std::vector<io::ModelNode>& nodes();
