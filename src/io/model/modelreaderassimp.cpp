@@ -326,8 +326,9 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
 
     // Opacity
     float opacity = 0.f;
-    aiReturn hasOpacity = material->Get(AI_MATKEY_OPACITY, opacity);
-    if (hasOpacity == AI_SUCCESS && opacity == 0.f) {
+    aiReturn result = material->Get(AI_MATKEY_OPACITY, opacity);
+    bool hasOpacity = result == AI_SUCCESS && opacity < 1.f;
+    if (hasOpacity && opacity == 0.f) {
         // If the material is transparent then do not add it
         return ModelMesh(
             std::move(vertexArray),
@@ -354,6 +355,9 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 std::move(indexArray),
                 std::move(textureArray)
             );
+        }
+        if (hasOpacity) {
+            LWARNING("Unsupported opacity + diffuse texture found");
         }
     }
     else {
@@ -388,6 +392,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 textureArray.push_back(std::move(texture));
             }
         }
+        if (hasOpacity) {
+            textureArray.back().color.a =
+                std::min(opacity, textureArray.back().color.a);
+        }
     }
 
     // Specular
@@ -408,6 +416,9 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 std::move(indexArray),
                 std::move(textureArray)
             );
+        }
+        if (hasOpacity) {
+            LWARNING("Unsupported opacity + specular texture found");
         }
     }
     else {
@@ -442,6 +453,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 textureArray.push_back(std::move(texture));
             }
         }
+        if (hasOpacity) {
+            textureArray.back().color.a =
+                std::min(opacity, textureArray.back().color.a);
+        }
     }
 
     // Normal
@@ -462,6 +477,9 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 std::move(indexArray),
                 std::move(textureArray)
             );
+        }
+        if (hasOpacity) {
+            LWARNING("Unsupported opacity + normal texture found");
         }
     }
 
