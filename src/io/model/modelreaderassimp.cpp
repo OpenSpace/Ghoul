@@ -417,9 +417,6 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 std::move(textureArray)
             );
         }
-        if (hasOpacity) {
-            LWARNING("Unsupported opacity + specular texture found");
-        }
     }
     else {
         // Load embedded simple material instead of textures
@@ -477,9 +474,6 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 std::move(indexArray),
                 std::move(textureArray)
             );
-        }
-        if (hasOpacity) {
-            LWARNING("Unsupported opacity + normal texture found");
         }
     }
 
