@@ -61,11 +61,11 @@ T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
     };
 
     static constexpr GaussLegendreCoefficient coefficients[] = {
-        { 0.0, 0.5688889 },
-        { -0.5384693, 0.47862867 },
-        { 0.5384693, 0.47862867 },
-        { -0.90617985, 0.23692688 },
-        { 0.90617985, 0.23692688 }
+        { .abscissa = 0.0, .weight = 0.5688889 },
+        { .abscissa = -0.5384693, .weight = 0.47862867 },
+        { .abscissa = 0.5384693, .weight = 0.47862867 },
+        { .abscissa = -0.90617985, .weight = 0.23692688 },
+        { .abscissa = 0.90617985, .weight = 0.23692688 }
     };
 
     const double a = t0;

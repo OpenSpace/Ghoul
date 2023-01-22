@@ -143,12 +143,12 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
 }
 
 void OpenGLCapabilitiesComponent::clearCapabilities() {
-    _glVersion = { 0, 0, 0 };
+    _glVersion = { .major = 0, .minor = 0, .release = 0 };
     _glslCompiler.clear();
     _vendor = Vendor::Other;
     _glRenderer.clear();
     _extensions.clear();
-    _glewVersion = { 0, 0, 0 };
+    _glewVersion = { .major = 0, .minor = 0, .release = 0 };
 
     _maxTextureSize = -1;
     _maxTextureSize3D = -1;

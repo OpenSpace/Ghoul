@@ -31,8 +31,8 @@
 
 namespace {
 struct Data {
-    const char* string;
-    unsigned int hash;
+    const char* string = nullptr;
+    unsigned int hash = 0;
 };
 
 // Just a list of random strings to test

@@ -333,7 +333,7 @@ bool Texture::isResident() const {
 }
 
 void Texture::setWrapping(WrappingMode wrapping) {
-    _wrapping = { wrapping, wrapping, wrapping };
+    _wrapping = { .s = wrapping, .t = wrapping, .r = wrapping };
     applyWrapping();
 }
 
