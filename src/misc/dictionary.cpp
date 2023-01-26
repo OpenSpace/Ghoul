@@ -77,14 +77,6 @@ void Dictionary::setValue(std::string key, T value) {
 template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
 T Dictionary::value(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    const size_t dotPos = key.find('.');
-    if (dotPos != std::string_view::npos) {
-        std::string_view before = key.substr(0, dotPos);
-        std::string_view after = key.substr(dotPos + 1);
-
-        ghoul::Dictionary d = value<ghoul::Dictionary>(before);
-        return d.value<T>(after);
-    }
 
     auto it = _storage.find(key);
     if (it == _storage.end()) {
@@ -161,19 +153,6 @@ T Dictionary::value(std::string_view key) const {
 template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
 bool Dictionary::hasValue(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    const size_t dotPos = key.find('.');
-    if (dotPos != std::string_view::npos) {
-        std::string_view before = key.substr(0, dotPos);
-        std::string_view after = key.substr(dotPos + 1);
-
-        if (hasValue<ghoul::Dictionary>(before)) {
-            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
-            return d.hasValue<T>(after);
-        }
-        else {
-            return false;
-        }
-    }
 
     auto it = _storage.find(key);
     if (it == _storage.end()) {
@@ -213,23 +192,9 @@ bool Dictionary::hasValue(std::string_view key) const {
 
 bool Dictionary::hasKey(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    const size_t dotPos = key.find('.');
-    if (dotPos != std::string_view::npos) {
-        std::string_view before = key.substr(0, dotPos);
-        std::string_view after = key.substr(dotPos + 1);
-
-        if (hasKey(before)) {
-            ghoul::Dictionary d = value<ghoul::Dictionary>(before);
-            return d.hasKey(after);
-        }
-        else {
-            return false;
-        }
-    }
-    else {
-        auto it = _storage.find(key);
-        return it != _storage.end();
-    }
+    
+    auto it = _storage.find(key);
+    return it != _storage.end();
 }
 
 std::vector<std::string_view> Dictionary::keys() const {

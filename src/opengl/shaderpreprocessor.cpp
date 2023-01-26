@@ -40,7 +40,7 @@
 
 namespace {
     bool isString(std::string_view str) {
-        return str.length() > 1 && str[0] == '"' && str[str.length() - 1] == '"';
+        return str.length() > 1 && str.front() == '"' && str.back() == '"';
     }
 
     std::string trim(const std::string& str, std::string* before = nullptr,
@@ -90,6 +90,60 @@ namespace {
         std::string_view type =
             isCore ? " core" : (isCompatibility ? " compatibility" : "");
         return fmt::format("#version {}{}0 {}", versionMajor, versionMinor, type);
+    }
+
+    bool hasKeyRecursive(const ghoul::Dictionary& dictionary, std::string_view key) {
+        const size_t dotPos = key.find('.');
+        if (dotPos != std::string_view::npos) {
+            std::string_view before = key.substr(0, dotPos);
+            std::string_view after = key.substr(dotPos + 1);
+
+            if (dictionary.hasKey(before)) {
+                ghoul::Dictionary d = dictionary.value<ghoul::Dictionary>(before);
+                return d.hasKey(after);
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return dictionary.hasKey(key);
+        }
+    }
+
+    template <typename T>
+    bool hasValueRecursive(const ghoul::Dictionary& dictionary, std::string_view key) {
+        const size_t dotPos = key.find('.');
+        if (dotPos != std::string_view::npos) {
+            std::string_view before = key.substr(0, dotPos);
+            std::string_view after = key.substr(dotPos + 1);
+
+            if (dictionary.hasValue<ghoul::Dictionary>(before)) {
+                ghoul::Dictionary d = dictionary.value<ghoul::Dictionary>(before);
+                return d.hasValue<T>(after);
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return dictionary.hasValue<T>(key);
+        }
+    }
+
+    template <typename T>
+    T valueRecursive(const ghoul::Dictionary& dictionary, std::string_view key) {
+        const size_t dotPos = key.find('.');
+        if (dotPos != std::string_view::npos) {
+            std::string_view before = key.substr(0, dotPos);
+            std::string_view after = key.substr(dotPos + 1);
+
+            ghoul::Dictionary d = dictionary.value<ghoul::Dictionary>(before);
+            return d.value<T>(after);
+        }
+        else {
+            return dictionary.value<T>(key);
+        }
     }
 } // namespace
 
@@ -399,7 +453,8 @@ bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
     }
 
     out = beforeDot + afterDot;
-    return ((afterDot.empty() && isString(beforeDot)) || _dictionary.hasKey(out));
+    return ((afterDot.empty() && isString(beforeDot)) ||
+           hasKeyRecursive(_dictionary, out));
 }
 
 std::string ShaderPreprocessor::substitute(const std::string& in,
@@ -415,32 +470,32 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
     if (isString(resolved)) {
         return resolved.substr(1, resolved.length() - 2);
     }
-    else if (_dictionary.hasValue<bool>(resolved)) {
-        return std::to_string(_dictionary.value<bool>(resolved));
+    else if (hasValueRecursive<bool>(_dictionary, resolved)) {
+        return std::to_string(valueRecursive<bool>(_dictionary, resolved));
     }
-    else if (_dictionary.hasValue<std::string>(resolved)) {
-        return _dictionary.value<std::string>(resolved);
+    else if (hasValueRecursive<std::string>(_dictionary, resolved)) {
+        return valueRecursive<std::string>(_dictionary, resolved);
     }
-    else if (_dictionary.hasValue<int>(resolved)) {
-        return std::to_string(_dictionary.value<int>(resolved));
+    else if (hasValueRecursive<int>(_dictionary, resolved)) {
+        return std::to_string(valueRecursive<int>(_dictionary, resolved));
     }
-    else if (_dictionary.hasValue<double>(resolved)) {
-        return std::to_string(_dictionary.value<double>(resolved));
+    else if (hasValueRecursive<double>(_dictionary, resolved)) {
+        return std::to_string(valueRecursive<double>(_dictionary, resolved));
     }
-    else if (_dictionary.hasValue<glm::ivec2>(resolved)) {
-        glm::ivec2 vec = _dictionary.value<glm::ivec2>(resolved);
+    else if (hasValueRecursive<glm::ivec2>(_dictionary, resolved)) {
+        glm::ivec2 vec = valueRecursive<glm::ivec2>(_dictionary, resolved);
         return fmt::format("ivec2({},{})", vec.x, vec.y);
     }
-    else if (_dictionary.hasValue<glm::ivec3>(resolved)) {
-        glm::ivec3 vec = _dictionary.value<glm::ivec3>(resolved);
+    else if (hasValueRecursive<glm::ivec3>(_dictionary, resolved)) {
+        glm::ivec3 vec = valueRecursive<glm::ivec3>(_dictionary, resolved);
         return fmt::format("ivec3({},{},{})", vec.x, vec.y, vec.z);
     }
-    else if (_dictionary.hasValue<glm::dvec2>(resolved)) {
-        glm::dvec2 vec = _dictionary.value<glm::dvec2>(resolved);
+    else if (hasValueRecursive<glm::dvec2>(_dictionary, resolved)) {
+        glm::dvec2 vec = valueRecursive<glm::dvec2>(_dictionary, resolved);
         return fmt::format("dvec2({},{})", vec.x, vec.y);
     }
-    else if (_dictionary.hasValue<glm::dvec3>(resolved)) {
-        glm::dvec3 vec = _dictionary.value<glm::dvec3>(resolved);
+    else if (hasValueRecursive<glm::dvec3>(_dictionary, resolved)) {
+        glm::dvec3 vec = valueRecursive<glm::dvec3>(_dictionary, resolved);
         return fmt::format("dvec3({},{},{})", vec.x, vec.y, vec.z);
     }
     else {
