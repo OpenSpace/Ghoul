@@ -82,7 +82,7 @@ namespace {
         static_assert(
             std::is_same_v<T, double> || std::is_same_v<T, int> || 
             std::is_same_v<T, std::string>,
-            "Only double, ints or strings are allowed in vectors"
+            "Only double, ints, or strings are allowed in vectors"
         );
         if (vec.empty()) {
             return "[]";
