@@ -74,6 +74,10 @@ void Dictionary::setValue(std::string key, T value) {
     }
 }
 
+void Dictionary::setValue(std::string key, const char value[]) {
+    setValue(std::move(key), std::string(value));
+}
+
 template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
 T Dictionary::value(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");

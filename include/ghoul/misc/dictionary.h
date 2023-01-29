@@ -112,6 +112,8 @@ public:
     template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
     void setValue(std::string key, T value);
 
+    void setValue(std::string key, const char value[]);
+
     /**
      * Retrieves the value stored at the provided \p key. The template parameter has to be
      * one of the types contained in the Types variant described above. If the Dictionary
