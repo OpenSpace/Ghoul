@@ -54,8 +54,7 @@ else ()
   target_compile_options(GhoulTest PRIVATE "-O0" )
 endif ()
 
-target_include_directories(GhoulTest PRIVATE "${GHOUL_ROOT_DIR}/ext/catch2/single_include")
-target_link_libraries(GhoulTest PRIVATE Ghoul)
+target_link_libraries(GhoulTest PRIVATE Catch2 Ghoul)
 
 if (APPLE)
   target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})

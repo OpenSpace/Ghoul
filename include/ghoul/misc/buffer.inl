@@ -50,7 +50,7 @@ void ghoul::Buffer::deserialize(T& value) {
 
 template<typename T>
 void ghoul::Buffer::serialize(const std::vector<T>& v) {
-    static_assert(std::is_pod<T>::value, "T has to be a POD for general serialize");
+    static_assert(std::is_trivially_copyable_v<T>, "T has to be trivially copyable");
 
     const size_t length = v.size();
     const size_t size = sizeof(T)*length+sizeof(size_t);
@@ -65,10 +65,7 @@ void ghoul::Buffer::serialize(const std::vector<T>& v) {
 template <typename Iter>
 void ghoul::Buffer::serialize(Iter begin, Iter end) {
     using T = typename std::iterator_traits<Iter>::value_type;
-    static_assert(
-        std::is_pod<T>::value,
-        "Iter must point to a POD for general serialize"
-    );
+    static_assert(std::is_trivially_copyable_v<T>, "*Iter has to be trivially copyable");
 
     const size_t length = std::distance(begin, end);
     const size_t size = sizeof(T) * length + sizeof(size_t);
@@ -85,7 +82,7 @@ void ghoul::Buffer::serialize(Iter begin, Iter end) {
 
 template<typename T>
 void ghoul::Buffer::deserialize(std::vector<T>& v) {
-    static_assert(std::is_pod<T>::value, "T has to be a POD for general deserialize");
+    static_assert(std::is_trivially_copyable_v<T>, "T has to be trivially copyable");
 
     ghoul_assert(
         _offsetRead + sizeof(size_t) <= _data.size(), "Insufficient buffer size"
@@ -102,10 +99,7 @@ void ghoul::Buffer::deserialize(std::vector<T>& v) {
 template <typename Iter>
 void ghoul::Buffer::deserialize(Iter begin, Iter end) {
     using T = typename std::iterator_traits<Iter>::value_type;
-    static_assert(
-        std::is_pod<T>::value,
-        "Iter must point to a POD for general serialize"
-    );
+    static_assert(std::is_trivially_copyable_v<T>, "*Iter has to be trivially copyable");
 
     size_t n;
     std::memcpy(&n, _data.data() + _offsetRead, sizeof(size_t));

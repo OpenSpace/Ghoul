@@ -22,8 +22,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "catch2/catch.hpp"
-
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 #include <ghoul/glm.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/lua/lua_helper.h>
@@ -58,7 +59,7 @@ TEMPLATE_TEST_CASE("LuaConversion", "[luaconversion]", bool, char, signed char,
     ghoul::lua::push(state, val);
 
     const T value = ghoul::lua::value<T>(state);
-    CHECK(value == Approx(val));
+    CHECK(value == Catch::Approx(val));
 
     lua_close(state);
 }
@@ -220,11 +221,11 @@ TEMPLATE_TEST_CASE("LuaConversion Float Fuzz", "[luaconversion]", float, double,
         ghoul::lua::push(state, val);
 
         const T value = ghoul::lua::value<T>(state);
-        CHECK(value == Approx(val));
+        CHECK(value == Catch::Approx(val));
 
         if (typeid(T) == typeid(long double)) {
-            if (Approx(value) != std::numeric_limits<long double>::infinity()) {
-                CHECK(value == Approx(val));
+            if (Catch::Approx(value) != std::numeric_limits<long double>::infinity()) {
+                CHECK(value == Catch::Approx(val));
             }
         }
     }
