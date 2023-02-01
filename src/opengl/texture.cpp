@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2022                                                               *
+ * Copyright (c) 2012-2023                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -333,7 +333,7 @@ bool Texture::isResident() const {
 }
 
 void Texture::setWrapping(WrappingMode wrapping) {
-    _wrapping = { wrapping, wrapping, wrapping };
+    _wrapping = { .s = wrapping, .t = wrapping, .r = wrapping };
     applyWrapping();
 }
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2022                                                               *
+ * Copyright (c) 2012-2023                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,12 +26,10 @@
 #include <ghoul/systemcapabilities/version.h>
 
 namespace {
-
-unsigned int packVersion(int major, int minor, int release) {
-    // safe since: 2^8 * 1000 * 1000 < 2^32
-    return major * 1000 * 1000  +  minor * 1000  +  release;
-}
-
+    unsigned int packVersion(int major, int minor, int release) {
+        // safe since: 2^8 * 1000 * 1000 < 2^32
+        return major * 1000 * 1000  +  minor * 1000  +  release;
+    }
 } // namespace
 
 namespace ghoul {
@@ -49,41 +47,11 @@ std::string to_string(const ghoul::systemcapabilities::Version& v) {
 } // namespace ghoul
 
 namespace ghoul::systemcapabilities {
-
-bool Version::operator==(const Version& rhs) const {
-    return (major == rhs.major) && (minor == rhs.minor) && (release == rhs.release);
-}
-
-bool Version::operator!=(const Version& rhs) const {
-    return !(*this == rhs);
-}
-
-bool Version::operator<(const Version& rhs) const {
+    
+std::strong_ordering Version::operator<=>(const Version& rhs) const noexcept {
     const unsigned int numThis = packVersion(major, minor, release);
     const unsigned int numRhs = packVersion(rhs.major, rhs.minor, rhs.release);
-
-    return numThis < numRhs;
-}
-
-bool Version::operator<=(const Version& rhs) const {
-    const unsigned int numThis = packVersion(major, minor, release);
-    const unsigned int numRhs = packVersion(rhs.major, rhs.minor, rhs.release);
-
-    return numThis <= numRhs;
-}
-
-bool Version::operator>(const Version& rhs) const {
-    const unsigned int numThis = packVersion(major, minor, release);
-    const unsigned int numRhs = packVersion(rhs.major, rhs.minor, rhs.release);
-
-    return numThis > numRhs;
-}
-
-bool Version::operator>=(const Version& rhs) const {
-    const unsigned int numThis = packVersion(major, minor, release);
-    const unsigned int numRhs = packVersion(rhs.major, rhs.minor, rhs.release);
-
-    return numThis >= numRhs;
+    return numThis <=> numRhs;
 }
 
 } // namespace ghoul::systemcapabilities

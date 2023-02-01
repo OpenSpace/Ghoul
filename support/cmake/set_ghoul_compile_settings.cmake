@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2022                                                                #
+# Copyright (c) 2012-2023                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -31,7 +31,6 @@ function (set_ghoul_compile_settings target)
     "/W4"       # Highest warning level
     "/wd4201"   # nonstandard extension used : nameless struct/union  [raised by: GLM]
     "/wd4127"   # conditional expression is constant [raised by: websocketpp]
-    "/std:c++latest" # Latest C++ standard
     "/permissive-"   # Enable conformance mode
     "/Zc:__cplusplus" # Correctly set the __cplusplus macro
   )
@@ -42,7 +41,7 @@ function (set_ghoul_compile_settings target)
     "-Wextra"
     "-Wmost"
     "-Wpedantic"
-    
+
     "-Wabstract-vbase-init"
     "-Walloca"
     "-Wanon-enum-enum-conversion"
@@ -122,7 +121,7 @@ function (set_ghoul_compile_settings target)
     "-Wvla"
     "-Wweak-template-vtables"
     "-Wzero-as-null-pointer-constant"
-    
+
     "-Wno-missing-braces"
   )
 
@@ -208,7 +207,7 @@ function (set_ghoul_compile_settings target)
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})
     target_compile_definitions(${target} PUBLIC "-DGHOUL_ASSERT")
     target_link_libraries(${target} PRIVATE "c++" "c++abi")
-    
+
     if (GHOUL_WARNINGS_AS_ERRORS)
       target_compile_options(${target} PRIVATE "-Werror")
     endif ()

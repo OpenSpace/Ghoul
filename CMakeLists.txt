@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2022                                                                #
+# Copyright (c) 2012-2023                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -128,7 +128,7 @@ if (GHOUL_MODULE_OPENGL)
   # glbindings
   if (NOT TARGET glbinding)
     begin_dependency("glbinding")
-  
+
     set(OPTION_BUILD_GPU_TESTS OFF CACHE BOOL "")
     set(OPTION_BUILD_TESTS OFF CACHE BOOL "")
     set(OPTION_BUILD_TOOLS OFF CACHE BOOL "")
@@ -137,13 +137,13 @@ if (GHOUL_MODULE_OPENGL)
     disable_external_warnings(glbinding)
     disable_external_warnings(glbinding-aux)
     target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
-  
+
     set_folder_location(glbinding "External")
     set_folder_location(glbinding-aux "External/glbinding-ext")
     set_folder_location(pack "External/glbinding-ext")
     set_folder_location(pack-glbinding "External/glbinding-ext")
     set_folder_location(KHRplatform-sources "External/glbinding-ext")
-  
+
     end_dependency("glbinding")
   endif ()
   end_module("OpenGL")

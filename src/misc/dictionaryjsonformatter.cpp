@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2022                                                               *
+ * Copyright (c) 2012-2023                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -44,21 +44,59 @@ namespace {
         return fmt::format("{}", d);
     }
 
+    std::string formatString(const std::string& value) {
+        std::string jsonString;
+        for (const char& c : value) {
+            switch (c) {
+            case '"':
+                jsonString += "\\\"";
+                break;
+            case '\\':
+                jsonString += "\\\\";
+                break;
+            case '\b':
+                jsonString += "\\b";
+                break;
+            case '\f':
+                jsonString += "\\f";
+                break;
+            case '\n':
+                jsonString += "\\n";
+                break;
+            case '\r':
+                jsonString += "\\r";
+                break;
+            case '\t':
+                jsonString += "\\t";
+                break;
+            default:
+                jsonString += c;
+            }
+        }
+
+        return "\"" + jsonString + "\"";
+    }
+
     template <typename T>
     std::string formatVector(const std::vector<T>& vec) {
         static_assert(
-            std::is_same_v<T, double> || std::is_same_v<T, int>,
-            "Only double or ints allowed"
+            std::is_same_v<T, double> || std::is_same_v<T, int> || 
+            std::is_same_v<T, std::string>,
+            "Only double, ints, or strings are allowed in vectors"
         );
-
         if (vec.empty()) {
             return "[]";
         }
-
         std::stringstream values;
+
         for (size_t i = 0; i < vec.size() - 1; i++) {
-            double v = static_cast<double>(vec[i]);
-            values << formatNumber(v) << ",";
+            if constexpr (std::is_arithmetic_v<T>) {
+                double v = static_cast<double>(vec[i]);
+                values << formatNumber(v) << ",";
+            }
+            else {
+                values << formatString(vec[i]) << ",";
+            }
         }
         values << vec.back();
 
@@ -105,39 +143,14 @@ namespace {
             return formatVector(vec);
         }
 
+        if (dictionary.hasValue<std::vector<std::string>>(key)) {
+            std::vector<std::string> vec = dictionary.value<std::vector<std::string>>(key);
+            return formatVector(vec);
+        }
+
         if (dictionary.hasValue<std::string>(key)) {
             std::string value = dictionary.value<std::string>(key);
-
-            std::string jsonString;
-            for (const char& c : value) {
-                switch (c) {
-                    case '"':
-                        jsonString += "\\\"";
-                        break;
-                    case '\\':
-                        jsonString += "\\\\";
-                        break;
-                    case '\b':
-                        jsonString += "\\b";
-                        break;
-                    case '\f':
-                        jsonString += "\\f";
-                        break;
-                    case '\n':
-                        jsonString += "\\n";
-                        break;
-                    case '\r':
-                        jsonString += "\\r";
-                        break;
-                    case '\t':
-                        jsonString += "\\t";
-                        break;
-                    default:
-                        jsonString += c;
-                }
-            }
-
-            return "\"" + jsonString + "\"";
+            return formatString(value);
         }
 
         throw JsonFormattingError(fmt::format(

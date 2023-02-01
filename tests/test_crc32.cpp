@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2022                                                               *
+ * Copyright (c) 2012-2023                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,8 +31,8 @@
 
 namespace {
 struct Data {
-    const char* string;
-    unsigned int hash;
+    const char* string = nullptr;
+    unsigned int hash = 0;
 };
 
 // Just a list of random strings to test

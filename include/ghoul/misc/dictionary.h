@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2022                                                               *
+ * Copyright (c) 2012-2023                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -111,6 +111,8 @@ public:
     // Just a helper function to make the error message a bit more palatable
     template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
     void setValue(std::string key, T value);
+
+    void setValue(std::string key, const char value[]);
 
     /**
      * Retrieves the value stored at the provided \p key. The template parameter has to be

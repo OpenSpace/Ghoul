@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2022                                                               *
+ * Copyright (c) 2012-2023                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,58 +33,7 @@ namespace ghoul::systemcapabilities {
 
 /// This struct stores the detected version of the GLSL driver
 struct Version {
-    /**
-     * Returns <code>true</code>, if major, minor, and release version parts are the
-     * same.
-     *
-     * \return <code>True</code> if both versions are the same
-     */
-    bool operator==(const Version& rhs) const;
-
-    /**
-     * Returns <code>true</code>, if major, minor, or release version parts are
-     * different.
-     *
-     * \return <code>True</code> if either major, minor, or release version is
-     *         different
-     */
-    bool operator!=(const Version& rhs) const;
-
-    /**
-     * First compares major version against major version, then minor against minor
-     * and finally release against release.
-     *
-     * \return <code>True</code> if <code>this</code> is a smaller version than
-     *         <code>rhs</code>
-     */
-    bool operator<(const Version& rhs) const;
-
-    /**
-     * First compares major version against major version, then minor against minor
-     * and finally release against release.
-     *
-     * \return <code>True</code> if <code>this</code> is a smaller or equal version
-     *         than <code>rhs</code>
-     */
-    bool operator<=(const Version& rhs) const;
-
-    /**
-     * First compares major version against major version, then minor against minor
-     * and finally release against release.
-     *
-     * \return <code>True</code> if <code>this</code> is a greater version than
-     *         <code>rhs</code>
-     */
-    bool operator>(const Version& rhs) const;
-
-    /**
-     * First compares major version against major version, then minor against minor
-     * and finally release against release.
-     *
-     * \return <code>True</code> if <code>this</code> is a greater or equal version
-     *         than <code>rhs</code>
-     */
-    bool operator>=(const Version& rhs) const;
+    std::strong_ordering operator<=>(const Version& rhs) const noexcept;
 
     /// The <code>major</code> part of the version
     int major;

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2022                                                               *
+ * Copyright (c) 2012-2023                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -129,7 +129,7 @@ void ThreadPool::stop(RunRemainingTasks runTasks, DetachThreads detachThreads) {
     // Delete all the workers. We don't want to actually delete them as we would otherwise
     // lose information about their sizes
     for (Worker& w : _workers) {
-        w = { nullptr, nullptr };
+        w = { .thread = nullptr, .shouldTerminate = nullptr };
     }
 
     ghoul_assert(!isRunning(), "The ThreadPool is still running");
@@ -306,7 +306,10 @@ void ThreadPool::activateWorker(Worker& worker) {
     }
 
     // Overwrite the worker and we are done
-    worker = { std::move(thread), std::move(shouldTerminate) };
+    worker = {
+        .thread = std::move(thread),
+        .shouldTerminate = std::move(shouldTerminate)
+    };
 
     while (!finishedInitializing) {}
 }
