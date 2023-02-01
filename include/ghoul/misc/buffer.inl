@@ -25,10 +25,11 @@
 
 #include <ghoul/misc/assert.h>
 #include <cstring>
+#include <type_traits>
 
 template<class T>
 void ghoul::Buffer::serialize(const T& v) {
-    static_assert(std::is_pod<T>::value, "T has to be a POD for general serialize");
+    static_assert(std::is_trivially_copyable_v<T>, "T has to be trivially copyable");
 
     const size_t size = sizeof(T);
     _data.resize(_data.capacity() + size);
@@ -38,7 +39,7 @@ void ghoul::Buffer::serialize(const T& v) {
 
 template<class T>
 void ghoul::Buffer::deserialize(T& value) {
-    static_assert(std::is_pod<T>::value, "T has to be a POD for general deserialize");
+    static_assert(std::is_trivially_copyable_v<T>, "T has to be trivially copyable");
 
     const size_t size = sizeof(T);
     ghoul_assert(_offsetRead + size <= _data.size(), "Insufficient buffer size");
