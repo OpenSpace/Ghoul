@@ -36,7 +36,6 @@ function (set_ghoul_compile_settings target)
   )
 
   set(CLANG_WARNINGS
-    # "-stdlib=libc++"
     "-Wall"
     "-Wextra"
     "-Wmost"
@@ -206,7 +205,6 @@ function (set_ghoul_compile_settings target)
   elseif (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})
     target_compile_definitions(${target} PUBLIC "-DGHOUL_ASSERT")
-    # target_link_libraries(${target} PRIVATE "c++" "c++abi")
 
     if (GHOUL_WARNINGS_AS_ERRORS)
       target_compile_options(${target} PRIVATE "-Werror")
