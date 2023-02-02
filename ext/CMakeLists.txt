@@ -25,7 +25,9 @@
 
 function(set_compile_options project)
   target_compile_features(${project} PUBLIC cxx_std_20)
-  target_compile_options(${project} PRIVATE /MP /EHsc /permissive-)
+  if (WIN32)
+    target_compile_options(${project} PRIVATE /MP /EHsc /permissive-)
+  endif ()
 endfunction()
 
 # System Libraries
