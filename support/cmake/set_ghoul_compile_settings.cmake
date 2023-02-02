@@ -67,7 +67,6 @@ function (set_ghoul_compile_settings target)
     "-Wduplicate-method-match"
     "-Wextra-semi"
     "-Wextra-semi-stmt"
-    "-Wfloat-equal"
     "-Wfloat-overflow-conversion"
     "-Wfloat-zero-conversion"
     "-Wformat"
