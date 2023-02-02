@@ -77,12 +77,6 @@ endif ()
 add_subdirectory(src)
 add_subdirectory(ext)
 
-# if (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -stdlib=libc++")
-#   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++ -lc++abi")
-# endif ()
-
-
 # Other applications
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)

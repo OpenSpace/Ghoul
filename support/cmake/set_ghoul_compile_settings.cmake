@@ -122,6 +122,7 @@ function (set_ghoul_compile_settings target)
     "-Wzero-as-null-pointer-constant"
 
     "-Wno-missing-braces"
+    "-Wno-c++98-compat-bind-to-temporary-copy"
   )
 
   set(GCC_WARNINGS
