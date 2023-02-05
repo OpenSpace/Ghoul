@@ -155,12 +155,8 @@ Font::Font(std::filesystem::path filename, float pointSize, opengl::TextureAtlas
     FT_Library library = nullptr;
     FT_Face face = nullptr;
     defer {
-        if (face) {
-            FT_Done_Face(face);
-        }
-        if (library) {
-            FT_Done_FreeType(library);
-        }
+        FT_Done_Face(face);
+        FT_Done_FreeType(library);
     };
     loadFace(_name, _pointSize * HighFaceResolutionFactor, library, face);
 
@@ -259,12 +255,8 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
     FT_Library library = nullptr;
     FT_Face face = nullptr;
     defer {
-        if (face) {
-            FT_Done_Face(face);
-        }
-        if (library) {
-            FT_Done_FreeType(library);
-        }
+        FT_Done_Face(face);
+        FT_Done_FreeType(library);
     };
     loadFace(_name, _pointSize, library, face);
 
@@ -482,12 +474,8 @@ void Font::generateKerning() {
     FT_Library library = nullptr;
     FT_Face face = nullptr;
     defer {
-        if (face) {
-            FT_Done_Face(face);
-        }
-        if (library) {
-            FT_Done_FreeType(library);
-        }
+        FT_Done_Face(face);
+        FT_Done_FreeType(library);
     };
     loadFace(_name, _pointSize, library, face);
 

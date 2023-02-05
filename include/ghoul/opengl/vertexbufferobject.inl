@@ -31,7 +31,7 @@ template <typename T>
 void VertexBufferObject::initialize(const std::vector<T>& vertexArray,
                                                    const std::vector<GLint>& indexArray)
 {
-    static_assert(std::is_pod<T>::value, "T has to be a POD");
+    static_assert(std::is_trivially_copyable_v<T>, "T has to be trivially copyable");
 
     ghoul_assert(!isInitialized(), "VertexBufferObject must not have been initialized");
     ghoul_assert(!vertexArray.empty(), "Vertex array must not be empty");
