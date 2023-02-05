@@ -222,6 +222,14 @@ if (GHOUL_MODULE_FONTRENDERING)
   set(FREETYPE_DIST OFF CACHE BOOL "")
   add_subdirectory(freetype2)
   target_link_libraries(Ghoul PUBLIC freetype)
+
+  if (MSVC)
+    target_compile_options(freetype PRIVATE "/W0")
+    target_compile_definitions(freetype PRIVATE "_SCL_SECURE_NO_WARNINGS")
+  else ()
+    target_compile_options(freetype PRIVATE "-w")
+  endif ()
+
   set_target_properties(freetype PROPERTIES FOLDER "External")
 
   if (TARGET zlib)
