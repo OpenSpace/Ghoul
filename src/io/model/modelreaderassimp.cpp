@@ -552,7 +552,7 @@ static void processNode(const aiNode& node, const aiScene& scene,
 
                         ModelAnimation::PositionKeyframe positionKeyframe;
                         positionKeyframe.time =
-                            abs(animation->mTicksPerSecond) <
+                            std::abs(animation->mTicksPerSecond) <
                             std::numeric_limits<double>::epsilon() ? posKey.mTime :
                             posKey.mTime / animation->mTicksPerSecond;
                         positionKeyframe.position = glm::vec3(
@@ -569,7 +569,7 @@ static void processNode(const aiNode& node, const aiScene& scene,
 
                         ModelAnimation::RotationKeyframe rotationKeyframe;
                         rotationKeyframe.time =
-                            abs(animation->mTicksPerSecond) <
+                            std::abs(animation->mTicksPerSecond) <
                             std::numeric_limits<double>::epsilon() ? rotKey.mTime :
                             rotKey.mTime / animation->mTicksPerSecond;
                         rotationKeyframe.rotation = glm::quat(
@@ -673,7 +673,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         if (animation->mNumChannels > 0) {
             modelAnimation = std::make_unique<ModelAnimation>(
                 animation->mName.C_Str(),
-                abs(animation->mTicksPerSecond) <
+                std::abs(animation->mTicksPerSecond) <
                 std::numeric_limits<double>::epsilon() ? // Not all formats have this
                 animation->mDuration :
                 animation->mDuration / animation->mTicksPerSecond

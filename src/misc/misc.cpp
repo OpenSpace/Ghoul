@@ -101,21 +101,6 @@ std::string replaceAll(std::string string, const std::string& from,
 }
 
 std::string encodeUrl(const std::string& string) {
-    constexpr std::string_view WhiteSpace = "%20";
-    constexpr std::string_view HashTag = "%23";
-    constexpr std::string_view DollarSign = "%24";
-    constexpr std::string_view Ampersand = "%26";
-    constexpr std::string_view PlusSign = "%2B";
-    constexpr std::string_view Comma = "%2C";
-    constexpr std::string_view Slash = "%2F";
-    constexpr std::string_view Colon = "%3A";
-    constexpr std::string_view Semicolon = "%3B";
-    constexpr std::string_view EqualsSign = "%3D";
-    constexpr std::string_view QuestionMark = "%3F";
-    constexpr std::string_view AtSymbol = "%40";
-    constexpr std::string_view LeftSquareBracket = "%5B";
-    constexpr std::string_view RightSquareBracket = "%5D";
-
     std::string result;
     result = replaceAll(string, " ", "%20");
     result = replaceAll(result, "#", "%23");
