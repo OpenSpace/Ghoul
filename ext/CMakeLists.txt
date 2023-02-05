@@ -178,7 +178,10 @@ end_dependency("stb_image")
 # Stackwalker
 if (MSVC)
   begin_dependency("Stackwalker")
+  set(StackWalker_DISABLE_TESTS ON CACHE BOOL "" FORCE)
   include_external_library(Ghoul PRIVATE StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
+  # The StackWalker CMakeLists file is doing weird things, so we need to patch it here
+  target_include_directories(StackWalker PUBLIC stackwalker/Main/StackWalker)
   end_dependency("Stackwalker")
 endif ()
 
