@@ -23,12 +23,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-function (include_external_library target_name visibility library_name path)
-  add_subdirectory(${path} SYSTEM)
-  target_link_libraries(${target_name} ${visibility} ${library_name})
-  set_target_properties(${library_name} PROPERTIES FOLDER "External")
-endfunction ()
-
 # System Libraries
 if (WIN32)
   target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
@@ -112,7 +106,9 @@ end_dependency("LZ4")
 # Lua
 if (GHOUL_MODULE_LUA)
   begin_module("Lua")
-  include_external_library(Ghoul PUBLIC Lua ${GHOUL_ROOT_DIR}/ext/lua)
+  add_subdirectory(lua SYSTEM)
+  target_link_libraries(Ghoul PUBLIC Lua)
+  set_target_properties(Lua PROPERTIES FOLDER "External")
   end_module("Lua")
 endif ()
 
@@ -128,7 +124,9 @@ if (GHOUL_MODULE_ASSIMP)
     set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "Set to have assimp build minizip" FORCE)
   endif ()
 
-  include_external_library(Ghoul PRIVATE assimp ${GHOUL_ROOT_DIR}/ext/assimp)
+  add_subdirectory(assimp SYSTEM)
+  target_link_libraries(Ghoul PRIVATE assimp)
+  set_target_properties(assimp PROPERTIES FOLDER "External")
 
   # We need to include this to be able to find the assimp/config.h file
   target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
@@ -167,24 +165,32 @@ begin_dependency("fmt")
 set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
 set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
 set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-include_external_library(Ghoul PUBLIC fmt ${GHOUL_ROOT_DIR}/ext/cppformat)
+add_subdirectory(cppformat SYSTEM)
+target_link_libraries(Ghoul PUBLIC fmt)
+set_target_properties(fmt PROPERTIES FOLDER "External")
 end_dependency("fmt")
 
 # scnlib
 begin_dependency("scnlib")
-include_external_library(Ghoul PUBLIC scn ${GHOUL_ROOT_DIR}/ext/scnlib)
+add_subdirectory(scnlib SYSTEM)
+target_link_libraries(Ghoul PUBLIC scn)
+set_target_properties(scn PROPERTIES FOLDER "External")
 end_dependency("scnlib")
 
 # stb_image
 begin_dependency("stb_image")
-include_external_library(Ghoul PUBLIC stb_image ${GHOUL_ROOT_DIR}/ext/stb_image)
+add_subdirectory(stb_image SYSTEM)
+target_link_libraries(Ghoul PUBLIC stb_image)
+set_target_properties(stb_image PROPERTIES FOLDER "External")
 end_dependency("stb_image")
 
 # Stackwalker
 if (MSVC)
   begin_dependency("Stackwalker")
   set(StackWalker_DISABLE_TESTS ON CACHE BOOL "" FORCE)
-  include_external_library(Ghoul PRIVATE StackWalker ${GHOUL_ROOT_DIR}/ext/stackwalker)
+  add_subdirectory(stackwalker SYSTEM)
+  target_link_libraries(Ghoul PRIVATE StackWalker)
+  set_target_properties(StackWalker PROPERTIES FOLDER "External")
   # The StackWalker CMakeLists file is doing weird things, so we need to patch it here
   target_include_directories(StackWalker PUBLIC stackwalker/Main/StackWalker)
   end_dependency("Stackwalker")
@@ -214,7 +220,9 @@ end_dependency("WebSocketPP")
 if (GHOUL_MODULE_FONTRENDERING)
   begin_module("FontRendering")
   set(FREETYPE_DIST OFF CACHE BOOL "")
-  include_external_library(Ghoul PUBLIC freetype ${GHOUL_ROOT_DIR}/ext/freetype2)
+  add_subdirectory(freetype2 SYSTEM)
+  target_link_libraries(Ghoul PUBLIC freetype)
+  set_target_properties(freetype PROPERTIES FOLDER "External")
 
   if (TARGET zlib)
     set_target_properties(zlib PROPERTIES FOLDER "External")
@@ -224,7 +232,9 @@ endif ()
 
 # Tiny process library
 begin_dependency("tiny-process-library")
-include_external_library(Ghoul PRIVATE tiny-process-library ${GHOUL_ROOT_DIR}/ext/tiny-process-library)
+add_subdirectory(tiny-process-library SYSTEM)
+target_link_libraries(Ghoul PRIVATE tiny-process-library)
+set_target_properties(tiny-process-library PROPERTIES FOLDER "External")
 end_dependency("tiny-process-library")
 
 
