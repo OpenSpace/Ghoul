@@ -29,7 +29,6 @@ function (set_ghoul_compile_settings target)
   set(MSVC_WARNINGS
     "/MP"       # Multi-threading support
     "/W4"       # Highest warning level
-    "/wd4201"   # nonstandard extension used : nameless struct/union  [raised by: GLM]
     "/wd4127"   # conditional expression is constant [raised by: websocketpp]
     "/permissive-"   # Enable conformance mode
     "/Zc:__cplusplus" # Correctly set the __cplusplus macro

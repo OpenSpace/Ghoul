@@ -23,29 +23,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-function(disable_external_warnings library_name)
-  if (MSVC)
-    target_compile_options(${library_name} PRIVATE "/W0")
-    target_compile_definitions(${library_name} PRIVATE "_SCL_SECURE_NO_WARNINGS")
-  else ()
-    target_compile_options(${library_name} PRIVATE "-w")
-  endif ()
-endfunction ()
-
-
-function(disable_external_warnings_for_file file_name)
-  if (MSVC)
-    set_source_files_properties(${file_name} PROPERTIES COMPILE_FLAGS "/W0")
-
-    set_source_files_properties(
-      ${file_name}
-      PROPERTIES COMPILE_DEFINITIONS "_SCL_SECURE_NO_WARNINGS"
-    )
-  else ()
-    set_source_files_properties(${file_name} PROPERTIES COMPILE_FLAGS "-w")
-  endif ()
-endfunction ()
-
 function (set_folder_location target folder)
   if (TARGET ${target})
     set_target_properties(${target} PROPERTIES FOLDER ${folder})
@@ -67,6 +44,5 @@ function (include_external_library target_name visibility library_name path)
     else ()
       target_compile_options(${library_name} PRIVATE "-w")
     endif ()
-    disable_external_warnings(${library_name})
   endif ()
 endfunction ()

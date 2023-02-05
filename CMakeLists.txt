@@ -23,16 +23,14 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
+cmake_policy(VERSION 3.25)
 project(Ghoul)
 
 # Setting default paths
 set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/support/cmake)
 
-include(${GHOUL_ROOT_DIR}/support/cmake/handle_external_library.cmake)
-include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
-include(${GHOUL_ROOT_DIR}/support/cmake/copy_shared_libraries.cmake)
 include(${GHOUL_ROOT_DIR}/support/cmake/message_macros.cmake)
 
 begin_header("Configuring Ghoul Project")
@@ -75,7 +73,7 @@ if (MSVC)
 endif ()
 
 add_subdirectory(src)
-add_subdirectory(ext)
+add_subdirectory(ext SYSTEM)
 
 # Other applications
 option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
