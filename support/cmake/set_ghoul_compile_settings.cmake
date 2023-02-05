@@ -158,10 +158,6 @@ function (set_ghoul_compile_settings target)
 
   if (MSVC)
     target_compile_options(${target} PRIVATE ${MSVC_WARNINGS})
-    if (GHOUL_WARNINGS_AS_ERRORS)
-      target_compile_options(${target} PRIVATE "/WX")
-    endif ()
-
     target_compile_definitions(${target}
       # This definition can be removed when the glbinding submodule is updated
       PUBLIC "_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING"
@@ -197,24 +193,12 @@ function (set_ghoul_compile_settings target)
   elseif (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})
     target_compile_definitions(${target} PUBLIC "-DGHOUL_ASSERT")
-
-    if (GHOUL_WARNINGS_AS_ERRORS)
-      target_compile_options(${target} PRIVATE "-Werror")
-    endif ()
   elseif (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})
     target_compile_definitions(${target} PUBLIC "-DGHOUL_ASSERT")
-
-    if (GHOUL_WARNINGS_AS_ERRORS)
-      target_compile_options(${target} PRIVATE "-Werror")
-    endif ()
   elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_compile_options(${target} PRIVATE ${GCC_WARNINGS})
     target_compile_definitions(${target} PUBLIC "-DGHOUL_ASSERT")
-
-    if (GHOUL_WARNINGS_AS_ERRORS)
-      target_compile_options(${target} PRIVATE "-Werror")
-    endif ()
   else ()
     message("Compiler not handled in set_ghoul_compile_settings.cmake")
   endif ()

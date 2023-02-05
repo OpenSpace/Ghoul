@@ -38,7 +38,6 @@ begin_header("Configuring Ghoul Project")
 #############################
 # Options
 #############################
-option(GHOUL_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
 option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit tests" OFF)
