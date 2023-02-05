@@ -587,7 +587,7 @@ static void processNode(const aiNode& node, const aiScene& scene,
 
                         ModelAnimation::ScaleKeyframe scaleKeyframe;
                         scaleKeyframe.time =
-                            abs(animation->mTicksPerSecond) <
+                            std::abs(animation->mTicksPerSecond) <
                             std::numeric_limits<double>::epsilon() ? scaleKey.mTime :
                             scaleKey.mTime / animation->mTicksPerSecond;
                         scaleKeyframe.scale = glm::vec3(

@@ -69,7 +69,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (abs(diff) < std::numeric_limits<double>::epsilon()) {
+                if (std::abs(diff) < std::numeric_limits<double>::epsilon()) {
                     currPos = kf.position;
                     interpolate = false;
                 }
@@ -111,7 +111,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (abs(diff) < std::numeric_limits<double>::epsilon()) {
+                if (std::abs(diff) < std::numeric_limits<double>::epsilon()) {
                     currRot = kf.rotation;
                     interpolate = false;
                 }
@@ -152,7 +152,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                 double diff = (scale.time * _timeScale) - now;
 
                 // Exact on a keyframe
-                if (abs(diff) < std::numeric_limits<double>::epsilon()) {
+                if (std::abs(diff) < std::numeric_limits<double>::epsilon()) {
                     currScale = scale.scale;
                     interpolate = false;
                 }

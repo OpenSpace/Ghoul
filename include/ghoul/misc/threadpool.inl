@@ -56,7 +56,7 @@ auto ThreadPool::queue(F&& f, Arg&&... arg) -> std::future<decltype(f(arg...))> 
 // We need a separate overload as we cannot use decltype(task(args...)) to determine the
 // result type of the execution
 template <typename T, typename... Args>
-auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&... arguments)
+auto ThreadPool::queue(std::packaged_task<T>&& task, Args&&...)
     -> decltype(task.get_future())
 {
     std::lock_guard guard(_queueMutex);

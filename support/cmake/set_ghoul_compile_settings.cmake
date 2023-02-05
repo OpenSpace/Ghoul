@@ -29,14 +29,12 @@ function (set_ghoul_compile_settings target)
   set(MSVC_WARNINGS
     "/MP"       # Multi-threading support
     "/W4"       # Highest warning level
-    "/wd4201"   # nonstandard extension used : nameless struct/union  [raised by: GLM]
     "/wd4127"   # conditional expression is constant [raised by: websocketpp]
     "/permissive-"   # Enable conformance mode
     "/Zc:__cplusplus" # Correctly set the __cplusplus macro
   )
 
   set(CLANG_WARNINGS
-    "-stdlib=libc++"
     "-Wall"
     "-Wextra"
     "-Wmost"
@@ -67,7 +65,6 @@ function (set_ghoul_compile_settings target)
     "-Wduplicate-method-match"
     "-Wextra-semi"
     "-Wextra-semi-stmt"
-    "-Wfloat-equal"
     "-Wfloat-overflow-conversion"
     "-Wfloat-zero-conversion"
     "-Wformat"
@@ -123,6 +120,7 @@ function (set_ghoul_compile_settings target)
     "-Wzero-as-null-pointer-constant"
 
     "-Wno-missing-braces"
+    "-Wno-c++98-compat-bind-to-temporary-copy"
   )
 
   set(GCC_WARNINGS
@@ -206,7 +204,6 @@ function (set_ghoul_compile_settings target)
   elseif (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(${target} PRIVATE ${CLANG_WARNINGS})
     target_compile_definitions(${target} PUBLIC "-DGHOUL_ASSERT")
-    target_link_libraries(${target} PRIVATE "c++" "c++abi")
 
     if (GHOUL_WARNINGS_AS_ERRORS)
       target_compile_options(${target} PRIVATE "-Werror")
