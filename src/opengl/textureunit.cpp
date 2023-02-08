@@ -59,6 +59,8 @@ void TextureUnit::deactivate() {
     if (_assigned) {
         _assigned = false;
         _busyUnits.at(_number) = false;
+
+        ghoul_assert(_totalActive > 0, "No active texture units");
         --_totalActive;
     }
 }
