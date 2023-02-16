@@ -23,20 +23,25 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-add_executable(
+include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
+
+add_executable(GhoulTest)
+set_ghoul_compile_settings(GhoulTest)
+target_sources(
   GhoulTest
-  ${GHOUL_ROOT_DIR}/tests/main.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_buffer.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_commandlineparser.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_crc32.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_csvreader.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_dictionary.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_dictionaryjsonformatter.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_dictionaryluaformatter.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_filesystem.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_luaconversions.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
-  ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
+  PRIVATE
+    ${GHOUL_ROOT_DIR}/tests/main.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_buffer.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_commandlineparser.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_crc32.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_csvreader.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_dictionary.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_dictionaryjsonformatter.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_dictionaryluaformatter.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_filesystem.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_luaconversions.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
 )
 
 target_compile_definitions(GhoulTest PRIVATE
@@ -46,16 +51,13 @@ target_compile_definitions(GhoulTest PRIVATE
   "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
 )
 
-set_ghoul_compile_settings(GhoulTest)
-
 if (MSVC)
   target_compile_options(GhoulTest PRIVATE "-Od" "/bigobj")
 else ()
   target_compile_options(GhoulTest PRIVATE "-O0" )
 endif ()
 
-target_include_directories(GhoulTest PRIVATE "${GHOUL_ROOT_DIR}/ext/catch2/single_include")
-target_link_libraries(GhoulTest PRIVATE Ghoul)
+target_link_libraries(GhoulTest PRIVATE Catch2 Ghoul)
 
 if (APPLE)
   target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})

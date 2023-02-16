@@ -31,3 +31,6 @@ url=https://github.com/OpenSpace/freetype-mirror
 [submodule "ext/scnlib"]
 	path = ext/scnlib
 	url = https://github.com/eliaskosunen/scnlib.git
+[submodule "ext/stackwalker"]
+	path = ext/stackwalker
+	url = https://github.com/JochenKalmbach/StackWalker

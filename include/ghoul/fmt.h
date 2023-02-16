@@ -32,6 +32,7 @@
 #endif // __GNUC__
 
 #include <fmt/format.h>
+#include <fmt/std.h>
 #include <fmt/ostream.h>
 
 #ifdef __GNUC__

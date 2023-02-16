@@ -23,8 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#define CATCH_CONFIG_RUNNER
-#include "catch2/catch.hpp"
+#include <catch2/catch_session.hpp>
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/consolelog.h>
