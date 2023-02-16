@@ -57,7 +57,7 @@ public:
         TextureType type = TextureType::TextureDiffuse;
         bool hasTexture = false;
         bool useForcedColor = false;
-        glm::vec4 color;
+        glm::vec4 color = glm::vec4(0.f, 0.f, 0.f, 1.f);
         bool isTransparent = false;
     };
 
