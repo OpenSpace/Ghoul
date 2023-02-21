@@ -80,7 +80,6 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/csvreader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/defer.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionary.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryjsonformatter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/dictionaryluaformatter.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/easing.h

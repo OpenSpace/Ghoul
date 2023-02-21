@@ -196,7 +196,7 @@ bool Dictionary::hasValue(std::string_view key) const {
 
 bool Dictionary::hasKey(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    
+
     auto it = _storage.find(key);
     return it != _storage.end();
 }

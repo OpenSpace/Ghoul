@@ -70,7 +70,7 @@ BooleanType(PopValue);
 
 
 /**
- * Returns the location of the calling function using <code>luaL_where</code> and returns
+ * Returns the location of the calling function using `luaL_where` and returns
  * that location as a string. This method is just a wrapper around this function and its
  * use is for non-fatal error handling.
  *
@@ -556,6 +556,7 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location = 1,
  * This function is equivalent to:
  * \verbatim
  * reinterpret_cast<T*>(lua_touserdata(L, lua_upvalueindex(i)));
+ * \endverbatim
  *
  * \param L The stack from which the user data is extracted
  * \param location The location on the registry where the user data is stored
