@@ -65,6 +65,11 @@ public:
      *        log messages
      * \param logLevelStamping Determines if the log should print the log level in the log
      *        messages
+     * \param cssIncludes The list of CSS files that are included in the header of the
+     *        HTML file
+     * \param jsIncludes The list of JavaScript files that are included in the header of
+     *        the HTML file
+     * \param minimumLogLevel The minimum log level that this logger will accept
      *
      * \pre \p filename must not be empty
      */

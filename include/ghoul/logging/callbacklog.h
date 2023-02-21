@@ -61,6 +61,7 @@ public:
      *        is logged
      * \param categoryStamping Determines if the log should print the categories
      * \param logLevelStamping Determines if the log should print the log level
+     * \param minimumLogLevel The minimum log level that this logger will accept
      */
     CallbackLog(CallbackFunction callbackFunction,
         TimeStamping timeStamping = TimeStamping::Yes,

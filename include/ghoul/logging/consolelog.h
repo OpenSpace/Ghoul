@@ -59,14 +59,7 @@ public:
      * Constructor that calls Log constructor.
      *
      * \param colorOutput Determines if the log should printed in color
-     * \param timeStamping Determines if the log should print the time when a message
-     *        is logged in the log messages
-     * \param dateStamping Determines if the log should print the time when a message
-     *        is logged in the log messages
-     * \param categoryStamping Determines if the log should print the categories in
-     *        the log messages
-     * \param logLevelStamping Determines if the log should print the log level in the
-     *        log messages
+     * \param minimumLogLevel The minimum log level that this logger will accept
      */
     ConsoleLog(ColorOutput colorOutput = ColorOutput::Yes,
         LogLevel minimumLogLevel = LogLevel::AllLogging);

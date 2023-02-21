@@ -46,7 +46,7 @@ public:
      * The constructor will create a new Lua state and optionally fill it with the Lua
      * standard libraries, if \p includeStandardLibraries is \c true.
      *
-     * \param includeStandardLibraries If \c true, the created Lua state will contain the
+     * \param include If \c Yes, the created Lua state will contain the
      *        set of Lua standard libraries
      * \param strict If this is \c true, the created Lua state will panic if an unused
      *        variable is read or being written to before being defined before

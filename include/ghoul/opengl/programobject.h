@@ -397,173 +397,6 @@ public:
     /**
      * Locates and sets the uniform \p name with the passed \p value. Returns
      * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
-     * call the OpenGL function <code>glProgramUniform1i</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param value The value the uniform should be set to
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, bool value);
-
-    /**
-     * Locates and sets the uniform \p name with the passed values \p v1 and \p v2.
-     * Returns <code>true</code> if the uniform could be found; <code>false</code>
-     * otherwise. Will call the OpenGL function <code>glProgramUniform2i</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param v1 The first value that should be used to set the uniform
-     * \param v2 The second value that should be used to set the uniform
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, bool v1, bool v2);
-
-    /**
-     * Locates and sets the uniform \p name with the passed values \p v1, \p v2, and
-     * \p v3. Returns <code>true</code> if the uniform could be found; <code>false</code>
-     * otherwise. Will call the OpenGL function <code>glProgramUniform3i</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param v1 The first value that should be used to set the uniform
-     * \param v2 The second value that should be used to set the uniform
-     * \param v3 The third value that should be used to set the uniform
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, bool v1, bool v2, bool v3);
-
-    /**
-     * Locates and sets the uniform \p name with the passed values \p v1, \p v2, \p v3,
-     * and \p v4. Returns <code>true</code> if the uniform could be found;
-     * <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform4i</code>.
-     *
-     * \param name The name of the uniform in the ShaderObjects%
-     * \param v1 The first value that should be used to set the uniform
-     * \param v2 The second value that should be used to set the uniform
-     * \param v3 The third value that should be used to set the uniform
-     * \param v4 The fourth value that should be used to set the uniform
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, bool v1, bool v2, bool v3, bool v4);
-
-    /**
-     * Locates and sets the uniform \p name with the passed \p value. Returns
-     * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
-     * call the OpenGL function <code>glProgramUniform2iv</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param value The value the uniform should be set to
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, const glm::bvec2& value);
-
-    /**
-     * Locates and sets the uniform \p name with the passed \p value. Returns
-     * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
-     * call the OpenGL function <code>glProgramUniform3iv</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param value The value the uniform should be set to
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, const glm::bvec3& value);
-
-    /**
-     * Locates and sets the uniform \p name with the passed \p value. Returns
-     * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
-     * call the OpenGL function <code>glProgramUniform4iv</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param value The value the uniform should be set to
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, const glm::bvec4& value);
-
-    /**
-     * Locates and sets the uniform(s) \p name with the passed values \p values, where the
-     * array consists of \p count number of values. Returns <code>true</code> if the
-     * uniform could be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform1iv</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param values The values the uniform(s) should be set to
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, const std::vector<bool>& values);
-
-    /**
-     * Locates and sets the uniform(s) \p name with the passed values \p values, where the
-     * array consists of \p count number of values. Returns <code>true</code> if the
-     * uniform could be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform2iv</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param values The values the uniform(s) should be set to
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, const std::vector<glm::bvec2>& values);
-
-    /**
-     * Locates and sets the uniform(s) \p name with the passed values \p values, where the
-     * array consists of \p count number of values. Returns <code>true</code> if the
-     * uniform could be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform3iv</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code>otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, const std::vector<glm::bvec3>& values);
-
-    /**
-     * Locates and sets the uniform(s) \p name with the passed values \p values, where the
-     * array consists of \p count number of values. Returns <code>true</code> if the
-     * uniform could be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform4iv</code>.
-     *
-     * \param name The name of the uniform in the ShaderObject%s
-     * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
-     * \return <code>true</code> if the uniform was successfully located,
-     *         <code>false</code> otherwise
-     *
-     * \pre \p name must not be empty
-     */
-    //bool setUniform(const std::string& name, const std::vector<glm::bvec4>& values);
-
-    /**
-     * Locates and sets the uniform \p name with the passed \p value. Returns
-     * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
      * call the OpenGL function <code>glProgramUniform1ui</code>.
      *
      * \param name The name of the uniform in the ShaderObject%s
@@ -697,14 +530,12 @@ public:
     bool setUniform(const std::string& name, const std::vector<glm::uvec2>& values);
 
     /**
-     * Locates and sets the uniform(s) \p name with the passed values \p values, where the
-     * array consists of \p count number of values. Returns <code>true</code> if the
-     * uniform could be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform3uiv</code>.
+     * Locates and sets the uniform(s) \p name with the passed values \p values.
+     * Returns <code>true</code> if the uniform could be found; <code>false</code>
+     * otherwise. Will call the OpenGL function <code>glProgramUniform3uiv</code>.
      *
      * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
      *
@@ -713,14 +544,12 @@ public:
     bool setUniform(const std::string& name, const std::vector<glm::uvec3>& values);
 
     /**
-     * Locates and sets the uniform(s) \p name with the passed values \p values, where the
-     * array consists of \p count number of values. Returns <code>true</code> if the
-     * uniform could be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform4uiv</code>.
+     * Locates and sets the uniform(s) \p name with the passed values \p values.
+     * Returns <code>true</code> if the uniform could be found; <code>false</code>
+     * otherwise. Will call the OpenGL function <code>glProgramUniform4uiv</code>.
      *
      * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
      *
@@ -834,14 +663,12 @@ public:
     bool setUniform(const std::string& name, const glm::ivec4& value);
 
     /**
-     * Locates and sets the uniform(s) \p name with the passed values \p values, where the
-     * array consists of \p count number of values. Returns <code>true</code> if the
-     * uniform could be found; <code>false</code> otherwise. Will call the OpenGL function
-     * <code>glProgramUniform1iv</code>.
+     * Locates and sets the uniform(s) \p name with the passed values \p values. Returns
+     * <code>true</code> if the uniform could be found; <code>false</code> otherwise. Will
+     * call the OpenGL function <code>glProgramUniform1iv</code>.
      *
      * \param name The name of the uniform in the ShaderObject%s
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      * \return <code>true</code> if the uniform was successfully located,
      *         <code>false</code> otherwise
      *
@@ -1878,52 +1705,44 @@ public:
     void setUniform(GLint location, const glm::vec4& value);
 
     /**
-     * Sets the uniform(s) initially located at \p location with the passed \p values,
-     * where the array consists of \p count elements. Will call the OpenGL function
-     * <code>glProgramUniform1fv</code>.
+     * Sets the uniform(s) initially located at \p location with the passed \p values.
+     * Will call the OpenGL function <code>glProgramUniform1fv</code>.
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const std::vector<GLfloat>& values);
 
     /**
-     * Sets the uniform(s) initially located at \p location with the passed \p values,
-     * where the array consists of \p count elements. Will call the OpenGL function
-     * <code>glProgramUniform2fv</code>.
+     * Sets the uniform(s) initially located at \p location with the passed \p values.
+     * Will call the OpenGL function <code>glProgramUniform2fv</code>.
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const std::vector<glm::vec2>& values);
 
     /**
-     * Sets the uniform(s) initially located at \p location with the passed \p values,
-     * where the array consists of \p count elements. Will call the OpenGL function
-     * <code>glProgramUniform3fv</code>.
+     * Sets the uniform(s) initially located at \p location with the passed \p values.
+     * Will call the OpenGL function <code>glProgramUniform3fv</code>.
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */
     void setUniform(GLint location, const std::vector<glm::vec3>& values);
 
     /**
-     * Sets the uniform(s) initially located at \p location with the passed \p values,
-     * where the array consists of \p count elements. Will call the OpenGL function
-     * <code>glProgramUniform4fv</code>.
+     * Sets the uniform(s) initially located at \p location with the passed \p values.
+     * Will call the OpenGL function <code>glProgramUniform4fv</code>.
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */
@@ -2013,13 +1832,11 @@ public:
     void setUniform(GLint location, const glm::dvec4& value);
 
     /**
-     * Sets the uniform(s) initially located at \p location with the passed \p values,
-     * where the array consists of \p count elements. Will call the OpenGL function
-     * <code>glProgramUniform1dv</code>.
+     * Sets the uniform(s) initially located at \p location with the passed \p values.
+     * Will call the OpenGL function <code>glProgramUniform1dv</code>.
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */
@@ -2032,7 +1849,6 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */
@@ -2045,7 +1861,6 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */
@@ -2058,7 +1873,6 @@ public:
      *
      * \param location The location of the uniform retrieved from #uniformLocation
      * \param values The values the uniform(s) should be set to
-     * \param count The number of values that are stored in values
      *
      * \pre \p location must not be <code>-1</code>
      */

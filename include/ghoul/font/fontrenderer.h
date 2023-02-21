@@ -136,9 +136,6 @@ public:
     /**
      * Deinitialize the singleton variant of the FontRenderer and cleans all used OpenGL
      * objects. Therefore, it requires a valid OpenGL state.
-     *
-     * \return <code>true</code> if the deinitialization succeeded, <code>false</code>
-     *         otherwise
      */
     static void deinitialize();
 
@@ -394,7 +391,6 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  * \param font The Font that is used to render the provided text.
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
- * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
@@ -408,7 +404,6 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \param font The Font that is used to render the provided text.
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
- * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,

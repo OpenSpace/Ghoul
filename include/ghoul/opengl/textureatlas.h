@@ -185,16 +185,16 @@ public:
      * separate texture. The \p windowing parameter provides possiblity to offset the
      * starting points (with the first two arguments and restrict the width (with the
      * third and fourth arguments).
-     *\verbatim
- -------------------
-|         b         |
-|    -----------    |
-| a |           | c |
-|   |           |   |
-|    -----------    |
-|         d         |
- -------------------
-     *\endverbatim
+     * \verbatim
+     *  -------------------
+     * |         b         |
+     * |    -----------    |
+     * | a |           | c |
+     * |   |           |   |
+     * |    -----------    |
+     * |         d         |
+     * -------------------
+     * \endverbatim
      * <code>windowing.x = a</code><br>
      * <code>windowing.y = b</code><br>
      * <code>windowing.z = c</code><br>

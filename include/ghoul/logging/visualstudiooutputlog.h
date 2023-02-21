@@ -53,6 +53,7 @@ public:
      *        the log messages
      * \param logLevelStamping Determines if the log should print the log level in the
      *        log messages
+     * \param minimumLogLevel The minimum log level that this logger will accept
      */
     VisualStudioOutputLog(TimeStamping timeStamping = TimeStamping::No,
         DateStamping dateStamping = DateStamping::No,

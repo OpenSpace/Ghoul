@@ -177,8 +177,6 @@ public:
      *        texels
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
      *        the border of the texture
-     * \param takeOwnership Sets whether or not the Texture object should take ownership
-     *        of the data.
      */
     Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,

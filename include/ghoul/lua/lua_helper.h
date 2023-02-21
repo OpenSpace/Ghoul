@@ -116,7 +116,7 @@ int luaError(lua_State* state, const std::string& message);
  * \return A string representation of the table
  *
  * \pre \p state must not be nullptr
- * \pre The Lua object at location \p \tableLocation must be a table
+ * \pre The Lua object at location \p tableLocation must be a table
  */
 [[nodiscard]] std::string luaTableToString(lua_State* state, int tableLocation);
 
@@ -179,8 +179,6 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
  * (= no numbering indices).
  *
  * \param filename The filename pointing to the script that is executed.
- * \param dictionary The #ghoul::Dictionary into which the values from the script are
- *        added
  * \param state If this is set to a valid lua_State, this state is used instead of
  *        creating a new state. It is the callers responsibility to ensure that the passed
  *        state is valid if this parameter is not <code>nullptr</code>. After calling this
@@ -275,8 +273,6 @@ ghoul::Dictionary loadDictionaryFromString(const std::string& script,
  * string may return mulitple values which will be included into the #ghoul::Dictionary.
  *
  * \param script The source code of the script that is executed
- * \param dictionary The #ghoul::Dictionary into which the values from the script are
- *        added
  * \param state If this is set to a valid lua_State, this state is used instead of
  *        creating a new state. It is the callers responsibility to ensure that the passed
  *        state is valid. After calling this method, the stack of the passed state will be
@@ -561,7 +557,7 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location = 1,
  * \param L The stack from which the user data is extracted
  * \param location The location on the registry where the user data is stored
  * \return A pointer to the user data at the specified location
- * \pre L must not be nullptr
+ * \pre \p L must not be nullptr
  */
 template <typename T>
 T* userData(lua_State* L, int location = 1);
@@ -589,7 +585,7 @@ T* userData(lua_State* L, int location = 1);
  * \param arguments The variable arguments that are pushed to the stack in the order in
  *        which they appear in this function call
  *
- * \pre \L must not be nullptr
+ * \pre \p L must not be nullptr
  */
 template <typename... Ts>
 void push(lua_State* L, Ts... arguments);
@@ -606,7 +602,7 @@ void push(lua_State* L, Ts... arguments);
  *
  * \return The extracted value of type T
  *
- * \pre \L must not be nullptr
+ * \pre \p L must not be nullptr
  */
 template <typename T>
 T tryGetValue(lua_State* L, bool& success);
@@ -625,7 +621,7 @@ namespace internal {
      * \param location The location from which the value should be extracted
      *
      * \throw LuaFormatException If the value at the provided stack location is not T
-     * \pre \L must not be nullptr
+     * \pre \p L must not be nullptr
      */
     template <typename T>
     T valueInner(lua_State* L, int location = 1);
