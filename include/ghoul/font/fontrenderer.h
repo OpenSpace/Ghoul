@@ -341,9 +341,6 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \param font The Font that is used to render the provided text.
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
- * \param direction Determines whether the \p pos should be modified based on how many
- *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
- *        up and down by the number of lines times the height of the used font
  * \param color The color that is used to the render the text
  * \param outlineColor The outline color that is used to the render the text if the
  *        provided \p font has one
@@ -362,6 +359,9 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \param color The color that is used to the render the text
+ * \param direction Determines whether the \p pos should be modified based on how many
+ *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
+ *        up and down by the number of lines times the height of the used font
  * \return The bounding box of the text that was printed
  */
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
@@ -391,6 +391,9 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  * \param font The Font that is used to render the provided text.
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
+ * \param direction Determines whether the \p pos should be modified based on how many
+ *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
+ *        up and down by the number of lines times the height of the used font
  * \return The bounding box of the text that was printed
  */
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,

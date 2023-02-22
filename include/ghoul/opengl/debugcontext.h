@@ -188,80 +188,80 @@ void setDebugCallback(CallbackFunction callback);
 namespace ghoul {
 
 /**
-* Converts a string with a \p source into a opengl::debug::Source object.
+* Converts a string with a \p value into a opengl::debug::Source object.
 * The valid values are "API", "Window System", "Shader Compiler", "Third Party",
 * "Application", "Other", and "Don't care".
 *
-* \param source The string containing the name of a opengl::debug::Source
+* \param value The string containing the name of a opengl::debug::Source
 *
-* \throw std::out_of_range if the \p source is not a valid name of an
+* \throw std::out_of_range if the \p value is not a valid name of an
 *        opengl::debug::Source object
 */
 template <>
-constexpr opengl::debug::Source from_string(std::string_view string) {
-    if (string == "API") { return opengl::debug::Source::API; }
-    if (string == "Window System") { return opengl::debug::Source::WindowSystem; }
-    if (string == "Shader Compiler") { return opengl::debug::Source::ShaderCompiler; }
-    if (string == "Third Party") { return opengl::debug::Source::ThirdParty; }
-    if (string == "Application") { return opengl::debug::Source::Application; }
-    if (string == "Other") { return opengl::debug::Source::Other; }
-    if (string == "Don't care") { return opengl::debug::Source::DontCare; }
+constexpr opengl::debug::Source from_string(std::string_view value) {
+    if (value == "API") { return opengl::debug::Source::API; }
+    if (value == "Window System") { return opengl::debug::Source::WindowSystem; }
+    if (value == "Shader Compiler") { return opengl::debug::Source::ShaderCompiler; }
+    if (value == "Third Party") { return opengl::debug::Source::ThirdParty; }
+    if (value == "Application") { return opengl::debug::Source::Application; }
+    if (value == "Other") { return opengl::debug::Source::Other; }
+    if (value == "Don't care") { return opengl::debug::Source::DontCare; }
 
-    throw ghoul::RuntimeError(fmt::format("Unrecognized debug source '{}'", string));
+    throw ghoul::RuntimeError(fmt::format("Unrecognized debug source '{}'", value));
 }
 
 /**
-* Converts a string with a \p type into a opengl::debug::Source object.
+* Converts a string with a \p value into a opengl::debug::Source object.
 * The valid values are "Error", "Deprecated", "Undefined", "Portability",
 * "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
 *
-* \param type The string containing the name of a opengl::debug::Type
+* \param value The string containing the name of a opengl::debug::Type
 *
-* \throw std::out_of_range if the \p type is not a valid name of an
+* \throw std::out_of_range if the \p value is not a valid name of an
 *        opengl::debug::Type object
 */
 template <>
-constexpr opengl::debug::Type from_string(std::string_view string) {
-    if (string == "Error") { return opengl::debug::Type::Error; }
-    if (string == "Deprecated") { return opengl::debug::Type::Deprecated; }
-    if (string == "Undefined") { return opengl::debug::Type::Undefined; }
-    if (string == "Portability") { return opengl::debug::Type::Portability; }
-    if (string == "Performance") { return opengl::debug::Type::Performance; }
-    if (string == "Marker") { return opengl::debug::Type::Marker; }
-    if (string == "Push group") { return opengl::debug::Type::PushGroup; }
-    if (string == "Pop group") { return opengl::debug::Type::PopGroup; }
-    if (string == "Other") { return opengl::debug::Type::Other; }
-    if (string == "Don't care") { return opengl::debug::Type::DontCare; }
+constexpr opengl::debug::Type from_string(std::string_view value) {
+    if (value == "Error") { return opengl::debug::Type::Error; }
+    if (value == "Deprecated") { return opengl::debug::Type::Deprecated; }
+    if (value == "Undefined") { return opengl::debug::Type::Undefined; }
+    if (value == "Portability") { return opengl::debug::Type::Portability; }
+    if (value == "Performance") { return opengl::debug::Type::Performance; }
+    if (value == "Marker") { return opengl::debug::Type::Marker; }
+    if (value == "Push group") { return opengl::debug::Type::PushGroup; }
+    if (value == "Pop group") { return opengl::debug::Type::PopGroup; }
+    if (value == "Other") { return opengl::debug::Type::Other; }
+    if (value == "Don't care") { return opengl::debug::Type::DontCare; }
 
-    throw ghoul::RuntimeError(fmt::format("Unrecognized debug type '{}'", string));
+    throw ghoul::RuntimeError(fmt::format("Unrecognized debug type '{}'", value));
 }
 
 /**
-* Converts a string with a \p severity into a opengl::debug::Severity object.
+* Converts a string with a \p value into a opengl::debug::Severity object.
 * The valid values are "High", "Medium", "Low", and "Notification".
 *
-* \param severity The string containing the name of a opengl::debug::Severity
+* \param value The string containing the name of a opengl::debug::Severity
 *
-* \throw std::out_of_range if the \p severity is not a valid name of an
+* \throw std::out_of_range if the \p value is not a valid name of an
 *        opengl::debug::Severity object
 */
 template <>
-constexpr opengl::debug::Severity from_string(std::string_view string) {
-    if (string == "High") { return opengl::debug::Severity::High; }
-    if (string == "Medium") { return opengl::debug::Severity::Medium; }
-    if (string == "Low") { return opengl::debug::Severity::Low; }
-    if (string == "Notification") { return opengl::debug::Severity::Notification; }
+constexpr opengl::debug::Severity from_string(std::string_view value) {
+    if (value == "High") { return opengl::debug::Severity::High; }
+    if (value == "Medium") { return opengl::debug::Severity::Medium; }
+    if (value == "Low") { return opengl::debug::Severity::Low; }
+    if (value == "Notification") { return opengl::debug::Severity::Notification; }
 
-    throw ghoul::RuntimeError(fmt::format("Unrecognized debug severity '{}'", string));
+    throw ghoul::RuntimeError(fmt::format("Unrecognized debug severity '{}'", value));
 }
 
 /**
- * Converts the \p source object into its string representation.
+ * Converts the \p value object into its string representation.
  * The valid return values are: "API", "Window System", "Shader Compiler", "Third Party",
  * "Application", "Other", and "Don't care".
  *
- * \param source The ghoul::opengl::debug::Source that is converted into a string
- * \return The string representation of the \p source
+ * \param value The ghoul::opengl::debug::Source that is converted into a string
+ * \return The string representation of the \p value
  */
 template <>
 inline std::string to_string(const ghoul::opengl::debug::Source& value) {
@@ -278,12 +278,12 @@ inline std::string to_string(const ghoul::opengl::debug::Source& value) {
 }
 
 /**
- * Converts the \p type object into its string representation.
+ * Converts the \p value object into its string representation.
  * The valid return values are: "Error", "Deprecated", "Undefined", "Portability",
  * "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
  *
- * \param type The ghoul::opengl::debug::Type that is converted into a string
- * \return The string representation of the \p type
+ * \param value The ghoul::opengl::debug::Type that is converted into a string
+ * \return The string representation of the \p value
  */
 template <>
 inline std::string to_string(const ghoul::opengl::debug::Type& value) {
@@ -303,11 +303,11 @@ inline std::string to_string(const ghoul::opengl::debug::Type& value) {
 }
 
 /**
- * Converts the \p severity object into its string representation.
+ * Converts the \p value object into its string representation.
  * The valid return values are: "High", "Medium", "Low", and "Notification".
  *
- * \param severity The ghoul::opengl::debug::Severity that is converted into a string
- * \return The string representation of the \p severity
+ * \param value The ghoul::opengl::debug::Severity that is converted into a string
+ * \return The string representation of the \p value
  */
 template <>
 inline std::string to_string(const ghoul::opengl::debug::Severity& value) {

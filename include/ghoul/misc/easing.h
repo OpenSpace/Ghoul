@@ -193,8 +193,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * cubic:
- * <code<y = (1/2)((2x)^3)       ; [0, 0.5)</code>
- * <code> y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]</code>
+ * <code>y = (1/2)((2x)^3)       ; [0, 0.5)</code>
+ * <code>y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]</code>
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]

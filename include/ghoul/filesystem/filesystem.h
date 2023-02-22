@@ -67,7 +67,7 @@ public:
 
     /**
      * Registers the path token \p token with this FileSystem. Henceforth, every call to,
-     * for example, #absolutePath(), the constructors of File, or Directory, will replace
+     * for example, #absPath, the constructors of File, or Directory, will replace
      * the \p token with \p path. The tokens cannot be removed or replaced afterwards, as
      * this might lead to inconsistencies since some files might have replaced the tokens
      * while others have not.
@@ -126,13 +126,13 @@ public:
 
     /**
      * Creates a CacheManager for this FileSystem. If a CacheManager already exists, this
-     * method will fail and log an error. The passed \p cacheDirectory has to be a valid
+     * method will fail and log an error. The passed \p directory has to be a valid
      * and existing Directory.
      *
-     * \param cacheDirectory The directory in which all cached files will be stored. Has
+     * \param directory The directory in which all cached files will be stored. Has
      *        to be an existing directory with proper read/write access.
      *
-     * \pre \p cacheDirectory must point to an existing directory
+     * \pre \p directory must point to an existing directory
      * \pre \p The CacheManager must not have been created before without destroying it
      */
     void createCacheManager(const std::filesystem::path& directory);
@@ -157,13 +157,14 @@ public:
     CacheManager* cacheManager();
 
     /**
-     * Listen to \p file for changes. When \p file is changed the File callback will be
+     * Listen to \p path for changes. When \p path is changed the \p callback will be
      * called.
      *
-     * \param file The file object to be tracked
+     * \param path The file object to be tracked
+     * \param callback The callback that will be called when the \p file changes
      *
-     * \pre \p file must not be a <code>nullptr</code>
-     * \pre \p file must not have been added before
+     * \pre \p path must not be a <code>nullptr</code>
+     * \pre \p path must not have been added before
      */
     int addFileListener(std::filesystem::path path, File::FileChangedCallback callback);
 
@@ -293,7 +294,7 @@ private:
 
 /**
  * Returns the absolute path to the passed \p path, resolving any tokens (if present)
- * in the process. The current working directory (#currentDirectory) is used as a base
+ * in the process. The current working directory is used as a base
  * path for this. All tokens contained in the \p ignoredTokens are ignored from the
  * token resolving
  *
@@ -305,28 +306,12 @@ private:
 std::filesystem::path absPath(std::string path);
 
 /**
- * Returns the absolute path to the passed \p path, resolving any tokens (if present)
- * in the process. The current working directory (#currentDirectory) is used as a base
- * path for this. All tokens contained in the \p ignoredTokens are ignored from the
- * token resolving
- *
- * \param path The path that should be converted into an absolute path
- * \return The absolute path to the passed \p path
- *
- * \pre \p path must not be empty
+ * \overload std::filesystem::path absPath(std::string path)
  */
 std::filesystem::path absPath(std::filesystem::path path);
 
 /**
- * Returns the absolute path to the passed \p path, resolving any tokens (if present)
- * in the process. The current working directory (#currentDirectory) is used as a base
- * path for this. All tokens contained in the \p ignoredTokens are ignored from the
- * token resolving
- *
- * \param path The path that should be converted into an absolute path
- * \return The absolute path to the passed \p path
- *
- * \pre \p path must not be empty
+ * \overload std::filesystem::path absPath(std::string path)
  */
 std::filesystem::path absPath(const char* path);
 

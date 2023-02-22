@@ -149,8 +149,6 @@ public:
      * \param parameters The parameters needed for the execution of this command. By the
      *        time this method is called, the parameters have already been verified by the
      *        #checkParameters method
-     * \return This method should return <code>true</code>, if the execution was
-     *         successful, <code>false</code> otherwise and log possible errors
      *
      * \throw CommandExecutionException If one parameter has the wrong type that was not
      *        detected in the checkParameters method
@@ -163,8 +161,6 @@ public:
      * (for example type), overwrite this method in the derived class.
      *
      * \param param The param which should be tested
-     * \return <code>true</code>, if the param are correct, <code>false</code>
-     *         otherwise
      *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */

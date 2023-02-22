@@ -227,28 +227,28 @@ public:
      * worker in the constructor or a subsequent call to #resize. The template parameters
      * of this function are best to be automatically determined. Example use-case:
      * \verbatim
-ghoul::ThreadPool pool(2);
-
-{
-    std::future<int> ret = pool.queue([](){ return 1337; });
-    auto urn = pool.queue([](){ return "foobar"; });
-    ghoul_assert(ret.get() == 1337);
-    ghoul_assert(urn.get() == "foobar");
-}
-
-{
-    auto func = [](int i, float f, std::string s) -> std::tuple<std::string, float, int> {
-        return std::make_tuple(s, f, i);
-    };
-
-    std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
-    std::tuple<std::string, float, int> val = ret.get();
-    ghoul_assert("3" == std::get<0>(val));
-    ghoul_assert(2.f == std::get<1>(val));
-    ghoul_assert(1 == std::get<2>(val));
-}
-
-\endverbatim
+     * ghoul::ThreadPool pool(2);
+     *
+     * {
+     *     std::future<int> ret = pool.queue([](){ return 1337; });
+     *     auto urn = pool.queue([](){ return "foobar"; });
+     *     ghoul_assert(ret.get() == 1337);
+     *     ghoul_assert(urn.get() == "foobar");
+     * }
+     *
+     * {
+     *     auto func = [](int i, float f, std::string s) {
+     *         return std::make_tuple(s, f, i);
+     *     };
+     *
+     *     std::future<std::tuple<std::string, float, int>> ret =
+     *         pool.queue(func, 1, 2.f, "3");
+     *     std::tuple<std::string, float, int> val = ret.get();
+     *     ghoul_assert("3" == std::get<0>(val));
+     *     ghoul_assert(2.f == std::get<1>(val));
+     *     ghoul_assert(1 == std::get<2>(val));
+     * }
+     * \endverbatim
      *
      * \tparam Function The description of the \p function%'s signature that will be
      *         called

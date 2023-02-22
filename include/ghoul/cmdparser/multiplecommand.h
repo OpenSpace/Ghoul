@@ -53,12 +53,6 @@ public:
      *
      * \param ptr1 The reference to the parameters that will be set when this command is
      *        executed
-     * \param ptr2 The reference  to the second parameters that will be set when this
-     *        command is executed
-     * \param ptr3 The reference to the third parameters that will be set when this
-     *        command is executed
-     * \param ptr4 The reference to the fourth parameters that will be set when this
-     *        command is executed
      * \param name The full name for this command. Has to start with a <code>-</code> in
      *        order to be valid
      * \param shortName The (optional) short name for this command. If it is provided, it
@@ -116,10 +110,6 @@ public:
      * \param ptr1 The reference to the parameters that will be set when this command is
      *        executed
      * \param ptr2 The reference  to the second parameters that will be set when this
-     *        command is executed
-     * \param ptr3 The reference to the third parameters that will be set when this
-     *        command is executed
-     * \param ptr4 The reference to the fourth parameters that will be set when this
      *        command is executed
      * \param name The full name for this command. Has to start with a <code>-</code> in
      *        order to be valid
@@ -184,8 +174,6 @@ public:
      * \param ptr2 The reference  to the second parameters that will be set when this
      *        command is executed
      * \param ptr3 The reference to the third parameters that will be set when this
-     *        command is executed
-     * \param ptr4 The reference to the fourth parameters that will be set when this
      *        command is executed
      * \param name The full name for this command. Has to start with a <code>-</code> in
      *        order to be valid

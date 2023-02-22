@@ -192,7 +192,7 @@ public:
 
     /**
      * Registers a class with the provided \p className and the user-defined
-     * #FactoryFunc. The \p factoryFunction must return a valid subclass of
+     * factory function. The \p factoryFunction must return a valid subclass of
      * <code>BaseClass</code> when is it called in the #create methods of TemplateFactory.
      * The <code>std::function</code> object is stored inside.
      *

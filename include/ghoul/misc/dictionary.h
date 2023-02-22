@@ -98,7 +98,7 @@ public:
      * Store the value \p value at the specified \p key, overwriting any existing value.
      * The type for T has to be a type that can be represented in the Types variant type.
      *
-     * \param key The key under which the \p value is stored. If \param key already
+     * \param key The key under which the \p value is stored. If \p key already
      *        existed, it will be silently overwritten
      * \param value The value to store. It has to be one of the types that is present in
      *        the Types variant

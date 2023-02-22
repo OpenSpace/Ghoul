@@ -87,8 +87,6 @@ public:
      * \param size The size (in bytes) of the shared memory block that should be created.
      *        The actual size in memory will be slightly larger due to necessary header
      *        information, which are not accessible by the user
-     * \return <code>true</code> if the creation of the shared memory block succeeded,
-     *         <code>false</code> otherwise
      *
      * \throw SharedMemoryError If there was an error creating the SharedMemory block
      */

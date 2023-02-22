@@ -44,8 +44,8 @@ public:
     /**
      * Default constructor.
      *
-     * \param programName The name of the program. Used in the #displayUsage and
-     *        #displayHelp methods
+     * \param programName The name of the program. Used in the #usageInformation and
+     *        #helpText methods
      * \param allowUnknownCommands If this is set to <code>true</code> the
      *        CommandlineParser will ignore commands it did not recognize and extract only
      *        the used commands from the passed command-line, leaving the unknown commands
@@ -211,7 +211,7 @@ public:
     std::string usageInformationForNamelessCommand() const;
 
     /**
-     * Return the full help text. It consists of the usage information (#displayUsage)
+     * Return the full help text. It consists of the usage information (#usageInformation)
      * followed by the help text for each CommandlineCommand (CommandlineCommand::help).
      *
      * \return The help information

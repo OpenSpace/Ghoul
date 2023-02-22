@@ -131,7 +131,7 @@ glm::tquat<valType> lookAtQuaternion(const glm::tvec3<valType> eye,
 }
 
 /**
- * Check if quaternion \p q1 and \q2 represent the same spatial orientation.
+ * Check if quaternion \p q1 and \p q2 represent the same spatial orientation.
  * The precision of the check can be controlled using the \p precision parameter
  */
 template <typename valType>

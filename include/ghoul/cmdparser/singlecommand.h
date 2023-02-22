@@ -280,7 +280,7 @@ class SingleCommandZeroArguments : public CommandlineCommand {
 public:
     /**
      * This constructor uses one <code>bool</code> parameter that is set to
-     * <code>true</code> if this command has . The command does not take
+     * <code>true</code> if this command has bee found. The command does not take
      * ownership of the passed value.
      *
      * \param ptr The reference to the bool that will be set to <code>true</code> on
@@ -292,7 +292,7 @@ public:
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      */
-    SingleCommandZeroArguments(bool& nExecutions, std::string name,
+    SingleCommandZeroArguments(bool& ptr, std::string name,
         std::string shortName = "", std::string infoText = "");
 
     /**
