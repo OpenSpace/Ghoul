@@ -221,8 +221,10 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
             continue;
         }
 
-        // Check if the texture is somewhat transparent
-        meshTexture.isTransparent = isTextureTransparent(meshTexture);
+        // Check if the diffuse texture is somewhat transparent
+        if (enumType == ModelMesh::TextureType::TextureDiffuse) {
+            meshTexture.isTransparent = isTextureTransparent(meshTexture);
+        }
 
         // Add new Texture to the textureStorage and point to it in the texture array
         meshTexture.hasTexture = true;
@@ -328,7 +330,7 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
     float opacity = 0.f;
     aiReturn result = material->Get(AI_MATKEY_OPACITY, opacity);
     bool hasOpacity = result == AI_SUCCESS && opacity < 1.f;
-    if (hasOpacity && opacity == 0.f) {
+    if (hasOpacity && opacity < std::numeric_limits<float>::epsilon()) {
         // If the material is transparent then do not add it
         return ModelMesh(
             std::move(vertexArray),
@@ -393,6 +395,7 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
             }
         }
         if (hasOpacity) {
+            textureArray.back().isTransparent = true;
             textureArray.back().color.a =
                 std::min(opacity, textureArray.back().color.a);
         }
@@ -431,8 +434,7 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 texture.color.r = color4.r;
                 texture.color.g = color4.g;
                 texture.color.b = color4.b;
-                texture.color.a = color4.a;
-                texture.isTransparent = texture.color.a < 1.f;
+                texture.color.a = 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }
@@ -449,10 +451,6 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 texture.color.a = 1.f;
                 textureArray.push_back(std::move(texture));
             }
-        }
-        if (hasOpacity) {
-            textureArray.back().color.a =
-                std::min(opacity, textureArray.back().color.a);
         }
     }
 
