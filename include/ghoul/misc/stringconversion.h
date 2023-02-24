@@ -32,7 +32,7 @@
 namespace ghoul {
 
 /**
- * Converts the passed \p string into a \c T value and returns it. For each valid
+ * Converts the passed \p string into a `T` value and returns it. For each valid
  * conversion, a template specialization has to be created. This function is meant to be
  * analogous to the `std::to_string` function and should behave as such:
  *

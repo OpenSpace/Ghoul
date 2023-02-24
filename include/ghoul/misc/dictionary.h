@@ -137,7 +137,7 @@ public:
      * compatible with the type T.
      *
      * \param key The key for which to check the existence and type
-     * \return \c true if the Dictionary contains such a key and it is of the requested
+     * \return `true` if the Dictionary contains such a key and it is of the requested
                type T
      *
      * \pre \p key must not be the empty string
@@ -150,7 +150,7 @@ public:
      * of its type.
      *
      * \param key The key for which to check the existence and type
-     * \return \c true if the Dictionary contains such a key and it is of the requested
+     * \return `true` if the Dictionary contains such a key and it is of the requested
                type T
      *
      * \pre \p key must not be the empty string
@@ -189,7 +189,7 @@ public:
      * contain additional values though.
      *
      * \p dict The subset dictionary
-     * \return \c true if the \p dict is a subset, \c false otherwise
+     * \return `true` if the \p dict is a subset, `false` otherwise
      */
     bool isSubset(const ghoul::Dictionary& dict) const;
 

@@ -83,12 +83,12 @@ template <typename T>
 
 /**
  * Returns whether \p name is naming a valid easing function. If this function returns
- * \c true and \p name is passed to #easingFunctionFromName, the function is guaranteed to
+ * `true` and \p name is passed to #easingFunctionFromName, the function is guaranteed to
  * not throw.
  *
  * \param name The name for which should be tested whether it is a valid easing function
  *        name
- * \return \c true if \p name is a valid name for an easing function, \c false otherwise
+ * \return `true` if \p name is a valid name for an easing function, `false` otherwise
  *
  * \pre \p name must not be nullptr
  */

@@ -145,7 +145,7 @@ private:
      *
      * \param extension The extension for which the TextureReaderBase should be returned
      * \return The first match of a reader that can read the provided \p extension, or
-     *         \c nullptr if no such reader exists
+     *         `nullptr` if no such reader exists
      */
     TextureReaderBase* readerForExtension(const std::string& extension);
 

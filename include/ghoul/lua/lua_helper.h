@@ -82,13 +82,13 @@ BooleanType(PopValue);
 [[nodiscard]] const char* errorLocation(lua_State* state);
 
 /**
- * Raises a fatal Lua error by calling the \c luaL_error function with the passed
+ * Raises a fatal Lua error by calling the `luaL_error` function with the passed
  * parameters.
  *
  * \param state The Lua state in which the error is raised
  * \param message The error message that will be printed to the Lua console alongside the
  *        file name and line number
- * \return The symbolic value that is returned by the \c luaL_error function to signal the
+ * \return The symbolic value that is returned by the `luaL_error` function to signal the
  *         Lua interpreter that an error has occurred
  *
  * \pre \p state must not be nullptr
@@ -97,7 +97,7 @@ int luaError(lua_State* state, const std::string& message);
 
 /**
  * Returns a string describing the \p state's value at location \p location. Supported
- * value types are \c boolean, \c number, \c string and \c table. For other types, only
+ * value types are `boolean`, `number`, `string` and `table`. For other types, only
  * the type as converted to string is returned.
  *
  * \param state The Lua state from which to read the value
@@ -359,9 +359,9 @@ std::string_view luaTypeToString(int type);
 /**
  * Creates a new Lua state and initializes it with the default Lua libraries.
  *
- * \param loadStandardLibraries If \c true, the Lua standard libraries will be loaded into
- *        the newly created state by means of a \c luaL_openlibs call
- * \param strictState If this is \c true, the created Lua state will panic if an unused
+ * \param loadStandardLibraries If `true`, the Lua standard libraries will be loaded into
+ *        the newly created state by means of a `luaL_openlibs` call
+ * \param strictState If this is `true`, the created Lua state will panic if an unused
  *        variable is read or being written to before being defined before
  * \return A valid new Lua state initialized with the default Lua libraries
  *
@@ -496,8 +496,8 @@ void verifyStackSize(lua_State* L, int expected = 0);
  * \param L The stack from which the value is checked
  * \param location The location at which the value is checked
  *
- * \return \c true if the value at location exists and has the requested type \tparam T
- *         \c false otherwise
+ * \return `true` if the value at location exists and has the requested type \tparam T
+ *         `false` otherwise
  *
  * \pre L must not be nullptr
  */
@@ -595,7 +595,7 @@ void push(lua_State* L, Ts... arguments);
  *
  * \tparam T The type of the return value.
  * \param L The stack from from which the top value is extracted
- * \param success Will be set to true if the extraction succeeded, \c false otherwise
+ * \param success Will be set to true if the extraction succeeded, `false` otherwise
  *
  * \return The extracted value of type T
  *

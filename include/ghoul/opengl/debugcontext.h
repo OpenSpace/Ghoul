@@ -135,7 +135,7 @@ void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous);
 
 /**
  * Enables or disables debug messages for the provided \p source, \p type, and
- * \p severity. Any of these values can be their respective \c Dontcare values if any
+ * \p severity. Any of these values can be their respective `Dontcare` values if any
  * value should be modified.
  *
  * \param source The Source of debug messages that should be modified

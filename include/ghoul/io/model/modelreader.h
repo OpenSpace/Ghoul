@@ -116,7 +116,7 @@ private:
      *
      * \param extension The extension for which the ModelReaderBase should be returned
      * \return The first match of a reader that can read the provided \p extension, or
-     *         \c nullptr if no such reader exists
+     *         `nullptr` if no such reader exists
      */
     ModelReaderBase* readerForExtension(const std::string& extension);
 

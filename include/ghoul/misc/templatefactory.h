@@ -134,7 +134,7 @@ public:
      *
      * \param className The class name of the instance that should be created
      * \param pool The optional memory pool that is used to allocate the new object. If
-     *        this value is \c std::nullopt, the operating systems memory allocated is
+     *        this value is `std::nullopt`, the operating systems memory allocated is
      *        used
      * \return A fully initialized instance of the registered class
      *
@@ -158,7 +158,7 @@ public:
      * \param dictionary The dictionary that will be passed to the constructor of the
      *        class
      * \param pool The optional memory pool that is used to allocate the new object. If
-     *        this value is \c std::nullopt, the operating systems memory allocated is
+     *        this value is `std::nullopt`, the operating systems memory allocated is
      *        used
      * \return A fully initialized instance of the registered class
      *

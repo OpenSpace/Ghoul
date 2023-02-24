@@ -66,17 +66,17 @@ public:
      * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
      * initialized here, it requires a valid OpenGL context. The size is defined as
-     * \c width, \c height, and \c depth.
+     * `width`, `height`, and `depth`.
      *
      * \param size The size (`width`, `height`, `depth`) of the TextureAtlas.
      *
      * \pre \p size's width and height has to be bigger than `4` and smaller than the GPU
      *      limit for 2D textures. The \p size's depth has to be `1`, `2`, `3`, or `4`
-     * \pre \c width component must be bigger than `4` and smaller than the GPU limit for
+     * \pre `width` component must be bigger than `4` and smaller than the GPU limit for
      *      2D tetxures
-     * \pre \c height component must be bigger than `4` and smaller than the GPU limit for
+     * \pre `height` component must be bigger than `4` and smaller than the GPU limit for
      *      2D tetxures
-     * \pre \c depth component must be `1`, `2`, `3`, or `4`
+     * \pre `depth` component must be `1`, `2`, `3`, or `4`
      */
     explicit TextureAtlas(glm::ivec3 size);
 

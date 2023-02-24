@@ -92,7 +92,7 @@ void setDebugMessageControl(Source source, Type type,
 
 void setDebugCallback(CallbackFunction callback) {
     // We have to store the function pointer that is passed into this function locally as
-    // it might otherwise be destroyed (and still be referenced by \c internalCallback.
+    // it might otherwise be destroyed (and still be referenced by `internalCallback`.
     // In a perfect world, we'd want to capture the function pointer, but the OpenGL
     // callback only allows pure C functions
     static CallbackFunction storage;
