@@ -123,10 +123,8 @@ public:
      * \pre \p workerDeinit must not be empty
      * \post The ThreadPool is running
      */
-    ThreadPool(
-        int nThreads = 1,
-        std::function<void ()> workerInit = [](){},
-        std::function<void ()> workerDeinit = [](){},
+    ThreadPool(int nThreads = 1, std::function<void()> workerInit = [](){},
+        std::function<void()> workerDeinit = [](){},
         thread::ThreadPriorityClass tpc = thread::ThreadPriorityClass::Normal,
         thread::ThreadPriorityLevel tpl = thread::ThreadPriorityLevel::Normal,
         thread::Background bg = thread::Background::No);

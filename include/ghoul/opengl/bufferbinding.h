@@ -29,15 +29,15 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <vector>
 
-namespace ghoul::opengl::bufferbinding {
+namespace ghoul::opengl {
+
+namespace bufferbinding {
     enum class Buffer {
         AtomicCounter,
         ShaderStorage,
         Uniform
     };
-} // namespace ghoul::opengl::bufferbinding
-
-namespace ghoul::opengl {
+} // bufferbinding
 
 /**
  * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER,
