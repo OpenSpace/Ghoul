@@ -112,7 +112,7 @@ public:
      *
      * \throw TextureLoadException If there was an error reading the \p memory
      * \throw MissingReaderException If there was no reader for the specified \p filename
-     * \pre \p memory must not be <code>nullptr</code>
+     * \pre \p memory must not be `nullptr`
      * \pre \p size must be > 0
      * \pre \p nDimensions The number of texture dimension must be 1, 2, or 3
      */

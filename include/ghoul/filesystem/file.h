@@ -37,13 +37,13 @@ class FileSystem;
 /**
  * This class is a handle for a generic file in the file system. The main functionality is
  * a platform-independent way of being notified of changes of the file. The constructor
- * or the #setCallback methods expect an <code>std::function</code> object (possibly
+ * or the #setCallback methods expect an `std::function` object (possibly
  * initialized using a lambda-expression) that will be called whenever the file changes on
  * the hard disk. The callback function has this object passed as a parameter. If many
  * changes of the file happen in quick succession, each change will trigger a separate
  * call of the callback. The file system is not polled, but the changes are pushed to the
  * application, so the changes are registered efficiently and are solely impacted by the
- * overhead of <code>std::function</code>.
+ * overhead of `std::function`.
  */
 class File {
 public:
@@ -89,9 +89,9 @@ public:
     void setCallback(FileChangedCallback callback);
 
     /**
-     * Returns the full path to the file as an <code>std::string</code>.
+     * Returns the full path to the file as an `std::string`.
      *
-     * \return The full path to the file as an <code>std::string</code>
+     * \return The full path to the file as an `std::string`
      */
     const std::filesystem::path& path() const;
 

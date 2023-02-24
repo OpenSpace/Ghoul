@@ -59,7 +59,7 @@ namespace ghoul {
  * will perform tasks from a list. A ThreadPool is created with a specific number of
  * threads but can be #resize%d after the fact, which will change the number of active
  * threads managed by this ThreadPool. Tasks can be queued by the #queue function,
- * which returns a <code>std::future</code> object that contains the possible return value
+ * which returns a `std::future` object that contains the possible return value
  * of the passed task.
  *
  * Example use-case:
@@ -158,7 +158,7 @@ public:
      *        logged.
      * \pre The ThreadPool must be running
      * \pre Cannot run remaining tasks and detach threads
-     *      <code>!(runTasks == Yes && detachThreads == Yes)</code>
+     *      `!(runTasks == Yes && detachThreads == Yes)`
      * \post The ThreadPool is stopped
      */
     void stop(RunRemainingTasks runTasks = RunRemainingTasks::Yes,
@@ -166,11 +166,9 @@ public:
     );
 
     /**
-     * Returns <code>true</code> if the ThreadPool is running, <code>false</code>
-     * otherwise.
+     * Returns `true` if the ThreadPool is running, `false` otherwise.
      *
-     * \return <code>true</code> if the ThreadPool is running, <code>false</code>
-     * otherwise
+     * \return `true` if the ThreadPool is running, `false` otherwise
      */
     bool isRunning() const;
 
@@ -217,7 +215,7 @@ public:
     void clearRemainingTasks();
 
     /**
-     * This function queues a task and returns an <code>std::future</code> object that
+     * This function queues a task and returns an `std::future` object that
      * holds a potential return value of the function. The common use-case is passing a
      * lambda expression to this function that either returns a value or just performs its
      * task on the referenced values. All tasks passed to this functions are potentially
@@ -252,26 +250,26 @@ public:
      *         called
      * \tparam Args A variable list of arguments that can be passed to the \p function
      * \param function The function that will be called. This can be any callable object,
-     *        such as <code>std::function</code>, a <code>lamdba</code> expression, a
-     *        <code>struct</code> with overloaded <code>operator()</code> or others
+     *        such as `std::function`, a `lamdba` expression, a
+     *        `struct` with overloaded `operator()` or others
      * \param arguments The potential list of arguments passed to the \p function
      * \return A future containing the result of the evaluation of \p function with the
      *         passed \p arguments. If the function does not return anything, an
-     * <code>std::future<void></code> is returned
+     *         `std::future<void><` is returned
      */
     template <typename Function, typename... Args>
     auto queue(Function&& function, Args&&... arguments)
         -> std::future<decltype(function(arguments...))>;
 
     /**
-    * This function queues a <code>std::packaged_task</code> and returns its
-    * <code>std::future</code> object that holds a potential return value. All tasks
+    * This function queues a `std::packaged_task` and returns its
+    * `std::future` object that holds a potential return value. All tasks
     * passed to this functions are potentially executed in parallel unless this ThreadPool
     * was initialized with only a single worker in the constructor or a subsequent call
     * to #resize. The template parameters of this function are best to be automatically
     * determined.
     *
-    * \tparam T The type information of the <code>std::packaged_task</code> that is to be
+    * \tparam T The type information of the `std::packaged_task` that is to be
     *         executed
     * \tparam Args A variable list of arguments that can be passed to the \p task
     * \param task The task that will be executed.
@@ -308,8 +306,8 @@ private:
     };
 
     /**
-     * This class represents a thin wrapper around <code>std::queue</code> that provides
-     * <code>std::mutex</code> protection for the available methods, thus making them
+     * This class represents a thin wrapper around `std::queue` that provides
+     * `std::mutex` protection for the available methods, thus making them
      * thread-safe to use. As soon as there is a better adapter pattern for the STL
      * classes that works in a concurrent environment, this class is not needed anymore.
      */
@@ -317,16 +315,16 @@ private:
     public:
         /**
          * Returns the top element of the queue and whether this item existed. If the
-         * queue was empty, <code>{ Task(), false}</code> is returned, otherwise the
-         * second argument to the <code>tuple</code> is <code>true</code>.
+         * queue was empty, `{ Task(), false }` is returned, otherwise the
+         * second argument to the `tuple` is `true`.
          *
          * \return A tuple containing either the top element of the queue and
-         *         <code>true</code>, or a default constructed Task and <code>false</code>
+         *         `true`, or a default constructed Task and `false`
          */
         std::tuple<Task, bool> pop();
 
         /**
-         * Pushes the \p task to the bottom of the <code>std::queue</code>.
+         * Pushes the \p task to the bottom of the `std::queue`.
          *
          * \param task The task to be pushed onto the queue
          */
@@ -335,7 +333,7 @@ private:
         /**
          * Returns whether the queue is empty.
          *
-         * \return <code>true</code> if the queue is empty
+         * \return `true` if the queue is empty
          */
         bool isEmpty() const;
 
@@ -355,7 +353,7 @@ private:
     };
 
     /**
-     * Activate the \p worker by creating a <code>std::thread</code> with the lambda
+     * Activate the \p worker by creating a `std::thread` with the lambda
      * expression that will do all of the work inside the Worker. This function will
      * overwrite the values of the passed \p worker.
      *
@@ -369,8 +367,7 @@ private:
     /// The list of remaining tasks that might be addressed by the available Worker%s
     std::shared_ptr<TaskQueue> _taskQueue;
 
-    /// <code>true</code> if the ThreadPool is currently running, <code>false</code>
-    /// otherwise
+    /// `true` if the ThreadPool is currently running, false otherwise
     std::shared_ptr<std::atomic_bool> _isRunning;
 
     /// The number of Worker%s that are currently waiting for a task
@@ -379,12 +376,12 @@ private:
     /// This mutex guards pushing to the queue
     std::mutex _queueMutex;
 
-    /// The mutex used by the <code>condition_variable</code> <code>_cv</code> used to
+    /// The mutex used by the `condition_variable` `_cv` used to
     /// wait for and wake up Worker%s based on incoming Task%s
     std::shared_ptr<std::mutex> _mutex;
 
     /// The condition variable that is used to wake up Worker%s when new Task%s are
-    /// incoming. Used in combination with <code>_mutex</code>
+    /// incoming. Used in combination with `_mutex`
     std::shared_ptr<std::condition_variable> _cv;
 
     /// The user-defined function that is called at initialization for each of the Worker

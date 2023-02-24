@@ -56,7 +56,7 @@ concept SupportedByDictionary = IsAnyOf<
  * of types. It has the ability to store and retrieve these items by unique string keys.
  * The only automatic conversion that is currently performed is to convert glm vector or
  * matrix types into std::vector types and reconstructing them on access such that:
- * <code>
+ * ```
  * Dictionary d;
  * d.setValue("a", glm::dvec4(1.0, 2.0, 3.0, 4.0);
  * std::vector<double> v = d.value<std::vector<double>>("a");
@@ -67,7 +67,7 @@ concept SupportedByDictionary = IsAnyOf<
  * e.setValue("a", std::vector<double>{5.0, 6.0, 7.0, 8.0});
  * glm::dvec4 vv = e.value<glm::dvec4>("a");
  * // vv.x == 5.0 && vv.y == 6.0 && vv.z == 7.0 && vv.w == 8.0
- * </code>
+ * ```
  * are legal
  */
 class Dictionary {

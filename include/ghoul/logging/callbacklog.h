@@ -34,16 +34,15 @@ namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that passes logs to the provided callback function. The
- * callback is specified using <code>std::function</code>. Trying to log messages when the
+ * callback is specified using `std::function`. Trying to log messages when the
  * callback object has been deleted results in undefined behavior. The formatting of the
  * log messages depends on the stamping settings. The different possibilities are:
- * \verbatim
-[DATE | TIME] CATEGORY (LEVEL) MESSAGE
-[DATE] CATEGORY (LEVEL) MESSAGE
-[TIME] CATEGORY (LEVEL) MESSAGE
- \endverbatim
- * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
- * missing.
+ * ```
+ * [DATE | TIME] CATEGORY (LEVEL) MESSAGE
+ * [DATE] CATEGORY (LEVEL) MESSAGE
+ * [TIME] CATEGORY (LEVEL) MESSAGE
+ * ```
+ * And the remaining possibilities with `CATEGORY` and `LEVEL` missing.
  */
 class CallbackLog : public Log {
 public:
@@ -82,7 +81,7 @@ public:
         std::string_view message) override;
 
     /**
-     * Replaces the old callback with this <code>callbackFunction</code>. This function
+     * Replaces the old callback with this `callbackFunction`. This function
      * is not checked and it is the caller's responsiblity to assure that the function
      * object is callable.
      *

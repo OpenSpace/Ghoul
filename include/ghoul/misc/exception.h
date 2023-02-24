@@ -33,7 +33,7 @@ namespace ghoul {
 
 /**
  * Superclass for all exceptions that are thrown in Ghoul. The total message of the
- * exception consists of the <code>message</code> prefixed with the <code>component</code>
+ * exception consists of the `message` prefixed with the `component`
  * that threw the exception if it was set.
  */
 struct RuntimeError : public std::runtime_error {

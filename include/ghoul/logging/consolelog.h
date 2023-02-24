@@ -34,14 +34,14 @@ namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that logs the messages to the console to the
- * <code>std::cout</code> stream. The formatting of the log messages depends on the
+ * `std::cout` stream. The formatting of the log messages depends on the
  * stamping settings. The different possibilities are:
- * \verbatim
-"[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
-"[DATE] CATEGORY (LEVEL) MESSAGE"
-"[TIME] CATEGORY (LEVEL) MESSAGE"
- \endverbatim
- * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
+ * ```
+ * "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
+ * "[DATE] CATEGORY (LEVEL) MESSAGE"
+ * "[TIME] CATEGORY (LEVEL) MESSAGE"
+ * ```
+ * And the remaining possibilities with `CATEGORY` and `LEVEL`
  * missing. A parameter in the constructor determines if the output text will be colored
  * according to the LogLevel:<br>
  * LogLevel::Debug -> Green<br>

@@ -68,7 +68,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
  * \throw ghoul::RuntimeError if one of the \p columns does not exist in the provided CSV
  * \pre fileName must not be empty
  * \pre columns must not be empty
- * \post <code>return.size() == columns.size()</code>
+ * \post `return.size() == columns.size()`
  */
 std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     const std::vector<std::string>& columns, bool includeFirstLine = false);
@@ -90,7 +90,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
  *        in the CSV file
  * \pre fileName must not be empty
  * \pre columns must not be empty
- * \post <code>return.size() == columns.size()</code>
+ * \post `return.size() == columns.size()`
  */
 std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     const std::vector<int>& columns, bool includeFirstLine = false);

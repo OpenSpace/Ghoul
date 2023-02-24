@@ -131,7 +131,7 @@ public:
     /**
      * Constructor creating a new Font with the specified \p filename at the provided
      * \p pointSize. The Glyphs of this Font will be stored in the \p atlas TextureAtlas
-     * if there is enough free space. If \p outline is <code>true</code> two sets of
+     * if there is enough free space. If \p outline is `true` two sets of
      * Glyphs are created which are combined to provide an outline of thickness
      * \p outlineThickness to the glyphs.
      *
@@ -175,7 +175,7 @@ public:
     /**
      * Returns whether this Font has an outline or not.
      *
-     * \return <code>true</code> if this Font has an outline, <code>false</code> otherwise
+     * \return `true` if this Font has an outline, `false` otherwise
      */
     bool hasOutline() const;
 
@@ -184,7 +184,7 @@ public:
      * this Font. The value returned is in pixel values and provides the width and the
      * height of the text if it were to be rendered.
      *
-     * \param text The text that is rendered to the screen. The <code>text</code> can also
+     * \param text The text that is rendered to the screen. The `text` can also
      *        contain '\\n' to have a linebreak, which is of the correct length for the
      *        selected font.
      * \return The pixel coordinates of the bounding box of the passed text

@@ -47,7 +47,7 @@ namespace bufferbinding {
  * #bindingNumber can be retrieved so that it can be used in a block binding.
  * A block binding number is assigned as soon as the first call to
  * ProgramObject::activate, ProgramObject::glEnum, or #bindingNumber is made. If there
- * are no free binding numbers left, an <code>std::runtime_error</code> will be thrown.
+ * are no free binding numbers left, an `std::runtime_error` will be thrown.
 */
 template <bufferbinding::Buffer T>
 class BufferBinding {
@@ -83,7 +83,7 @@ public:
 
     /**
      * Deinitializes all the used BufferBinding%s and marks them as free. The total
-     * number of used buffer bindings after this call will be <code>0</code>.
+     * number of used buffer bindings after this call will be `0`.
      */
     static void deinitialize();
 
@@ -121,10 +121,10 @@ private:
      */
     static void initialize();
 
-    /// The number in <code>[0, maxBindings]</code> referring to this BufferBinding
+    /// The number in `[0, maxBindings]` referring to this BufferBinding
     GLint _number = 0;
 
-    /// <code>true</code> if the list of busy bindings and the maximum number of bindings
+    /// `true` if the list of busy bindings and the maximum number of bindings
     /// have been initialized
     static bool _isInitialized;
 
@@ -138,8 +138,8 @@ private:
     static unsigned int _maxBufferBindings;
 
     /**
-     * This vector stores a bool at position <code>i</code> if the buffer binding number
-     * <code>i</code> is currently in use
+     * This vector stores a bool at position `i` if the buffer binding number
+     * `i` is currently in use
      */
     static std::vector<bool> _busyBindings;
 };

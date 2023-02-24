@@ -43,7 +43,7 @@ namespace ghoul {
  * process' responsibility to #remove the shared memory at the end of its lifetime; then,
  * other processes can use the constructor with the same name to get access to the shared
  * memory. The overloaded operator void* makes the SharedMemory usable just like a
- * <code>void</code> pointer in the code. The size of the memory is accessible using the
+ * `void` pointer in the code. The size of the memory is accessible using the
  * #size method. Due to some necessary header information, the amount of memory that is
  * allocated will be slightly larger than the passed amount. The allocated memory
  * automatically provides storage for a thread-safe locking mechanism. In the current
@@ -113,8 +113,8 @@ public:
      * the name is available.
      *
      * \param name The name of the shared memory block that should be tested
-     * \return <code>true</code> if a shared memory block exists with the given \p name,
-     *         <code>false</code> otherwise
+     * \return `true` if a shared memory block exists with the given \p name,
+     *         `false` otherwise
      *
      * \throw SharedMemoryError If there was an error retrieving the information about the
      *        SharedMemory block
@@ -125,7 +125,7 @@ public:
      * Creates a SharedMemory object pointing to a previously created shared memory block
      * (#create). If \p name is a valid name for a shared memory block, the constructor
      * will attach the memory into the calling process' address space, making it available
-     * through the operator <code>void*</code>. If an error occurs either getting a valid
+     * through the operator `void*`. If an error occurs either getting a valid
      * handle on the memory mapped file or during mapping the memory into the address
      * space, a SharedMemoryError is thrown. It is possible for the same process to attach
      * the same shared memory block multiple times. It is undefined if two SharedMemory
@@ -214,7 +214,7 @@ private:
     /**
      * Stores a mapping from name (as specified in the #create method) to the acquired
      * handle. This is necessary as each new CreateFileMapping call will create new
-     * handle of type <code>void*</code>, making it impossible to acquire the handle for a
+     * handle of type `void*`, making it impossible to acquire the handle for a
      * specific name otherwise.
      */
     static std::map<const std::string, void*> _createdSections;

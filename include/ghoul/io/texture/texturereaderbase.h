@@ -85,7 +85,7 @@ public:
      * \param nDimensions The number of dimensions of the texture that is created
      *
      * \throw TextureLoadException If there was an error reading the \p memory
-     * \pre \p memory must not be <code>nullptr</code>
+     * \pre \p memory must not be `nullptr`
      * \pre \p size must be > 0
      * \pre \p nDimensions must be 1, 2, or 3
      */

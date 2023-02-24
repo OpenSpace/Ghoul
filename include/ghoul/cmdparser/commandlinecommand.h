@@ -40,18 +40,11 @@ namespace ghoul::cmdparser {
  * implemented. The CommandlineCommand are used by adding them to the CommandlineParser,
  * using the method CommandlineParser::addCommand. The common way of using the commands
  * is to pass a variable of appropriate type to the CommandlineCommand by reference, which
- * gets set to the correct value when the command is executed.
- * Within the parser, the command's <code>name</code> and <code>shortName</code> must be
- * unique.
+ * gets set to the correct value when the command is executed. Within the parser, the
+ * command's `name` and `shortName` must be unique.
  *
- * There exist a number of defined convenience classes to use, for example
- * CommandlineCommandBoolean, CommandlineCommandFloat, CommandlineCommandTwoFloat,
- * CommadnlineCommandInteger, CommandlineCommandTwoInteger, CommandlineCommandString,
- * CommandlineCommandTwoString that accept one or two of the listed parameter-types.
- *
- * For generic use, see the templated classes SingleCommandlineCommand and
- * MultipleCommandlineCommand which are capable of setting basic types that are
- * convertible from string using a <code>std::stringstream</code>.
+ * For use, see the templated classes SingleCommand and MultipleCommand which are capable
+ * of setting basic types that are convertible from string using a `std::stringstream`.
  */
 class CommandlineCommand {
 public:
@@ -76,15 +69,15 @@ public:
     /**
      * The constructor which saves the arguments to own member variables.
      *
-     * \param name The (long) name of the parameter. For example <code>--command1</code>
-     * \param shortName The abbreviated name of the parameter. For example <code>-c</code>
+     * \param name The (long) name of the parameter. For example `--command1`
+     * \param shortName The abbreviated name of the parameter. For example `-c`
      * \param infoText A short text (preferably one line) explaining what the command
      *        does. Used in the CommandlineParser::displayHelp method
      * \param parameterList A user-readable description which parameters are used and
      *        supported. This is used in the CommandlineParser::displayUsage and
      *        CommandlineParser::displayHelp methods
      * \param argumentNum The number of arguments this command accepts
-     * \param allowMultipleCalls If this argument is <code>true</code> it signals the
+     * \param allowMultipleCalls If this argument is `true` it signals the
      *        CommandlineParser that it should allow multiple instances of this
      *        CommandlineCommand in a single command line
      *
@@ -183,13 +176,13 @@ public:
 
 protected:
     /**
-     * Casts the string value \p s into the type <code>T</code>. If the conversion fails,
+     * Casts the string value \p s into the type `T`. If the conversion fails,
      * an CommandException is thrown. The conversion is done via an
-     * <code>std::stringstream</code> so it can only cast those types supported by the
+     * `std::stringstream` so it can only cast those types supported by the
      * stream.
      *
      * \tparam T The type of the value which should be converted
-     * \param s The <code>std::string</code> representation of the value
+     * \param s The `std::string` representation of the value
      *
      * \throws CommandException If the conversion failed
      * \pre \p s must not be empty
@@ -198,14 +191,13 @@ protected:
     T cast(const std::string& s) const;
 
     /**
-     * Checks if the string value \p s can be cast into the type <code>T</code>. It only
-     * returns <code>true</code> for those values that can be converted using an
-     * <code>std::stringstream</code>.
+     * Checks if the string value \p s can be cast into the type `T`. It only
+     * returns `true` for those values that can be converted using an
+     * `std::stringstream`.
      *
      * \tparam T The type of the value which should be converted
-     * \param s The <code>std::string</code> representation of the value
-     * \return <code>true</code> if the value can be converted, <code>false</code>
-     * otherwise
+     * \param s The `std::string` representation of the value
+     * \return `true` if the value can be converted, `false` otherwise
      */
     template <class T>
     [[nodiscard]] bool is(const std::string& s) const;

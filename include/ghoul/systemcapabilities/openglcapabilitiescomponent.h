@@ -71,11 +71,11 @@ public:
     Version openGLVersion() const;
 
     /**
-     * Returns the value of a call to <code>glGetString(GL_VENDOR)</code>. This will give
+     * Returns the value of a call to `glGetString(GL_VENDOR)`. This will give
      * detailed information about the vendor of the main graphics card. This string can be
      * used if the automatic Vendor detection failed.
      *
-     * \return The value of a call to <code>glGetString(GL_VENDOR)</code>
+     * \return The value of a call to `glGetString(GL_VENDOR)`
      */
     const std::string& glslCompiler() const;
 
@@ -101,9 +101,9 @@ public:
     const std::vector<std::string>& extensions() const;
 
     /**
-     * Checks is a specific <code>extension</code> is supported or not
-     * \return <code>true</code> if the <code>extension</code> is supported;
-     * <code>false</code> otherwise
+     * Checks is a specific `extension` is supported or not
+     *
+     * \return `true` if the `extension` is supported; `false` otherwise
      */
     bool isExtensionSupported(std::string_view extension) const;
 
@@ -154,9 +154,9 @@ public:
     int maxUniformBufferBindings() const;
 
     /**
-     * Returns the <code>OpenGL</code> string.
+     * Returns the `OpenGL` string.
      *
-     * \return The <code>OpenGL</code> string
+     * \return The `OpenGL` string
      */
     std::string_view name() const override;
 

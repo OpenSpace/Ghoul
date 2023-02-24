@@ -50,11 +50,11 @@ class CacheManager;
 
 /**
  * The methods are for dealing with path tokens. These are tokens of the form
- * <code>${...}</code> which are like variables, pointing to a specific location. These
+ * `${...}` which are like variables, pointing to a specific location. These
  * tokens can only be bound once, as some of the tokens might already have been resolved
  * and changing the tokens later might lead to inconsistencies. For the same reason, it is
  * not possible to unregister tokens. Every FileSystem contains one token
- * <code>${TEMPORARY}</code> that points to the location of the system's temporary files.
+ * `${TEMPORARY}` that points to the location of the system's temporary files.
  */
 class FileSystem {
 public:
@@ -72,9 +72,9 @@ public:
      * this might lead to inconsistencies since some files might have replaced the tokens
      * while others have not.
      *
-     * \param token The token in the form <code>${...}</code>
+     * \param token The token in the form `${...}`
      * \param path The path the token should point to
-     * \param override If <code>true</code> an existing token will be silently overriden
+     * \param override If `true` an existing token will be silently overriden
      *
      * \pre \p token must not be empty
      * \pre \p token must start with FileSystem::TokenOpeningBrace and end with
@@ -86,7 +86,7 @@ public:
 
     /**
      * Replaces the path tokens present in the \p path if any exist. If all tokens could
-     * be replaced, the method returns <code>true</code>; if <code>false</code> is
+     * be replaced, the method returns `true`; if `false` is
      * returned, one or more tokens could not be replaced. In this case, only part of the
      * path is modified.
      *
@@ -109,16 +109,16 @@ public:
      * Checks whether the \p token has been registered to a path before.
      * \param token The token to be checked.
      *
-     * \return <code>true</code> if the \p token has been registered to a path before,
-     *         <code>false</code> otherwise
+     * \return `true` if the \p token has been registered to a path before,
+     *         `false` otherwise
      */
     bool hasRegisteredToken(const std::string& token) const;
 
     /**
-     * Returns <code>true</code> if the \p path contains any tokens.
+     * Returns `true` if the \p path contains any tokens.
      *
      * \param path The path that is checked for tokens
-     * \return <code>true</code> if the \p path contains any tokens
+     * \return `true` if the \p path contains any tokens
      *
      * \pre \p path must not be empty
      */
@@ -150,7 +150,7 @@ public:
     /**
      * Returns the CacheManager associated with this FileSystem
      *
-     * \return The CacheManager or <code>nullptr</code> if it has not been initialized
+     * \return The CacheManager or `nullptr` if it has not been initialized
      *
      * \pre CacheManager must have been created before
      */
@@ -163,7 +163,7 @@ public:
      * \param path The file object to be tracked
      * \param callback The callback that will be called when the \p file changes
      *
-     * \pre \p path must not be a <code>nullptr</code>
+     * \pre \p path must not be a `nullptr`
      * \pre \p path must not have been added before
      */
     int addFileListener(std::filesystem::path path, File::FileChangedCallback callback);
@@ -172,7 +172,7 @@ public:
      * Removes the file object from tracking lists. The file on the filesystem may still
      * be tracked and other File objects may still have callbacks registered.
      *
-     * \pre \p file must not be a <code>nullptr</code>
+     * \pre \p file must not be a `nullptr`
      * \pre \p file must have been added before (addFileListener)
      */
     void removeFileListener(int callbackIdentifier);

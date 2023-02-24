@@ -30,9 +30,9 @@ namespace ghoul {
 
 /**
  * This structure can be used to make a more expressive boolean parameter for methods.
- * Instead of using <code>bool</code>, which does not convey any direct meaning and forces
+ * Instead of using `bool`, which does not convey any direct meaning and forces
  * the programmer to read the documentation what the parameter does, this class can be
- * <code>typedef</code>ed to a meaningful name.
+ * `typedef`ed to a meaningful name.
  *
  * For example:
  * \verbatim
@@ -41,8 +41,8 @@ using AllowOverride = ghoul::Boolean;
 void foo(std::string value, AllowOverride override = AllowOverride::Yes);
 \endverbatim
  * Though it is more verbal, it elimiates ambiguity regarding parameters. This class is
- * implicitly convertible to <code>bool</code>, but not the other way around. Furthermore,
- * it supports the <code>==</code>, <code>!=</code>, and <code>!</code> operators.
+ * implicitly convertible to `bool`, but not the other way around. Furthermore,
+ * it supports the `==`, `!=`, and `!` operators.
  *
  * When using the Boolean class, also consider the BooleanType defintion to create a
  * typesafe version of the usage describe above.
@@ -63,7 +63,7 @@ struct Boolean {
     /// Explicit constructor to convert from \c bool into Boolean
     constexpr explicit Boolean(bool v) : value(v ? Yes : No) {}
 
-    /// This operator returns <code>true</code> if the stored value is equal to \c Yes.
+    /// This operator returns `true` if the stored value is equal to \c Yes.
     constexpr operator bool() const noexcept { return value == Yes; }
 
     constexpr bool operator==(Boolean r) const noexcept { return value == r.value; }

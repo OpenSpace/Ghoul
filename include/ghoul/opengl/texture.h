@@ -39,12 +39,11 @@ namespace ghoul::opengl {
 
 /**
  * This class is a wrapper for an OpenGL texture. It wraps the OpenGL method for
- * generating (<code>glGenTextures</code>), binding (<code>glBindTexture</code>, #bind),
- * enabling (<code>glEnable</code>, #enable) and others. A new texture can be created
- * either from an image file using the TextureManager or loadTexture function or using a
- * pointer to the data. The data layout must be as specified by the
- * <code>glTexImageXD</code> functions (see OpenGL reference). After creation a Texture
- * must be uploaded (uploadTexture) before it can be used in
+ * generating (`glGenTextures`), binding (`glBindTexture`, #bind), enabling (`glEnable`,
+ * #enable) and others. A new texture can be created either from an image file using the
+ * TextureManager or loadTexture function or using a pointer to the data. The data layout
+ * must be as specified by the `glTexImageXD` functions (see OpenGL reference). After
+ * creation a Texture must be uploaded (uploadTexture) before it can be used in
  * the graphics pipeline. See http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
  * for detailed information on the different arguments
  */
@@ -94,8 +93,8 @@ public:
     };
 
     // Encapsulating the wrapping mode state for 1D, 2D, and 3D textures.  1D textures
-    // only use <code>s</code>, 2D textures use <code>s</code> and <code>t</code>, where
-    // as 3D textures use all three specified wrapping modes.
+    // only use `s`, 2D textures use `s` and `t`, where as 3D textures use all three
+    // specified wrapping modes.
     struct WrappingModes {
         WrappingMode s;
         WrappingMode t = s;
@@ -106,15 +105,14 @@ public:
 
     /**
      * This constructor will create storage internally to fit the amount of data that is
-     * necessary for the \p dimensions <code>* bytesPerPixel</code> (which is in turn
+     * necessary for the \p dimensions `* bytesPerPixel` (which is in turn
      * dependent on the \p dataType). The Texture can be 1D, 2D, or 3D depending on how
-     * many components are equal to <code>1</code>.
+     * many components are equal to `1`.
      *
      * \param dimensions The dimensions of the texture. A 3D texture will be created
-     *        if all components are bigger than <code>1</code>, a 2D texture will be
-     *        created if the <code>z</code> component is equal to <code>1</code>, while a
-     *        1D texture is created if the <code>y</code> and <code>z</code> component is
-     *        equal to <code>1</code>
+     *        if all components are bigger than `1`, a 2D texture will be created if the
+     *        `z` component is equal to `1`, while a 1D texture is created if the `y` and
+     *        `z` component is equal to `1`
      * \param type The type of the texture. Must be one of GL_TEXTURE_1D, GL_TEXTURE_2D,
      *        or GL_TEXTURE_3D
      * \param format Specifies the format of the data
@@ -136,7 +134,7 @@ public:
      *        of the data allocated. In case there is no data allocated, the Texture will
      *        automatically not take ownership
      *
-     * \pre Element of \p dimensions must be bigger or equal <code>1</code>
+     * \pre Element of \p dimensions must be bigger or equal `1`
      */
     Texture(glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
@@ -147,21 +145,20 @@ public:
 
     /**
      * This constructor will generate a Texture out of the passed data. The data should
-     * contain enough bytes to fill <code>dimensions * bytesPerPixel</code> (which is in
+     * contain enough bytes to fill `dimensions * bytesPerPixel` (which is in
      * turn dependent on the dataType) pixel. The Texture can be 1D, 2D, or 3D depending
-     * on how many components are equal to <code>1</code>.
+     * on how many components are equal to `1`.
      * \param data The data from which to generate the Texture. The data must be in a
      * linear format and (in 2D and 3D cases) aligned so that it can be accessed using the
-     * following equations: <code>(y * dimensions.x) + x</code> in the 2D case and
-     * <code>(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x</code> in the 3D
-     * case. This Texture will take ownership of the data array and will delete it once
-     * this object is destroyed.
+     * following equations: `(y * dimensions.x) + x` in the 2D case and
+     * `(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x` in the 3D case. This
+     * Texture will take ownership of the data array and will delete it once this object
+     * is destroyed.
      *
-     * \param dimensions The dimensions of the texture. A 3D texture will be created
-     *        if all components are bigger than <code>1</code>, a 2D texture will be
-     *        created if the <code>z</code> component is equal to <code>1</code>, while a
-     *        1D texture is created if the <code>y</code> and <code>z</code> component is
-     *        equal to <code>1</code>
+     * \param dimensions The dimensions of the texture. A 3D texture will be created if
+     *        all components are bigger than `1`, a 2D texture will be created if the `z`
+     *        component is equal to `1`, while a 1D texture is created if the `y` and `z`
+     *        component is equal to `1`
      * \param type The type of the texture. Must be one of GL_TEXTURE_1D, GL_TEXTURE_2D,
      *        or GL_TEXTURE_3D
      * \param format Specifies the format of the data
@@ -189,12 +186,12 @@ public:
      */
     ~Texture();
 
-    /// Enables this texture type by calling <code>glEnable</code>
+    /// Enables this texture type by calling `glEnable`
     void enable() const;
-    /// Disables this texture type by calling <code>glDisable</code>
+    /// Disables this texture type by calling `glDisable`
     void disable() const;
 
-    /// Binds this texture to the texture type by calling <code>glBindTexture</code>
+    /// Binds this texture to the texture type by calling `glBindTexture`
     void bind() const;
 
     /// Returns the OpenGL name of this texture.
@@ -221,9 +218,8 @@ public:
     /**
      * Returns the type for this texture.
      *
-     * \return The type for this texture. This value can either be
-     *         <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code> or
-     *         <code>GL_TEXTURE_3D</code> depending on the dimension of the stored
+     * \return The type for this texture. This value can either be `GL_TEXTURE_1D`,
+     *         `GL_TEXTURE_2D` or `GL_TEXTURE_3D` depending on the dimension of the stored
      *         texture.
      */
     GLenum type() const;
@@ -233,18 +229,16 @@ public:
      *
      * \param type The new type for the texture.
      *
-     * \pre \p type must be <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code> or
-     *      <code>GL_TEXTURE_3D</code>
+     * \pre \p type must be `GL_TEXTURE_1D`, `GL_TEXTURE_2D` or `GL_TEXTURE_3D`
      */
     void setType(GLenum type);
 
     /**
-     * Returns the dimensions of this texture. If the texture is a 2D texture, the
-     * <code>z</code> component will be equal to <code>1</code> and if the texture is a 1D
-     * texture, the <code>y</code> and <code>z</code> components will be equal to
-     * <code>1</code>.
+     * Returns the dimensions of this texture. If the texture is a 2D texture, the `z`
+     * component will be equal to `1` and if the texture is a 1D texture, the `y` and `z`
+     * components will be equal to `1`.
      *
-     * \return The dimensions of this texture.
+     * \return The dimensions of this texture
      */
     const glm::uvec3& dimensions() const;
 
@@ -274,8 +268,7 @@ public:
 
     /**
      * Sets the format for this texture. This only updates the internal state and doesn't
-     * affect the texture on the graphics card. Call <code>uploadTexture</code> to apply
-     * changes.
+     * affect the texture on the graphics card. Call `uploadTexture` to apply changes.
      *
      * \param format The new format for this texture
      */
@@ -318,11 +311,10 @@ public:
 
     /**
      * Sets a swizzle mask that is applied to this Texture object. Each element of the
-     * <code>std::array</code> corresponds to one of the components, i.e., the first
+     * `std::array` corresponds to one of the components, i.e., the first
      * index of \p swizzleMask is the red channel and so on. The symbolic constants that
-     * are allowed in \p swizzleMask are: <code>GL_RED</code>, <code>GL_GREEN</code>,
-     * <code>GL_BLUE</code>, <code>GL_ALPHA</code>, <code>GL_ONE</code>, and
-     * <code>GL_ZERO</code>. See
+     * are allowed in \p swizzleMask are: `GL_RED`, `GL_GREEN`, `GL_BLUE`, `GL_ALPHA`,
+     * `GL_ONE`, and `GL_ZERO`. See
      * https://www.opengl.org/sdk/docs/man/html/glTexParameter.xhtml for more information.
      *
      * \param swizzleMask The swizzle mask that is applied to this Texture
@@ -330,8 +322,7 @@ public:
     void setSwizzleMask(std::array<GLenum, 4> swizzleMask);
 
     /**
-     * Reinstates the default swizzle mask of
-     * <code>{ GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA}</code>
+     * Reinstates the default swizzle mask of `{ GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA}`
      */
     void setDefaultSwizzleMask();
 
@@ -389,7 +380,7 @@ public:
 
     /**
      * Returns the size the pixel data should have according to the dimensionality and the
-     * bytes per pixel. <code>dimensions.x * dimensions.y * dimensions.z * bpp</code>. The
+     * bytes per pixel. `dimensions.x * dimensions.y * dimensions.z * bpp`. The
      * real size of the data can be different if it was set manually.
      *
      * \return The size of the pixel data according to the dimensionality and the bytes
@@ -409,9 +400,9 @@ public:
     void setPixelData(void* pixels, TakeOwnership takeOwnership = TakeOwnership::Yes);
 
     /**
-     * Returns <code>true</code> if the OpenGL texture is resident in the GPU memory.
+     * Returns `true` if the OpenGL texture is resident in the GPU memory.
      *
-     * \return <code>true</code> if the OpenGL texture is resident
+     * \return `true` if the OpenGL texture is resident
      */
     bool isResident() const;
 
@@ -457,40 +448,36 @@ public:
 
     /**
      * Binds and uploads the texture to graphics memory. The Texture has to be of type
-     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
-     * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions.
+     * `GL_TEXTURE_1D`, `GL_TEXTURE_2D`, or `GL_TEXTURE_3D`. The type will be determined
+     * automatically based on the provided dimensions.
      */
     void uploadTexture();
 
     /**
      * Binds and uploads the texture to graphics memory. The Texture has to be of type
-     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
-     * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions. The function calls glTexSubImage which means that the texture
-     * will already have to be existing in graphics memory.
+     * `GL_TEXTURE_1D`, `GL_TEXTURE_2D`, or `GL_TEXTURE_3D`. The type will be determined
+     * automatically based on the provided dimensions. The function calls glTexSubImage
+     * which means that the texture will already have to be existing in graphics memory.
      */
     void reUploadTexture();
 
     /**
      * Binds and uploads the texture to graphics memory using a pixel buffer object.
-     * The Texture has to be of type
-     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
-     * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions. The data pointer will not be used. Intead it is assumed that
-     * the provided pixel buffer object contains the data of the right size and format.
+     * The Texture has to be of type `GL_TEXTURE_1D`, `GL_TEXTURE_2D`, or `GL_TEXTURE_3D`.
+     * The type will be determined automatically based on the provided dimensions. The
+     * data pointer will not be used. Intead it is assumed that the provided pixel buffer
+     * object contains the data of the right size and format.
      */
     void uploadTextureFromPBO(GLuint pbo);
 
     /**
      * Binds and uploads the texture to graphics memory using a pixel buffer object.
-     * The Texture has to be of type
-     * <code>GL_TEXTURE_1D</code>, <code>GL_TEXTURE_2D</code>, or
-     * <code>GL_TEXTURE_3D</code>. The type will be determined automatically based on the
-     * provided dimensions. The data pointer will not be used. Intead it is assumed that
-     * the provided pixel buffer object contains the data of the right size and format.
-     * The function calls glTexSubImage which means that the texture will already have
-     * to be existing in graphics memory.
+     * The Texture has to be of type `GL_TEXTURE_1D`, `GL_TEXTURE_2D`, or `GL_TEXTURE_3D`.
+     * The type will be determined automatically based on the provided dimensions. The
+     * data pointer will not be used. Intead it is assumed that the provided pixel buffer
+     * object contains the data of the right size and format. The function calls
+     * glTexSubImage which means that the texture will already have to be existing in
+     * graphics memory.
      */
     void reUploadTextureFromPBO(GLuint pbo);
 
@@ -510,24 +497,22 @@ public:
      * Changes (=grants/revokes) ownership of the stored data. Changing this will not
      * change the underlying data.
      *
-     * \param hasOwnership <code>true</code> if this Texture should own the data in
-     * <code>_pixels</code>
+     * \param hasOwnership `true` if this Texture should own the data in `_pixels`
      */
     void setDataOwnership(TakeOwnership hasOwnership);
 
     /**
      * Returns if this Texture owns its contained data.
      *
-     * \return <code>true</code> if this Texture owns its contained data
+     * \return `true` if this Texture owns its contained data
      */
     bool dataOwnership() const;
 
     /**
-     * Accesses the <code>i</code>-th texel in the data array. Returns a reference to it
+     * Accesses the `i`-th texel in the data array. Returns a reference to it
      * so that it can be changed by the caller. Only Textures with a data type of the
-     * following list can be used to fetch textures: <code>GL_UNSIGNED_BYTE</code>,
-     * <code>GL_BYTE</code>, <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
+     * following list can be used to fetch textures: `GL_UNSIGNED_BYTE`, `GL_BYTE`,
+     * `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`, `GL_FLOAT`. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
      *
@@ -543,13 +528,11 @@ public:
     T& texel(unsigned int x);
 
     /**
-     * Accesses the <code>i</code>-th texel in the data array. Only Textures with a data
-     * type of the following list can be used to fetch textures:
-     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Accesses the `i`-th texel in the data array. Only Textures with a data
+     * type of the following list can be used to fetch textures: `GL_UNSIGNED_BYTE`,
+     * `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`,
+     * `GL_FLOAT`. Trying to use this function on another type will lead to undefined
+     * behavior in the return value.
      *
      * \tparam T The type of the data that is returned
      * \param x The position of the texel that should be fetched
@@ -563,17 +546,16 @@ public:
     const T& texel(unsigned int x) const;
 
     /**
-     * Accesses the texel at <code>(x,y)</code> from the data array. Returns a reference
-     * to it so that it can be changed by the caller. Only Textures with a data type of
-     * the following list can be used to fetch textures: <code>GL_UNSIGNED_BYTE</code>,
-     * <code>GL_BYTE</code>, <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
+     * Accesses the texel at `(x,y)` from the data array. Returns a reference to it so
+     * that it can be changed by the caller. Only Textures with a data type of the
+     * following list can be used to fetch textures: `GL_UNSIGNED_BYTE`, `GL_BYTE`,
+     * `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`, `GL_FLOAT`. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
      *
      * \tparam T The type of the data that is returned
-     * \param x The coordinate on the <code>width</code> axis
-     * \param y The coordinate on the <code>height</code> axis
+     * \param x The coordinate on the `width` axis
+     * \param y The coordinate on the `height` axis
      * \return The texel at the specified position casted to the requested type T
      *
      * \pre The Texture must be a two dimensional Texture
@@ -585,17 +567,15 @@ public:
     T& texel(unsigned int x, unsigned int y);
 
     /**
-     * Accesses the texel at <code>(x,y)</code> from the data array. Only Textures with a
-     * data type of the following list can be used to fetch textures:
-     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Accesses the texel at `(x,y)` from the data array. Only Textures with a
+     * data type of the following list can be used to fetch textures: `GL_UNSIGNED_BYTE`,
+     * `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`,
+     * `GL_FLOAT`. Trying to use this function on another type will lead to undefined
+     * behavior in the return value.
      *
      * \tparam T The type of the data that is returned
-     * \param x The coordinate on the <code>width</code> axis
-     * \param y The coordinate on the <code>height</code> axis
+     * \param x The coordinate on the `width` axis
+     * \param y The coordinate on the `height` axis
      * \return The texel at the specified position casted to the requested type T
      *
      * \pre The Texture must be a two dimensional Texture
@@ -607,12 +587,10 @@ public:
     const T& texel(unsigned int x, unsigned int y) const;
 
     /**
-     * Accesses the texel at <code>position</code> from the data array. Returns a
-     * reference to it so that it can be changed by the caller. Only Textures with a data
-     * type of the following list can be used to fetch textures:
-     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
+     * Accesses the texel at `position` from the data array. Returns a reference to it so
+     * that it can be changed by the caller. Only Textures with a data type of the
+     * following list can be used to fetch textures: `GL_UNSIGNED_BYTE`, `GL_BYTE`,
+     * `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`, `GL_FLOAT`. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
      *
@@ -622,20 +600,18 @@ public:
      *
      * \pre The Texture must be a two dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
-     * \pre <code>position.x</code> must be smaller than the width of the Texture
-     * \pre <code>position.y</code> must be smaller than the height of the Texture
+     * \pre `position.x` must be smaller than the width of the Texture
+     * \pre `position.y` must be smaller than the height of the Texture
      */
     template <class T>
     T& texel(const glm::uvec2& position);
 
     /**
-     * Accesses the texel at <code>position</code> from the data array. Only Textures with
-     * a data type of the following list can be used to fetch textures:
-     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Accesses the texel at `position` from the data array. Only Textures with a data
+     * type of the following list can be used to fetch textures: `GL_UNSIGNED_BYTE`,
+     * `GL_BYTE`, `GL_UNSIGNED_SHORT`,`GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`, `GL_FLOAT`.
+     * Trying to use this function on another type will lead to undefined behavior in the
+     * return value.
      *
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
@@ -643,25 +619,24 @@ public:
      *
      * \pre The Texture must be a two dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
-     * \pre <code>position.x</code> must be smaller than the width of the Texture
-     * \pre <code>position.y</code> must be smaller than the height of the Texture
+     * \pre `position.x` must be smaller than the width of the Texture
+     * \pre `position.y` must be smaller than the height of the Texture
      */
     template<class T>
     const T& texel(const glm::uvec2& position) const;
 
     /**
-     * Accesses the texel at <code>(x,y,z)</code> from the data array. Returns a reference
+     * Accesses the texel at `(x,y,z)` from the data array. Returns a reference
      * to it so that it can be changed by the caller. Only Textures with a data type of
-     * the following list can be used to fetch textures: <code>GL_UNSIGNED_BYTE</code>,
-     * <code>GL_BYTE</code>, <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
+     * the following list can be used to fetch textures: `GL_UNSIGNED_BYTE`, `GL_BYTE`,
+     * `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`, `GL_FLOAT`. Trying to
      * use this function on another type will lead to undefined behavior in the return
      * value.
      *
      * \tparam T The type of the data that is returned
-     * \param x The coordinate on the <code>width</code> axis
-     * \param y The coordinate on the <code>height</code> axis
-     * \param z The coordinate on the <code>depth</code> axis
+     * \param x The coordinate on the `width` axis
+     * \param y The coordinate on the `height` axis
+     * \param z The coordinate on the `depth` axis
      * \return The texel at the specified position casted to the requested type T
      *
      * \pre The Texture must be a three dimensional Texture
@@ -674,18 +649,16 @@ public:
     T& texel(unsigned int x, unsigned int y, unsigned int z);
 
     /**
-     * Accesses the texel at <code>(x,y,z)</code> from the data array. Only Textures with
+     * Accesses the texel at `>(x,y,z)` from the data array. Only Textures with
      * a data type of the following list can be used to fetch textures:
-     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * `GL_UNSIGNED_BYTE`, `GL_BYTE`, `GL_UNSIGNED_SHORT` `GL_SHORT`, `GL_UNSIGNED_INT`,
+     * `GL_INT`, `GL_FLOAT`. Trying to use this function on another type will lead to
+     * undefined behavior in the return value.
      *
      * \tparam T The type of the data that is returned
-     * \param x The coordinate on the <code>width</code> axis
-     * \param y The coordinate on the <code>height</code> axis
-     * \param z The coordinate on the <code>depth</code> axis
+     * \param x The coordinate on the `width` axis
+     * \param y The coordinate on the `height` axis
+     * \param z The coordinate on the `depth` axis
      * \return The texel at the specified position casted to the requested type T
      *
      * \pre The Texture must be a three dimensional Texture
@@ -698,14 +671,12 @@ public:
     const T& texel(unsigned int x, unsigned int y, unsigned int z) const;
 
     /**
-     * Accesses the texel at <code>position</code> from the data array. Returns a
+     * Accesses the texel at `position` from the data array. Returns a
      * reference to it so that it can be changed by the caller. Only Textures with a data
-     * type of the following list can be used to fetch textures:
-     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * type of the following list can be used to fetch textures: `GL_UNSIGNED_BYTE`,
+     * `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`, `GL_INT`,
+     * `GL_FLOAT`. Trying to use this function on another type will lead to undefined
+     * behavior in the return value.
      *
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
@@ -713,47 +684,43 @@ public:
      *
      * \pre The Texture must be a three dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
-     * \pre <code>position.x</code> must be smaller than the width of the Texture
-     * \pre <code>position.y</code> must be smaller than the height of the Texture
-     * \pre <code>position.z</code> must be smaller than the height of the Texture
+     * \pre `position.x` must be smaller than the width of the Texture
+     * \pre `position.y` must be smaller than the height of the Texture
+     * \pre `position.z` must be smaller than the height of the Texture
      */
     template <class T>
     T& texel(const glm::uvec3& position);
 
     /**
-     * Accesses the texel at <code>position</code> from the data array. Only Textures with
+     * Accesses the texel at `position` from the data array. Only Textures with
      * a data type of the following list can be used to fetch textures:
-     * <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * `GL_UNSIGNED_BYTE`, `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`,
+     * `GL_INT`, `GL_FLOAT`. Trying to use this function on another type will lead to
+     * undefined behavior in the return value.
      * \tparam T The type of the data that is returned
      * \param position The coordinate of the texel
      * \return The texel at the specified position casted to the requested type T
      *
      * \pre The Texture must be a three dimensional Texture
      * \pre The size of T must be equal to the bytes per pixel stored in the Texture
-     * \pre <code>position.x</code> must be smaller than the width of the Texture
-     * \pre <code>position.y</code> must be smaller than the height of the Texture
-     * \pre <code>position.z</code> must be smaller than the height of the Texture
+     * \pre `position.x` must be smaller than the width of the Texture
+     * \pre `position.y` must be smaller than the height of the Texture
+     * \pre `position.z` must be smaller than the height of the Texture
      */
     template<class T>
     const T& texel(const glm::uvec3& position) const;
 
     /**
-     * Returns the texel at the specified position as a <code>float</code> vector.
-     * Independent of the underlying type, each component of the vector is in the range of
-     * <code>[0,1]</code>. Only Texture%s with a data type of the following list can be
-     * used to fetch textures: <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code> . Trying
-     * to use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Returns the texel at the specified position as a `float` vector. Independent of the
+     * underlying type, each component of the vector is in the range of `[0,1]`. Only
+     * Texture%s with a data type of the following list can be used to fetch textures:
+     * `GL_UNSIGNED_BYTE`, `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`,
+     * `GL_INT`, `GL_FLOAT` . Trying to use this function on another type will lead to
+     * undefined behavior in the return value.
      *
-     * \param x The coordinate on the <code>width</code> axis
+     * \param x The coordinate on the `width` axis
      * \return The texel at the specified position as a vector with each component in
-     *         <code>[0,1]</code>
+     *         `[0,1]`
      *
      * \pre The Texture must be a one dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -761,19 +728,17 @@ public:
     glm::vec4 texelAsFloat(unsigned int x) const;
 
     /**
-     * Returns the texel at the specified position as a <code>float</code> vector.
-     * Independent of the underlying type, each component of the vector is in the range of
-     * <code>[0,1]</code>. Only Texture%s with a data type of the following list can be
-     * used to fetch textures: <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Returns the texel at the specified position as a `float` vector. Independent of the
+     * underlying type, each component of the vector is in the range of `[0,1]`. Only
+     * Texture%s with a data type of the following list can be used to fetch textures:
+     * `GL_UNSIGNED_BYTE`, `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`,
+     * `GL_INT`, `GL_FLOAT`. Trying to use this function on another type will lead to
+     * undefined behavior in the return value.
      *
-     * \param x The coordinate on the <code>width</code> axis
-     * \param y The coordinate on the <code>height</code> axis
+     * \param x The coordinate on the `width` axis
+     * \param y The coordinate on the `height` axis
      * \return The texel at the specified position as a vector with each component in
-     *         <code>[0,1]</code>
+     *         `[0,1]`
      *
      * \pre The Texture must be a two dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -782,40 +747,36 @@ public:
     glm::vec4 texelAsFloat(unsigned int x, unsigned int y) const;
 
     /**
-     * Returns the texel at the specified position as a <code>float</code> vector.
-     * Independent of the underlying type, each component of the vector is in the range of
-     * <code>[0,1]</code>. Only Textures with a data type of the following list can be
-     * used to fetch textures: <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Returns the texel at the specified position as a `float` vector. Independent of the
+     * underlying type, each component of the vector is in the range of `[0,1]`. Only
+     * Textures with a data type of the following list can be used to fetch textures:
+     * `GL_UNSIGNED_BYTE`, `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`,
+     * `GL_INT`, `GL_FLOAT`. Trying to use this function on another type will lead to
+     * undefined behavior in the return value.
      *
      * \param pos The coordinate of the texel
      * \return The texel at the specified position as a vector with each component in
-     *         <code>[0,1]</code>
+     *         `[0,1]`
      *
      * \pre The Texture must be a two dimensional Texture
-     * \pre <code>pos.x</code> must be smaller than the width of the Texture
-     * \pre <code>pos.y</code> must be smaller than the height of the Texture
+     * \pre `pos.x` must be smaller than the width of the Texture
+     * \pre `pos.y` must be smaller than the height of the Texture
      */
     glm::vec4 texelAsFloat(const glm::uvec2& pos) const;
 
     /**
-     * Returns the texel at the specified position as a <code>float</code> vector.
-     * Independent of the underlying type, each component of the vector is in the range of
-     * <code>[0,1]</code>. Only Textures with a data type of the following list can be
-     * used to fetch textures: <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Returns the texel at the specified position as a `float` vector. Independent of the
+     * underlying type, each component of the vector is in the range of `[0,1]`. Only
+     * Textures with a data type of the following list can be used to fetch textures:
+     * `GL_UNSIGNED_BYTE`, `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`,
+     * `GL_INT`, `GL_FLOAT`. Trying to use this function on another type will lead to
+     * undefined behavior in the return value.
      *
-     * \param x The coordinate on the <code>width</code> axis
-     * \param y The coordinate on the <code>height</code> axis
-     * \param z The coordinate on the <code>depth</code> axis
+     * \param x The coordinate on the `width` axis
+     * \param y The coordinate on the `height` axis
+     * \param z The coordinate on the `depth` axis
      * \return The texel at the specified position as a vector with each component in
-     *         <code>[0,1]</code>
+     *         `[0,1]`
      *
      * \pre The Texture must be a three dimensional Texture
      * \pre \p x must be smaller than the width of the Texture
@@ -825,23 +786,21 @@ public:
     glm::vec4 texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const;
 
     /**
-     * Returns the texel at the specified position as a <code>float</code> vector.
-     * Independent of the underlying type, each component of the vector is in the range of
-     * <code>[0,1]</code>. Only Texture%s with a data type of the following list can be
-     * used to fetch textures: <code>GL_UNSIGNED_BYTE</code>, <code>GL_BYTE</code>,
-     * <code>GL_UNSIGNED_SHORT</code>, <code>GL_SHORT</code>,
-     * <code>GL_UNSIGNED_INT</code>, <code>GL_INT</code>, <code>GL_FLOAT</code>. Trying to
-     * use this function on another type will lead to undefined behavior in the return
-     * value.
+     * Returns the texel at the specified position as a `float` vector. Independent of the
+     * underlying type, each component of the vector is in the range of `[0,1]`. Only
+     * Texture%s with a data type of the following list can be used to fetch textures:
+     * `GL_UNSIGNED_BYTE`, `GL_BYTE`, `GL_UNSIGNED_SHORT`, `GL_SHORT`, `GL_UNSIGNED_INT`,
+     * `GL_INT`, `GL_FLOAT`. Trying to use this function on another type will lead to
+     * undefined behavior in the return value.
      *
      * \param pos The coordinate of the texel
      * \return The texel at the specified position as a vector with each component in
-     *         <code>[0,1]</code>
+     *         `[0,1]`
      *
      * \pre The Texture must be a three dimensional Texture
-     * \pre <code>pos.x</code> must be smaller than the width of the Texture
-     * \pre <code>pos.y</code> must be smaller than the height of the Texture
-     * \pre <code>pos.z</code> must be smaller than the depth of the Texture
+     * \pre `pos.x` must be smaller than the width of the Texture
+     * \pre `pos.y` must be smaller than the height of the Texture
+     * \pre `pos.z` must be smaller than the depth of the Texture
      */
     glm::vec4 texelAsFloat(const glm::uvec3& pos) const;
 
@@ -896,8 +855,8 @@ private:
     };
 
     /**
-     * Stores the dimensions of the texture, <code>y</code> and <code>z</code> may be
-     * <code>1</code> if the Texture is 1D or 2D
+     * Stores the dimensions of the texture, `y` and `z` may be `1` if the Texture is 1D
+     * or 2D.
      */
     glm::uvec3 _dimensions = glm::uvec3(0);
     Format _format;

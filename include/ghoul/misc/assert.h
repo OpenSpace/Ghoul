@@ -33,7 +33,7 @@ namespace ghoul {
 
 /**
  * Exception that gets thrown if an assertion is triggered and the user selects the
- * <code>AssertionException</code> option.
+ * `AssertionException` option.
  */
 struct AssertionException : public std::runtime_error {
     explicit AssertionException(std::string exp, std::string msg, std::string file,
@@ -73,10 +73,10 @@ void internal_assert(std::string expression, std::string message, std::string fi
 #endif
 
 /**
- * This macro asserts on the <code>__condition__</code> and prints the optional
- * <code>__message__</code>. In addition, it gives the option of aborting, exiting, or
+ * This macro asserts on the `__condition__` and prints the optional
+ * `__message__`. In addition, it gives the option of aborting, exiting, or
  * ignoring the assertion. The macro is optimized away in Release mode. Due to this fact,
- * the <code>__condition__</code> must not have any sideeffects.
+ * the `__condition__` must not have any sideeffects.
  */
 
 #ifdef GHL_THROW_ON_ASSERT

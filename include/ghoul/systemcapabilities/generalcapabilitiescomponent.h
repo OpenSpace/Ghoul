@@ -127,7 +127,7 @@ public:
     /**
      * Returns the amount of available, installed main memory (RAM) on the system in MB.
      * This value is retrieved using the Windows Management Instrumentation (if
-     * available). The default value is <code>-1</code>.
+     * available). The default value is `-1`.
      *
      * \return The amount of available main memory
      */
@@ -169,9 +169,9 @@ public:
     const std::string& extensions() const;
 
     /**
-     * Returns the <code>CPU</code> string.
+     * Returns the `CPU` string.
      *
-     * \return The <code>CPU</code> string
+     * \return The `CPU` string
      */
     std::string_view name() const override;
 

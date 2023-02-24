@@ -123,16 +123,13 @@ int luaError(lua_State* state, const std::string& message);
 /**
  * Returns a string describing the \p state's current stack. The values of each entry in
  * the stack is printed, which includes tables (printed recursively), but excludes
- * <code>function</code>, <code>thread</code>, <code>userdata</code>, and
- * <code>light userdata</code> objects, for which only the type is returned. The returned
- * string is in the the format:
- * \verbatim
-<code>
-1: <entry>
-2: <entry>
-...
-</code>
-\endverbatim
+ * `function`, `thread`, `userdata`, and `light userdata` objects, for which only the type
+ * is returned. The returned string is in the the format:
+ * ```
+ * 1: <entry>
+ * 2: <entry>
+ * ...
+ * ```
  * If the stack does not contain any values, an empty string is returned.
  *
  * \param state The Lua state that will have its stack printed
@@ -156,11 +153,11 @@ int luaError(lua_State* state, const std::string& message);
  *        added
  * \param state If this is set to a valid lua_State, this state is used instead of
  *        creating a new state. It is the callers responsibility to ensure that the passed
- *        state is valid if this parameter is not <code>nullptr</code>. After calling this
+ *        state is valid if this parameter is not `nullptr`. After calling this
  *        method, the stack of the passed state will be empty after this function returns.
  *
  * \throw FormattingException If the #ghoul::Dictionary contains mixed keys of both type
- *        <code>string</code> and type <code>number</code>
+ *        `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
  * \throw LuaRuntimeException If there was an error initializing a new Lua state if it
  *        was necessary
@@ -181,12 +178,12 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
  * \param filename The filename pointing to the script that is executed.
  * \param state If this is set to a valid lua_State, this state is used instead of
  *        creating a new state. It is the callers responsibility to ensure that the passed
- *        state is valid if this parameter is not <code>nullptr</code>. After calling this
+ *        state is valid if this parameter is not `nullptr`. After calling this
  *        method, the stack of the passed state will be empty after this function returns.
  * \return The ghoul::Dictionary described by the Lua script
  *
  * \throw FormattingException If the #ghoul::Dictionary contains mixed keys of both type
- *        <code>string</code> and type <code>number</code>
+ *        `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
  * \throw LuaRuntimeException If there was an error initializing a new Lua state if it
  *        was necessary
@@ -214,7 +211,7 @@ ghoul::Dictionary loadDictionaryFromFile(const std::string& filename,
  *        empty.
  *
  * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
- *        keys of both type <code>string</code> and type <code>number</code>
+ *        keys of both type `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
@@ -259,7 +256,7 @@ void loadArrayDictionaryFromString(const std::string& script,
  * \return The ghoul::Dictionary described by the Lua script
  *
  * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
- *        keys of both type <code>string</code> and type <code>number</code>
+ *        keys of both type `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
@@ -299,7 +296,7 @@ ghoul::Dictionary loadArrayDictionaryFromString(const std::string& script,
  * \param location The stack index of the item to extract. Defaults to -1 (topmost item).
  *
  * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
- *        <code>string</code> and type <code>number</code>
+ *        `string` and type `number`
  * \pre \p state must not be nullptr
  * \post \p state%'s stack is unchanged
  */
@@ -317,7 +314,7 @@ void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary,
  *
  * \return The #ghoul::Dictionary into which the values from the stack are added
  * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
- *        <code>string</code> and type <code>number</code>
+ *        `string` and type `number`
  * \pre \p state must not be nullptr
  * \post \p state%'s stack is unchanged
  */
@@ -383,7 +380,7 @@ void destroyLuaState(lua_State* state);
 
 /**
  * This function executes the Lua script pointed to by \p filename using the passed
- * <code>lua_State</code> \p state.
+ * `lua_State` \p state.
  *
  * \param state The Lua state that is used to execute the script
  * \param filename The file path that contains the Lua script that is executed
@@ -399,7 +396,7 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename);
 
 /**
  * This function executes the Lua script provided as plain text in \p script using the
- * passed <code>lua_State</code> \p state.
+ * passed `lua_State` \p state.
  *
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
@@ -411,7 +408,7 @@ void runScript(lua_State* state, const std::string& script);
 
 /**
  * This function executes the Lua script provided as plain text in \p script using the
- * passed <code>lua_State</code> \p state.
+ * passed `lua_State` \p state.
  *
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
@@ -575,7 +572,7 @@ T* userData(lua_State* L, int location = 1);
  *  - floating point types
  *  - bool
  *  - nil_t for pushing a nil value
- *  - text (<code>std::string</code> or <code>const char *</code>)
+ *  - text (`std::string` or `const char*`)
  *  - std::vectors with integer, floating point, or text
  *  - pointers, which are pushed as light user data
  *  - GLM matrix and vector types
@@ -593,7 +590,7 @@ void push(lua_State* L, Ts... arguments);
 /**
  * Tries to read a value of type T from the top of the Lua stack and informs about
  * whether it was successful or not. Can be used to try to read more complex data types,
- * that are not supported by the <code>value</code> functions. If the provided type is
+ * that are not supported by the `value` functions. If the provided type is
  * not supported by the function, a compile error will occur.
  *
  * \tparam T The type of the return value.

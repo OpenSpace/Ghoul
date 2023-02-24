@@ -39,7 +39,7 @@ class MultipleCommand : public CommandlineCommand {};
  * This class represents a command that can called multiple times in a given commandline
  * and has a single argument of respective type \p T. Each time the command is called, the
  * converted value is appended to a vector that has been passed in the constructor. The
- * template class \p T must be convertable using an <code>std::stringstream</code>.
+ * template class \p T must be convertable using an `std::stringstream`.
  * \tparam T The typename of the first argument type
  *
  * \sa MultipleCommandZeroArguments
@@ -53,10 +53,10 @@ public:
      *
      * \param ptr1 The reference to the parameters that will be set when this command is
      *        executed
-     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * \param name The full name for this command. Has to start with a `-` in
      *        order to be valid
      * \param shortName The (optional) short name for this command. If it is provided, it
-     *        has to start with a <code>-</code> in order to be valid
+     *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
@@ -93,7 +93,7 @@ protected:
  * and has 2 arguments of respective types \p T and \p U. Each time the command is called,
  * the converted value is appended to a vector that has been passed in the constructor.
  * The template classes \p T, \p U, \p V, and \p U must be convertable using an
- * <code>std::stringstream</code>.
+ * `std::stringstream`.
  *
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
@@ -111,10 +111,10 @@ public:
      *        executed
      * \param ptr2 The reference  to the second parameters that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * \param name The full name for this command. Has to start with a `-` in
      *        order to be valid
      * \param shortName The (optional) short name for this command. If it is provided, it
-     *        has to start with a <code>-</code> in order to be valid
+     *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
@@ -154,7 +154,7 @@ protected:
  * and has 3 arguments of respective types \p T, \p U, and \p V. Each time the command is
  * called, the converted value is appended to a vector that has been passed in the
  * constructor. The template classes \p T, \p U, \p V, and \p U must be convertable using
- * an <code>std::stringstream</code>.
+ * an `std::stringstream`.
  *
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
@@ -175,10 +175,10 @@ public:
      *        command is executed
      * \param ptr3 The reference to the third parameters that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * \param name The full name for this command. Has to start with a `-` in
      *        order to be valid
      * \param shortName The (optional) short name for this command. If it is provided, it
-     *        has to start with a <code>-</code> in order to be valid
+     *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
@@ -219,7 +219,7 @@ protected:
  * and has 4 arguments of respective types \p T, \p U, \p V, and \p U. Each time the
  * command is called, the converted value is appended to a vector that has been
  * passed in the constructor. The template classes \p T, \p U, \p V, and \p U must be
- * convertable using an <code>std::stringstream</code>.
+ * convertable using an `std::stringstream`.
  *
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
@@ -243,10 +243,10 @@ public:
      *        command is executed
      * \param ptr4 The reference to the fourth parameters that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * \param name The full name for this command. Has to start with a `-` in
      *        order to be valid
      * \param shortName The (optional) short name for this command. If it is provided, it
-     *        has to start with a <code>-</code> in order to be valid
+     *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      * \param parameterList The explanation of the parameters that this command expects.
@@ -285,7 +285,7 @@ protected:
 
 /**
  * This class represents a command with zero arguments which can be called multiple times
- * in a given commandline. The <code>int</code> pointer will contain the number of how
+ * in a given commandline. The `int` pointer will contain the number of how
  * often the command was present in the command-line.
  *
  * \sa MultipleCommand
@@ -293,15 +293,15 @@ protected:
 class MultipleCommandZeroArguments : public CommandlineCommand {
 public:
     /**
-     * This constructor requests one <code>int</code> parameter that returns the number of
+     * This constructor requests one `int` parameter that returns the number of
      * times this command was executed.
      *
      * \param nExecutions The reference to the int that will be set to the number of
      *        executions
-     * \param name The full name for this command. Has to start with a <code>-</code> in
+     * \param name The full name for this command. Has to start with a `-` in
      *        order to be valid
      * \param shortName The (optional) short name for this command. If it is provided, it
-     *        has to start with a <code>-</code> in order to be valid
+     *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      */
@@ -309,7 +309,7 @@ public:
         std::string shortName = "", std::string infoText = "");
 
     /**
-     * Increases the <code>int</code> value passed in the constructor by one per
+     * Increases the `int` value passed in the constructor by one per
      * execution.
      */
     void execute(const std::vector<std::string>& /*parameters*/) override;

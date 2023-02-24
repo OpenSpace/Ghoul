@@ -58,7 +58,7 @@ public:
 
 
 // The 'defer' macro can be used to execute a piece of code at the end of a scope, for
-// example to guarantee that a <code>delete</code> function is called.
+// example to guarantee that a `delete` function is called.
 // Example:
 // int* i = new int;
 // defer { delete i; };

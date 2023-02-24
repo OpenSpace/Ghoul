@@ -46,7 +46,7 @@ public:
      *
      * \param programName The name of the program. Used in the #usageInformation and
      *        #helpText methods
-     * \param allowUnknownCommands If this is set to <code>true</code> the
+     * \param allowUnknownCommands If this is set to `true` the
      *        CommandlineParser will ignore commands it did not recognize and extract only
      *        the used commands from the passed command-line, leaving the unknown commands
      *        untouched. This allows other parts of the program to deal with command-line
@@ -63,16 +63,16 @@ public:
 
     /**
      * Sets if this CommandlineParser allows command-line arguments that do not belong to
-     * any registered CommandlineCommand. If this is set to <code>true</code>, a receiving
-     * <code>std::vector</code> has to be provided in the setCommandline method which
+     * any registered CommandlineCommand. If this is set to `true`, a receiving
+     * `std::vector` has to be provided in the setCommandline method which
      * will contain all command-line arguments that were not consumed by this parser.
      * Warning: This method is only valid to be called before setCommmandLine. Calling it
      * after the command-line has been set results in undefined behavior.
      *
-     * \param allowUnknownCommands If set to <code>true</code> this parser allows unknown
-     *        arguments without a corresponding CommandlineCommand. If <code>false</code>
+     * \param allowUnknownCommands If set to `true` this parser allows unknown
+     *        arguments without a corresponding CommandlineCommand. If `false`
      *        this will lead to logging of errors and #execute will return
-     *        <code>false</code> if any unknown commands are encountered during execution
+     *        `false` if any unknown commands are encountered during execution
      */
     void setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands);
 
@@ -81,8 +81,8 @@ public:
      * CommandlineCommand associated with them, in the command-line set by
      * setCommandline.
      *
-     * \return <code>true</code> if unknown command-line arguments are allowed by this
-     *         CommandlineParser; <code>false</code> otherwise
+     * \return `true` if unknown command-line arguments are allowed by this
+     *         CommandlineParser; `false` otherwise
      */
     AllowUnknownCommands allowsUnknownCommands() const;
 
@@ -90,9 +90,9 @@ public:
      * Sets the command-line given from the main function.
      *
      * \param arguments The commandline arguments, beginning with the name of the
-     * application
+     *        application
      * \return The storage for the commands that have not been consumed by the
-     *         CommandlineParser. The <code>vector</code> will be cleared by this function
+     *         CommandlineParser. The `vector` will be cleared by this function
      *         and will be filled by the #execute method
      *
      * \pre \p arguments must not be empty
@@ -109,7 +109,7 @@ public:
      * executed, thus leaving the CommandlineCommands in an undefined state. In the case
      * of any other exception, none of the CommandlineCommands have been executed.
      *
-     * \return <code>true</code> if the help message should be displayed by the caller
+     * \return `true` if the help message should be displayed by the caller
      *         using the displayHelp method.
      *
      * \throws CommandlineException If there are malformed commandline parameters that
@@ -128,7 +128,7 @@ public:
      * \param cmd The command that is to be added. The ownership of the CommandlineCommand
      *        will be transferred to the CommandlineParser
      *
-     * \pre \p cmd must not be <code>nullptr</code>
+     * \pre \p cmd must not be `nullptr`
      * \pre The name of \p cmd may not have been used in a previous registered
      *      CommandlineCommand's name or short name
      * \pre If \p cmd has a short name, it may not have been used in a previous registered
@@ -141,34 +141,34 @@ public:
      * have a name or a short name. This method transfers ownership of the
      * CommandlineCommand from the caller to the CommandlineParser, which will delete the
      * command upon destruction. If there already is an CommandlineCommand present for
-     * nameless argument, it will be replaced by <code>cmd</code>.
+     * nameless argument, it will be replaced by `cmd`.
      *
      * \param cmd The command responsible for those arguments
      *
-     * \pre \p cmd must not be <code>nullptr</code>
+     * \pre \p cmd must not be `nullptr`
      */
     void addCommandForNamelessArguments(std::unique_ptr<CommandlineCommand> cmd);
 
     /**
      * Returns if a command with the provided \p name has previously been registered.
      *
-     * \return <code>true</code> if a CommandlineCommand with the provided \p name has
-     *         previously been registered; <code>false</code> otherwise
+     * \return `true` if a CommandlineCommand with the provided \p name has
+     *         previously been registered; `false` otherwise
      */
     bool hasCommandForName(const std::string& name) const;
 
     /**
      * Returns if a command with the provided \p shortName has previously been registered.
      *
-     * \return <code>true</code> if a CommandlineCommand with the provided \p shortName
-     *         has previously been registered; <code>false</code> otherwise
+     * \return `true` if a CommandlineCommand with the provided \p shortName
+     *         has previously been registered; `false` otherwise
      */
     bool hasCommandForShortName(const std::string& shortName) const;
 
     /**
      * Returns if a nameless command has been previously registered.
      *
-     * \return <code>true</code> if a nameless command has been previously registered
+     * \return `true` if a nameless command has been previously registered
      */
     bool hasNamelessCommand() const;
 
@@ -194,7 +194,7 @@ public:
      * command registered as the nameless command.
      *
      * \param command Show information for the command with the CommandlineCommand::name
-     *        or CommandlineCommand::shortName only. If <code>command = "Nameless"</code>
+     *        or CommandlineCommand::shortName only. If `command = "Nameless"`
      *        the usage information for the nameless argument is logged
      * \return The usage information for the provided CommandlineCommand
      *
@@ -221,20 +221,20 @@ public:
 protected:
     /** Returns the CommandlineCommand with a specific CommandlineCommand::shortName or
      * CommandlineCommand::name from the list of stored commands. If no such command
-     * exists <code>nullptr</code> will be returned.
+     * exists `nullptr` will be returned.
      *
      * \param shortOrLongName Either the CommandlineCommand::name or
      *        CommandlineCommand::shortName of the command that should be fetched
      * \return The command that respond to the given name or short name, or
-     *         <code>nullptr</code> if no such CommandlineCommand exists
+     *         `nullptr` if no such CommandlineCommand exists
      */
     CommandlineCommand* getCommand(const std::string& shortOrLongName);
 
     /**
-     * Returns <code>true</code> if the \a _arguments contains only a single help
+     * Returns `true` if the \em _arguments contains only a single help
      * argument.
      *
-     * \return Whether the \a _arguments only contain a single help argument
+     * \return Whether the \em _arguments only contain a single help argument
      */
     bool hasOnlyHelpCommand() const;
 

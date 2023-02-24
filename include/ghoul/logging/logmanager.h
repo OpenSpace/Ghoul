@@ -59,8 +59,8 @@ class Log;
  * Macros are defined to make logging messages easier. These macros are: #LDEBUG,
  * #LDEBUGC, #LINFO, #LINFOC, #LWARNING, #LWARNINGC, #LERROR, #LERRORC, #LFATAL, #LFATALC.
  * The *C versions of the macros requires the category and the message as a parameter. The
- * versions without the C require an <code>std::string</code> variable named
- * <code>_loggerCat</code> to be defined in the scope of the macro "call".
+ * versions without the C require an `std::string` variable named
+ * `_loggerCat` to be defined in the scope of the macro "call".
  */
 class LogManager {
 public:
@@ -80,7 +80,7 @@ public:
      * \param immediateFlush Determines if all Log%s will be flushed out immediately
      *        after a message was received. In the case of file-backed logs, the files
      *        will be written out to disk and in case of a console log, the console will
-     *        be updated. Passing <code>true</code> will slow down the execution but
+     *        be updated. Passing `true` will slow down the execution but
      *        guarantees that a crash immediately after a log message won't lead to data
      *        loss.
      */
@@ -88,9 +88,9 @@ public:
         ImmediateFlush immediateFlush = ImmediateFlush::No);
 
     /**
-     * The main method to log messages. If the <code>level</code> is >= the level this
-     * LogManager was created with, the <code>message</code> will be passed to the stored
-     * Log%s. The <code>category</code> will be used in different ways depending on the
+     * The main method to log messages. If the `level` is >= the level this
+     * LogManager was created with, the `message` will be passed to the stored
+     * Log%s. The `category` will be used in different ways depending on the
      * Log in question, but examples are grouping or prepending to the message.
      *
      * \param level The level of the message that should be passed to the Log%s
@@ -102,9 +102,9 @@ public:
     void logMessage(LogLevel level, std::string_view category, std::string_view message);
 
     /**
-     * The main method to log messages. If the <code>level</code> is >= the level this
-     * LogManager was created with, the <code>message</code> will be passed to the stored
-     * Log%s. The <code>category</code> of the message will be an empty string, which
+     * The main method to log messages. If the `level` is >= the level this
+     * LogManager was created with, the `message` will be passed to the stored
+     * Log%s. The `category` of the message will be an empty string, which
      * causes it to be ignored by most Log%s.
      *
      * \param level The level of the message that should be passed to the Log%s

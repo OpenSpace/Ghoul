@@ -111,7 +111,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the line
- * <code>y = x</code>.
+ * `y = x`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -124,7 +124,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the parabola
- * <code>y = x^2</code>.
+ * `y = x^2`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -137,7 +137,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the parabola
- * <code>y = -x^2 + 2x</code>.
+ * `y = -x^2 + 2x`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -151,8 +151,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * quadratic:
- * <code>y = (1/2)((2x)^2)             ; [0, 0.5)</code>
- * <code>y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]</code>
+ * `y = (1/2)((2x)^2)             ; [0, 0.5)`
+ * `y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -166,7 +166,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the cubic
- * <code>y = x^3</code>.
+ * `y = x^3`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -179,7 +179,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the cubic
- * <code>y = (x - 1)^3 + 1</code>.
+ * `y = (x - 1)^3 + 1`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -193,8 +193,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * cubic:
- * <code>y = (1/2)((2x)^3)       ; [0, 0.5)</code>
- * <code>y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]</code>
+ * `y = (1/2)((2x)^3)       ; [0, 0.5)`
+ * `y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -207,7 +207,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quartic
- * <code>y = x^4</code>.
+ * `y = x^4`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -220,7 +220,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quartic
- * <code>y = 1 - (x - 1)^4</code>.
+ * `y = 1 - (x - 1)^4`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -234,8 +234,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * quartic:
- * <code>y = (1/2)((2x)^4)        ; [0, 0.5)</code>
- * <code>y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]</code>
+ * `y = (1/2)((2x)^4)        ; [0, 0.5)`
+ * `y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -248,7 +248,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quintic
- * <code>y = x^5</code>.
+ * `y = x^5`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -261,7 +261,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quintic
- * <code>y = (x - 1)^5 + 1</code>.
+ * `y = (x - 1)^5 + 1`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -275,8 +275,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * quintic:
- * <code>y = (1/2)((2x)^5)       ; [0, 0.5)</code>
- * <code>y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]</code>
+ * `y = (1/2)((2x)^5)       ; [0, 0.5)`
+ * `y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -355,8 +355,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * circular function:
- * <code>y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)</code>
- * <code>y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]</code>
+ * `y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)`
+ * `y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -370,7 +370,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
- * exponential function: <code>y = 2^(10(x - 1))</code>
+ * exponential function: `y = 2^(10(x - 1))`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -383,7 +383,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
- * exponential function: <code>y = -2^(-10x) + 1</code>
+ * exponential function: `y = -2^(-10x) + 1`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -397,8 +397,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
  * piecewise exponential function:
- * <code>y = (1/2)2^(10(2x - 1))         ; [0,0.5)</code>
- * <code>y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]</code>
+ * `y = (1/2)2^(10(2x - 1))         ; [0,0.5)`
+ * `y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -412,7 +412,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the damped
- * sine wave: <code>y = sin(13pi/2*x)*pow(2, 10 * (x - 1))</code>
+ * sine wave: `y = sin(13pi/2*x)*pow(2, 10 * (x - 1))`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -425,7 +425,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the damped
- * sine wave: <code>y = sin(-13pi/2*(x + 1))*pow(2, -10x) + 1</code>
+ * sine wave: `y = sin(-13pi/2*(x + 1))*pow(2, -10x) + 1`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -439,8 +439,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * exponentially-damped sine wave:
- * <code>y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)</code>
- * <code>y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]</code>
+ * `y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)`
+ * `y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -453,7 +453,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
- * overshooting cubic: <code>y = x^3-x*sin(x*pi)</code>
+ * overshooting cubic: `y = x^3-x*sin(x*pi)`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -466,7 +466,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
- * overshooting cubic: <code>y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))</code>
+ * overshooting cubic: `y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -480,8 +480,8 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * overshooting cubic function:
- * <code>y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)</code>
- * <code>y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]</code>
+ * `y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)`
+ * `y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]`
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -494,7 +494,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quadratic
- * equation: <code>ax^2 + bx + c</code>.
+ * equation: `ax^2 + bx + c`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -507,7 +507,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quadratic
- * equation: <code>ax^2 + bx + c</code>.
+ * equation: `ax^2 + bx + c`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -520,7 +520,7 @@ template <typename T>
 
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the quadratic
- * equation: <code>ax^2 + bx + c</code>.
+ * equation: `ax^2 + bx + c`.
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]

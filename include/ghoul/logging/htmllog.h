@@ -54,8 +54,8 @@ public:
      *
      * \param filename The path and filename of the file that will receive the log
      *        messages
-     * \param writeToAppend If this is <code>true</code>, the log messages will be
-     *        appended to the file. If it is <code>false</code> the file will be
+     * \param writeToAppend If this is `true`, the log messages will be
+     *        appended to the file. If it is `false` the file will be
      *        overwritten without a warning.
      * \param timeStamping Determines if the log should print the time when a message is
      *        logged in the log messages
@@ -86,8 +86,7 @@ public:
     virtual ~HTMLLog() override;
 
     /**
-     * Method that logs a message with a given <code>level</code> and
-     * <code>category</code> to the text file.
+     * Method that logs a message with a given `level` and `category` to the text file.
      *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
