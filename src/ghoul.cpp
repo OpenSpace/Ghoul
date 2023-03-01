@@ -33,13 +33,13 @@
 namespace ghoul {
 
 void initialize() {
-    ZoneScoped
+    ZoneScoped;
 
     ghoul::filesystem::FileSystem::initialize();
 }
 
 void deinitialize() {
-    ZoneScoped
+    ZoneScoped;
 
     ghoul::lua::internal::deinitializeGlobalState();
     ghoul::filesystem::FileSystem::deinitialize();

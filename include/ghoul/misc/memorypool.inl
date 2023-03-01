@@ -75,7 +75,7 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::reset() {
 
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
 void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::housekeeping() {
-    ZoneScoped
+    ZoneScoped;
 
     if (_emptyList.empty()) {
         return;
@@ -110,7 +110,7 @@ template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
 void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(std::size_t bytes,
                                                                     std::size_t alignment)
 {
-    ZoneScoped
+    ZoneScoped;
 
     ghoul_assert(
         bytes <= BucketSize,
@@ -175,7 +175,7 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p
                                                                         std::size_t bytes,
                                                                 std::size_t /*alignment*/)
 {
-    ZoneScoped
+    ZoneScoped;
 
     if (NoDealloc) {
         return;

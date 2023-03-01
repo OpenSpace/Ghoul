@@ -1011,7 +1011,7 @@ void ModelGeometry::enableAnimation(bool value) {
 }
 
 void ModelGeometry::initialize() {
-    ZoneScoped
+    ZoneScoped;
 
     for (io::ModelNode& node : _nodes) {
         for (io::ModelMesh& mesh : node.meshes()) {

@@ -89,7 +89,7 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
 std::shared_ptr<Font> FontManager::font(std::string_view name, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
-    ZoneScoped
+    ZoneScoped;
     ghoul_assert(!name.empty(), "Name must not be empty");
 
     unsigned int hash = hashCRC32(name);
@@ -114,7 +114,7 @@ std::shared_ptr<Font> FontManager::font(std::string_view name, float fontSize,
 std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
                                         Outline withOutline, LoadGlyphs loadGlyphs)
 {
-    ZoneScoped
+    ZoneScoped;
 
     const auto itPath = _fontPaths.find(hashName);
     if (itPath == _fontPaths.cend()) {
@@ -146,8 +146,8 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     );
 
     if (loadGlyphs) {
-        ZoneScopedN("Load Glyphs")
-        TracyGpuZone("Load Glyphs")
+        ZoneScopedN("Load Glyphs");
+        TracyGpuZone("Load Glyphs");
         f->loadGlyphs(
             std::vector<wchar_t>(DefaultCharacterSet.begin(), DefaultCharacterSet.end())
         );

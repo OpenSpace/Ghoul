@@ -41,7 +41,6 @@ begin_header("Configuring Ghoul Project")
 option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
 option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit tests" OFF)
-option(GHOUL_PROFILING_ENABLE_TRACY "Enable profiling with Tracy" OFF)
 
 option(GHOUL_MODULE_ASSIMP "Enable AssImp Model loader" ON)
 option(GHOUL_MODULE_COMMANDLINEPARSER "Enable Commandlineparser" ON)
@@ -70,6 +69,17 @@ if (MSVC)
     message(FATAL_ERROR "Cannot enable AVX2 and AVX512 instructions simultaneously")
   endif ()
 endif ()
+
+
+if (WIN32)
+  option(GHOUL_ENABLE_EDIT_CONTINUE "Enable Edit&Continue" ON)
+
+  if (TRACY_ENABLE)
+    message(WARNING "Tracy does not support compiling with Edit&Continue, so we have to disable that feature")
+    set(GHOUL_ENABLE_EDIT_CONTINUE OFF CACHE BOOL "" FORCE)
+  endif ()
+endif ()
+
 
 add_subdirectory(src)
 add_subdirectory(ext SYSTEM)

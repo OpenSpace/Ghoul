@@ -24,7 +24,7 @@ url=https://github.com/OpenSpace/freetype-mirror
 	url = https://github.com/OpenSpace/tiny-process-library.git
 [submodule "ext/tracy"]
 	path = ext/tracy
-	url = https://github.com/OpenSpace/tracy.git
+	url = https://github.com/wolfpld/tracy.git
 [submodule "ext/catch2"]
 	path = ext/catch2
 	url = https://github.com/catchorg/Catch2.git

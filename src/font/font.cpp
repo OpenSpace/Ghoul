@@ -74,7 +74,7 @@ namespace {
     void loadFace(const std::filesystem::path& name, float size, FT_Library& library,
                   FT_Face& face)
     {
-        ZoneScoped
+        ZoneScoped;
 
         const FT_Error e1 = FT_Init_FreeType(&library);
         handleError(e1, nullptr, nullptr, nullptr, name, size);
@@ -144,7 +144,7 @@ Font::Font(std::filesystem::path filename, float pointSize, opengl::TextureAtlas
     , _hasOutline(hasOutline)
     , _outlineThickness(outlineThickness)
 {
-    ZoneScoped
+    ZoneScoped;
 
     ghoul_assert(!_name.empty(), "Filename must not be empty");
     ghoul_assert(_pointSize > 0.f, "Need positive point size");
@@ -211,7 +211,7 @@ glm::vec2 Font::boundingBox(std::string_view text) {
 }
 
 const Font::Glyph* Font::glyph(wchar_t character) {
-    ZoneScoped
+    ZoneScoped;
 
     // Check if charcode has been already loaded
     for (const Glyph& g : _glyphs) {
@@ -247,7 +247,7 @@ const Font::Glyph* Font::glyph(wchar_t character) {
 }
 
 void Font::loadGlyphs(std::vector<wchar_t> characters) {
-    ZoneScoped
+    ZoneScoped;
     TracyGpuZone("loadGlyph")
 
     const unsigned int atlasDepth  = _atlas.size().z;
@@ -325,7 +325,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         // an outline, we need to increase the size of the base to match the outline so
         // that they can be rendered on top of each other
         if (_hasOutline) {
-            ZoneScopedN("Outline")
+            ZoneScopedN("Outline");
             FT_Stroker stroker;
             const FT_Error e1 = FT_Stroker_New(library, &stroker);
             handleError(e1, library, face, stroker, _name, _pointSize);
