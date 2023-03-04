@@ -587,23 +587,6 @@ T* userData(lua_State* L, int location = 1);
 template <typename... Ts>
 void push(lua_State* L, Ts... arguments);
 
-/**
- * Tries to read a value of type T from the top of the Lua stack and informs about
- * whether it was successful or not. Can be used to try to read more complex data types,
- * that are not supported by the `value` functions. If the provided type is
- * not supported by the function, a compile error will occur.
- *
- * \tparam T The type of the return value.
- * \param L The stack from from which the top value is extracted
- * \param success Will be set to true if the extraction succeeded, `false` otherwise
- *
- * \return The extracted value of type T
- *
- * \pre \p L must not be nullptr
- */
-template <typename T>
-T tryGetValue(lua_State* L, bool& success);
-
 namespace internal {
     void deinitializeGlobalState();
 

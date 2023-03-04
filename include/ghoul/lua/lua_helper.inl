@@ -337,10 +337,11 @@ std::string Name() {
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
-                       std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::dvec2> ||
-                       std::is_same_v<T, glm::dvec3> || std::is_same_v<T, glm::dvec4> ||
-                       std::is_same_v<T, glm::vec2> || std::is_same_v<T, glm::vec3> ||
-                       std::is_same_v<T, glm::vec4> ||
+                       std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
+                       std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
+                       std::is_same_v<T, glm::dvec2> || std::is_same_v<T, glm::dvec3> ||
+                       std::is_same_v<T, glm::dvec4> || std::is_same_v<T, glm::vec2> ||
+                       std::is_same_v<T, glm::vec3>  || std::is_same_v<T, glm::vec4> ||
                        std::is_same_v<T, glm::dmat2x2> ||
                        std::is_same_v<T, glm::dmat2x3> ||
                        std::is_same_v<T, glm::dmat2x4> ||
@@ -459,6 +460,33 @@ T valueInner(lua_State* L, int location) {
         return holder.value<glm::dvec3>("value");
     }
     else if constexpr (std::is_same_v<T, glm::ivec4>) {
+        lua_pushvalue(L, location);
+        defer{ lua_pop(L, 1); };
+
+        ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
+        ghoul::Dictionary holder;
+        holder.setValue("value", value);
+        return holder.value<glm::dvec4>("value");
+    }
+    else if constexpr (std::is_same_v<T, glm::uvec2>) {
+        lua_pushvalue(L, location);
+        defer{ lua_pop(L, 1); };
+
+        ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
+        ghoul::Dictionary holder;
+        holder.setValue("value", value);
+        return holder.value<glm::dvec2>("value");
+    }
+    else if constexpr (std::is_same_v<T, glm::uvec3>) {
+        lua_pushvalue(L, location);
+        defer{ lua_pop(L, 1); };
+
+        ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
+        ghoul::Dictionary holder;
+        holder.setValue("value", value);
+        return holder.value<glm::dvec3>("value");
+    }
+    else if constexpr (std::is_same_v<T, glm::uvec4>) {
         lua_pushvalue(L, location);
         defer{ lua_pop(L, 1); };
 
@@ -650,6 +678,18 @@ T valueInner(lua_State* L, int location) {
                 typename T::value_type value = d.value<glm::dvec4>(k);
                 res.push_back(std::move(value));
             }
+            else if constexpr (std::is_same_v<typename T::value_type, glm::uvec2>) {
+                typename T::value_type value = d.value<glm::dvec2>(k);
+                res.push_back(std::move(value));
+            }
+            else if constexpr (std::is_same_v<typename T::value_type, glm::uvec3>) {
+                typename T::value_type value = d.value<glm::dvec3>(k);
+                res.push_back(std::move(value));
+            }
+            else if constexpr (std::is_same_v<typename T::value_type, glm::uvec4>) {
+                typename T::value_type value = d.value<glm::dvec4>(k);
+                res.push_back(std::move(value));
+            }
             else if constexpr (std::is_same_v<typename T::value_type, glm::mat2x2>) {
                 typename T::value_type value = d.value<glm::dmat2x2>(k);
                 res.push_back(std::move(value));
@@ -733,10 +773,11 @@ bool hasValue(lua_State* L, int location) {
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
-                       std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::dvec2> ||
-                       std::is_same_v<T, glm::dvec3> || std::is_same_v<T, glm::dvec4> ||
-                       std::is_same_v<T, glm::vec2>  || std::is_same_v<T, glm::vec3> ||
-                       std::is_same_v<T, glm::vec4> ||
+                       std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
+                       std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
+                       std::is_same_v<T, glm::dvec2> || std::is_same_v<T, glm::dvec3> ||
+                       std::is_same_v<T, glm::dvec4> || std::is_same_v<T, glm::vec2>  ||
+                       std::is_same_v<T, glm::vec3>  || std::is_same_v<T, glm::vec4>  ||
                        std::is_same_v<T, glm::dmat2x2> ||
                        std::is_same_v<T, glm::dmat2x3> ||
                        std::is_same_v<T, glm::dmat2x4> ||
@@ -830,67 +871,6 @@ void push(lua_State* L, Ts... arguments) {
     ghoul_precondition(L != nullptr, "L must not be nullptr");
 
     (internal::push(L, arguments), ...);
-}
-
-template <typename T>
-T tryGetValue(lua_State* L, bool& success) {
-    ghoul_precondition(L != nullptr, "L must not be nullptr");
-
-    const T fallback = T();
-    T result = fallback;
-
-    if constexpr (isGlmVector<T>()) {
-        lua_pushnil(L);
-        for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; ++i) {
-            int hasNext = lua_next(L, -2);
-            if (hasNext != 1) {
-                success = false;
-                return fallback;
-            }
-            if (lua_isnumber(L, -1) != 1) {
-                success = false;
-                return fallback;
-            }
-            else {
-                result[i] = static_cast<typename T::value_type>(lua_tonumber(L, -1));
-                lua_pop(L, 1);
-            }
-        }
-        // The last accessor argument and the table are still on the stack
-        lua_pop(L, 1);
-        success = true;
-    }
-    else if constexpr (isGlmMatrix<T>()) {
-        lua_pushnil(L);
-        int number = 1;
-        for (glm::length_t i = 0; i < T::type::row_type::length(); ++i) {
-            for (glm::length_t j = 0; j < T::type::col_type::length(); ++j) {
-                int hasNext = lua_next(L, -2);
-                if (hasNext != 1) {
-                    success = false;
-                    return fallback;
-                }
-                if (lua_isnumber(L, -1) != 1) {
-                    success = false;
-                    return fallback;
-                }
-                else {
-                    result[i][j] =
-                        static_cast<typename T::value_type>(lua_tonumber(L, -1));
-                    lua_pop(L, 1);
-                    ++number;
-                }
-            }
-        }
-        // The last accessor argument and the table are still on the stack
-        lua_pop(L, 1);
-        success = true;
-    }
-    else {
-        static_assert(sizeof(T) == 0, "Unable to push type T onto the Lua stack");
-    }
-
-    return result;
 }
 
 } // namespace ghoul::lua
