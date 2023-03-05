@@ -65,7 +65,7 @@ TEMPLATE_TEST_CASE("LuaConversion", "[luaconversion]", bool, char, signed char,
     lua_close(state);
 }
 
-TEST_CASE("LuaConversion: String", "[luaconversion]") {
+TEST_CASE("LuaConversion: Const char*", "[luaconversion]") {
     lua_State* state = luaL_newstate();
 
     ghoul::lua::push(state, "value");
@@ -77,15 +77,26 @@ TEST_CASE("LuaConversion: String", "[luaconversion]") {
 }
 
 TEMPLATE_TEST_CASE("LuaConversion: String", "[luaconversion]", std::string,
-                   std::filesystem::path)
+                   std::filesystem::path, std::string_view)
 {
     using T = TestType;
 
     lua_State* state = luaL_newstate();
 
-    ghoul::lua::push(state, "value");
+    ghoul::lua::push(state, T("value"));
 
     const T value = ghoul::lua::value<T>(state);
+    CHECK(value == "value");
+
+    lua_close(state);
+}
+
+TEST_CASE("LuaConversion: String", "[luaconversion]") {
+    lua_State* state = luaL_newstate();
+
+    ghoul::lua::push(state, "value");
+
+    const std::string value = ghoul::lua::value<std::string>(state);
     CHECK(value == "value");
 
     lua_close(state);
@@ -607,6 +618,26 @@ TEST_CASE("LuaConversion: Variant", "[luaconversion]") {
         T2 v = ghoul::lua::value<T2>(state);
         REQUIRE(std::holds_alternative<bool>(v));
         CHECK(std::get<bool>(v) == true);
+    }
+
+    using T3 = std::variant<std::string, double, glm::ivec2>;
+    {
+        ghoul::lua::push(state, "abc");
+        T3 v = ghoul::lua::value<T3>(state);
+        REQUIRE(std::holds_alternative<std::string>(v));
+        CHECK(std::get<std::string>(v) == "abc");
+    }
+    {
+        ghoul::lua::push(state, 2.2);
+        T3 v = ghoul::lua::value<T3>(state);
+        REQUIRE(std::holds_alternative<double>(v));
+        CHECK(std::get<double>(v) == 2.2);
+    }
+    {
+        ghoul::lua::push(state, glm::ivec2(3, 4));
+        T3 v = ghoul::lua::value<T3>(state);
+        REQUIRE(std::holds_alternative<glm::ivec2>(v));
+        CHECK(std::get<glm::ivec2>(v) == glm::ivec2(3, 4));
     }
 
     lua_close(state);
