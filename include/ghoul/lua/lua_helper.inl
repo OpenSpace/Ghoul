@@ -776,10 +776,7 @@ bool hasValue(lua_State* L, int location) {
                        std::is_same_v<T, std::filesystem::path> ||
                        std::is_same_v<T, std::string_view>)
     {
-        // lua_isstring also returns true for numbers that silently convert into strings
-        bool isString = lua_isstring(L, location);
-        bool isNumber = lua_isnumber(L, location);
-        return isString && !isNumber;
+        return lua_type(L, location) == LUA_TSTRING;
     }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary> ||
                        internal::is_string_map<T>::value ||
