@@ -256,7 +256,6 @@ template void Dictionary::setValue(std::string, bool value);
 template void Dictionary::setValue(std::string, double);
 template void Dictionary::setValue(std::string, int);
 template void Dictionary::setValue(std::string, std::string);
-template void Dictionary::setValue(std::string, const char*);
 template void Dictionary::setValue(std::string, std::vector<int>);
 template void Dictionary::setValue(std::string, std::vector<double>);
 template void Dictionary::setValue(std::string, std::vector<std::string>);

@@ -45,10 +45,10 @@ class Dictionary;
 template <typename T>
 concept SupportedByDictionary = IsAnyOf<
     T,
-    bool, int, double, const char*, std::string, Dictionary, std::vector<int>, std::vector<double>,
-    std::vector<std::string>, glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2,
-    glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
-    glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
+    bool, int, double, std::string, Dictionary, std::vector<int>,
+    std::vector<double>, std::vector<std::string>, glm::ivec2, glm::ivec3, glm::ivec4,
+    glm::dvec2, glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4,
+    glm::dmat3x2, glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
 >;
 
 /**
