@@ -165,6 +165,17 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     }
                     i += number;
                 }
+                else {
+                    // We have found an unknown command but we don't allow them, so we
+                    // have to bail out here
+                    throw ghoul::RuntimeError(
+                        fmt::format(
+                            "Found unknown command '{}' but none are allowed",
+                            _arguments[i]
+                        ),
+                        "CommandlineParser"
+                    );
+                }
             }
         }
         else {
