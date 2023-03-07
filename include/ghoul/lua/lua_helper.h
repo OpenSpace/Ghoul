@@ -502,7 +502,7 @@ void verifyStackSize(lua_State* L, int expected = 0);
  * \pre L must not be nullptr
  */
 template <typename T>
-bool hasValue(lua_State* L, int location = 1);
+bool hasValue(lua_State* L, int location = -1);
 
 /**
  * Extracts a value from the provided location of the provided stack and returns it.
@@ -518,7 +518,7 @@ bool hasValue(lua_State* L, int location = 1);
  * \pre L must not be nullptr
  */
 template <typename T>
-T value(lua_State* L, int location = 1, PopValue shouldPopValue = PopValue::Yes);
+T value(lua_State* L, int location = -1, PopValue shouldPopValue = PopValue::Yes);
 
 /**
  * Extracts multiple values from the provided (and subsequent locations) of the provided
