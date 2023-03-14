@@ -31,7 +31,6 @@ target_sources(
   GhoulTest
   PRIVATE
     ${GHOUL_ROOT_DIR}/tests/main.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_buffer.cpp
     ${GHOUL_ROOT_DIR}/tests/test_commandlineparser.cpp
     ${GHOUL_ROOT_DIR}/tests/test_crc32.cpp
     ${GHOUL_ROOT_DIR}/tests/test_csvreader.cpp

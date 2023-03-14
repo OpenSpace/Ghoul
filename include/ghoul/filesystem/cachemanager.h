@@ -40,9 +40,9 @@ namespace ghoul::filesystem {
  * cached result. This class only generates and manages the file paths and does not do any
  * caching itself. The use case for this is for expensive operations that has have result,
  * which gets written to a file and the developer wants to retain the results without
- * recomputing it at every application start. Using the same <code>file</code> and
- * <code>information</code> values, the same path will be retrieved in subsequent
- * application runs. The persistent files are stored in a <code>cache</code> file so that
+ * recomputing it at every application start. Using the same `file` and
+ * `information` values, the same path will be retrieved in subsequent
+ * application runs. The persistent files are stored in a `cache` file so that
  * they can be retained between application runs. If two CacheManagers are pointing at the
  * same directory, the result is undefined.
  */
@@ -62,7 +62,7 @@ public:
     CacheManager(std::filesystem::path directory);
 
     /**
-     * The destructor will save all information in a <code>cache</code> file in the cache
+     * The destructor will save all information in a `cache` file in the cache
      * directory that was passed in the constructor so that they can be retrieved when the
      * application is started up again.
      */
@@ -81,10 +81,8 @@ public:
      *        identify a cached file
      * \return The cached file that can be used by the caller to store the results
      *
-     * \throw RuntimeError If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p file
+     * \throw RuntimeError If there is an illegal character (`/`, `\\`, `?`, `%`, `*`,
+     *        `:`, `|`, `"`, `<`, `>`, or `.`) in the \p file
      */
     [[nodiscard]] std::filesystem::path cachedFilename(const std::filesystem::path& file,
         std::optional<std::string_view> information = std::nullopt);
@@ -98,20 +96,17 @@ public:
      *
      * \param file The file for which the cached file should be searched
      * \param information The identifying information for the file
-     * \return <code>true</code> if a cached file was requested before; <code>false</code>
-     *         otherwise
+     * \return `true` if a cached file was requested before; `false` otherwise
      *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *         <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *         <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *         <code>\></code>, or <code>.</code>) in the \p file
+     * \throw IllegalArgumentException If there is an illegal character (`/`, `\`, `?`,
+     *        `%`, `*`, `:`, `|`, `"`, `<`, `>`, or `.`) in the \p file
      */
     [[nodiscard]] bool hasCachedFile(const std::filesystem::path& file,
         std::optional<std::string_view> information = std::nullopt) const;
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
-     * <code>file</code> has not previously been used to request a cache entry, no error
+     * `file` has not previously been used to request a cache entry, no error
      * will be signaled. If no information is provided, the method will use the date of
      * last modification as a unique identifier for the file.
      *
@@ -119,10 +114,8 @@ public:
      * \param information The detailed information for the cached file which should be
      *        deleted
      *
-     * \throw IllegalArgumentException If there is an illegal character (<code>/</code>,
-     *        <code>\\</code>, <code>?</code>, <code>%</code>, <code>*</code>,
-     *        <code>:</code>, <code>|</code>, <code>"</code>, <code>\<</code>,
-     *        <code>\></code>, or <code>.</code>) in the \p file
+     * \throw IllegalArgumentException If there is an illegal character (`/`, `\`, `?`,
+     *        `%`, `*`, `:`, `|`, `"`, `<`, `>`, or `.`) in the \p file
      */
     void removeCacheFile(const std::filesystem::path& file,
         std::optional<std::string_view> information = std::nullopt);

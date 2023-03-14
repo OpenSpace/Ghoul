@@ -35,11 +35,11 @@ namespace ghoul::systemcapabilities {
 struct Version {
     std::strong_ordering operator<=>(const Version& rhs) const noexcept;
 
-    /// The <code>major</code> part of the version
+    /// The `major` part of the version
     int major;
-    /// The <code>minor</code> part of the version
+    /// The `minor` part of the version
     int minor;
-    /// The <code>release</code> part of the version
+    /// The `release` part of the version
     int release;
 };
 

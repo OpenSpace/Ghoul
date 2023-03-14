@@ -27,20 +27,27 @@
 
 #include <ghoul/misc/assert.h>
 
-namespace ghoul {
-
 namespace {
+    // Boolean constant used to check whether a value T is part of a parameter pack Ts
+    template <typename T, typename U> struct is_one_of;
+    template <typename T, typename... Ts>
+    struct is_one_of<T, std::variant<Ts...>> :
+        std::bool_constant<(std::is_same_v<T, Ts> || ...)>
+    {};
+
     // List of types that are stored as-is in the Dictionary
-    using DirectTypes = std::variant<bool, double, int, std::string, Dictionary,
+    using DirectTypes = std::variant<bool, double, int, std::string, ghoul::Dictionary,
         std::vector<int>, std::vector<double>, std::vector<std::string>>;
-    template <typename T> using isDirectType = internal::is_one_of<T, DirectTypes>;
+    template <typename T> using isDirectType = is_one_of<T, DirectTypes>;
 
     // Vector types that are converted into std::vector for storage purposes
     using GLMTypes = std::variant<glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2,
-    glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
+        glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
         glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4>;
-    template <typename T> using isGLMType = internal::is_one_of<T, GLMTypes>;
+    template <typename T> using isGLMType = is_one_of<T, GLMTypes>;
 } // namespace
+
+namespace ghoul {
 
 Dictionary::KeyError::KeyError(std::string msg)
     : RuntimeError(std::move(msg), "Dictionary")
@@ -58,7 +65,7 @@ bool Dictionary::operator!=(const Dictionary& rhs) const noexcept {
     return _storage != rhs._storage;
 }
 
-template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
+template <SupportedByDictionary T>
 void Dictionary::setValue(std::string key, T value) {
     ghoul_assert(!key.empty(), "Key must not be empty");
     if constexpr (isDirectType<T>::value) {
@@ -69,16 +76,16 @@ void Dictionary::setValue(std::string key, T value) {
         std::vector<typename T::value_type> vec(p, p + ghoul::glm_components<T>::value);
         _storage.insert_or_assign(std::move(key), std::move(vec));
     }
+    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
+    {
+        setValue(std::move(key), std::string(value));
+    }
     else {
         static_assert(sizeof(T) == 0, "Unsupported type");
     }
 }
 
-void Dictionary::setValue(std::string key, const char value[]) {
-    setValue(std::move(key), std::string(value));
-}
-
-template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
+template <SupportedByDictionary T>
 T Dictionary::value(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
 
@@ -149,12 +156,16 @@ T Dictionary::value(std::string_view key) const {
         std::memcpy(glm::value_ptr(res), vec.data(), sizeof(T));
         return res;
     }
+    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
+    {
+        return value<std::string>(key);
+    }
     else {
         static_assert(sizeof(T) == 0, "Unsupported type");
     }
 }
 
-template <typename T, std::enable_if_t<Dictionary::IsAllowedType<T>{}, int>>
+template <SupportedByDictionary T>
 bool Dictionary::hasValue(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
 
@@ -189,6 +200,10 @@ bool Dictionary::hasValue(std::string_view key) const {
                 std::get<VT>(it->second).size() == ghoul::glm_components<T>::value;
         }
     }
+    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
+    {
+        return hasValue<std::string>(key);
+    }
     else {
         static_assert(sizeof(T) == 0, "Unknown type T");
     }
@@ -196,7 +211,7 @@ bool Dictionary::hasValue(std::string_view key) const {
 
 bool Dictionary::hasKey(std::string_view key) const {
     ghoul_assert(!key.empty(), "Key must not be empty");
-    
+
     auto it = _storage.find(key);
     return it != _storage.end();
 }

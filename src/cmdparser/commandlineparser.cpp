@@ -37,13 +37,13 @@ namespace {
 constexpr std::string_view _loggerCat = "CommandlineParser";
 
 /**
- * Extracts multiple arguments from a single list. <br>
- * If <code>count</code> is <code>-2</code>, arguments will be extracted, as long as no
- * new commands is found. <code>in[begin]</code> itself will not be extracted if this is
- * the command.<br>
- * If <code>count</code> is <code>-1</code>, the rest of the line will be extracted.<br>
- * If <code>count</code> is <code>> 0</code>, that many arguments will be extracted and
- * returned.
+ * Extracts multiple arguments from a single list.
+ *
+ * If `count` is `-2`, arguments will be extracted, as long as no new commands is found.
+ * `in[begin]` itself will not be extracted if this is the command.
+ *
+ * If `count` is `-1`, the rest of the line will be extracted.
+ * If `count` is `> 0`, that many arguments will be extracted and returned.
  */
 int extractArguments(const std::vector<std::string>& in, std::vector<std::string>& out,
                      const size_t begin, const int count)
@@ -164,6 +164,17 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                         _remainingArguments.push_back(arg);
                     }
                     i += number;
+                }
+                else {
+                    // We have found an unknown command but we don't allow them, so we
+                    // have to bail out here
+                    throw ghoul::RuntimeError(
+                        fmt::format(
+                            "Found unknown command '{}' but none are allowed",
+                            _arguments[i]
+                        ),
+                        "CommandlineParser"
+                    );
                 }
             }
         }

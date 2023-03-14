@@ -44,11 +44,11 @@ public:
 
     /**
      * The constructor will create a new Lua state and optionally fill it with the Lua
-     * standard libraries, if \p includeStandardLibraries is \c true.
+     * standard libraries, if \p includeStandardLibraries is `true`.
      *
-     * \param includeStandardLibraries If \c true, the created Lua state will contain the
+     * \param include If `Yes`, the created Lua state will contain the
      *        set of Lua standard libraries
-     * \param strict If this is \c true, the created Lua state will panic if an unused
+     * \param strict If this is `true`, the created Lua state will panic if an unused
      *        variable is read or being written to before being defined before
      *
      * \throw LuaRuntimeException If an error occurs during the state creation
@@ -66,15 +66,15 @@ public:
     LuaState& operator=(LuaState&& other) noexcept;
 
     /**
-     * Converts this LuaState into a \c lua_State pointer for compatibility with other
-     * parts that might still rely on bare \c lua_State pointers.
+     * Converts this LuaState into a `lua_State` pointer for compatibility with other
+     * parts that might still rely on bare `lua_State` pointers.
      *
-     * \return The contained \c lua_State pointer
+     * \return The contained `lua_State` pointer
      */
     operator lua_State*() const;
 
 private:
-    /// The stored \c lua_State
+    /// The stored `lua_State`
     lua_State* _state;
 };
 

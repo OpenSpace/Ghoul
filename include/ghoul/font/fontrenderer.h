@@ -77,20 +77,20 @@ public:
      * passed text. In addition the initial size of the rendering window has to be passed.
      * The inputs for the ProgramObject are as follows:
      *
-     * The <b>vertex shader</b> recieves three <code>vec2</code> for each vertex: The
+     * The <b>vertex shader</b> recieves three `vec2` for each vertex: The
      * <i>Position</i> (location 0) in pixel screen space coordinates, the
      * <i>Base Texture Coordinates</i> (location 1) which provides the texture coordinates
      * for the base font layer, and the <i>Outline Texture Coordinates</i> (location 2)
      * which provides the texture coordinates for the outline font layer. Furhermore, the
-     * following uniforms are provided: The <code>projection</code> (<code>mat4</code>)
+     * following uniforms are provided: The `projection` (`mat4`)
      * contains the projection matrix that is derived using the provided window size and
-     * maps the pixel coordinates to normalized device coordinates, the <code>tex</code>
-     * (<code>sampler2D</code>) is the TextureAtlas that contains all glyphs and into
+     * maps the pixel coordinates to normalized device coordinates, the `tex`
+     * (`sampler2D`) is the TextureAtlas that contains all glyphs and into
      * which the <i>Base Texture Coordinates</i> and <i>Outline Texture Coordinates</i>
-     * index into. The <code>baseColor</code> (<code>vec4</code>) contains the
-     * user-specified color for the base layer, whereas the <code>outlineColor</code>
-     * (<code>vec4</code>) is the color for the outline layer. Finally, the
-     * <code>hasOutline</code> (<code>bool</code>) is <code>true</code> whether the passed
+     * index into. The `baseColor` (`vec4`) contains the
+     * user-specified color for the base layer, whereas the `outlineColor`
+     * (`vec4`) is the color for the outline layer. Finally, the
+     * `hasOutline` (`bool`) is `true` whether the passed
      * font has an outline or not.
      *
      * \param program The custom ProgramObject that is used to render any passed text.
@@ -136,9 +136,6 @@ public:
     /**
      * Deinitialize the singleton variant of the FontRenderer and cleans all used OpenGL
      * objects. Therefore, it requires a valid OpenGL state.
-     *
-     * \return <code>true</code> if the deinitialization succeeded, <code>false</code>
-     *         otherwise
      */
     static void deinitialize();
 
@@ -146,8 +143,8 @@ public:
      * Check whether the singleton variant of the FontRenderer has already been
      * initialized.
      *
-     * \return <code>true</code> if the singleton FontRenderer has already been
-     *         initialized; <code>false</code> otherwise
+     * \return `true` if the singleton FontRenderer has already been
+     *         initialized; `false` otherwise
      */
     static bool isInitialized();
 
@@ -344,9 +341,6 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \param font The Font that is used to render the provided text.
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
- * \param direction Determines whether the \p pos should be modified based on how many
- *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
- *        up and down by the number of lines times the height of the used font
  * \param color The color that is used to the render the text
  * \param outlineColor The outline color that is used to the render the text if the
  *        provided \p font has one
@@ -365,6 +359,9 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \param color The color that is used to the render the text
+ * \param direction Determines whether the \p pos should be modified based on how many
+ *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
+ *        up and down by the number of lines times the height of the used font
  * \return The bounding box of the text that was printed
  */
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
@@ -394,7 +391,9 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  * \param font The Font that is used to render the provided text.
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
- * \param color The color that is used to the render the text
+ * \param direction Determines whether the \p pos should be modified based on how many
+ *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
+ *        up and down by the number of lines times the height of the used font
  * \return The bounding box of the text that was printed
  */
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
@@ -408,7 +407,6 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \param font The Font that is used to render the provided text.
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
- * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
 glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,

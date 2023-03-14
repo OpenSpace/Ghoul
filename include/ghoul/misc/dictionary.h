@@ -37,21 +37,26 @@
 
 namespace ghoul {
 
-namespace internal {
-    // Boolean constant used to check whether a value T is part of a parameter pack Ts
-    template <typename T, typename U> struct is_one_of;
-    template <typename T, typename... Ts>
-    struct is_one_of<T, std::variant<Ts...>> :
-        std::bool_constant<(std::is_same_v<T, Ts> || ...)>
-    {};
-} // namespace internal
+template <typename T, typename... U>
+concept IsAnyOf = (std::same_as<T, U> || ...);
+
+class Dictionary;
+
+template <typename T>
+concept SupportedByDictionary = IsAnyOf<
+    T,
+    bool, int, double, std::string, Dictionary, std::vector<int>,
+    std::vector<double>, std::vector<std::string>, glm::ivec2, glm::ivec3, glm::ivec4,
+    glm::dvec2, glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4,
+    glm::dmat3x2, glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
+>;
 
 /**
  * The Dictionary is a class that represents a mapping from a string to a fixed selection
  * of types. It has the ability to store and retrieve these items by unique string keys.
  * The only automatic conversion that is currently performed is to convert glm vector or
  * matrix types into std::vector types and reconstructing them on access such that:
- * <code>
+ * ```
  * Dictionary d;
  * d.setValue("a", glm::dvec4(1.0, 2.0, 3.0, 4.0);
  * std::vector<double> v = d.value<std::vector<double>>("a");
@@ -62,7 +67,7 @@ namespace internal {
  * e.setValue("a", std::vector<double>{5.0, 6.0, 7.0, 8.0});
  * glm::dvec4 vv = e.value<glm::dvec4>("a");
  * // vv.x == 5.0 && vv.y == 6.0 && vv.z == 7.0 && vv.w == 8.0
- * </code>
+ * ```
  * are legal
  */
 class Dictionary {
@@ -74,10 +79,6 @@ public:
         glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
         glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
     >;
-
-    /// Returns true if T is one of the allowed storage types
-    template <typename T> using IsAllowedType = internal::is_one_of<T, Types>;
-
 
     /// Exception that is thrown if the Dictionary does not contain a provided key
     struct KeyError : public ghoul::RuntimeError {
@@ -98,21 +99,20 @@ public:
      * Store the value \p value at the specified \p key, overwriting any existing value.
      * The type for T has to be a type that can be represented in the Types variant type.
      *
-     * \param key The key under which the \p value is stored. If \param key already
+     * \param key The key under which the \p value is stored. If \p key already
      *        existed, it will be silently overwritten
      * \param value The value to store. It has to be one of the types that is present in
      *        the Types variant
      *
      * \pre \p key must not be the empty string
      */
-    template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>
+    template <SupportedByDictionary T>
     void setValue(std::string key, T value);
 
-    // Just a helper function to make the error message a bit more palatable
-    template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
-    void setValue(std::string key, T value);
-
-    void setValue(std::string key, const char value[]);
+    /**
+     * \overload void setValue(std::string key, T value)
+     */
+    //void setValue(std::string key, const char value[]);
 
     /**
      * Retrieves the value stored at the provided \p key. The template parameter has to be
@@ -128,11 +128,7 @@ public:
      * \throws ValueError If the value stored at \p key is not of type T
      * \pre \p key must not be the empty string
      */
-    template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>
-    T value(std::string_view key) const;
-
-    // Just a helper function to make the error message a bit more palatable
-    template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
+    template <SupportedByDictionary T>
     T value(std::string_view key) const;
 
     /**
@@ -141,16 +137,12 @@ public:
      * compatible with the type T.
      *
      * \param key The key for which to check the existence and type
-     * \return \c true if the Dictionary contains such a key and it is of the requested
+     * \return `true` if the Dictionary contains such a key and it is of the requested
                type T
      *
      * \pre \p key must not be the empty string
      */
-    template <typename T, std::enable_if_t<IsAllowedType<T>{}, int> = 0>
-    bool hasValue(std::string_view key) const;
-
-    // Just a helper function to make the error message a bit more palatable
-    template <typename T, std::enable_if_t<!IsAllowedType<T>{}, int> = 0>
+    template <SupportedByDictionary T>
     bool hasValue(std::string_view key) const;
 
     /**
@@ -158,7 +150,7 @@ public:
      * of its type.
      *
      * \param key The key for which to check the existence and type
-     * \return \c true if the Dictionary contains such a key and it is of the requested
+     * \return `true` if the Dictionary contains such a key and it is of the requested
                type T
      *
      * \pre \p key must not be the empty string
@@ -197,7 +189,7 @@ public:
      * contain additional values though.
      *
      * \p dict The subset dictionary
-     * \return \c true if the \p dict is a subset, \c false otherwise
+     * \return `true` if the \p dict is a subset, `false` otherwise
      */
     bool isSubset(const ghoul::Dictionary& dict) const;
 
@@ -208,24 +200,6 @@ private:
     >;
     std::map<std::string, StorageTypes, std::less<>> _storage;
 };
-
-// Just a few helper functions to make the error message a bit more palatable
-template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int>>
-void Dictionary::setValue(std::string, T) {
-    static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
-}
-
-template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
-T Dictionary::value(std::string_view) const {
-    static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
-    return T();
-}
-
-template <typename T, std::enable_if_t<!Dictionary::IsAllowedType<T>{}, int >>
-bool Dictionary::hasValue(std::string_view) const {
-    static_assert(sizeof(T) == 0, "Type is not an allowed type for Dictionary");
-    return false;
-}
 
 } // namespace ghoul
 

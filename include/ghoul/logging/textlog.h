@@ -37,12 +37,12 @@ namespace ghoul::logging {
  * A concrete subclass of Log that logs the messages to a plain text file on hard disk.
  * The formatting of the log messages depends on the stamping settings. The different
  * possibilities are:
- * \verbatim
-"[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
-"[DATE] CATEGORY (LEVEL) MESSAGE"
-"[TIME] CATEGORY (LEVEL) MESSAGE"
-\endverbatim
- * And the remaining possibilities with <code>CATEGORY</code> and <code>LEVEL</code>
+ * ```
+ * "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
+ * "[DATE] CATEGORY (LEVEL) MESSAGE"
+ * "[TIME] CATEGORY (LEVEL) MESSAGE"
+ * ```
+ * And the remaining possibilities with `CATEGORY` and `LEVEL`
  * missing. Only the #log method needs to be overwritten in a subclass, if a
  * different output format is required. The file will be opened in the constructor and
  * closed in the destructor of this class. A parameter in the constructor controls of the
@@ -53,27 +53,28 @@ public:
     BooleanType(Append);
 
     /**
-    * Constructor that calls Log constructor and opens the file that will log the
-    * messages. If the file does not exist, it will be created. If the path to the file is
-    * invalid, an <code>std::ios_base::failure</code> exception will be thrown.
-    *
-    * \param filename The path and filename of the file that will receive the log
-    *        messages
-    * \param writeToAppend If this is <code>true</code>, the log messages will be appended
-    *        to the file. If it is <code>false</code> the file will be overwritten without
-    *        a warning.
-    * \param timeStamping Determines if the log should print the time when a message is
-    *        logged in the log messages
-    * \param dateStamping Determines if the log should print the time when a message is
-    *        logged in the log messages
-    * \param categoryStamping Determines if the log should print the categories in the
-    *        log messages
-    * \param logLevelStamping Determines if the log should print the log level in the log
-    *        messages
-    *
-    * \throw std::ios_base::failure If the opening of the file failed
-    * \pre \p filename must not be empty
-    */
+     * Constructor that calls Log constructor and opens the file that will log the
+     * messages. If the file does not exist, it will be created. If the path to the file is
+     * invalid, an `std::ios_base::failure` exception will be thrown.
+     *
+     * \param filename The path and filename of the file that will receive the log
+     *        messages
+     * \param writeToAppend If this is `true`, the log messages will be appended
+     *        to the file. If it is `false` the file will be overwritten without
+     *        a warning.
+     * \param timeStamping Determines if the log should print the time when a message is
+     *        logged in the log messages
+     * \param dateStamping Determines if the log should print the time when a message is
+     *        logged in the log messages
+     * \param categoryStamping Determines if the log should print the categories in the
+     *        log messages
+     * \param logLevelStamping Determines if the log should print the log level in the log
+     *        messages
+     * \param minimumLogLevel The minimum log level that this logger will accept
+     *
+     * \throw std::ios_base::failure If the opening of the file failed
+     * \pre \p filename must not be empty
+     */
     TextLog(const std::string& filename, Append writeToAppend = Append::Yes,
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
@@ -85,8 +86,7 @@ public:
     virtual ~TextLog() override;
 
     /**
-     * Method that logs a <code>message</code> with a given <code>level</code> and
-     * <code>category</code> to the text file.
+     * Method that logs a `message` with a given `level` and `category` to the text file.
      *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass

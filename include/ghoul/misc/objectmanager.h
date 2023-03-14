@@ -74,11 +74,11 @@ public:
 
     /**
      * This method can be called to blanket-release all remaining held objects. If
-     * \p emitWarnings is \c Yes, each remaining object is logged, also mentioning the
+     * \p emitWarnings is `Yes`, each remaining object is logged, also mentioning the
      * remaining reference counter before destruction. If everything went well in
      * shutdown, this method should not do anything and should not emit any warnings.
      *
-     * \param emitWarnings If \c Yes each remaining object will emit a warning including
+     * \param emitWarnings If `Yes` each remaining object will emit a warning including
      *        information about the remaining reference counter at destruction
      */
     void releaseAll(Warnings emitWarnings = Warnings::Yes);
@@ -89,8 +89,8 @@ public:
      * newly created object, a pointer to which is returned by this function call and all
      * subsequent function calls with the same \p name. If an object existed at the time
      * of the call, the \p creationFunction is not called. This method only returns
-     * \c nullptr if \p creationFunction returned a \c nullptr, which will cause *all*
-     * following calls with the same name to return a \c nullptr as well. The
+     * `nullptr` if \p creationFunction returned a `nullptr`, which will cause *all*
+     * following calls with the same name to return a `nullptr` as well. The
      * \p creationFunction will be called exactly once for each \p name regardless of its
      * return value.
      *
@@ -103,11 +103,11 @@ public:
 
     /**
      * Releases the object with the provided \p name. If the object has been requested
-     * \c i number of times, and this is the \c ith call for this \p name, the
+     * `i` number of times, and this is the `i`th call for this \p name, the
      * \p destructionFunction is called with the object to take care of any
      * additional destruction. OBS: The regular destructor of the object will be
      * automatically called after the \p destructionFunction returns, so it is **not**
-     * advised for the client to call \c delete on the object as well.
+     * advised for the client to call `delete` on the object as well.
      *
      * \param name The unique name of the object that should be released
      * \param destructionFunction The function that can handle additional destruction
@@ -120,13 +120,13 @@ public:
 
     /**
      * Releases the provided \p object. If the object has been requested
-     * \c i number of times, and this is the \c ith call for this \p object, the
+     * `i` number of times, and this is the `i`th call for this \p object, the
      * \p destructionFunction is called with the object to take care of any
      * additional destruction. OBS: The regular destructor of the object will be
      * automatically called after the \p destructionFunction returns, so it is **not**
-     * advised for the client to call \c delete on the object as well.
+     * advised for the client to call `delete` on the object as well.
      *
-     * \param object The object that should be released or \c nullptr
+     * \param object The object that should be released or `nullptr`
      * \param destructionFunction The function that can handle additional destruction
      *        events required by the client. Please not that the regular destructor will
      *        be automatically called after this method returns program control back to

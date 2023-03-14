@@ -50,12 +50,11 @@ namespace ghoul::systemcapabilities {
  * SystemCapabilitiesComponent subclass is as follows: It gets created with the
  * constructor and should provide a descriptive name to this SystemCapabilitiesComponent's
  * constructor, then, the #initialize function will be called, #detectCapabilities follows
- * and finally a call to #capabilities, which should return an <code>std::vector</code> of
- * <code>std::pair</code>'s with <code>{</code>description<code>,</code>value
- * <code>}</code>. Each SystemCapabilitiesComponent%'s #deinitialize function might be
- * called with a call to #initialize directly following and it should rescan all the
- * values and capabilities on the following #initialize function again to check for
- * changes.
+ * and finally a call to #capabilities, which should return an `std::vector` of
+ * `std::pair`'s with `{`description `,`value `}`. Each SystemCapabilitiesComponent%'s
+ * #deinitialize function might be called with a call to #initialize directly following
+ * and it should rescan all the values and capabilities on the following #initialize
+ * function again to check for changes.
  */
 class SystemCapabilitiesComponent {
 public:
@@ -88,7 +87,7 @@ public:
      * will be logged. This method needs to be called from each derived subclass, even if
      * WMI is not used.
      *
-     * \param initializeWMI If this parameter is <code>true</code>, the Windows Management
+     * \param initializeWMI If this parameter is `true`, the Windows Management
      *        Instrumentation will be initialized.
      */
     SystemCapabilitiesComponent(InitializeWMI initializeWMI = InitializeWMI::Yes);
@@ -160,7 +159,7 @@ protected:
     * the WMI is not enabled, or the application is compiled on a non-Windows
     * architecture, this method is a no-op.
     *
-    * \return <code>true</code> if the WMI has been initialized
+    * \return `true` if the WMI has been initialized
     */
     static bool isWMIInitialized();
 
@@ -184,12 +183,12 @@ protected:
     /**
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
-     * <code>std::string</code>.
+     * `std::string`.
      *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     *        the attribute could be found and it is of type <code>string</code>)
+     *        the attribute could be found and it is of type `string`)
      *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
@@ -203,12 +202,12 @@ protected:
     /**
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
-     * <code>int</code>.
+     * `int`.
      *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     *        the attribute could be found and it is of type <code>int</code>)
+     *        the attribute could be found and it is of type `int`)
      *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
@@ -222,12 +221,12 @@ protected:
     /**
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
-     * <code>unsigned int</code>.
+     * `unsigned int`.
      *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     *        the attribute could be found and it is of type <code>unsigned int</code>)
+     *        the attribute could be found and it is of type `unsigned int`)
      *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
@@ -241,13 +240,13 @@ protected:
     /**
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
-     * <code>unsigned long long</code>.
+     * `unsigned long long`.
      *
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
      *        the attribute could be found and it is of type
-     *        <code>unsigned long long</code>)
+     *        `unsigned long long`)
      *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
@@ -259,13 +258,13 @@ protected:
         unsigned long long& value);
 
     /**
-     * The locator object that was used in the <code>CoCreateInstance</code> call in the
+     * The locator object that was used in the `CoCreateInstance` call in the
      * #initializeWMI call
      */
     static IWbemLocator* _iwbemLocator;
 
     /**
-     * The service object that was used in the <code>_iwbemLocator->ConnectServer</code>
+     * The service object that was used in the `_iwbemLocator->ConnectServer`
      * call in the #initializeWMI call
      */
     static IWbemServices* _iwbemServices;

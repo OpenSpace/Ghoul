@@ -92,7 +92,7 @@ private:
      *
      * \param extension The extension for which the TextureWriterBase should be returned
      * \return The first TextureWriterBase that can write the provided \p extension, or
-     *         \c nullptr if no such file exists
+     *         `nullptr` if no such file exists
      */
     TextureWriterBase* writerForExtension(const std::string& extension);
 

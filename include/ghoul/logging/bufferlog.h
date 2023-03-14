@@ -39,7 +39,7 @@ namespace ghoul::logging {
  * possible attributes and the amount of stored data is located. The version is always
  * located in the first byte of the buffer and determines the size and the structure of
  * the rest of the header. Each log entry stores an 8 byte timestamp followed by a
- * <code>\0</code> terminated ASCII char array containing the message. Each logging will
+ * `\0` terminated ASCII char array containing the message. Each logging will
  * test if there is enough memory left in the buffer. For memory exhaustion management, a
  * custom callback can be specified (#setCallback) that will have to reset the buffer
  * (#resetBuffer) or a warning will be logged. The buffer can be written to disk
@@ -84,7 +84,7 @@ public:
      *        callback's responsibility to either clear the buffer (#resetBuffer) or
      *        provide a new buffer that is used instead (#setBuffer)
      *
-     * \pre \p address must not be <code>nullptr</code>
+     * \pre \p address must not be `nullptr`
      * \pre \p bufferSize must be positive
      */
     BufferLog(void* address, size_t bufferSize, MemoryExhaustedCallback callback);
@@ -100,7 +100,7 @@ public:
      * \param bufferSize The total size of the buffer. It is the callers responsibility to
      *        assure that the provided buffer is at least as big as \p bufferSize
      *
-     * \pre \p address must not be <code>nullptr</code>
+     * \pre \p address must not be `nullptr`
      * \pre \p bufferSize must be positive
      */
     BufferLog(void* address, size_t bufferSize);
@@ -171,7 +171,7 @@ public:
      * \param bufferSize The size of the buffer that will be used by the BufferLog to
      *        store messages.
      *
-     * \pre \p buffer must not be <code>nullptr</code>
+     * \pre \p buffer must not be `nullptr`
      * \pre \p bufferSize must be positive
      */
     void setBuffer(void* buffer, size_t bufferSize);
@@ -204,7 +204,7 @@ protected:
 
     /**
      * This block of memory will store all log messages that are added to this BufferLog
-     * it has to be as big as the value provided in <code>_totalSize</code>
+     * it has to be as big as the value provided in `_totalSize`
      */
     void* _buffer;
     size_t _totalSize; ///< The total size of the buffer used by this BufferLog
@@ -217,9 +217,9 @@ protected:
      */
     MemoryExhaustedCallback _callback;
 
-    /** This variable is <code>true</code> if this BufferLog has had its callback trigged
+    /** This variable is `true` if this BufferLog has had its callback trigged
      * in the current callstack. It forces some methods to ignore the
-     * <code>atomic_lock</code> to ensure that no deadlock can happen.
+     * `atomic_lock` to ensure that no deadlock can happen.
      */
     bool _inCallbackStack = false;
 };

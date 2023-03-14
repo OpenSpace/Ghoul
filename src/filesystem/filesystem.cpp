@@ -234,7 +234,7 @@ CacheManager* FileSystem::cacheManager() {
 }
 
 void FileSystem::triggerFilesystemEvents() {
-    ZoneScoped
+    ZoneScoped;
 
 #ifdef WIN32
     // Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls

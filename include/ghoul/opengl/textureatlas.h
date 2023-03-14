@@ -47,12 +47,11 @@ class Texture;
  * This class represents a texture atlas which automatically organizes smaller textures
  * in a compact representation. The TextureAtlas is useful if many small textures are
  * needed, but the overhead of creating a separate Texture for each is not desireable.
- * The TextureAtlas is created with a <code>size</code>, and in order to fill the atlas,
- * new regions have to first be requested (#newRegion) and then filled with data
- * (#setRegionData). Due to the fact that the TextureAtlas is represented by a single
- * Texture on the GPU, the <code>depth</code> can only be <code>1</code>, <code>2</code>,
- * <code>3</code>, or <code>4</code>. Before the atlas can be used, it has to be uploaded
- * to the GPU first (#upload).
+ * The TextureAtlas is created with a `size`, and in order to fill the atlas, new regions
+ * have to first be requested (#newRegion) and then filled with data (#setRegionData). Due
+ * to the fact that the TextureAtlas is represented by a single Texture on the GPU, the
+ * `depth` can only be `1`, `2`, `3`, or `4`. Before the atlas can be used, it has to be
+ * uploaded to the GPU first (#upload).
  */
 class TextureAtlas {
 public:
@@ -67,20 +66,17 @@ public:
      * The constructor completely initializes the Texture Atlas. No additional
      * initialization step is necessary. Due to the fact that the underlying Texture is
      * initialized here, it requires a valid OpenGL context. The size is defined as
-     * \c width, \c height, and \c depth.
+     * `width`, `height`, and `depth`.
      *
-     * \param size The size (<code>width</code>, <code>height</code>, <code>depth</code>)
-     *        of the TextureAtlas.
+     * \param size The size (`width`, `height`, `depth`) of the TextureAtlas.
      *
-     * \pre \p size's width and height has to be bigger than <code>4</code> and smaller
-     *      than the GPU limit for 2D textures. The \p size's depth has to be
-     *      <code>1</code>, <code>2</code>, <code>3</code>, or <code>4</code>
-     * \pre \c width component must be bigger than <code>4</code> and smaller than the GPU
-     *      limit for 2D tetxures
-     * \pre \c height component must be bigger than <code>4</code> and smaller than the
-     *      GPU limit for 2D tetxures
-     * \pre \c depth component must be <code>1</code>, <code>2</code>, <code>3</code>, or
-     *      <code>4</code>
+     * \pre \p size's width and height has to be bigger than `4` and smaller than the GPU
+     *      limit for 2D textures. The \p size's depth has to be `1`, `2`, `3`, or `4`
+     * \pre `width` component must be bigger than `4` and smaller than the GPU limit for
+     *      2D tetxures
+     * \pre `height` component must be bigger than `4` and smaller than the GPU limit for
+     *      2D tetxures
+     * \pre `depth` component must be `1`, `2`, `3`, or `4`
      */
     explicit TextureAtlas(glm::ivec3 size);
 
@@ -161,14 +157,13 @@ public:
     /**
      * Sets the data in the region designated by the \p handle to the passed \p data.
      * <b>Warning</b>: Please note that this function does not check for buffer overflows
-     * or underflows. In all cases,
-     * <code>width(region) * height(region) * depth(atlas)</code> number of bytes are read
-     * from the <code>data</code> block.
+     * or underflows. In all cases, `width(region) * height(region) * depth(atlas)` number
+     * of bytes are read from the `data` block.
      *
      * \param handle The handle of the region for which the data is provided
      * \param data The data that should be set for the specified region
      *
-     * \pre \p data must not be a <code>nullptr</code>
+     * \pre \p data must not be a `nullptr`
      */
     void setRegionData(RegionHandle handle, void* data);
 
@@ -180,58 +175,54 @@ public:
 
     /**
      * Returns the texture coordinates that define the provided region. If the returned
-     * <code>topLeft</code> and <code>bottomRight</code> coordinates are used as texture
+     * `topLeft` and `bottomRight` coordinates are used as texture
      * coordinates, the result will be the same as if the data would have been bound to a
      * separate texture. The \p windowing parameter provides possiblity to offset the
      * starting points (with the first two arguments and restrict the width (with the
      * third and fourth arguments).
-     *\verbatim
- -------------------
-|         b         |
-|    -----------    |
-| a |           | c |
-|   |           |   |
-|    -----------    |
-|         d         |
- -------------------
-     *\endverbatim
-     * <code>windowing.x = a</code><br>
-     * <code>windowing.y = b</code><br>
-     * <code>windowing.z = c</code><br>
-     * <code>windowing.w = d</code><br>
+     * ```
+     *  -------------------
+     * |         b         |
+     * |    -----------    |
+     * | a |           | c |
+     * |   |           |   |
+     * |    -----------    |
+     * |         d         |
+     * -------------------
+     * ```
+     *   - `windowing.x = a`
+     *   - `windowing.y = b`
+     *   - `windowing.z = c`
+     *   - `windowing.w = d`
      *
      *
      * \param handle The handle of the region for which the texture coordinates shall be
      * retrieved
      * \param windowing Determines whether a subset of the region should be retrieved. If
-     *        this parameter is equal to <code>glm::ivec4(0)</code>, the full region is
-     *        returned. The first two parameters <code>x</code> and <code>y</code>
-     *        determine an offset for the top left corner, while the third and fourth
-     *        parameters are subtracted from the bottom right corner. That means that if
-     *        <code>windowing</code> is equal to
-     *        <code>glm::ivec4(width / 4, height / 4, width / 4, height / 4</code>, a
+     *        this parameter is equal to `glm::ivec4(0)`, the full region is returned. The
+     *        first two parameters `x` and `y` determine an offset for the top left
+     *        corner, while the third and fourth parameters are subtracted from the bottom
+     *        right corner. That means that if `windowing` is equal to
+     *        `glm::ivec4(width / 4, height / 4, width / 4, height / 4`, a
      *        subset in the center of the region is returned.
-     * \return A TextureCoordinatesResult structure containing the <code>topLeft</code>
-     *         corner of the region in texture coordinates and that
-     *        <code>bottomRight</code> corner of the region in texture coordinates
+     * \return A TextureCoordinatesResult structure containing the `topLeft` corner of the
+     *         region in texture coordinates and that `bottomRight` corner of the region
+     *         in texture coordinates
      */
     TextureCoordinatesResult textureCoordinates(
         RegionHandle handle, const glm::ivec4& windowing = glm::ivec4(0)) const;
 
     /**
-     * Returns the size of the TextureAtlas in <code>width</code>, <code>height</code>,
-     * and <code>depth</code>.
+     * Returns the size of the TextureAtlas in `width`, `height`, and `depth`.
      *
-     * \return The size of the TextureAtlas in <code>width</code>, <code>height</code>,
-     *         and <code>depth</code>.
+     * \return The size of the TextureAtlas in `width`, `height`, and `depth`.
      */
     glm::ivec3 size() const;
 
     /**
-     * Returns the amount of pixels out of the maximum size (<code>width</code> *
-     * <code>height</code>) that are currently in use. Please note that this is <b>not</b>
-     * equal to the amount of pixels that can possiblity be used due to fragmentation in
-     * the atlas.
+     * Returns the amount of pixels out of the maximum size (`width * height`) that are
+     * currently in use. Please note that this is *not* equal to the amount of pixels that
+     * can possiblity be used due to fragmentation in the atlas.
      *
      * \return The amount of pixels that are currently in use in the atlas.
      */

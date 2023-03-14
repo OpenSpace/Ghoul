@@ -33,7 +33,7 @@ namespace ghoul::io {
 /**
  * Reads a one dimensional texture from a cmap (color map) file. The format of the cmap
  * files have the width of the Texture in the first non-comment, non-empty line and is
- * followed by <code>width</code> number of lines that contain four values for red, green,
+ * followed by `width` number of lines that contain four values for red, green,
  * blue, and alpha each. If the file is malformed, an TextureLoadException is thrown
  */
 class TextureReaderCMAP : public TextureReaderBase {
@@ -65,7 +65,7 @@ public:
      * \param nDimensions The number of dimensions of the texture that is created
      *
      * \throw TextureLoadException If there was an error reading the \p memory
-     * \pre \p memory must not be <code>nullptr</code>
+     * \pre \p memory must not be `nullptr`
      * \pre \p size must be > 0
      * \pre \p nDimensions must be 1, 2, or 3
      */
@@ -73,7 +73,7 @@ public:
         size_t size, int nDimensions) const override;
 
     /*
-     * Returns the supported extension (<code>cmap</code>).
+     * Returns the supported extension (`cmap`).
      *
      * \return The supported extension
      */

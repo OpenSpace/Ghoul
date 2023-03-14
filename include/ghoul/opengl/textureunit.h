@@ -34,13 +34,13 @@
 namespace ghoul::opengl {
 
 /**
- * This class manages Texture Units and is a wrapper around <code>GL_TEXTURE0</code>,
- * <code>GL_TEXTURE1</code>, ... It manages which texture units are currently active and
+ * This class manages Texture Units and is a wrapper around `GL_TEXTURE0`,
+ * `GL_TEXTURE1`, ... It manages which texture units are currently active and
  * which units are free to use. To use a TextureUnit, it has to be #activate%d, the
  * Texture has to be bound, and then the #unitNumber can be retrieved so that it can be
  * used in a uniform. A unit number is assigned as soon as the first call to #activate,
  * #glEnum, or #unitNumber is made. If there are no free unit numbers left, an
- * <code>std::runtime_error</code> will be thrown.
+ * `std::runtime_error` will be thrown.
  */
 class TextureUnit {
 public:
@@ -64,7 +64,7 @@ public:
      * This method will activate the enum assigned to this TextureUnit. If this is the
      * first call to either activate, #glEnum, or #unitNumber, a free unit number will be
      * assigned to this object. This will call the OpenGL function
-     * <code>glActiveTexture</code> with the enum as a parameter.
+     * `glActiveTexture` with the enum as a parameter.
      *
      * \throw TextureUnitError If the new unit number could not be assigned
      */
@@ -80,7 +80,7 @@ public:
      * This method returns the texture unit enum that was assigned to this TextureUnit. If
      * this is the first call to either #activate, glEnum, or #unitNumber, a free unit
      * enum will be assigned to this object. The returned enum is equivalent to
-     * <code>GL_TEXTURE0 + unitNumber()</code>.
+     * `GL_TEXTURE0 + unitNumber()`.
      *
      * \return The unit enum that was assigned to this TextureUnit
      */
@@ -111,7 +111,7 @@ public:
 
     /**
      * Sets the zero unit as the active texture unit. This call is equivalent to calling
-     * the OpenGL function <code>glActiveTexture(GL_TEXTURE0)</code>.
+     * the OpenGL function `glActiveTexture(GL_TEXTURE0)`.
      */
     static void setZeroUnit();
 
@@ -142,19 +142,19 @@ private:
      */
     static void initialize();
 
-    /// The number in <code>[0, maxTexUnits]</code> referring to this TextureUnit
+    /// The number in `[0, maxTexUnits]` referring to this TextureUnit
     GLint _number = 0;
 
     /**
-     * The enum in <code>[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]</code> referring to this
+     * The enum in `[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]` referring to this
      * TextureUnit
      */
     GLenum _glEnum = GLenum(0);
 
-    /// <code>true</code> if this TextureUnit has been assigned
+    /// `true` if this TextureUnit has been assigned
     bool _assigned = false;
 
-    /// <code>true</code> if the list of busy units and the maximum number of units have
+    /// `true` if the list of busy units and the maximum number of units have
     /// been initialized
     static bool _isInitialized;
 
@@ -165,8 +165,8 @@ private:
     static unsigned int _maxTexUnits;
 
     /**
-     * This vector stores a bool at position <code>i</code> if the texture unit number
-     * <code>i</code> is currently in use
+     * This vector stores a bool at position `i` if the texture unit number
+     * `i` is currently in use
      */
     static std::vector<bool> _busyUnits;
 };

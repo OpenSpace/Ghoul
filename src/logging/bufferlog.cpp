@@ -43,8 +43,8 @@ namespace {
         uint8_t version;
 
         /**
-         * This atomic is set to <code>true</code> if some process is currently writing to
-         * the log, otherwise it is <code>false</code>. It is not guaranteed that this
+         * This atomic is set to `true` if some process is currently writing to
+         * the log, otherwise it is `false`. It is not guaranteed that this
          * value is usable when the buffer is written to disk in its entirety.
          */
         std::atomic_flag mutex;
@@ -57,8 +57,8 @@ namespace {
 
         /**
          * This value provides an offset to find the first byte in the buffer that has not
-         * been used already. The values between <code>_buffer + sizeof(Header)</code> and
-         * <code>_buffer + sizeof(Header) + firstEmptyByte</code> are the logs that have
+         * been used already. The values between `_buffer + sizeof(Header)` and
+         * `_buffer + sizeof(Header) + firstEmptyByte` are the logs that have
          * been stored before.
          */
         uint32_t firstEmptyByte;

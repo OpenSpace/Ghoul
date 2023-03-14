@@ -31,15 +31,15 @@
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/opengl/ghoul_gl.h>
 
-#include <Tracy.hpp>
-#include <TracyOpenGL.hpp>
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyOpenGL.hpp>
 
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable: 4100)
 #endif // WIN32
 
-#include <TracyLua.hpp>
+#include <tracy/TracyLua.hpp>
 
 #ifdef WIN32
 #pragma warning(pop)

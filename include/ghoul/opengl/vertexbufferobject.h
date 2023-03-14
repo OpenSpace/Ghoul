@@ -66,8 +66,8 @@ public:
     /**
      * A runtime function that checks if initialize has been called.
      *
-     * \returns <code>true</code> if any initialize function has been called and
-     *          <code>false</code> otherwise.
+     * \returns `true` if any initialize function has been called and
+     *          `false` otherwise.
      */
     bool isInitialized() const;
 
@@ -91,8 +91,7 @@ public:
      * \p indexArray list. The structure of the vertex data can be arbitrary but correct
      * offsets must be specified using #vertexAttribPointer.
      *
-     * \tparam T The structore holding information for each vertex; must be a
-     *         <code>POD</code>
+     * \tparam T The structore holding information for each vertex; must be a `POD`
      * \param vertexArray The vertex array used for this VertexBufferObject
      * \param indexArray The index list used for this VertexBufferObject
      *
@@ -104,22 +103,20 @@ public:
 
     /**
      * Sets the render mode for this VertexBufferObject. The render mode is how OpenGL is
-     * treating the vertices and indices. The default is <code>GL_TRIANGLES</code> but
-     * other common render primitives are <code>GL_LINES</code> and
-     * <code>GL_POINTS</code>. See
+     * treating the vertices and indices. The default is `GL_TRIANGLES` but other common
+     * render primitives are `GL_LINES` and `GL_POINTS`. See
      * https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml for supported render
      * modes.
-     * \param mode The render mode. Default is <code>GL_TRIANGLES</code>
+     * \param mode The render mode. Default is `GL_TRIANGLES`
      */
     void setRenderMode(GLenum mode = GL_TRIANGLES);
 
     /**
-     * A wrapper function for <code>glEnableVertexAttribArray</code> and
-     * <code>glVertexAttribPointer</code> that defines how the values passed in the
-     * #initialize method are interpreted.
+     * A wrapper function for `glEnableVertexAttribArray` and `glVertexAttribPointer` that
+     * defines how the values passed in the #initialize method are interpreted.
      * \param index The index of the attribute to be modified
      * \param size The number of elements in this attribute
-     * \param type The data type, for example <code>GL_FLOAT</code>
+     * \param type The data type, for example `GL_FLOAT`
      * \param stride The size for all values of a vertex
      * \param offset The offset for the specific member
      * \param normalized flag weather the attribute should be normalized
@@ -138,8 +135,8 @@ public:
 
 private:
     /**
-     * Constructs the internal GL objects by calling <code>glGenVertexArrays</code> and
-     * <code>glGenBuffers</code>
+     * Constructs the internal GL objects by calling `glGenVertexArrays` and
+     * `glGenBuffers`
      */
     void generateGLObjects();
 

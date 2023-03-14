@@ -88,22 +88,22 @@ public:
         std::filesystem::path filePath);
 
     /**
-     * Retrieves the Font with the name <code>name</code>, which must have been previously
+     * Retrieves the Font with the name `name`, which must have been previously
      * registered (#registerFontPath). If this is the first call to this function for a
-     * specific combination of <code>name</code> and <code>fontSize</code> the Font is
-     * initialized. In this case, the <code>loadGlyphs</code> parameter determines whether
+     * specific combination of `name` and `fontSize` the Font is
+     * initialized. In this case, the `loadGlyphs` parameter determines whether
      * the Font object will be initialized with a common set of English glyphs. Otherwise,
      * the function will return immediately with the correct Font object. If the
-     * <code>name</code> does not name a registered Font or the registered path does not
-     * exist, a <code>nullptr</code> is returned.
+     * `name` does not name a registered Font or the registered path does not
+     * exist, a `nullptr` is returned.
      *
      * \param name User-defined name for the Font that is to be retrieved
      * \param fontSize The font size (in pt) for the Font
-     * \param withOutline If this parameter is <code>true</code> the created Font will
+     * \param withOutline If this parameter is `true` the created Font will
      *        contain outlines as well as the base Font
-     * \param loadGlyphs If <code>true</code>, the first initialization of the Font will
+     * \param loadGlyphs If `true`, the first initialization of the Font will
      *        also preload a set of commonly used glyphs
-     * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
+     * \return Returns a usable and initialized Font object, or `nullptr` if an
      *         error occurred
      *
      * \pre \p name must not be empty
@@ -112,23 +112,23 @@ public:
         Outline withOutline = Outline::Yes, LoadGlyphs loadGlyphs = LoadGlyphs::Yes);
 
     /**
-     * Retrieves the Font with the hashed name <code>hashName</code>, which must have been
+     * Retrieves the Font with the hashed name `hashName`, which must have been
      * previously registered (#registerFontPath). If this is the first call to this
-     * function for a specific combination of <code>hashName</code> and
-     * <code>fontSize</code> the Font is initialized. In this case, the\
-     * <code>loadGlyphs</code> parameter determines whether the Font object will be
+     * function for a specific combination of `hashName` and
+     * `fontSize` the Font is initialized. In this case, the\
+     * `loadGlyphs` parameter determines whether the Font object will be
      * initialized with a common set of English glyphs. Otherwise, the function will
-     * return immediately with the correct Font object. If the <code>name</code> does not
+     * return immediately with the correct Font object. If the `name` does not
      * name a registered Font or the registered path does not exist, a
-     * <code>nullptr</code> is returned.
+     * `nullptr` is returned.
      *
      * \param hashName A hashed name of the font that is to be retrieved
      * \param fontSize The font size (in pt) for the Font
-     * \param withOutline If this parameter is <code>true</code> the created Font will
+     * \param withOutline If this parameter is `true` the created Font will
      *        contain outlines as well as the base Font
-     * \param loadGlyphs If <code>true</code>, the first initialization of the Font will
+     * \param loadGlyphs If `true`, the first initialization of the Font will
      *        also preload a set of commonly used glyphs
-     * \return Returns a usable and initialized Font object, or <code>nullptr</code> if an
+     * \return Returns a usable and initialized Font object, or `nullptr` if an
      *         error occurred
      */
     std::shared_ptr<Font> font(unsigned int hashName, float fontSize,

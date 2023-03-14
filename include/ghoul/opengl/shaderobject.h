@@ -122,9 +122,9 @@ public:
     /**
      * A copy constructor that will copy all of the internal state, and the shader source,
      * but it will generate a new OpenGL name for the copied object. In addition, if the
-     * content of the specified file has changed between creating the <code>cpy</code>,
-     * the copied Shader will use the changed file. That means a ShaderObject will not
-     * cache the contents of the file inside.
+     * content of the specified file has changed between creating the `cpy`, the copied
+     * Shader will use the changed file. That means a ShaderObject will not cache the
+     * contents of the file inside.
      *
      * \param cpy The original object that will be copied
      *
@@ -156,11 +156,11 @@ public:
      * The assignment operator that will copy all of the internal state, and the shader
      * source, but it will generate a new OpenGL name for the assigned object. In
      * addition, if the content of the specified file has changed between creating the
-     * <code>rhs</code>, the assigned Shader will use the changed file. That is, a
-     * ShaderObject will not cache the contents of the file inside.
+     * `rhs`, the assigned Shader will use the changed file. That is, a ShaderObject will
+     * not cache the contents of the file inside.
      *
      * \param rhs The original right hand side that will be used to set this object
-     * \return A reference to <code>this</code>
+     * \return A reference to `this`
      *
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      *        generated
@@ -259,9 +259,9 @@ public:
     std::string_view typeAsString() const;
 
     /**
-     * Returns the ShaderObject <code>type</code> as a human readable string.
+     * Returns the ShaderObject `type` as a human readable string.
      *
-     * \return The ShaderObject <code>type</code> as a human readable string
+     * \return The ShaderObject `type` as a human readable string
      */
     static std::string_view stringForShaderType(ShaderType type);
 

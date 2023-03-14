@@ -33,8 +33,7 @@ namespace ghoul {
 /**
  * Returns an interpolated value based on the factor supplied in \p t. In addition to the
  * interpolation factor \p t two values which to interpolate between must be supplied.
- * For <code>t = 0.0</code>, \p p0 is returned, for <code>t = 1.0</code>, \p p1 is
- * returned.
+ * For `t = 0.0`, \p p0 is returned, for `t = 1.0`, \p p1 is returned.
  *
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation

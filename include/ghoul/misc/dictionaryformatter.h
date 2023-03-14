@@ -34,7 +34,7 @@ class Dictionary;
 
 /**
  * A DictionaryFormatter will take a Dictionary and convert it into an
- * <code>std::string</code>. The resulting format of the string will be determined by the
+ * `std::string`. The resulting format of the string will be determined by the
  * concrete implementation of the subclass.
  */
 class DictionaryFormatter {

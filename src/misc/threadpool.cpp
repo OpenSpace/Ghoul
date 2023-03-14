@@ -37,12 +37,10 @@ namespace {
 
 namespace ghoul {
 
-using Func = std::function<void()>;
-using namespace thread;
-
-ThreadPool::ThreadPool(int nThreads, Func workerInit, Func workerDeinit,
-                       ThreadPriorityClass tpc, ThreadPriorityLevel tpl,
-                       Background bg)
+ThreadPool::ThreadPool(int nThreads, std::function<void()> workerInit,
+                       std::function<void()> workerDeinit,
+                       thread::ThreadPriorityClass tpc, thread::ThreadPriorityLevel tpl,
+                       thread::Background bg)
     : _workers(nThreads)
     , _taskQueue(std::make_shared<TaskQueue>())
     , _isRunning(std::make_shared<std::atomic_bool>(true))

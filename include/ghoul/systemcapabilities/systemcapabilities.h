@@ -44,7 +44,7 @@ namespace ghoul::systemcapabilities {
  * the application, but most values can be considered to be static and cache-able. New
  * components can be added using the #addComponent and retrieved using the #component
  * method. Each type of component can only be added once to the SystemCapabilities. The
- * second insertion will log a warning if <code>GHL_DEBUG</code> is defined.
+ * second insertion will log a warning if `GHL_DEBUG` is defined.
  */
 class SystemCapabilities {
 public:
@@ -94,7 +94,7 @@ public:
         SystemCapabilitiesComponent::Verbosity::Default) const;
 
     /**
-     * Adds the passed <code>component</code> to this SystemCapabilities and assumes
+     * Adds the passed `component` to this SystemCapabilities and assumes
      * ownership of this object. This method will not automatically detect the
      * capabilities in this component; this has to be done using the
      * #ghoul::systemcapabilities::SystemCapabilitiesComponent::detectCapabilities
@@ -110,11 +110,11 @@ public:
     void addComponent(std::unique_ptr<SystemCapabilitiesComponent> component);
 
     /**
-     * Returns the component of type <code>T</code>.
+     * Returns the component of type `T`.
      *
      * \tparam T The subclass of SystemCapabilitiesComponent that should be retrieved
      * \return The SystemCapabilitiesComponent that should be retrieved or
-     *         <code>nullptr</code> if no such type exists
+     *         `nullptr` if no such type exists
      *
      * \throws CapabilitiesComponentNotFoundError If no component of type T could be found
      */
