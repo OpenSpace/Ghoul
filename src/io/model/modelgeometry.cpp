@@ -38,7 +38,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 7;
+    constexpr int8_t CurrentCacheVersion = 8;
     constexpr int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -170,11 +170,18 @@ ModelGeometry::ModelCacheException::ModelCacheException(std::filesystem::path fi
 
 ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
                              std::vector<TextureEntry> textureStorage,
-                             std::unique_ptr<io::ModelAnimation> animation)
+                             std::unique_ptr<io::ModelAnimation> animation,
+                             bool isTransparent, bool hasCalcTransparency)
     : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
     , _animation(std::move(animation))
-{}
+    , _isTransparent(std::move(isTransparent))
+    , _hasCalcTransparency(std::move(hasCalcTransparency))
+{
+    if (!_hasCalcTransparency) {
+        calculateTransparency();
+    }
+}
 
 std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                                                   const std::filesystem::path& cachedFile,
@@ -353,6 +360,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
+
+                // isTransparent
+                uint8_t isT;
+                fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+                texture.isTransparent = (isT == 1);
 
                 // texture
                 if (texture.hasTexture) {
@@ -544,19 +557,43 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             animation->nodeAnimations().push_back(nodeAnimation);
         }
 
+        // _isTransparent
+        uint8_t isT;
+        fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+        bool isTransparent = (isT == 1);
+
+        // _hasCalcTransparency
+        uint8_t hasCalcT;
+        fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
+        bool hasCalcTransparency = (hasCalcT == 1);
+
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
             std::move(nodeArray),
             std::move(textureStorageArray),
-            std::move(animation)
+            std::move(animation),
+            isTransparent,
+            hasCalcTransparency
         );
     }
     else {
+        // _isTransparent
+        uint8_t isT;
+        fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+        bool isTransparent = (isT == 1);
+
+        // _hasCalcTransparency
+        uint8_t hasCalcT;
+        fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
+        bool hasCalcTransparency = (hasCalcT == 1);
+
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
             std::move(nodeArray),
             std::move(textureStorageArray),
-            nullptr
+            nullptr,
+            isTransparent,
+            hasCalcTransparency
         );
     }
 }
@@ -714,6 +751,14 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                     reinterpret_cast<const char*>(&mesh.textures()[t].color.b),
                     sizeof(float)
                 );
+                fileStream.write(
+                    reinterpret_cast<const char*>(&mesh.textures()[t].color.a),
+                    sizeof(float)
+                );
+
+                // isTransparent
+                uint8_t isT = (mesh.textures()[t].isTransparent) ? 1 : 0;
+                fileStream.write(reinterpret_cast<const char*>(&isT), sizeof(uint8_t));
 
                 // texture
                 if (mesh.textures()[t].hasTexture) {
@@ -912,6 +957,14 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         }
     }
 
+    // _isTransparent
+    uint8_t isT = _isTransparent ? 1 : 0;
+    fileStream.write(reinterpret_cast<const char*>(&isT), sizeof(uint8_t));
+
+    // _hasCalcTransparency
+    uint8_t hasCalcT = _hasCalcTransparency ? 1 : 0;
+    fileStream.write(reinterpret_cast<const char*>(&hasCalcT), sizeof(uint8_t));
+
     return fileStream.good();
 }
 
@@ -949,6 +1002,44 @@ double ModelGeometry::animationDuration() const {
 
     return _animation->duration();
 }
+
+void ModelGeometry::calculateTransparency() {
+    if (_hasCalcTransparency) {
+        return;
+    }
+
+    bool isTransparent = false;
+    for (const io::ModelNode& n : _nodes) {
+        if (isTransparent) {
+            break;
+        }
+
+        for (const io::ModelMesh& m : n.meshes()) {
+            if (m.isTransparent()) {
+                isTransparent = true;
+                break;
+            }
+        }
+    }
+
+    _isTransparent = isTransparent;
+    _hasCalcTransparency = true;
+}
+
+void ModelGeometry::recalculateTransparency() {
+    _hasCalcTransparency = false;
+    return calculateTransparency();
+}
+
+bool ModelGeometry::isTransparent() const {
+    if (!_hasCalcTransparency) {
+        LWARNING(
+            "Transparency has not been calculated for this model, value may be invalid"
+        );
+    }
+    return _isTransparent;
+}
+
 
 std::vector<io::ModelNode>& ModelGeometry::nodes() {
     return _nodes;
@@ -1020,6 +1111,7 @@ void ModelGeometry::initialize() {
     }
 
     calculateBoundingRadius();
+    calculateTransparency();
 }
 
 void ModelGeometry::deinitialize() {

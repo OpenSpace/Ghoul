@@ -50,6 +50,25 @@ namespace {
 
 namespace ghoul::io {
 
+static bool isTextureTransparent(const ModelMesh::Texture texture) {
+    int nChannels = texture.texture->numberOfChannels();
+
+    if (nChannels < 4) {
+        return false;
+    }
+
+    // Check if there is at least one pixel that is somewhat transparent
+    for (unsigned int j = 0; j < texture.texture->dimensions().x; ++j) {
+        for (unsigned int k = 0; k < texture.texture->dimensions().y; ++k) {
+            float alpha = texture.texture->texelAsFloat(glm::vec2(j, k)).a;
+            if (alpha < 1.f) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
                                  const aiTextureType& type,
                                  const ModelMesh::TextureType& enumType,
@@ -190,7 +209,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
 
             for (unsigned int k = 0; k < meshTexture.texture->dimensions().y; ++k) {
                 float alpha = meshTexture.texture->texelAsFloat(glm::vec2(j, k)).a;
-                if (alpha != 0.f) {
+                if (alpha > 0.f) {
                     isOpaque = true;
                     break;
                 }
@@ -200,6 +219,11 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
         // If entire texture is transparent, do not add it
         if (!isOpaque) {
             continue;
+        }
+
+        // Check if the diffuse texture is somewhat transparent
+        if (enumType == ModelMesh::TextureType::TextureDiffuse) {
+            meshTexture.isTransparent = isTextureTransparent(meshTexture);
         }
 
         // Add new Texture to the textureStorage and point to it in the texture array
@@ -304,8 +328,9 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
 
     // Opacity
     float opacity = 0.f;
-    aiReturn hasOpacity = material->Get(AI_MATKEY_OPACITY, opacity);
-    if (hasOpacity == AI_SUCCESS && opacity == 0.f) {
+    aiReturn result = material->Get(AI_MATKEY_OPACITY, opacity);
+    bool hasOpacity = result == AI_SUCCESS && opacity < 1.f;
+    if (hasOpacity && opacity < std::numeric_limits<float>::epsilon()) {
         // If the material is transparent then do not add it
         return ModelMesh(
             std::move(vertexArray),
@@ -333,6 +358,9 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 std::move(textureArray)
             );
         }
+        if (hasOpacity) {
+            LWARNING("Unsupported opacity + diffuse texture found");
+        }
     }
     else {
         // Load embedded simple material instead of textures
@@ -344,9 +372,11 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorDiffuse;
-                texture.color.x = color4.r;
-                texture.color.y = color4.g;
-                texture.color.z = color4.b;
+                texture.color.r = color4.r;
+                texture.color.g = color4.g;
+                texture.color.b = color4.b;
+                texture.color.a = color4.a;
+                texture.isTransparent = texture.color.a < 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }
@@ -357,11 +387,17 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorDiffuse;
-                texture.color.x = color3.r;
-                texture.color.y = color3.g;
-                texture.color.z = color3.b;
+                texture.color.r = color3.r;
+                texture.color.g = color3.g;
+                texture.color.b = color3.b;
+                texture.color.a = 1.f;
                 textureArray.push_back(std::move(texture));
             }
+        }
+        if (hasOpacity) {
+            textureArray.back().isTransparent = true;
+            textureArray.back().color.a =
+                std::min(opacity, textureArray.back().color.a);
         }
     }
 
@@ -395,9 +431,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorSpecular;
-                texture.color.x = color4.r;
-                texture.color.y = color4.g;
-                texture.color.z = color4.b;
+                texture.color.r = color4.r;
+                texture.color.g = color4.g;
+                texture.color.b = color4.b;
+                texture.color.a = 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }
@@ -408,9 +445,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
                 ModelMesh::Texture texture;
                 texture.hasTexture = false;
                 texture.type = ModelMesh::TextureType::ColorSpecular;
-                texture.color.x = color3.r;
-                texture.color.y = color3.g;
-                texture.color.z = color3.b;
+                texture.color.r = color3.r;
+                texture.color.g = color3.g;
+                texture.color.b = color3.b;
+                texture.color.a = 1.f;
                 textureArray.push_back(std::move(texture));
             }
         }

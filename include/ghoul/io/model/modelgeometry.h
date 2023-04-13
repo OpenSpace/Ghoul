@@ -58,7 +58,8 @@ public:
 
     ModelGeometry(std::vector<io::ModelNode> nodes,
         std::vector<TextureEntry> textureStorage,
-        std::unique_ptr<io::ModelAnimation> animation);
+        std::unique_ptr<io::ModelAnimation> animation,
+        bool isTransparent = false, bool hasCalcTransparency = false);
     ModelGeometry(ModelGeometry&&) noexcept = default;
     ~ModelGeometry() noexcept = default;
 
@@ -80,6 +81,9 @@ public:
     void calculateBoundingRadius();
     bool hasAnimation() const;
     double animationDuration() const;
+    void calculateTransparency();
+    void recalculateTransparency();
+    bool isTransparent() const;
 
     std::vector<io::ModelNode>& nodes();
     const std::vector<io::ModelNode>& nodes() const;
@@ -92,6 +96,8 @@ protected:
     std::vector<io::ModelNode> _nodes;
     std::vector<TextureEntry> _textureStorage;
     std::unique_ptr<io::ModelAnimation> _animation;
+    bool _hasCalcTransparency = false;
+    bool _isTransparent = false;
 };
 
 }  // namespace ghoul::modelgeometry

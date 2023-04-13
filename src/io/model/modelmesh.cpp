@@ -25,11 +25,12 @@
 
 #include <ghoul/io/model/modelmesh.h>
 
-#include <ghoul/io/texture/texturereader.h>
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/opengl/programobject.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/fmt.h>
+#include <ghoul/io/texture/texturereader.h>
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/programobject.h>
+#include <ghoul/opengl/textureunit.h>
 
 namespace {
     std::string textureTypeToString(const ghoul::io::ModelMesh::TextureType& type) {
@@ -65,6 +66,17 @@ void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
 void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
                        bool isFullyTexturedModel, bool isProjection) const
 {
+    // Count how many textures have image textures
+    int counter = 0;
+    for (const Texture& texture : _textures) {
+        if (texture.hasTexture) {
+            ++counter;
+        }
+    }
+
+    std::vector<ghoul::opengl::TextureUnit> textureUnits(counter);
+    int textureUnitIndex = 0;
+
     if (!isProjection) {
         if (isFullyTexturedModel) {
             // Reset shader
@@ -79,7 +91,6 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
             }
 
             // Bind appropriate textures
-            int textureCounter = 0;
             for (const Texture& texture : _textures) {
                 // Tell shader wether to render invisible mesh with flashy color or not
                 program.setUniform("use_forced_color", texture.useForcedColor);
@@ -90,8 +101,8 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
                 std::string name = textureTypeToString(texture.type);
                 // Use texture or color
                 if (texture.hasTexture) {
-                    // Active proper texture unit before binding
-                    glActiveTexture(GL_TEXTURE0 + textureCounter);
+                    // Activate proper texture unit before binding
+                    textureUnits[textureUnitIndex].activate();
 
                     // Specular special case
                     if (texture.type == TextureType::TextureSpecular) {
@@ -100,11 +111,13 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
 
                     // Tell shader to use textures and set texture unit
                     program.setUniform("has_" + name, true);
-                    program.setUniform(name, textureCounter);
+                    program.setUniform(name, textureUnits[textureUnitIndex]);
 
                     // And finally bind the texture
                     texture.texture->bind();
-                    ++textureCounter;
+
+                    // Advance the texture unit index
+                    ++textureUnitIndex;
                 }
                 // Use embedded simple colors instead of textures
                 else {
@@ -132,15 +145,18 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
                 {
                     // Use texture or color
                     if (texture.hasTexture) {
-                        // Active proper texture unit before binding
-                        glActiveTexture(GL_TEXTURE1);
+                        // Activate proper texture unit before binding
+                        textureUnits[textureUnitIndex].activate();
 
                         // Tell shader to use textures and set texture unit
                         program.setUniform("has_texture_diffuse", true);
-                        program.setUniform("baseTexture", 1);
+                        program.setUniform("baseTexture", textureUnits[textureUnitIndex]);
 
                         // And finally bind the texture
                         texture.texture->bind();
+
+                        // Advance the texture unit index
+                        ++textureUnitIndex;
                         break;
                     }
                     // Use embedded simple colors instead of textures
@@ -198,6 +214,17 @@ void ModelMesh::setInvisible(bool isInvisible) {
 
 bool ModelMesh::isInvisible() const {
     return _isInvisible;
+}
+
+bool ModelMesh::isTransparent() const {
+    for (const Texture& t : _textures) {
+        if ((t.type == TextureType::TextureDiffuse ||
+             t.type == TextureType::ColorDiffuse) && t.isTransparent)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 const std::vector<ModelMesh::Vertex>& ModelMesh::vertices() const {
