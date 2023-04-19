@@ -152,6 +152,8 @@ if (GHOUL_MODULE_ASSIMP)
       "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
       <string.h>
     )
+  else ()
+    set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
   endif ()
   set_target_properties(uninstall PROPERTIES FOLDER "External")
   if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
