@@ -37,7 +37,7 @@ namespace {
 
     // List of types that are stored as-is in the Dictionary
     using DirectTypes = std::variant<bool, double, int, std::string, ghoul::Dictionary,
-        std::vector<int>, std::vector<double>, std::vector<std::string>>;
+        void*, std::vector<int>, std::vector<double>, std::vector<std::string>>;
     template <typename T> using isDirectType = is_one_of<T, DirectTypes>;
 
     // Vector types that are converted into std::vector for storage purposes
@@ -256,6 +256,7 @@ template void Dictionary::setValue(std::string, bool value);
 template void Dictionary::setValue(std::string, double);
 template void Dictionary::setValue(std::string, int);
 template void Dictionary::setValue(std::string, std::string);
+template void Dictionary::setValue(std::string, void*);
 template void Dictionary::setValue(std::string, std::vector<int>);
 template void Dictionary::setValue(std::string, std::vector<double>);
 template void Dictionary::setValue(std::string, std::vector<std::string>);
@@ -281,6 +282,7 @@ template bool Dictionary::value(std::string_view) const;
 template double Dictionary::value(std::string_view) const;
 template int Dictionary::value(std::string_view) const;
 template std::string Dictionary::value(std::string_view) const;
+template void* Dictionary::value(std::string_view) const;
 template std::vector<int> Dictionary::value(std::string_view) const;
 template std::vector<double> Dictionary::value(std::string_view) const;
 template std::vector<std::string> Dictionary::value(std::string_view) const;
@@ -306,6 +308,7 @@ template bool Dictionary::hasValue<bool>(std::string_view) const;
 template bool Dictionary::hasValue<double>(std::string_view) const;
 template bool Dictionary::hasValue<int>(std::string_view) const;
 template bool Dictionary::hasValue<std::string>(std::string_view) const;
+template bool Dictionary::hasValue<void*>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<int>>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<double>>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<std::string>>(std::string_view) const;

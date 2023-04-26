@@ -415,28 +415,36 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
         }
 
         // get the value
-        switch (lua_type(state, ValueTableIndex)) {
+        const int valueType = lua_type(state, ValueTableIndex);
+        switch (valueType) {
             case LUA_TNUMBER: {
                 double value = lua_tonumber(state, ValueTableIndex);
                 dictionary.setValue(key, value);
-            } break;
+                break;
+            }
             case LUA_TBOOLEAN: {
                 bool value = (lua_toboolean(state, ValueTableIndex) == 1);
                 dictionary.setValue(key, value);
-            } break;
+                break;
+            }
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, ValueTableIndex);
                 dictionary.setValue(key, value);
-            } break;
+                break;
+            }
             case LUA_TTABLE: {
-                Dictionary d;
-                luaDictionaryFromState(state, d);
+                Dictionary d = luaDictionaryFromState(state);
                 dictionary.setValue(key, d);
-            } break;
+                break;
+            }
+            case LUA_TLIGHTUSERDATA:
+            case LUA_TUSERDATA: {
+                void* data = lua_touserdata(state, ValueTableIndex);
+                dictionary.setValue(key, data);
+                break;
+            }
             default:
-                throw LuaFormatException(
-                    "Unknown type: " + std::to_string(lua_type(state, ValueTableIndex))
-                );
+                throw LuaFormatException("Unknown type: " + std::to_string(valueType));
         }
 
         // get back up one level

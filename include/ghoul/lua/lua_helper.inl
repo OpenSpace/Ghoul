@@ -273,6 +273,10 @@ std::vector<T> dictionaryToVector(const ghoul::Dictionary& d) {
             T value = static_cast<int>(d.value<double>(k));
             res.push_back(std::move(value));
         }
+        else if constexpr (std::is_pointer_v<T>) {
+            void* value = d.value<void*>(k);
+            res.push_back(reinterpret_cast<T>(value));
+        }
         else {
             T value = d.value<T>(k);
             res.push_back(std::move(value));
@@ -473,6 +477,9 @@ std::string Name() {
     else if constexpr (is_optional<T>::value) {
         return "[" + Name<typename T::value_type>() + "]";
     }
+    else if constexpr (std::is_pointer_v<T>) {
+        return "user pointer";
+    }
     else {
         static_assert(sizeof(T) == 0, "Missing case for T");
     }
@@ -513,6 +520,9 @@ T valueInner(lua_State* L, int location) {
                        std::is_same_v<T, std::string_view>)
     {
         return lua_tostring(L, location);
+    }
+    else if constexpr (std::is_pointer_v<T>) {
+        return reinterpret_cast<T>(lua_touserdata(L, location));
     }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
         lua_pushvalue(L, location);
@@ -731,6 +741,10 @@ T valueInner(lua_State* L, int location) {
                         dictionaryToVector<typename T::mapped_type::value_type>(dictVal);
                     res[std::string(k)] = std::move(value);
                 }
+                else if constexpr (std::is_pointer_v<typename T::mapped_type>) {
+                    void* val = d.value<void*>(k);
+                    res[std::string(k)] = reinterpret_cast<typename T::mapped_type>(val);
+                }
                 else {
                     typename T::mapped_type value = d.value<typename T::mapped_type>(k);
                     res[std::string(k)] = std::move(value);
@@ -777,6 +791,9 @@ bool hasValue(lua_State* L, int location) {
                        std::is_same_v<T, std::string_view>)
     {
         return lua_type(L, location) == LUA_TSTRING;
+    }
+    else if constexpr (std::is_pointer_v<T>) {
+        return lua_isuserdata(L, location);
     }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary> ||
                        internal::is_string_map<T>::value ||
