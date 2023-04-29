@@ -51,6 +51,11 @@ template <typename T> struct is_string_map<std::map<std::string, T>> : std::true
 template <typename T> struct is_vector : std::false_type {};
 template <typename T> struct is_vector<std::vector<T>> : std::true_type {};
 
+template<typename T>
+struct is_array : std::false_type {};
+
+template<typename T, std::size_t N>
+struct is_array<std::array<T, N>> : std::true_type {};
 
 // Boolean constant used to check whether a value T is part of a parameter pack Ts
 template <typename T, typename U> struct is_one_of;
@@ -183,9 +188,23 @@ void pushDictionaryHelper(lua_State* L, const ghoul::Dictionary& d, std::string_
     }
 }
 
-template <typename T>
+template <typename T, bool NumericKeys = false>
 std::vector<T> dictionaryToVector(const ghoul::Dictionary& d) {
     std::vector<std::string_view> keys = d.keys();
+    if constexpr (NumericKeys) {
+        std::sort(
+            keys.begin(),
+            keys.end(),
+            [](std::string_view lhs, std::string_view rhs) {
+                int lhsValue;
+                int rhsValue;
+                std::from_chars(lhs.data(), lhs.data() + lhs.size(), lhsValue);
+                std::from_chars(rhs.data(), rhs.data() + rhs.size(), rhsValue);
+                return lhsValue < rhsValue;
+            }
+        );
+    }
+
     std::vector<T> res;
     res.reserve(keys.size());
     for (std::string_view k : keys) {
@@ -438,6 +457,7 @@ std::string Name() {
     else if constexpr (std::is_same_v<T, ghoul::Dictionary> ||
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
+                       internal::is_array<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
                        std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
                        std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
@@ -544,7 +564,7 @@ T valueInner(lua_State* L, int location) {
                        std::is_same_v<T, glm::dmat4x4>)
     {
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
         ghoul::Dictionary holder;
@@ -553,7 +573,7 @@ T valueInner(lua_State* L, int location) {
     }
     else if constexpr (std::is_same_v<T, glm::ivec2>) {
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
         ghoul::Dictionary holder;
@@ -562,7 +582,7 @@ T valueInner(lua_State* L, int location) {
     }
     else if constexpr (std::is_same_v<T, glm::ivec3>) {
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
         ghoul::Dictionary holder;
@@ -571,7 +591,7 @@ T valueInner(lua_State* L, int location) {
     }
     else if constexpr (std::is_same_v<T, glm::ivec4>) {
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
         ghoul::Dictionary holder;
@@ -580,7 +600,7 @@ T valueInner(lua_State* L, int location) {
     }
     else if constexpr (std::is_same_v<T, glm::uvec2>) {
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
         ghoul::Dictionary holder;
@@ -589,7 +609,7 @@ T valueInner(lua_State* L, int location) {
     }
     else if constexpr (std::is_same_v<T, glm::uvec3>) {
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
         ghoul::Dictionary holder;
@@ -598,7 +618,7 @@ T valueInner(lua_State* L, int location) {
     }
     else if constexpr (std::is_same_v<T, glm::uvec4>) {
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary value = ghoul::lua::luaDictionaryFromState(L);
         ghoul::Dictionary holder;
@@ -657,7 +677,7 @@ T valueInner(lua_State* L, int location) {
         else {
             // First get the state as a Dictionary which is then converted into the map
             lua_pushvalue(L, location);
-            defer{ lua_pop(L, 1); };
+            defer { lua_pop(L, 1); };
 
             ghoul::Dictionary d = ghoul::lua::luaDictionaryFromState(L);
             std::vector<std::string_view> keys = d.keys();
@@ -756,10 +776,38 @@ T valueInner(lua_State* L, int location) {
     else if constexpr (is_vector<T>::value) {
         // First get the state as a Dictionary which is then converted into the vector
         lua_pushvalue(L, location);
-        defer{ lua_pop(L, 1); };
+        defer { lua_pop(L, 1); };
 
         ghoul::Dictionary d = ghoul::lua::luaDictionaryFromState(L);
         T res = dictionaryToVector<typename T::value_type>(d);
+        return res;
+    }
+    else if constexpr (is_array<T>::value) {
+        // First get the state as a Dictionary which is then converted into the vector
+        lua_pushvalue(L, location);
+        defer { lua_pop(L, 1); };
+
+        ghoul::Dictionary d = ghoul::lua::luaDictionaryFromState(L);
+        std::vector<typename T::value_type> r =
+            dictionaryToVector<typename T::value_type, true>(d);
+
+        T res;
+
+        if (r.size() != res.size()) {
+            // The list of values that was passed in was of different length then what was
+            // requested out of it
+            std::string name = Name<T>();
+            std::string error = fmt::format(
+                "Expected '{}' values for '{}' but got '{}' instead",
+                res.size(), name, r.size()
+            );
+            // This function won't actually return, but C++ doesn't know that, so
+            ghoul::lua::luaError(L, error.c_str());
+            throw LuaFormatException(std::move(error));
+        }
+
+
+        std::copy_n(r.begin(), r.size(), res.begin());
         return res;
     }
     else {
@@ -798,6 +846,7 @@ bool hasValue(lua_State* L, int location) {
     else if constexpr (std::is_same_v<T, ghoul::Dictionary> ||
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
+                       internal::is_array<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
                        std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
                        std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
