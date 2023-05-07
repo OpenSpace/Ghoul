@@ -51,11 +51,12 @@ template <typename T> struct is_string_map<std::map<std::string, T>> : std::true
 template <typename T> struct is_vector : std::false_type {};
 template <typename T> struct is_vector<std::vector<T>> : std::true_type {};
 
-template<typename T>
-struct is_array : std::false_type {};
-
-template<typename T, std::size_t N>
+template <typename T> struct is_array : std::false_type {};
+template <typename T, std::size_t N>
 struct is_array<std::array<T, N>> : std::true_type {};
+
+template <typename T> struct is_tuple : std::false_type {};
+template <typename... Ts> struct is_tuple<std::tuple<Ts...>> : std::true_type {};
 
 // Boolean constant used to check whether a value T is part of a parameter pack Ts
 template <typename T, typename U> struct is_one_of;
@@ -91,12 +92,27 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
             throw LuaExecutionException("Too few arguments to Lua function call");
         }
 
-        std::get<I>(tuple) = value<T>(L, baseLocation + I, PopValue::No);
+        std::get<I>(tuple) = value<std::tuple_element_t<I, std::tuple<Ts...>>>(
+            L,
+            baseLocation + I,
+            PopValue::No
+        );
         argumentsFound += 1;
     }
 
     if constexpr (I+1 != sizeof...(Ts)) {
         extractValues<I+1>(L, tuple, baseLocation, nArguments, argumentsFound);
+    }
+}
+
+template <size_t I = 0, typename... Ts>
+constexpr void pushTupleValues(lua_State* L, const std::tuple<Ts...>& tuple) {
+    using T = std::tuple_element_t<I, std::tuple<Ts...>>;
+
+    ghoul::lua::push(L, static_cast<int>(I + 1), std::get<I>(tuple));
+    lua_settable(L, -3);
+    if constexpr (I + 1 != sizeof...(Ts)) {
+        pushTupleValues<I + 1, Ts...>(L, tuple);
     }
 }
 
@@ -185,6 +201,37 @@ void pushDictionaryHelper(lua_State* L, const ghoul::Dictionary& d, std::string_
         else {
             pushDictionaryHelper<I + 1>(L, d, key);
         }
+    }
+}
+
+template <size_t I = 0, typename... Ts>
+constexpr void extractValues(const ghoul::Dictionary& dict, std::tuple<Ts...>& tuple) {
+    using T = std::tuple_element_t<I, std::tuple<Ts...>>;
+
+    std::vector<std::string_view> keys = dict.keys();
+    std::sort(
+        keys.begin(),
+        keys.end(),
+        [](std::string_view lhs, std::string_view rhs) {
+            int lhsValue;
+            int rhsValue;
+            std::from_chars(lhs.data(), lhs.data() + lhs.size(), lhsValue);
+            std::from_chars(rhs.data(), rhs.data() + rhs.size(), rhsValue);
+            return lhsValue < rhsValue;
+        }
+    );
+
+    if constexpr (std::is_same_v<T, float>) {
+        std::get<I>(tuple) = static_cast<float>(dict.value<double>(keys[I]));
+    }
+    else if constexpr (std::is_same_v<T, int>) {
+        std::get<I>(tuple) = static_cast<int>(dict.value<double>(keys[I]));
+    }
+    else {
+        std::get<I>(tuple) = dict.value<T>(keys[I]);
+    }
+    if constexpr (I + 1 != sizeof...(Ts)) {
+        extractValues<I + 1, Ts...>(dict, tuple);
     }
 }
 
@@ -290,6 +337,12 @@ std::vector<T> dictionaryToVector(const ghoul::Dictionary& d) {
         }
         else if constexpr (std::is_same_v<T, int>) {
             T value = static_cast<int>(d.value<double>(k));
+            res.push_back(std::move(value));
+        }
+        else if constexpr (is_tuple<T>::value) {
+            ghoul::Dictionary dictVal = d.value<ghoul::Dictionary>(k);
+            T value;
+            extractValues(dictVal, value);
             res.push_back(std::move(value));
         }
         else if constexpr (std::is_pointer_v<T>) {
@@ -417,6 +470,22 @@ void push(lua_State* L, T value) {
             lua_settable(L, -3);
         }
     }
+    else if constexpr (is_array<T>::value) {
+        lua_newtable(L);
+        for (size_t i = 1; i <= value.size(); i++) {
+            if constexpr (std::is_same_v<typename T::value_type, bool>) {
+                ghoul::lua::push(L, static_cast<int>(i), static_cast<bool>(value[i - 1]));
+            }
+            else {
+                ghoul::lua::push(L, static_cast<int>(i), value[i - 1]);
+            }
+            lua_settable(L, -3);
+        }
+    }
+    else if constexpr (is_tuple<T>::value) {
+        lua_newtable(L);
+        pushTupleValues(L, value);
+    }
     else if constexpr (std::is_same_v<T, ghoul::Dictionary>) {
         lua_newtable(L);
         for (std::string_view key : value.keys()) {
@@ -458,6 +527,7 @@ std::string Name() {
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
                        internal::is_array<T>::value ||
+                       internal::is_tuple<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
                        std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
                        std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
@@ -761,6 +831,17 @@ T valueInner(lua_State* L, int location) {
                         dictionaryToVector<typename T::mapped_type::value_type>(dictVal);
                     res[std::string(k)] = std::move(value);
                 }
+                else if constexpr (is_array<typename T::mapped_type>::value) {
+                    // A vector is going to be stored as a Dictionary
+                    ghoul::Dictionary dictVal = d.value<ghoul::Dictionary>(k);
+                    typename T::mapped_type value =
+                        dictionaryToVector<typename T::mapped_type::value_type>(dictVal);
+                    res[std::string(k)] = std::move(value);
+                }
+                else if constexpr (is_tuple<typename T::mapped_type>::value) {
+                    ghoul::Dictionary dictVal = d.value<ghoul::Dictionary>(k);
+                    extractValues(dictVal, res[std::string(k)]);
+                }
                 else if constexpr (std::is_pointer_v<typename T::mapped_type>) {
                     void* val = d.value<void*>(k);
                     res[std::string(k)] = reinterpret_cast<typename T::mapped_type>(val);
@@ -810,6 +891,26 @@ T valueInner(lua_State* L, int location) {
         std::copy_n(r.begin(), r.size(), res.begin());
         return res;
     }
+    else if constexpr (is_tuple<T>::value) {
+        // The values for the tuple are currently inside of a table, but we need to lift
+        // them to the top level for the `extractValues` function to work. For now, we'll
+        // use a new state for this to simplify the code. This could be made more
+        // efficient if we use the same stack but copy values around in a smart way
+        lua_State* newL = luaL_newstate();
+        
+        lua_pushnil(L);
+        while (lua_next(L, -2) != 0) {
+            lua_xmove(L, newL, 1);
+        }
+
+        int n = lua_gettop(newL);
+        T result;
+        int argumentsFound = 0;
+        // Location is 1 since we copied over the values into a new Lua state
+        internal::extractValues(newL, result, 1, n, argumentsFound);
+        lua_close(newL);
+        return result;
+    }
     else {
         static_assert(sizeof(T) == 0, "Unhandled type T");
     }
@@ -847,6 +948,7 @@ bool hasValue(lua_State* L, int location) {
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
                        internal::is_array<T>::value ||
+                       internal::is_tuple<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
                        std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
                        std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
@@ -888,7 +990,7 @@ T value(lua_State* L, int location, PopValue shouldPopValue) {
 
     if constexpr (internal::is_optional<T>::value) {
         const int n = lua_gettop(L);
-        if (n < location) {
+        if (n < location || n == 0) {
             // We tried to access an optional value for which no parameter was provided
             return std::nullopt;
         }
