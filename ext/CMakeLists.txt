@@ -258,3 +258,11 @@ if (NOT TARGET TracyClient)
 endif ()
 target_link_libraries(Ghoul PUBLIC TracyClient)
 end_dependency("Tracy")
+
+# RenderDoc
+if (WIN32)
+  begin_dependency("RenderDoc")
+  add_subdirectory(renderdoc)
+  target_link_libraries(Ghoul PUBLIC renderdoc)
+  end_dependency("RenderDoc")
+endif ()

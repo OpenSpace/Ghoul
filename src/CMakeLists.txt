@@ -221,6 +221,7 @@ if (GHOUL_MODULE_OPENGL)
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/openglstatecache.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
+      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/renderdoc.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
@@ -244,6 +245,7 @@ if (GHOUL_MODULE_OPENGL)
       opengl/openglstatecache.cpp
       opengl/programobject.cpp
       opengl/programobjectmanager.cpp
+      opengl/renderdoc.cpp
       opengl/shaderobject.cpp
       opengl/shaderpreprocessor.cpp
       opengl/texture.cpp

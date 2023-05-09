@@ -23,52 +23,47 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/ghoul.h>
-
-#include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/filesystem/filesystem.h>
-#include <ghoul/lua/lua_helper.h>
-#include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/renderdoc.h>
 
-namespace ghoul {
+#include <ghoul/logging/logmanager.h>
+#include <fmt/format.h>
 
-void initialize() {
-    ZoneScoped;
+#ifdef WIN32
+#include <Windows.h>
+#endif // WIN32
 
-    ghoul::filesystem::FileSystem::initialize();
-    ghoul::opengl::loadRenderDoc();
+namespace ghoul::opengl {
+
+void loadRenderDoc() {
+    pRENDERDOC_GetAPI getApi = nullptr;
+#ifdef WIN32
+    if (HMODULE mod = GetModuleHandleA("renderdoc.dll");  mod) {
+        getApi = reinterpret_cast<pRENDERDOC_GetAPI>(
+            GetProcAddress(mod, "RENDERDOC_GetAPI")
+        );
+    }
+#else // ^^^ WIN32 ||| !WIN32 vvv
+    if (void* mod = dlopen("librenderdoc.so", RTLD_NOW | RTLD_NOLOAD);  mod) {
+        getApi = reinterpret_cast<pRENDERDOC_GetAPI>(dlsym(mod, "RENDERDOC_GetAPI"));
+    }
+#endif // WIN32
+
+    if (getApi) {
+        int ret = getApi(
+            eRENDERDOC_API_Version_1_6_0,
+            reinterpret_cast<void**>(&renderdocApi)
+        );
+        if (!ret) {
+            LERRORC("RenderDoc", "Error loading API");
+            return;
+        }
+
+        int major = 0;
+        int minor = 0;
+        int patch = 0;
+        renderdocApi->GetAPIVersion(&major, &minor, &patch);
+        LINFOC("RenderDoc", fmt::format("Loaded API {}.{}.{}", major, minor, patch));
+    }
 }
 
-void deinitialize() {
-    ZoneScoped;
-
-    ghoul::lua::internal::deinitializeGlobalState();
-    ghoul::filesystem::FileSystem::deinitialize();
-}
-
-std::string licenseText() {
-    return "GHOUL\n\
-General Helpful Open Utility Library\n\
-\n\
-Copyright(c) 2012 - 2021\n\
-\n\
-Permission is hereby granted, free of charge, to any person obtaining a copy of this\n\
-software and associated documentation files(the \"Software\"), to deal in the Software\n\
-without restriction, including without limitation the rights to use, copy, modify,\n\
-merge, publish, distribute, sublicense, and / or sell copies of the Software, and to\n\
-permit persons to whom the Software is furnished to do so, subject to the following\n\
-conditions:\n\
-\n\
-The above copyright notice and this permission notice shall be included in all copies\n\
-or substantial portions of the Software.\n\
-\n\
-THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,\n\
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A\n\
-PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT\n\
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF\n\
-CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE\n\
-OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n";
-}
-
-} // namespace ghoul
+} // namespace ghoul::opengl
