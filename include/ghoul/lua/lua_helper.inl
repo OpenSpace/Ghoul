@@ -30,6 +30,7 @@
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
+#include <charconv>
 #include <filesystem>
 #include <optional>
 #include <type_traits>
