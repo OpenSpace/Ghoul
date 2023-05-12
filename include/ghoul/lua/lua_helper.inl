@@ -206,7 +206,7 @@ void pushDictionaryHelper(lua_State* L, const ghoul::Dictionary& d, std::string_
 }
 
 template <size_t I = 0, typename... Ts>
-constexpr void extractValues(const ghoul::Dictionary& dict, std::tuple<Ts...>& tuple) {
+void extractValues(const ghoul::Dictionary& dict, std::tuple<Ts...>& tuple) {
     using T = std::tuple_element_t<I, std::tuple<Ts...>>;
 
     std::vector<std::string_view> keys = dict.keys();
