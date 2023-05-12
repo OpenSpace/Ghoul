@@ -30,6 +30,8 @@
 
 #ifdef WIN32
 #include <Windows.h>
+#else // ^^^ WIN32 | !WIN32 vvv
+#include <dlfcn.h>
 #endif // WIN32
 
 namespace ghoul::opengl {
