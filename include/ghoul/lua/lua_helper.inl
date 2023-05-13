@@ -108,8 +108,6 @@ constexpr void extractValues(lua_State* L, std::tuple<Ts...>& tuple, int baseLoc
 
 template <size_t I = 0, typename... Ts>
 constexpr void pushTupleValues(lua_State* L, const std::tuple<Ts...>& tuple) {
-    using T = std::tuple_element_t<I, std::tuple<Ts...>>;
-
     ghoul::lua::push(L, static_cast<int>(I + 1), std::get<I>(tuple));
     lua_settable(L, -3);
     if constexpr (I + 1 != sizeof...(Ts)) {

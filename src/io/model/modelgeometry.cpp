@@ -175,8 +175,8 @@ ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
     : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
     , _animation(std::move(animation))
-    , _isTransparent(std::move(isTransparent))
     , _hasCalcTransparency(std::move(hasCalcTransparency))
+    , _isTransparent(std::move(isTransparent))
 {
     if (!_hasCalcTransparency) {
         calculateTransparency();
