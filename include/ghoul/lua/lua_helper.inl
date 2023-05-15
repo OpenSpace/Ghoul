@@ -896,7 +896,7 @@ T valueInner(lua_State* L, int location) {
         // use a new state for this to simplify the code. This could be made more
         // efficient if we use the same stack but copy values around in a smart way
         lua_State* newL = luaL_newstate();
-        
+
         lua_pushnil(L);
         while (lua_next(L, -2) != 0) {
             lua_xmove(L, newL, 1);

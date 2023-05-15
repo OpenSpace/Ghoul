@@ -57,7 +57,7 @@ namespace {
                 // one that ends with " and join them
                 if (lineValues[i].front() == '"') {
                     // First check if the " is terminated in the same value
-                    
+
                     if (size_t p = lineValues[i].find('"', 1);  p != std::string::npos) {
                         // It is terminated here, so we can advance the i counter as there
                         // is nothing to be done. This was just a ".." pair without a ,

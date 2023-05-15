@@ -80,7 +80,7 @@ namespace {
     template <typename T>
     std::string formatVector(const std::vector<T>& vec) {
         static_assert(
-            std::is_same_v<T, double> || std::is_same_v<T, int> || 
+            std::is_same_v<T, double> || std::is_same_v<T, int> ||
             std::is_same_v<T, std::string>,
             "Only double, ints, or strings are allowed in vectors"
         );
@@ -144,7 +144,8 @@ namespace {
         }
 
         if (dictionary.hasValue<std::vector<std::string>>(key)) {
-            std::vector<std::string> vec = dictionary.value<std::vector<std::string>>(key);
+            std::vector<std::string> vec =
+                dictionary.value<std::vector<std::string>>(key);
             return formatVector(vec);
         }
 

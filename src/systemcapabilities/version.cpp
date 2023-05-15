@@ -47,7 +47,7 @@ std::string to_string(const ghoul::systemcapabilities::Version& v) {
 } // namespace ghoul
 
 namespace ghoul::systemcapabilities {
-    
+
 std::strong_ordering Version::operator<=>(const Version& rhs) const noexcept {
     const unsigned int numThis = packVersion(major, minor, release);
     const unsigned int numRhs = packVersion(rhs.major, rhs.minor, rhs.release);

@@ -54,8 +54,8 @@ public:
 
     /**
      * Constructor that calls Log constructor and opens the file that will log the
-     * messages. If the file does not exist, it will be created. If the path to the file is
-     * invalid, an `std::ios_base::failure` exception will be thrown.
+     * messages. If the file does not exist, it will be created. If the path to the file
+     * is invalid, an `std::ios_base::failure` exception will be thrown.
      *
      * \param filename The path and filename of the file that will receive the log
      *        messages
