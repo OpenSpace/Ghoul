@@ -1,36 +1,6 @@
-[submodule "ext/glm"]
-	path = ext/glm
-	url = https://github.com/g-truc/glm.git
-[submodule "ext/freetype2"]
-	path = ext/freetype2
-url=https://github.com/OpenSpace/freetype-mirror
-[submodule "ext/cppformat"]
-	path = ext/cppformat
-	url = https://github.com/fmtlib/fmt.git
-[submodule "ext/assimp"]
-	path = ext/assimp
-	url = https://github.com/assimp/assimp.git
-[submodule "ext/lua/src"]
-	path = ext/lua/src
-	url = https://github.com/Lua/Lua.git
-[submodule "ext/glbinding"]
-	path = ext/glbinding
-	url = https://github.com/cginternals/glbinding.git
-[submodule "ext/websocketpp"]
-	path = ext/websocketpp
-	url = https://github.com/zaphoyd/websocketpp.git
-[submodule "ext/tiny-process-library"]
-	path = ext/tiny-process-library
-	url = https://github.com/OpenSpace/tiny-process-library.git
 [submodule "ext/tracy"]
 	path = ext/tracy
 	url = https://github.com/wolfpld/tracy.git
-[submodule "ext/catch2"]
-	path = ext/catch2
-	url = https://github.com/catchorg/Catch2.git
-[submodule "ext/scnlib"]
-	path = ext/scnlib
-	url = https://github.com/eliaskosunen/scnlib.git
 [submodule "ext/stackwalker"]
 	path = ext/stackwalker
 	url = https://github.com/JochenKalmbach/StackWalker

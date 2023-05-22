@@ -56,7 +56,8 @@ else ()
   target_compile_options(GhoulTest PRIVATE "-O0" )
 endif ()
 
-target_link_libraries(GhoulTest PRIVATE Catch2 Ghoul)
+find_package(Catch2 CONFIG REQUIRED)
+target_link_libraries(GhoulTest PRIVATE Catch2::Catch2 Ghoul)
 
 if (APPLE)
   target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})

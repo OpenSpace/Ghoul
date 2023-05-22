@@ -49,19 +49,9 @@ endif ()
 
 # GLM
 begin_dependency("GLM")
-set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
-find_package(GLM REQUIRED)
-message(STATUS "Including GLM found at ${GLM_INCLUDE_DIRS}")
-target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(Ghoul PUBLIC glm::glm)
 end_dependency("GLM")
-
-add_subdirectory(catch2)
-# Catch2 by default compiles with C++14, which leads to some linker errors:
-# https://github.com/catchorg/Catch2/issues/2046
-target_compile_features(Catch2 PUBLIC cxx_std_20)
-target_compile_features(Catch2WithMain PUBLIC cxx_std_20)
-set_target_properties(Catch2 PROPERTIES FOLDER External)
-set_target_properties(Catch2WithMain PROPERTIES FOLDER External)
 
 if (GHOUL_MODULE_OPENGL)
   begin_module("OpenGL")
@@ -69,114 +59,54 @@ if (GHOUL_MODULE_OPENGL)
   # OpenGL
   begin_dependency("OpenGL")
   find_package(OpenGL REQUIRED)
-  target_link_libraries(Ghoul PUBLIC ${OPENGL_LIBRARIES})
-  message(STATUS "Linking OpenGL found at ${OPENGL_LIBRARIES}")
+  target_link_libraries(Ghoul PUBLIC OpenGL::GL)
   end_dependency("OpenGL")
 
   # glbindings
   if (NOT TARGET glbinding)
     begin_dependency("glbinding")
-
-    set(OPTION_BUILD_GPU_TESTS OFF CACHE BOOL "")
-    set(OPTION_BUILD_TESTS OFF CACHE BOOL "")
-    set(OPTION_BUILD_TOOLS OFF CACHE BOOL "")
-    set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "")
-    add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
+    find_package(glbinding CONFIG REQUIRED)
     target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
-
-    set_target_properties(glbinding PROPERTIES FOLDER "External")
-    set_target_properties(glbinding-aux PROPERTIES FOLDER "External/glbinding-ext")
-    set_target_properties(pack PROPERTIES FOLDER "External/glbinding-ext")
-    set_target_properties(pack-glbinding PROPERTIES FOLDER "External/glbinding-ext")
-    set_target_properties(KHRplatform-sources PROPERTIES FOLDER "External/glbinding-ext")
-
     end_dependency("glbinding")
   endif ()
+
   end_module("OpenGL")
 endif ()
 
 # LZ4
 begin_dependency("LZ4")
-find_package(LZ4 REQUIRED)
-target_include_directories(Ghoul PRIVATE ${LZ4_INCLUDE_DIR})
-target_link_libraries(Ghoul PRIVATE ${LZ4_LIBRARIES})
-set_target_properties(lz4 PROPERTIES FOLDER "External")
+find_package(lz4 CONFIG REQUIRED)
+target_link_libraries(Ghoul PRIVATE lz4::lz4)
 end_dependency("LZ4")
 
 # Lua
 if (GHOUL_MODULE_LUA)
   begin_module("Lua")
-  add_subdirectory(lua)
-  target_link_libraries(Ghoul PUBLIC Lua)
-  set_target_properties(Lua PROPERTIES FOLDER "External")
+  find_package(Lua REQUIRED)
+  target_include_directories(Ghoul PUBLIC ${LUA_INCLUDE_DIR})
+  target_link_libraries(Ghoul PUBLIC ${LUA_LIBRARIES})
   end_module("Lua")
 endif ()
+
 
 # Assimp
 if (GHOUL_MODULE_ASSIMP)
   begin_module("AssImp")
-  set(ASSIMP_BUILD_SHARED_LIBS OFF)
-  set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
-  set(ASSIMP_NO_EXPORTER ON CACHE BOOL "")
-  set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
-
-  if (UNIX)
-    set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "Set to have assimp build minizip" FORCE)
-  endif ()
-
-  add_subdirectory(assimp)
-  target_link_libraries(Ghoul PRIVATE assimp)
-  set_target_properties(assimp PROPERTIES FOLDER "External")
-
-  # We need to include this to be able to find the assimp/config.h file
-  target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
-  if (NOT APPLE)
-    target_precompile_headers(assimp PRIVATE
-      "$<$<COMPILE_LANGUAGE:CXX>:functional>"
-      "$<$<COMPILE_LANGUAGE:CXX>:istream>"
-      "$<$<COMPILE_LANGUAGE:CXX>:list>"
-      "$<$<COMPILE_LANGUAGE:CXX>:locale>"
-      "$<$<COMPILE_LANGUAGE:CXX>:map>"
-      "$<$<COMPILE_LANGUAGE:CXX>:ostream>"
-      "$<$<COMPILE_LANGUAGE:CXX>:set>"
-      "$<$<COMPILE_LANGUAGE:CXX>:sstream>"
-      "$<$<COMPILE_LANGUAGE:CXX>:vector>"
-      "$<$<COMPILE_LANGUAGE:CXX>:tuple>"
-      "$<$<COMPILE_LANGUAGE:CXX>:unordered_map>"
-      "$<$<COMPILE_LANGUAGE:CXX>:assimp/DefaultLogger.hpp>"
-      "$<$<COMPILE_LANGUAGE:CXX>:assimp/Exceptional.h>"
-      "$<$<COMPILE_LANGUAGE:CXX>:assimp/mesh.h>"
-      "$<$<COMPILE_LANGUAGE:CXX>:assimp/scene.h>"
-      "$<$<COMPILE_LANGUAGE:CXX>:assimp/StringUtils.h>"
-      "$<$<COMPILE_LANGUAGE:CXX>:assimp/types.h>"
-      "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
-      <string.h>
-    )
-  else ()
-    set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
-  endif ()
-  set_target_properties(uninstall PROPERTIES FOLDER "External")
-  if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
-    set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "External")
-  endif ()
+  find_package(assimp CONFIG REQUIRED)
+  target_link_libraries(Ghoul PRIVATE assimp::assimp)
   end_module("AssImp")
 endif ()
 
 # fmt
 begin_dependency("fmt")
-set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
-set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
-set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-add_subdirectory(cppformat)
-target_link_libraries(Ghoul PUBLIC fmt)
-set_target_properties(fmt PROPERTIES FOLDER "External")
+find_package(fmt CONFIG REQUIRED)
+target_link_libraries(Ghoul PUBLIC fmt::fmt)
 end_dependency("fmt")
 
 # scnlib
 begin_dependency("scnlib")
-add_subdirectory(scnlib SYSTEM)
-target_link_libraries(Ghoul PUBLIC scn)
-set_target_properties(scn PROPERTIES FOLDER "External")
+find_package(scn CONFIG REQUIRED)
+target_link_libraries(Ghoul PUBLIC scn::scn)
 end_dependency("scnlib")
 
 # stb_image
@@ -200,51 +130,22 @@ endif ()
 
 # WebSocket++ / WebSocketPP
 begin_dependency("WebSocketPP")
-include(ExternalProject)
-set(WEBSOCKETPP_ROOT_DIR ${GHOUL_ROOT_DIR}/ext/websocketpp)
-ExternalProject_Add(websocketpp
-  SOURCE_DIR ${WEBSOCKETPP_ROOT_DIR}
-  CMAKE_GENERATOR "${CMAKE_GENERATOR}"
-  CMAKE_ARGS ${EXTERNAL_TOOLCHAIN} ${EXTRA_EXTERNAL_ARGS} -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
-  INSTALL_COMMAND ""
-  LOG_CONFIGURE 1
-  LOG_BUILD 1
-  STEP_TARGETS configure build
-)
-add_dependencies(Ghoul websocketpp)
-target_include_directories(Ghoul SYSTEM PUBLIC ${WEBSOCKETPP_ROOT_DIR})
-set_target_properties(websocketpp PROPERTIES FOLDER "External")
-set_target_properties(websocketpp-build PROPERTIES FOLDER "External")
-set_target_properties(websocketpp-configure PROPERTIES FOLDER "External")
+find_package(websocketpp CONFIG REQUIRED)
+target_link_libraries(Ghoul PUBLIC websocketpp::websocketpp)
 end_dependency("WebSocketPP")
 
 # Freetype
 if (GHOUL_MODULE_FONTRENDERING)
   begin_module("FontRendering")
-  set(FREETYPE_DIST OFF CACHE BOOL "")
-  add_subdirectory(freetype2)
-  target_link_libraries(Ghoul PUBLIC freetype)
-
-  if (MSVC)
-    target_compile_options(freetype PRIVATE "/W0")
-    target_compile_definitions(freetype PRIVATE "_SCL_SECURE_NO_WARNINGS")
-  else ()
-    target_compile_options(freetype PRIVATE "-w")
-  endif ()
-
-  set_target_properties(freetype PROPERTIES FOLDER "External")
-
-  if (TARGET zlib)
-    set_target_properties(zlib PROPERTIES FOLDER "External")
-  endif ()
+  find_package(Freetype REQUIRED)
+  target_link_libraries(Ghoul PUBLIC Freetype::Freetype)
   end_module("FontRendering")
 endif ()
 
 # Tiny process library
 begin_dependency("tiny-process-library")
-add_subdirectory(tiny-process-library)
-target_link_libraries(Ghoul PRIVATE tiny-process-library)
-set_target_properties(tiny-process-library PROPERTIES FOLDER "External")
+find_package(tiny-process-library CONFIG REQUIRED)
+target_link_libraries(Ghoul PRIVATE tiny-process-library::tiny-process-library)
 end_dependency("tiny-process-library")
 
 
