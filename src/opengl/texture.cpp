@@ -76,7 +76,7 @@ Texture::Texture(glm::uvec3 dimensions, GLenum type, Format format, GLenum inter
 
 Texture::Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format,
                  GLenum internalFormat, GLenum dataType, FilterMode filter,
-                 WrappingMode wrapping)
+                 WrappingMode wrapping, int pixelAlignment)
     : _dimensions(std::move(dimensions))
     , _format(format)
     , _internalFormat(internalFormat)
@@ -86,6 +86,7 @@ Texture::Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format,
     , _type(type)
     , _hasOwnershipOfData(true)
     , _pixels(data)
+    , _pixelAlignment(pixelAlignment)
 {
 #ifdef Debugging_Ghoul_Textures_Indices
     index = nextIndex++;
@@ -317,7 +318,10 @@ const void* Texture::pixelData() const {
     return _pixels;
 }
 
-void Texture::setPixelData(void* pixels, TakeOwnership takeOwnership) {
+void Texture::setPixelData(void* pixels, TakeOwnership takeOwnership, int pixelAlignment)
+{
+    _pixelAlignment = pixelAlignment;
+
     if (_hasOwnershipOfData) {
         purgeFromRAM();
     }
@@ -378,6 +382,8 @@ void Texture::applySwizzleMask() {
 
 void Texture::uploadDataToTexture(void* pixelData) {
     bind();
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, _pixelAlignment);
 
     switch (_type) {
         case GL_TEXTURE_1D:

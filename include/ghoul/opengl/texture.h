@@ -174,11 +174,14 @@ public:
      *        texels
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
      *        the border of the texture
+     * \param pixelAlignment The byte-alignment for each of the pixels in the provided
+     *        \p data array
      */
     Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
         FilterMode filter = FilterMode::Linear,
-        WrappingMode wrapping = WrappingMode::Repeat);
+        WrappingMode wrapping = WrappingMode::Repeat,
+        int pixelAlignment = 1);
 
     /**
      * Unloads the Texture from GPU memory and destroys the id. The destructor will also
@@ -396,8 +399,11 @@ public:
      * \param pixels The pointer to the new data array that should be used.
      * \param takeOwnership Should this Texture take ownership of the data and delete
      *        it?
+     * \param pixelAlignment The byte-alignment for each of the pixels in the provided
+     *        \p pixels array
      */
-    void setPixelData(void* pixels, TakeOwnership takeOwnership = TakeOwnership::Yes);
+    void setPixelData(void* pixels, TakeOwnership takeOwnership = TakeOwnership::Yes,
+        int pixelAlignment = 1);
 
     /**
      * Returns `true` if the OpenGL texture is resident in the GPU memory.
@@ -875,6 +881,7 @@ private:
 
     bool _hasOwnershipOfData = false;
     void* _pixels = nullptr;
+    int _pixelAlignment = 1;
 
 #ifdef Debugging_Ghoul_Textures_Indices
     int index = 0;
