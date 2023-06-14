@@ -31,7 +31,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelReaderBinary";
-    constexpr int8_t CurrentModelVersion = 7;
+    constexpr int8_t CurrentModelVersion = 8;
     constexpr int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -241,6 +241,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
+
+                // isTransparent
+                uint8_t isT;
+                fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+                texture.isTransparent = (isT == 1);
 
                 // texture
                 if (texture.hasTexture) {
