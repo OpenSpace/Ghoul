@@ -76,7 +76,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     // Check the file format version
     int8_t version = 0;
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
-    if (version != CurrentModelVersion) {
+    if ( (version != CurrentModelVersion) && (version != CurrentModelVersion - 1) ) {
         throw ModelLoadException(
             filename,
             "The format of the OS-model file has changed",
@@ -241,12 +241,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
+                if (version == CurrentModelVersion) {
+                    fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
+                    // isTransparent
+                    uint8_t isT;
+                    fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+                    texture.isTransparent = (isT == 1);
+                }
 
-                // isTransparent
-                uint8_t isT;
-                fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
-                texture.isTransparent = (isT == 1);
 
                 // texture
                 if (texture.hasTexture) {
