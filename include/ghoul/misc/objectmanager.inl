@@ -85,7 +85,10 @@ T* ObjectManager<T>::request(const std::string& name,
         // If we couldn't find the name, we'll have to create the object and initialize
         // the reference counter to 1
         LDEBUGC(name, "Creating object");
-        Info info { creationFunction(), 1 };
+        Info info {
+            .object = creationFunction(),
+            .refCount = 1
+        };
         T* p = info.object.get();
         _objects[name] = std::move(info);
         return p;
