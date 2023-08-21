@@ -189,7 +189,16 @@ CacheManager::CacheManager(std::filesystem::path directory)
     // Under normal operation, the resulting vector should be of size == 0, but if the
     // last execution of the application crashed, the directory was not cleaned up
     // properly
-    _files = cacheInfoFromDirectory(_directory);
+    try {
+        _files = cacheInfoFromDirectory(_directory);
+    }
+    catch (const ghoul::RuntimeError& err) {
+        LERRORC(err.component, err.message);
+        LINFO("Deleting catch folder");
+        file.close();
+        std::filesystem::remove_all(_directory);
+        std::filesystem::create_directory(_directory);
+    }
 }
 
 CacheManager::~CacheManager() {
