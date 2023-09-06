@@ -30,8 +30,21 @@
 
 namespace ghoul::io {
 
-/// Writes the texture using the Sean Barrett's stb_image library.
+/// Writes the texture using the Sean Barrett's stb_image library
 class TextureWriterSTB : public TextureWriterBase {
+    /**
+     * Saves the \p texture to disk.
+     *
+     * \param texture The Texture to write to disk
+     * \param filename The target file for the Texture
+     *
+     * \pre \p filename must not be empty
+     * \pre The extension of \p filename must be among the supported extensions as
+     *      reported by supportedExtensions
+     * \throw TextureWriteException If there was an error writing the \p texture
+     */
+    void saveTexture(const opengl::Texture& texture,
+        const std::string& filename) const override;
 
     /**
      * Returns the supported file extensions.

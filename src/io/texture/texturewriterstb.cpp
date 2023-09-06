@@ -25,23 +25,68 @@
 
 #include <ghoul/io/texture/texturewriterstb.h>
 
+#include <ghoul/opengl/texture.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
+#include <filesystem>
 
 namespace ghoul::io {
 
+void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
+                                   const std::string& filename) const
+{
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+
+    std::string extension = std::filesystem::path(filename).extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
+    ghoul_assert(!extension.empty(), "Filename must have an extension");
+
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+        [](unsigned char c) { return std::tolower(c); });
+
+    int w = texture.width();
+    int h = texture.height();
+
+    int nComponents = texture.numberOfChannels();
+    const void* data = texture.pixelData();
+
+    // @TODO handle 3D textures! (And texture dimensions in general)
+    int res = -1;
+    if (extension == "jpeg" || extension == "jpg") {
+
+    }
+    else if (extension == "png") {
+        res = stbi_write_png(filename.c_str(), w, h, nComponents, data, 0);
+    }
+    else if (extension == "bmp") {
+
+    }
+    else if (extension == "tga") {
+
+    }
+    else if (extension == "hdr") {
+
+    }
+    else {
+        // @TODO: Just write to a png anyways?
+        throw TextureWriteException(
+            filename,
+            fmt::format("Could not write to image with file extension {}", extension),
+            *this
+        );
+    }
+}
+
 std::vector<std::string> TextureWriterSTB::supportedExtensions() const {
-    // Taken from stb_image.h
+    // Taken from stb_image_writer.h
     return {
         "jpeg", "jpg",
         "png",
         "bmp",
-        "psd",  // Photoshop
         "tga",
-        "gif",
-        "hdr",  // Radiance RGBE format
-        "pic",  // Softimage PIC
-        "ppm", "pgm"
+        "hdr"
     };
 }
 
