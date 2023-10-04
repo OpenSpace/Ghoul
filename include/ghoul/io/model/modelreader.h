@@ -88,7 +88,8 @@ public:
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
         const std::filesystem::path& filename,
         ForceRenderInvisible forceRenderInvisible = ForceRenderInvisible::No,
-        NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes);
+        NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes,
+        bool useCache = true);
 
     /**
      * Returns a list of all the extensions that are supported by registered readers. If
