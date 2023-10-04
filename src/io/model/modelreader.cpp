@@ -60,7 +60,8 @@ ModelReader& ModelReader::ref() {
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
                                                     const std::filesystem::path& filename,
                                                 ForceRenderInvisible forceRenderInvisible,
-                                            NotifyInvisibleDropped notifyInvisibleDropped)
+                                            NotifyInvisibleDropped notifyInvisibleDropped,
+                                                                            bool useCache)
 {
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
@@ -77,8 +78,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         throw MissingReaderException(extension, filename);
     }
 
-    if (!reader->needsCache()) {
-        LINFO(std::format("Loading ModelGeometry file '{}'", filename));
+    if (!useCache || !reader->needsCache()) {
+        LINFO(fmt::format("Loading ModelGeometry file {}", filename));
         return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
     }
 
