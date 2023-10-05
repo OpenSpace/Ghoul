@@ -41,6 +41,7 @@ target_sources(
     ${GHOUL_ROOT_DIR}/tests/test_luaconversions.cpp
     ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
     ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_templatefactory.cpp
 )
 
 target_compile_definitions(GhoulTest PRIVATE
