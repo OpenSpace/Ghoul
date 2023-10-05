@@ -30,6 +30,7 @@
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
+#include <algorithm>
 #include <charconv>
 #include <filesystem>
 #include <optional>
@@ -977,6 +978,16 @@ bool hasValue(lua_State* L, int location) {
     }
     else if constexpr (internal::is_variant<T>::value) {
         return internal::hasVariantValue<0, T>(L, location);
+    }
+    else if constexpr (internal::is_optional<T>::value) {
+        const int n = lua_gettop(L);
+        if (n < location || n == 0) {
+            // We tried to access an optional value for which no parameter was provided
+            return true;
+        }
+        else {
+            return hasValue<typename T::value_type>(L, location);
+        }
     }
     else {
         static_assert(sizeof(T) == 0, "Unhandled type T");

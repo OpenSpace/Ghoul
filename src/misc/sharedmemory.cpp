@@ -213,7 +213,7 @@ SharedMemory::SharedMemory(std::string name)
     if (!_sharedMemoryHandle) {
         std::string errorMsg = lastErrorToString(GetLastError());
         throw SharedMemoryError(fmt::format(
-            "Error accessing shared memory '{}': {}", name, errorMsg
+            "Error accessing shared memory '{}': {}", _name, errorMsg
         ));
     }
 
@@ -223,7 +223,7 @@ SharedMemory::SharedMemory(std::string name)
 
         std::string errorMsg = lastErrorToString(GetLastError());
         throw SharedMemoryError(fmt::format(
-            "Error creating view for shared memory '{}': {}", name, errorMsg
+            "Error creating view for shared memory '{}': {}", _name, errorMsg
         ));
     }
 #else // ^^^^ WIN32 // !WIN32 vvvv
