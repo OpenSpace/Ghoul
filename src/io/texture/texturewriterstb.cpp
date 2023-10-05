@@ -25,10 +25,16 @@
 
 #include <ghoul/io/texture/texturewriterstb.h>
 
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/texture.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
 #include <filesystem>
+#include <string_view>
+
+namespace {
+    constexpr std::string_view _loggerCat = "STB_TextureWriter";
+}
 
 namespace ghoul::io {
 
@@ -52,25 +58,37 @@ void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
     int nComponents = texture.numberOfChannels();
     const void* data = texture.pixelData();
 
-    // @TODO handle 3D textures! (And texture dimensions in general)
+    if (texture.dimensions().z > 1) {
+        LERROR(fmt::format(
+            "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
+            filename
+        ));
+        return;
+    }
+
     int res = -1;
     if (extension == "jpeg" || extension == "jpg") {
-
+        res = stbi_write_jpg(filename.c_str(), w, h, nComponents, data, 0);
     }
     else if (extension == "png") {
         res = stbi_write_png(filename.c_str(), w, h, nComponents, data, 0);
     }
     else if (extension == "bmp") {
-
+        res = stbi_write_bmp(filename.c_str(), w, h, nComponents, data);
     }
     else if (extension == "tga") {
-
+        res = stbi_write_tga(filename.c_str(), w, h, nComponents, data);
     }
     else if (extension == "hdr") {
-
+        res = stbi_write_hdr(
+            filename.c_str(),
+            w,
+            h,
+            nComponents,
+            reinterpret_cast<const float*>(data)
+        );
     }
     else {
-        // @TODO: Just write to a png anyways?
         throw TextureWriteException(
             filename,
             fmt::format("Could not write to image with file extension {}", extension),
