@@ -79,15 +79,19 @@ void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
     else if (extension == "tga") {
         res = stbi_write_tga(filename.c_str(), w, h, nComponents, data);
     }
-    else if (extension == "hdr") {
-        res = stbi_write_hdr(
-            filename.c_str(),
-            w,
-            h,
-            nComponents,
-            reinterpret_cast<const float*>(data)
-        );
-    }
+    // @TODO (2023-10-06, emmbr26) Fix implementation. This does not generate correct
+    // colors. Prabably the data format is currently not correct, as the other formats
+    // expect 8-bit colors while the HDR function wants 32-bit rgb(e) data. Did not
+    // seem too important to fix at point of writing, as it's currently not used anywhere
+    //else if (extension == "hdr") {
+    //    res = stbi_write_hdr(
+    //        filename.c_str(),
+    //        w,
+    //        h,
+    //        nComponents,
+    //        reinterpret_cast<const float*>(data)
+    //    );
+    //}
     else {
         throw TextureWriteException(
             filename,
@@ -103,8 +107,8 @@ std::vector<std::string> TextureWriterSTB::supportedExtensions() const {
         "jpeg", "jpg",
         "png",
         "bmp",
-        "tga",
-        "hdr"
+        //"hdr",
+        "tga"
     };
 }
 
