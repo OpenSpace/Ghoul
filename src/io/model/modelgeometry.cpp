@@ -38,8 +38,10 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 8;
+    constexpr int8_t CurrentCacheVersion = 9;
     constexpr int FormatStringSize = 4;
+    constexpr int8_t ShouldSkipMarker = -1;
+    constexpr int8_t NoSkipMarker = 1;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
         using Format = ghoul::opengl::Texture::Format;
@@ -190,7 +192,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 {
     std::ifstream fileStream(cachedFile, std::ifstream::binary);
     if (!fileStream.good()) {
-        throw ModelCacheException(cachedFile, "Could not open file");
+        throw ModelCacheException(cachedFile, "Could not open file to load cache");
     }
 
     // Check the caching version
@@ -207,7 +209,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     int32_t nTextureEntries = 0;
     fileStream.read(reinterpret_cast<char*>(&nTextureEntries), sizeof(int32_t));
     if (nTextureEntries == 0) {
-        LINFO("No TextureEntries were loaded");
+        LINFO("No cahced TextureEntries were loaded");
+    }
+    else if (nTextureEntries < 0) {
+        std::string message = fmt::format(
+            "Model cannot have negative number of texture entries while loading "
+            "cache: {}", nTextureEntries
+        );
+        throw ModelCacheException(cachedFile, message);
     }
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
@@ -218,8 +227,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Name
         int32_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(int32_t));
-        if (nameSize == 0) {
-            throw ModelCacheException(cachedFile, "No texture name was loaded");
+        if (nameSize <= 0) {
+            throw ModelCacheException(
+                cachedFile,
+                "No texture name was found while loading cache"
+            );
         }
         textureEntry.name.resize(nameSize);
         fileStream.read(textureEntry.name.data(), nameSize);
@@ -257,8 +269,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // data
         int32_t textureSize = 0;
         fileStream.read(reinterpret_cast<char*>(&textureSize), sizeof(int32_t));
-        if (textureSize == 0) {
-            throw ModelCacheException(cachedFile, "No texture size was loaded");
+        if (textureSize <= 0) {
+            throw ModelCacheException(
+                cachedFile,
+                "No texture size was found while loading cache"
+            );
         }
         std::byte* data = new std::byte[textureSize];
         fileStream.read(reinterpret_cast<char*>(data), textureSize);
@@ -282,8 +297,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     // Read how many nodes to read
     int32_t nNodes = 0;
     fileStream.read(reinterpret_cast<char*>(&nNodes), sizeof(int32_t));
-    if (nNodes == 0) {
-        throw ModelCacheException(cachedFile, "No nodes were loaded");
+    if (nNodes <= 0) {
+        throw ModelCacheException(cachedFile, "No nodes were found while loading cache");
     }
 
     // Nodes
@@ -293,6 +308,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Read how many meshes to read
         int32_t nMeshes = 0;
         fileStream.read(reinterpret_cast<char*>(&nMeshes), sizeof(int32_t));
+        if (nMeshes < 0) {
+            std::string message = fmt::format(
+                "Model cannot have negative number of meshes while loading cache: {}",
+                nMeshes
+            );
+            throw ModelCacheException(cachedFile, message);
+        }
 
         // Meshes
         std::vector<io::ModelMesh> meshArray;
@@ -301,8 +323,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             // Vertices
             int32_t nVertices = 0;
             fileStream.read(reinterpret_cast<char*>(&nVertices), sizeof(int32_t));
-            if (nVertices == 0) {
-                throw ModelCacheException(cachedFile, "No vertices were loaded");
+            if (nVertices <= 0) {
+                throw ModelCacheException(
+                    cachedFile,
+                    "No vertices were found while loading cache"
+                );
             }
             std::vector<io::ModelMesh::Vertex> vertexArray;
             vertexArray.reserve(nVertices);
@@ -319,8 +344,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             // Indices
             int32_t nIndices = 0;
             fileStream.read(reinterpret_cast<char*>(&nIndices), sizeof(int32_t));
-            if (nIndices == 0) {
-                throw ModelCacheException(cachedFile, "No indices were loaded");
+            if (nIndices <= 0) {
+                throw ModelCacheException(
+                    cachedFile,
+                    "No indices were found while loading cache"
+                );
             }
             std::vector<unsigned int> indexArray;
             indexArray.reserve(nIndices);
@@ -339,14 +367,24 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             // Textures
             int32_t nTextures = 0;
             fileStream.read(reinterpret_cast<char*>(&nTextures), sizeof(int32_t));
-            if (nTextures == 0 && !isInvisible) {
-                throw ModelCacheException(cachedFile, "No textures were loaded");
+            if (nTextures <= 0 && !isInvisible) {
+                throw ModelCacheException(
+                    cachedFile,
+                    "No materials were found while loading cache"
+                );
             }
             std::vector<io::ModelMesh::Texture> textureArray;
             textureArray.reserve(nTextures);
 
             for (int32_t t = 0; t < nTextures; ++t) {
                 io::ModelMesh::Texture texture;
+
+                // Skip marker
+                int8_t skip;
+                fileStream.read(reinterpret_cast<char*>(&skip), sizeof(int8_t));
+                if (skip == ShouldSkipMarker) {
+                    continue;
+                }
 
                 // type
                 fileStream.read(reinterpret_cast<char*>(&texture.type), sizeof(uint8_t));
@@ -377,7 +415,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                     if (index >= textureStorageArray.size()) {
                         throw ModelCacheException(
                             cachedFile,
-                            "Texture index is outside of textureStorage"
+                            "Texture index is outside textureStorage during cache loading"
                         );
                     }
 
@@ -426,6 +464,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Read how many children to read
         int32_t nChildren = 0;
         fileStream.read(reinterpret_cast<char*>(&nChildren), sizeof(int32_t));
+        if (nChildren < 0) {
+            std::string message = fmt::format(
+                "Model cannot have negative number of children while loading cache: {}",
+                nChildren
+            );
+            throw ModelCacheException(cachedFile, message);
+        }
 
         // Children
         std::vector<int> childrenArray;
@@ -461,8 +506,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Name
         uint8_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(uint8_t));
+        if (nameSize == 0) {
+            LINFO("No name was found for animation while loading cache");
+        }
         std::string name;
-        fileStream.read(name.data(), nameSize);
+        fileStream.read(name.data(), nameSize * sizeof(char));
 
         // Duration
         double duration;
@@ -471,8 +519,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Read how many NodeAnimations to read
         int32_t nNodeAnimations = 0;
         fileStream.read(reinterpret_cast<char*>(&nNodeAnimations), sizeof(int32_t));
-        if (nNodeAnimations == 0) {
-            throw ModelCacheException(cachedFile, "No node animations were loaded");
+        if (nNodeAnimations <= 0) {
+            throw ModelCacheException(
+                cachedFile,
+                "No node animations were found while loading cache"
+            );
         }
 
         // NodeAnimations
@@ -513,7 +564,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint32_t nRot;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
-            for (uint32_t p = 0; p < nRot; ++p) {
+            for (uint32_t r = 0; r < nRot; ++r) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
@@ -536,7 +587,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint32_t nScale;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
-            for (uint32_t p = 0; p < nScale; ++p) {
+            for (uint32_t s = 0; s < nScale; ++s) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
@@ -601,7 +652,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) const {
     std::ofstream fileStream(cachedFile, std::ofstream::binary);
     if (!fileStream.good()) {
-        throw ModelCacheException(cachedFile, "Could not open file");
+        throw ModelCacheException(cachedFile, "Could not open file to save cache");
     }
 
     // Write which version of caching that is used
@@ -615,6 +666,13 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     if (nTextureEntries == 0) {
         LINFO("No TextureEntries were loaded while saving cache");
     }
+    else if (nTextureEntries < 0) {
+        std::string message = fmt::format(
+            "Model cannot have negative number of texture entries while saving cache: {}",
+            nTextureEntries
+        );
+        throw ModelCacheException(cachedFile, message);
+    }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
     for (int32_t te = 0; te < nTextureEntries; ++te) {
@@ -622,8 +680,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         int32_t nameSize = static_cast<int32_t>(
             _textureStorage[te].name.size() * sizeof(char)
         );
-        if (nameSize == 0) {
-            throw ModelCacheException(cachedFile, "No texture name was loaded");
+        if (nameSize <= 0) {
+            throw ModelCacheException(
+                cachedFile,
+                "No texture name was found while saving cache"
+            );
         }
         fileStream.write(reinterpret_cast<const char*>(&nameSize), sizeof(int32_t));
         fileStream.write(_textureStorage[te].name.data(), nameSize);
@@ -661,8 +722,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         // data
         _textureStorage[te].texture->downloadTexture();
         int32_t pixelSize = _textureStorage[te].texture->expectedPixelDataSize();
-        if (pixelSize == 0) {
-            throw ModelCacheException(cachedFile, "No texture size was loaded");
+        if (pixelSize <= 0) {
+            throw ModelCacheException(
+                cachedFile,
+                "No texture size was found while saving cache"
+            );
         }
         fileStream.write(reinterpret_cast<const char*>(&pixelSize), sizeof(int32_t));
 
@@ -672,8 +736,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
     // Write how many nodes are to be written
     int32_t nNodes = static_cast<int32_t>(_nodes.size());
-    if (nNodes == 0) {
-        throw ModelCacheException(cachedFile, "No nodes were loaded");
+    if (nNodes <= 0) {
+        throw ModelCacheException(
+            cachedFile,
+            "No nodes were found while saving cache"
+        );
     }
     fileStream.write(reinterpret_cast<const char*>(&nNodes), sizeof(int32_t));
 
@@ -681,14 +748,24 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     for (const io::ModelNode& node : _nodes) {
         // Write how many meshes are to be written
         int32_t nMeshes = static_cast<int32_t>(node.meshes().size());
+        if (nMeshes < 0) {
+            std::string message = fmt::format(
+                "Model cannot have negative number of meshes while saving cache: {}",
+                nMeshes
+            );
+            throw ModelCacheException(cachedFile, message);
+        }
         fileStream.write(reinterpret_cast<const char*>(&nMeshes), sizeof(int32_t));
 
         // Meshes
         for (const io::ModelMesh& mesh : node.meshes()) {
             // Vertices
             int32_t nVertices = static_cast<int32_t>(mesh.vertices().size());
-            if (nVertices == 0) {
-                throw ModelCacheException(cachedFile, "No vertices were loaded");
+            if (nVertices <= 0) {
+                throw ModelCacheException(
+                    cachedFile,
+                    "No vertices were found while saving cache"
+                );
             }
             fileStream.write(reinterpret_cast<const char*>(&nVertices), sizeof(int32_t));
 
@@ -701,8 +778,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
             // Indices
             int32_t nIndices = static_cast<int32_t>(mesh.indices().size());
-            if (nIndices == 0) {
-                throw ModelCacheException(cachedFile, "No indices were loaded");
+            if (nIndices <= 0) {
+                throw ModelCacheException(
+                    cachedFile,
+                    "No indices were found while saving cache"
+                );
             }
             fileStream.write(reinterpret_cast<const char*>(&nIndices), sizeof(int32_t));
 
@@ -717,15 +797,29 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
             // Textures
             int32_t nTextures = static_cast<int32_t>(mesh.textures().size());
-            if (nTextures == 0 && !mesh.isInvisible()) {
-                throw ModelCacheException(cachedFile, "No textures were loaded");
+            if (nTextures <= 0 && !mesh.isInvisible()) {
+                throw ModelCacheException(
+                    cachedFile,
+                    "No materials were found while saving cache"
+                );
             }
             fileStream.write(reinterpret_cast<const char*>(&nTextures), sizeof(int32_t));
 
             for (int32_t t = 0; t < nTextures; ++t) {
                 // Don't save the debug texture to the cache
+                // Write matching skip marker
                 if (mesh.textures()[t].useForcedColor) {
+                    fileStream.write(
+                        reinterpret_cast<const char*>(&ShouldSkipMarker),
+                        sizeof(int8_t)
+                    );
                     continue;
+                }
+                else {
+                    fileStream.write(
+                        reinterpret_cast<const char*>(&NoSkipMarker),
+                        sizeof(int8_t)
+                    );
                 }
 
                 // type
@@ -781,7 +875,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                     if (!wasFound) {
                         throw ModelCacheException(
                             cachedFile,
-                            "Could not find texture in textureStorage"
+                            "Could not find texture in textureStorage while saving cache"
                         );
                     }
                 }
@@ -805,6 +899,14 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
         // Write how many children are to be written
         int32_t nChildren = static_cast<int32_t>(node.children().size());
+        if (nChildren < 0) {
+            std::string message = fmt::format(
+                "Model cannot have negative number of children while saving "
+                "cache: {}", nChildren
+            );
+            throw ModelCacheException(cachedFile, message);
+        }
+
         fileStream.write(reinterpret_cast<const char*>(&nChildren), sizeof(int32_t));
 
         // Children
@@ -824,9 +926,15 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     if (_animation != nullptr) {
         // Name
         if (_animation->name().size() >= std::numeric_limits<uint8_t>::max()) {
-            LWARNING("A maximum name length of 255 is supported");
+            LWARNING(fmt::format(
+                "A maximum animaion name length of {} is supported",
+                std::numeric_limits<uint8_t>::max()
+            ));
         }
         uint8_t nameSize = static_cast<uint8_t>(_animation->name().size());
+        if (nameSize == 0) {
+            LINFO("No name was found for animation while saving cache");
+        }
         fileStream.write(reinterpret_cast<const char*>(&nameSize), sizeof(uint8_t));
         fileStream.write(
             reinterpret_cast<const char*>(_animation->name().data()),
@@ -839,8 +947,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
         // Write how many NodeAnimations are to be written
         int32_t nAnimations = static_cast<int32_t>(_animation->nodeAnimations().size());
-        if (nAnimations == 0) {
-            throw ModelCacheException(cachedFile, "No node animations were loaded");
+        if (nAnimations <= 0) {
+            throw ModelCacheException(
+                cachedFile,
+                "No node animations were found while saving cache"
+            );
         }
         fileStream.write(reinterpret_cast<const char*>(&nAnimations), sizeof(int32_t));
 
