@@ -157,6 +157,35 @@ namespace {
             );
         }
     }
+
+    void pickupTransformRecursive(std::vector<glm::vec3>& transforms,
+              const std::vector<ghoul::io::ModelNode>& nodes,
+              const ghoul::io::ModelNode* node,
+              const glm::mat4x4& parentTransform) {
+        if (!node) {
+            LERROR("Cannot transform empty node");
+            return;
+        }
+
+        glm::mat4x4 globalTransform;
+        if (node->hasAnimation()) {
+            globalTransform = parentTransform * node->animationTransform();
+        }
+        else {
+            globalTransform = parentTransform * node->transform();
+        }
+
+        transforms.push_back(globalTransform * glm::vec4(0, 0, 0, 1));
+
+        for (int child : node->children()) {
+            pickupTransformRecursive(
+                transforms,
+                nodes,
+                &nodes[child],
+                globalTransform
+            );
+        }
+    }
 } // namespace
 
 namespace ghoul::modelgeometry {
@@ -1066,6 +1095,16 @@ std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() {
 
 const std::vector<ModelGeometry::TextureEntry>& ModelGeometry::textureStorage() const {
     return _textureStorage;
+}
+
+glm::vec3 ModelGeometry::center() const {
+    glm::mat4x4 transform = glm::mat4x4(1.f);
+    std::vector<glm::vec3> transformedPositions;
+    pickupTransformRecursive(transformedPositions, _nodes, _nodes.data(), transform);
+
+    // Pick the last one as the pickup of transforms is recursive
+    // -> will have picked up all parent transforms
+    return transformedPositions.back();
 }
 
 void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedModel,
