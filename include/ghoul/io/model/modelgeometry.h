@@ -90,6 +90,8 @@ public:
     std::vector<TextureEntry>& textureStorage();
     const std::vector<TextureEntry>& textureStorage() const;
 
+    glm::vec3 center() const;
+
 protected:
     double _boundingRadius = 0.0;
     bool _animationEnabled = false;
