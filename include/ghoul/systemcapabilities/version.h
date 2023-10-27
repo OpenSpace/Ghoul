@@ -28,6 +28,7 @@
 
 #include <ghoul/misc/stringconversion.h>
 #include <string>
+#include <compare>
 
 namespace ghoul::systemcapabilities {
 
