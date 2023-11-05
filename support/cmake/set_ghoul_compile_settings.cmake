@@ -29,6 +29,11 @@ function (set_ghoul_compile_settings target)
   set(MSVC_WARNINGS
     "/MP"       # Multi-threading support
     "/W4"       # Highest warning level
+    "/w44062"   # missing case label
+    "/w44289"   # using for-loop variable outside of loop
+    "/w44296"   # expression is always true/false
+    "/w45041"   # out-of-line definition for constexpr data is deprecated
+    "/w45204"   # virtual class has non-virtual trivial destructor
     "/wd4127"   # conditional expression is constant [raised by: websocketpp]
     "/permissive-"   # Enable conformance mode
     "/Zc:__cplusplus" # Correctly set the __cplusplus macro
