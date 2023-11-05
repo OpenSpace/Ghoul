@@ -255,8 +255,6 @@ void Texture::applyFilter() {
             glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
             glTexParameteri(_type, GL_TEXTURE_BASE_LEVEL, 0);
             break;
-        default:
-            throw MissingCaseException();
     }
 }
 
@@ -618,7 +616,6 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     return { t.r, t.g, 0.f, 1.f };
                 }
                 default:
-                    ghoul_assert(false, "Missing case label");
                     throw MissingCaseException();
             }
         case Format::RGB:

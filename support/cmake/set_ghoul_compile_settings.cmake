@@ -168,6 +168,7 @@ function (set_ghoul_compile_settings target)
       PUBLIC "_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING"
       # This definition can be removed when Cppformat is updated to remove the allocator warning
       PUBLIC "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING"
+      PUBLIC "_CRT_SECURE_NO_WARNINGS"
       PRIVATE "NOMINMAX"
       PRIVATE "WIN32_LEAN_AND_MEAN"
       PRIVATE "VC_EXTRALEAN"
