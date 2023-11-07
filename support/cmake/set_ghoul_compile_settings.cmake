@@ -29,6 +29,11 @@ function (set_ghoul_compile_settings target)
   set(MSVC_WARNINGS
     "/MP"       # Multi-threading support
     "/W4"       # Highest warning level
+    "/w44062"   # missing case label
+    "/w44289"   # using for-loop variable outside of loop
+    "/w44296"   # expression is always true/false
+    "/w45041"   # out-of-line definition for constexpr data is deprecated
+    "/w45204"   # virtual class has non-virtual trivial destructor
     "/wd4127"   # conditional expression is constant [raised by: websocketpp]
     "/permissive-"   # Enable conformance mode
     "/Zc:__cplusplus" # Correctly set the __cplusplus macro
@@ -163,6 +168,7 @@ function (set_ghoul_compile_settings target)
       PUBLIC "_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING"
       # This definition can be removed when Cppformat is updated to remove the allocator warning
       PUBLIC "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING"
+      PUBLIC "_CRT_SECURE_NO_WARNINGS"
       PRIVATE "NOMINMAX"
       PRIVATE "WIN32_LEAN_AND_MEAN"
       PRIVATE "VC_EXTRALEAN"
