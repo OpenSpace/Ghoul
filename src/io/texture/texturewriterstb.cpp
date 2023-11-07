@@ -34,7 +34,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "STB_TextureWriter";
-}
+} // namespace
 
 namespace ghoul::io {
 
@@ -45,12 +45,17 @@ void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
 
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
+        // Remove the leading . of the extension
         extension = extension.substr(1);
     }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
-    std::transform(extension.begin(), extension.end(), extension.begin(),
-        [](unsigned char c) { return std::tolower(c); });
+    std::transform(
+        extension.begin(),
+        extension.end(),
+        extension.begin(),
+        [](unsigned char c) { return std::tolower(c); }
+    );
 
     int w = texture.width();
     int h = texture.height();
