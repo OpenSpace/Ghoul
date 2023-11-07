@@ -28,8 +28,9 @@
 namespace ghoul::cmdparser {
 
 template <typename T>
-SingleCommand<T>::SingleCommand(T& ptr1, std::string name, std::string shortName,
-                                std::string infoText, std::string parameterList)
+SingleCommand<T>::SingleCommand(std::optional<T>& ptr1, std::string name,
+                                std::string shortName, std::string infoText,
+                                std::string parameterList)
     : CommandlineCommand(
         std::move(name),
         std::move(shortName),
@@ -50,11 +51,8 @@ void SingleCommand<T>::execute(const std::vector<std::string>& parameters) {
     if constexpr (std::is_same_v<T, std::string>) {
         // If we have a string the parameter set might contain an arbitrary number of
         // parameters that we have to concatenate first
-
-        // The parameter list contains the command-name as the first argument and we don't
-        // want that
         _ptr1 = ghoul::join(
-            std::vector<std::string>(parameters.begin() + 1, parameters.end()),
+            std::vector<std::string>(parameters.begin(), parameters.end()),
             " "
         );
     }
@@ -73,9 +71,9 @@ void SingleCommand<T>::checkParameters(const std::vector<std::string>& parameter
 }
 
 template <typename T, typename U>
-SingleCommand<T, U>::SingleCommand(T& ptr1, U& ptr2, std::string name,
-                                   std::string shortName, std::string infoText,
-                                   std::string parameterList)
+SingleCommand<T, U>::SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2,
+                                   std::string name, std::string shortName,
+                                   std::string infoText, std::string parameterList)
     : CommandlineCommand(
         std::move(name),
         std::move(shortName),
@@ -106,7 +104,8 @@ void SingleCommand<T, U>::checkParameters(
 }
 
 template <typename T, typename U, typename V>
-SingleCommand<T, U, V>::SingleCommand(T& ptr1, U& ptr2, V& ptr3, std::string name,
+SingleCommand<T, U, V>::SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2,
+                                      std::optional<V>& ptr3, std::string name,
                                       std::string shortName, std::string infoText,
                                       std::string parameterList)
     : CommandlineCommand(
@@ -141,7 +140,8 @@ void SingleCommand<T, U, V>::checkParameters(
 }
 
 template <typename T, typename U, typename V, typename W>
-SingleCommand<T, U, V, W>::SingleCommand(T& ptr1, U& ptr2, V& ptr3, W& ptr4,
+SingleCommand<T, U, V, W>::SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2,
+                                         std::optional<V>& ptr3, std::optional<W>& ptr4,
                                          std::string name, std::string shortName,
                                          std::string infoText, std::string parameterList)
     : CommandlineCommand(

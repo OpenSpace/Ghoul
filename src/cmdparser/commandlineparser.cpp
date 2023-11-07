@@ -61,8 +61,6 @@ int extractArguments(const std::vector<std::string>& in, std::vector<std::string
         }
     }
     else if (count == -3) {
-        // Add the -command and then read till the end
-        out.push_back(in[begin]);
         // Extract arguments until a new command is found
         // The '-' restriction is enforced in the #addCommand method
         for (size_t i = begin + 1; (i < in.size()) && (in[i][0] != '-'); ++i) {

@@ -28,6 +28,8 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
+#include <optional>
+
 namespace ghoul::cmdparser {
 
 template <typename... T>
@@ -59,7 +61,7 @@ public:
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
      */
-    SingleCommand(T& ptr1, std::string name, std::string shortName = "",
+    SingleCommand(std::optional<T>& ptr1, std::string name, std::string shortName = "",
         std::string infoText = "", std::string parameterList = "");
 
     /**
@@ -83,7 +85,7 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    T& _ptr1;
+    std::optional<T>& _ptr1;
 };
 
 /**
@@ -115,8 +117,9 @@ public:
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
      */
-    SingleCommand(T& ptr1, U& ptr2, std::string name, std::string shortName = "",
-        std::string infoText = "", std::string parameterList = "");
+    SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2, std::string name,
+        std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * Executes this SingleCommand and stores the values passed as \p parameters into the
@@ -139,8 +142,8 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    T& _ptr1;
-    U& _ptr2;
+    std::optional<T>& _ptr1;
+    std::optional<U>& _ptr2;
 };
 
 /**
@@ -175,8 +178,9 @@ public:
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
      */
-    SingleCommand(T& ptr1, U& ptr2, V& ptr3, std::string name, std::string shortName = "",
-        std::string infoText = "", std::string parameterList = "");
+    SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2, std::optional<V>& ptr3,
+        std::string name, std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
 
     /**
      * Executes this SingleCommand and stores the values passed as \p parameters into the
@@ -199,9 +203,9 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    T& _ptr1;
-    U& _ptr2;
-    V& _ptr3;
+    std::optional<T>& _ptr1;
+    std::optional<U>& _ptr2;
+    std::optional<V>& _ptr3;
 };
 
 /**
@@ -239,9 +243,9 @@ public:
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
      */
-    SingleCommand(T& ptr1, U& ptr2, V& ptr3, W& ptr4, std::string name,
-        std::string shortName = "", std::string infoText = "",
-        std::string parameterList = "");
+    SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2, std::optional<V>& ptr3,
+        std::optional<W>& ptr4, std::string name, std::string shortName = "",
+        std::string infoText = "", std::string parameterList = "");
 
     /**
      * Executes this SingleCommand and stores the values passed as \p parameters into the
@@ -264,10 +268,10 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    T& _ptr1 = nullptr;
-    U& _ptr2 = nullptr;
-    V& _ptr3 = nullptr;
-    W& _ptr4 = nullptr;
+    std::optional<T>& _ptr1 = nullptr;
+    std::optional<U>& _ptr2 = nullptr;
+    std::optional<V>& _ptr3 = nullptr;
+    std::optional<W>& _ptr4 = nullptr;
 };
 
 
@@ -292,7 +296,7 @@ public:
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      */
-    SingleCommandZeroArguments(bool& ptr, std::string name,
+    SingleCommandZeroArguments(std::optional<bool>& ptr, std::string name,
         std::string shortName = "", std::string infoText = "");
 
     /**
@@ -301,7 +305,7 @@ public:
     virtual void execute(const std::vector<std::string>& /*parameters*/) override;
 
 protected:
-    bool& _ptr;
+    std::optional<bool>& _ptr;
 };
 
 } // namespace ghoul::cmdparser
