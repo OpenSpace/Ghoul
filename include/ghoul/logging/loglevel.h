@@ -90,7 +90,7 @@ constexpr std::string_view to_string(logging::LogLevel string) {
 * Returns the LogLevel for the passed string representation. The name of
 * each level is equal to its enum value.
 *
-* \return The the LogLevel for the passed string representation
+* \return The LogLevel for the passed string representation
 */
 template <>
 constexpr logging::LogLevel from_string(std::string_view string) {
@@ -104,6 +104,21 @@ constexpr logging::LogLevel from_string(std::string_view string) {
     if (string == "None") { return logging::LogLevel::NoLogging; }
 
     throw ghoul::RuntimeError("Unknown log level '" + std::string(string) + "'");
+}
+
+/**
+* Returns the color representation of the passed LogLevel
+*/
+constexpr glm::vec4 to_color(logging::LogLevel level) {
+    constexpr glm::vec4 White(0.9f, 0.9f, 0.9f, 1.f);
+
+    switch (level) {
+    case logging::LogLevel::Debug:   return glm::vec4(0.f, 1.f, 0.f, 1.f);
+    case logging::LogLevel::Warning: return glm::vec4(1.f, 1.f, 0.f, 1.f);
+    case logging::LogLevel::Error:   return glm::vec4(1.f, 0.f, 0.f, 1.f);
+    case logging::LogLevel::Fatal:   return glm::vec4(0.3f, 0.3f, 0.85f, 1.f);
+    default:                         return White;
+    }
 }
 
 } // namespace
