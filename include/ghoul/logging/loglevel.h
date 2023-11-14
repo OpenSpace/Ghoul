@@ -26,6 +26,7 @@
 #ifndef __GHOUL___LOGLEVEL___H__
 #define __GHOUL___LOGLEVEL___H__
 
+#include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringconversion.h>
@@ -109,15 +110,15 @@ constexpr logging::LogLevel from_string(std::string_view string) {
 /**
 * Returns the color representation of the passed LogLevel
 */
-constexpr glm::vec4 to_color(logging::LogLevel level) {
+constexpr glm::vec4 toColor(logging::LogLevel level) {
     constexpr glm::vec4 White(0.9f, 0.9f, 0.9f, 1.f);
 
     switch (level) {
-    case logging::LogLevel::Debug:   return glm::vec4(0.f, 1.f, 0.f, 1.f);
-    case logging::LogLevel::Warning: return glm::vec4(1.f, 1.f, 0.f, 1.f);
-    case logging::LogLevel::Error:   return glm::vec4(1.f, 0.f, 0.f, 1.f);
-    case logging::LogLevel::Fatal:   return glm::vec4(0.3f, 0.3f, 0.85f, 1.f);
-    default:                         return White;
+        case logging::LogLevel::Debug:   return glm::vec4(0.f, 1.f, 0.f, 1.f);
+        case logging::LogLevel::Warning: return glm::vec4(1.f, 1.f, 0.f, 1.f);
+        case logging::LogLevel::Error:   return glm::vec4(1.f, 0.f, 0.f, 1.f);
+        case logging::LogLevel::Fatal:   return glm::vec4(0.3f, 0.3f, 0.85f, 1.f);
+        default:                         return White;
     }
 }
 
