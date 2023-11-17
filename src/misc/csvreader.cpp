@@ -49,6 +49,8 @@ namespace {
             // those apart, and we need to reassemble it here
 
             for (size_t i = 0; i < lineValues.size(); i++) {
+                ghoul::trimWhitespace(lineValues[i]);
+
                 if (lineValues[i].empty()) {
                     continue;
                 }
