@@ -30,16 +30,16 @@ namespace ghoul {
 
 /**
  * This structure can be used to make a more expressive boolean parameter for methods.
- * Instead of using `bool`, which does not convey any direct meaning and forces
- * the programmer to read the documentation what the parameter does, this class can be
+ * Instead of using `bool`, which does not convey any direct meaning and forces the
+ * programmer to read the documentation what the parameter does, this class can be
  * `typedef`ed to a meaningful name.
  *
  * For example:
- * \verbatim
-using AllowOverride = ghoul::Boolean;
-
-void foo(std::string value, AllowOverride override = AllowOverride::Yes);
-\endverbatim
+ * ```
+ * using AllowOverride = ghoul::Boolean;
+ *
+ * void foo(std::string value, AllowOverride override = AllowOverride::Yes);
+ * ```
  * Though it is more verbal, it elimiates ambiguity regarding parameters. This class is
  * implicitly convertible to `bool`, but not the other way around. Furthermore,
  * it supports the `==`, `!=`, and `!` operators.
@@ -50,8 +50,7 @@ void foo(std::string value, AllowOverride override = AllowOverride::Yes);
 struct Boolean {
     enum Value { Yes = 1, No = 0 };
 
-    // Switch to this as soon as
-    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104398
+    // Switch to this as soon as https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104398
     // is fixed
     //enum class Value { Yes = 1, No = 0 };
     //using enum Value;

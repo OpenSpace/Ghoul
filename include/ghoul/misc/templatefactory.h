@@ -38,18 +38,24 @@ namespace ghoul {
 
 class Dictionary;
 
-/// Main exception that is thrown by the TemplateFactory in the case of errors
+/**
+ * Main exception that is thrown by the TemplateFactory in the case of errors.
+ */
 struct TemplateFactoryError : public RuntimeError {
     explicit TemplateFactoryError(std::string msg);
 };
 
-/// Exception that is thrown if a requested class has not been registered before
+/**
+ * Exception that is thrown if a requested class has not been registered before.
+ */
 struct TemplateClassNotFoundError : public TemplateFactoryError {
     explicit TemplateClassNotFoundError(std::string name);
     const std::string className;
 };
 
-/// Exception that is thrown if a registered class is called with a wrong constructor
+/**
+ * Exception that is thrown if a registered class is called with a wrong constructor.
+ */
 struct TemplateConstructionError : public TemplateFactoryError {
     explicit TemplateConstructionError(std::string msg);
 };
@@ -66,43 +72,41 @@ public:
 /**
  * This class implements a generic Factory pattern that can be used for any class as long
  * as a default constructor and/or constructor taking a Dictionary is available for the
- * subclass. The usage of this TemplateFactory is as follows: The `BaseClass`
- * template parameter is the base class of all classes that can be created using this
- * factory. Only subclasses of `BaseClass` can be added to the factory, or a
- * compile-time error will be generated. Subclasses of the `BaseClass` (or the
- * `BaseClass` itself) can be registered using the #registerClass method, which
- * takes the subclass as a template parameter. All registered classes can then be created
- * using the #create method, providing the same `className` with which the
- * class was registered. If the subclass that was registered provides both an empty
- * default constructor as well as a constructor taking a single
- * `const ghoul::Dictionary&` parameter, the second #create method can be used
- * which takes the `className` as well as the Dictionary with which to
- * instantiate the class. If this method is used and the class does not provide a
- * Dictionary constructor, an exception is thrown. Likewise, if the registered class does
- * not provide a default constructor and is called with the first #create method, a
- * similar exception is thrown. #hasClass tests if a specific `className` was
- * registered previously. For example:
- * \verbatim
-class A {};
-class B : public A {};
-class C {};
-class D : public A {
-public:
-    D(const ghoul::Dictionary&);
-};
-
-TemplateFactory<A> factory;
-factory.registerClass<B>("B");
-factory.registerClass<C>("C"); // compile error as C is not a subclass of A
-factory.registerClass<D>("D");
-A* i = factory.create("B"); // creates an instance of B with the default constructor
-i = factory.create("D"); // creates an instance of D with the default constructor
-i = factory.create("D", { }); // creates an instance of D with the Dictionary constructor
-i = factory.create("B", { }); // throws an exception as B does not have a Dictionary ctor
-\endverbatim
+ * subclass. The usage of this TemplateFactory is as follows: The `BaseClass` template
+ * parameter is the base class of all classes that can be created using this factory. Only
+ * subclasses of `BaseClass` can be added to the factory, or a compile-time error will be
+ * generated. Subclasses of the `BaseClass` (or the `BaseClass` itself) can be registered
+ * using the #registerClass method, which takes the subclass as a template parameter. All
+ * registered classes can then be created using the #create method, providing the same
+ * `className` with which the class was registered. If the subclass that was registered
+ * provides both an empty default constructor as well as a constructor taking a single
+ * `const ghoul::Dictionary&` parameter, the second #create method can be used which takes
+ * the `className` as well as the Dictionary with which to instantiate the class. If this
+ * method is used and the class does not provide a Dictionary constructor, an exception is
+ * thrown. Likewise, if the registered class does not provide a default constructor and is
+ * called with the first #create method, a similar exception is thrown. #hasClass tests if
+ * a specific `className` was registered previously. For example:
+ * ```
+ * class A {};
+ * class B : public A {};
+ * class C {};
+ * class D : public A {
+ * public:
+ *     D(const ghoul::Dictionary&);
+ * };
+ *
+ * TemplateFactory<A> factory;
+ * factory.registerClass<B>("B");
+ * factory.registerClass<C>("C"); // compile error as C is not a subclass of A
+ * factory.registerClass<D>("D");
+ * A* i = factory.create("B"); // creates an instance of B with the default constructor
+ * i = factory.create("D"); // creates an instance of D with the default constructor
+ * i = factory.create("D", { }); // creates instance of D with the Dictionary constructor
+ * i = factory.create("B", { }); // throws exception as B does not have a Dictionary ctor
+ * ```
  *
  * \tparam BaseClass The base class of all classes that can be registered and created
- * using this factory
+ *         using this factory
  */
 template <typename BaseClass>
 class TemplateFactory : public TemplateFactoryBase {
@@ -113,9 +117,9 @@ public:
      * TemplateFactory.
      *
      * \param useDictionary `true` if the class was called with a provided
-     *        Dictionary and the Dictionary should be used.
+     *        Dictionary and the Dictionary should be used
      * \param dict The Dictionary that should be used to initialize the subclass. If
-     *        \p useDictionary is `false`, this is the empty Dictionary.
+     *        \p useDictionary is `false`, this is the empty Dictionary
      * \return The initialized subclass of type `BaseClass`
      *
      * \throw TemplateConstructionError If the class was initialized using the wrong
@@ -134,8 +138,7 @@ public:
      *
      * \param className The class name of the instance that should be created
      * \param pool The optional memory pool that is used to allocate the new object. If
-     *        this value is `std::nullopt`, the operating systems memory allocated is
-     *        used
+     *        this value is `std::nullopt`, the operating systems memory allocated is used
      * \return A fully initialized instance of the registered class
      *
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
@@ -158,8 +161,7 @@ public:
      * \param dictionary The dictionary that will be passed to the constructor of the
      *        class
      * \param pool The optional memory pool that is used to allocate the new object. If
-     *        this value is `std::nullopt`, the operating systems memory allocated is
-     *        used
+     *        this value is `std::nullopt`, the operating systems memory allocated is used
      * \return A fully initialized instance of the registered class
      *
      * \throw TemplateClassNotFoundError If the \p className did not name a previously
@@ -172,14 +174,13 @@ public:
         MemoryPoolBase* pool = nullptr) const;
 
     /**
-     * Registers a `Class` with the provided \p className so that it can later
-     * be #create%d using the same \p className. `Class` has to be a subclass
-     * of `BaseClass` or a compile-error will occur. If a class already has
-     * been registered under the \p className, an exception will be thrown.
+     * Registers a `Class` with the provided \p className so that it can later be
+     * #create%d using the same \p className. `Class` has to be a subclass of `BaseClass`
+     * or a compile-error will occur. If a class already has been registered under the
+     * \p className, an exception will be thrown.
      *
-     * \tparam Class The class that should be registered under the provided
-     *         \p className
-     * \param className The class name under which the `Class` is registered.
+     * \tparam Class The class that should be registered under the provided \p className
+     * \param className The class name under which the `Class` is registered
      *
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre `Class` must be derived from `BaseClass`
@@ -191,10 +192,10 @@ public:
     void registerClass(std::string className);
 
     /**
-     * Registers a class with the provided \p className and the user-defined
-     * factory function. The \p factoryFunction must return a valid subclass of
-     * `BaseClass` when is it called in the #create methods of TemplateFactory.
-     * The `std::function` object is stored inside.
+     * Registers a class with the provided \p className and the user-defined factory
+     * function. The \p factoryFunction must return a valid subclass of `BaseClass` when
+     * is it called in the #create methods of TemplateFactory. The `std::function` object
+     * is stored inside.
      *
      * \param className The class name, which will be registered with the provided
      *        factory function
@@ -203,7 +204,7 @@ public:
      *        argument of the function pointer is `true` if the #create method
      *        was called with a Dictionary as an additional parameter, implying that the
      *        subclass should be constructed using the Dictionary provided as the second
-     *        argument. The factory function is free to ignore this request.
+     *        argument. The factory function is free to ignore this request
      *
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre \p className must not be empty
@@ -219,8 +220,8 @@ public:
      * it is guaranteed that the \p className can be used to generate a valid instance.
      *
      * \param className The class name that is to be tested
-     * \return `true` if the \p className was used in #registerClass
-     *         before; `false` otherwise
+     * \return `true` if the \p className was used in #registerClass before; `false`
+     *         otherwise
      *
      * \pre \p className must not be empty
      */

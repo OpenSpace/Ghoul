@@ -50,7 +50,7 @@ constexpr unsigned int hashCRC32(const char* s);
  *
  * \param buffer The buffer whose contents are to be hashed
  * \param size The size of the buffer
- * \return tThe hash value for the passed buffer
+ * \return The hash value for the passed buffer
  */
 constexpr unsigned int hashCRC32(const char* buffer, unsigned int size);
 

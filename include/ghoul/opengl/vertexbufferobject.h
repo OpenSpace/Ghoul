@@ -66,8 +66,7 @@ public:
     /**
      * A runtime function that checks if initialize has been called.
      *
-     * \returns `true` if any initialize function has been called and
-     *          `false` otherwise.
+     * \return `true` if any initialize function has been called and `false` otherwise
      */
     bool isInitialized() const;
 
@@ -107,6 +106,7 @@ public:
      * render primitives are `GL_LINES` and `GL_POINTS`. See
      * https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml for supported render
      * modes.
+     *
      * \param mode The render mode. Default is `GL_TRIANGLES`
      */
     void setRenderMode(GLenum mode = GL_TRIANGLES);
@@ -114,6 +114,7 @@ public:
     /**
      * A wrapper function for `glEnableVertexAttribArray` and `glVertexAttribPointer` that
      * defines how the values passed in the #initialize method are interpreted.
+     *
      * \param index The index of the attribute to be modified
      * \param size The number of elements in this attribute
      * \param type The data type, for example `GL_FLOAT`
@@ -124,19 +125,25 @@ public:
     void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLsizei stride,
         GLuint offset, GLboolean normalized = GL_FALSE);
 
-    /// Binds the VBO
+    /**
+     * Binds the VBO.
+     */
     void bind();
 
-    /// Unbinds the VBO
+    /**
+     * Unbinds the VBO.
+     */
     void unbind();
 
-    /// Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
+    /**
+     * Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
+     */
     void render();
 
 private:
     /**
      * Constructs the internal GL objects by calling `glGenVertexArrays` and
-     * `glGenBuffers`
+     * `glGenBuffers`.
      */
     void generateGLObjects();
 

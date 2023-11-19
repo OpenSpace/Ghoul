@@ -32,25 +32,25 @@ namespace ghoul::logging {
 
 /**
   * A concrete subclass of Log that logs the messages to the Visual Studio output window
-  * or the system debugger using the `OutputDebugString` method. If neither
-  * Visual Studio nor a system debugger is attached, this log will silently ignore all
-  * incoming log messages.
+  * or the system debugger using the `OutputDebugString` method. If neither Visual Studio
+  * nor a system debugger is attached, this log will silently ignore all incoming log
+  * messages.
   *
-  * If this logger is included in any non `WIN32` system, it will also silently
-  * ignore all logging messages
- */
+  * If this logger is included in any non `WIN32` system, it will also silently ignore all
+  * logging messages
+  */
 
 class VisualStudioOutputLog : public Log {
 public:
     /**
      * Constructor that calls Log constructor.
      *
-     * \param timeStamping Determines if the log should print the time when a message
-     *        is logged in the log messages
-     * \param dateStamping Determines if the log should print the time when a message
-     *        is logged in the log messages
-     * \param categoryStamping Determines if the log should print the categories in
-     *        the log messages
+     * \param timeStamping Determines if the log should print the time when a message is
+     *        logged in the log messages
+     * \param dateStamping Determines if the log should print the time when a message is
+     *        logged in the log messages
+     * \param categoryStamping Determines if the log should print the categories in the
+     *        log messages
      * \param logLevelStamping Determines if the log should print the log level in the
      *        log messages
      * \param minimumLogLevel The minimum log level that this logger will accept

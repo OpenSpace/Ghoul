@@ -36,9 +36,9 @@ struct aiScene;
 namespace ghoul::io {
 
 /**
- * This model reader loads the provided file using the Assimp library. This simple
- * method loads multiple shapes, from different 3D file formats.
- * All supported formats are listed in ModelReaderAssimp::supportedExtensions().
+ * This model reader loads the provided file using the Assimp library. This simple method
+ * loads multiple shapes, from different 3D file formats. All supported formats are listed
+ * in ModelReaderAssimp::supportedExtensions().
  *
  * \sa https://github.com/assimp/assimp
  */
@@ -53,8 +53,7 @@ public:
      * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
      * \return The ModelGeometry containing the model
      *
-     * \throw ModelLoadException If there was an error loading the model
-     *        from \p filename
+     * \throw ModelLoadException If there was an error loading the model from \p filename
      * \pre \p filename must not be empty
      */
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(

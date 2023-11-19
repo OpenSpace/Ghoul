@@ -40,6 +40,7 @@ class MultipleCommand : public CommandlineCommand {};
  * and has a single argument of respective type \p T. Each time the command is called, the
  * converted value is appended to a vector that has been passed in the constructor. The
  * template class \p T must be convertable using an `std::stringstream`.
+ *
  * \tparam T The typename of the first argument type
  *
  * \sa MultipleCommandZeroArguments
@@ -53,8 +54,8 @@ public:
      *
      * \param ptr1 The reference to the parameters that will be set when this command is
      *        executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -71,8 +72,8 @@ public:
      *
      * \param parameters The parameters for this MultipleCommand
      *
-     * \throws CommandExecutionException If one parameter has the wrong type that was not
-     *         detected in the checkParameters method
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
      */
     void execute(const std::vector<std::string>& parameters) override;
 
@@ -80,6 +81,7 @@ public:
      * Checks whether all of the \p parameters have the correct types.
      *
      * \param parameters The list of parameters that are to be checked
+     *
      * \throw CommandParameterException If any of the parameters have the wrong type
      */
     void checkParameters(const std::vector<std::string>& parameters) const override;
@@ -109,10 +111,10 @@ public:
      *
      * \param ptr1 The reference to the parameters that will be set when this command is
      *        executed
-     * \param ptr2 The reference  to the second parameters that will be set when this
+     * \param ptr2 The reference to the second parameters that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -171,12 +173,12 @@ public:
      *
      * \param ptr1 The reference to the parameters that will be set when this command is
      *        executed
-     * \param ptr2 The reference  to the second parameters that will be set when this
+     * \param ptr2 The reference to the second parameters that will be set when this
      *        command is executed
      * \param ptr3 The reference to the third parameters that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -217,9 +219,9 @@ protected:
 /**
  * This class represents a command that can called multiple times in a given commandline
  * and has 4 arguments of respective types \p T, \p U, \p V, and \p U. Each time the
- * command is called, the converted value is appended to a vector that has been
- * passed in the constructor. The template classes \p T, \p U, \p V, and \p U must be
- * convertable using an `std::stringstream`.
+ * command is called, the converted value is appended to a vector that has been passed in
+ * the constructor. The template classes \p T, \p U, \p V, and \p U must be convertable
+ * using an `std::stringstream`.
  *
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
@@ -237,14 +239,14 @@ public:
      *
      * \param ptr1 The reference to the parameters that will be set when this command is
      *        executed
-     * \param ptr2 The reference  to the second parameters that will be set when this
+     * \param ptr2 The reference to the second parameters that will be set when this
      *        command is executed
      * \param ptr3 The reference to the third parameters that will be set when this
      *        command is executed
      * \param ptr4 The reference to the fourth parameters that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested

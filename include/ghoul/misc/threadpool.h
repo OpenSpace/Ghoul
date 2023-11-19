@@ -58,34 +58,33 @@ namespace ghoul {
  * The ThreadPool is a class that manages a list of threads (= ThreadPool::Worker%s) that
  * will perform tasks from a list. A ThreadPool is created with a specific number of
  * threads but can be #resize%d after the fact, which will change the number of active
- * threads managed by this ThreadPool. Tasks can be queued by the #queue function,
- * which returns a `std::future` object that contains the possible return value
- * of the passed task.
+ * threads managed by this ThreadPool. Tasks can be queued by the #queue function, which
+ * returns a `std::future` object that contains the possible return value of the passed
+ * task.
  *
  * Example use-case:
- *\verbatim
- ghoul::ThreadPool pool(2);
-
-{
-    std::future<int> ret = pool.queue([](){ return 1337; });
-    auto urn = pool.queue([](){ return "foobar"; });
-    ghoul_assert(ret.get() == 1337);
-    ghoul_assert(urn.get() == "foobar");
- }
-
- {
-    auto func = [](int i, float f, std::string s) -> std::tuple<std::string, float, int> {
-    return std::make_tuple(s, f, i);
- };
-
-    std::future<std::tuple<std::string, float, int>> ret = pool.queue(func, 1, 2.f, "3");
-    std::tuple<std::string, float, int> val = ret.get();
-    ghoul_assert("3" == std::get<0>(val));
-    ghoul_assert(2.f == std::get<1>(val));
-    ghoul_assert(1 == std::get<2>(val));
- }
-
-\endverbatim
+ * ```
+ *  ghoul::ThreadPool pool(2);
+ *
+ * {
+ *     std::future<int> ret = pool.queue([](){ return 1337; });
+ *     auto urn = pool.queue([](){ return "foobar"; });
+ *     ghoul_assert(ret.get() == 1337);
+ *     ghoul_assert(urn.get() == "foobar");
+ *  }
+ *
+ *  {
+ *     auto f = [](int i, float f, std::string s) -> std::tuple<std::string, float, int> {
+ *        return std::make_tuple(s, f, i);
+ *     };
+ *
+ *     std::future<std::tuple<std::string, float, int>> r = pool.queue(f, 1, 2.f, "3");
+ *     std::tuple<std::string, float, int> val = r.get();
+ *     ghoul_assert("3" == std::get<0>(val));
+ *     ghoul_assert(2.f == std::get<1>(val));
+ *     ghoul_assert(1 == std::get<2>(val));
+ *  }
+ * ```
  *
  * Tasks passed to the ThreadPool as started in order a strict FIFO ordering.
  *
@@ -118,6 +117,7 @@ public:
      *        the ThreadPool
      * \param bg Whether the worker threads managed by this thread pool are run in a
      *        background mode (depending on the support of the operating system)
+     *
      * \pre \p nThreads must be bigger than 0
      * \pre \p workerInit must not be empty
      * \pre \p workerDeinit must not be empty
@@ -155,7 +155,8 @@ public:
      *        function will return immediately. if DetachThreads::No, this function will
      *        block until all workers have finished. Potential exceptions that occur
      *        during detaching or joining will be caught and an error message will be
-     *        logged.
+     *        logged
+     *
      * \pre The ThreadPool must be running
      * \pre Cannot run remaining tasks and detach threads
      *      `!(runTasks == Yes && detachThreads == Yes)`
@@ -222,7 +223,7 @@ public:
      * executed in parallel unless this ThreadPool was initialized with only a single
      * worker in the constructor or a subsequent call to #resize. The template parameters
      * of this function are best to be automatically determined. Example use-case:
-     * \verbatim
+     * ```
      * ghoul::ThreadPool pool(2);
      *
      * {
@@ -244,39 +245,37 @@ public:
      *     ghoul_assert(2.f == std::get<1>(val));
      *     ghoul_assert(1 == std::get<2>(val));
      * }
-     * \endverbatim
+     * ```
      *
      * \tparam Function The description of the \p function%'s signature that will be
      *         called
      * \tparam Args A variable list of arguments that can be passed to the \p function
      * \param function The function that will be called. This can be any callable object,
-     *        such as `std::function`, a `lamdba` expression, a
-     *        `struct` with overloaded `operator()` or others
+     *        such as `std::function`, a `lamdba` expression, a `struct` with overloaded
+     *        `operator()` or others
      * \param arguments The potential list of arguments passed to the \p function
      * \return A future containing the result of the evaluation of \p function with the
      *         passed \p arguments. If the function does not return anything, an
-     *         `std::future<void><` is returned
+     *         `std::future<void>` is returned
      */
     template <typename Function, typename... Args>
     auto queue(Function&& function, Args&&... arguments)
         -> std::future<decltype(function(arguments...))>;
 
     /**
-    * This function queues a `std::packaged_task` and returns its
-    * `std::future` object that holds a potential return value. All tasks
-    * passed to this functions are potentially executed in parallel unless this ThreadPool
-    * was initialized with only a single worker in the constructor or a subsequent call
-    * to #resize. The template parameters of this function are best to be automatically
-    * determined.
-    *
-    * \tparam T The type information of the `std::packaged_task` that is to be
-    *         executed
-    * \tparam Args A variable list of arguments that can be passed to the \p task
-    * \param task The task that will be executed.
-    * \param arguments The potential list of arguments passed to the \p task
-    * \return A future containing the result of the evaluation of \p task with the
-    * passed \p arguments.
-    */
+     * This function queues a `std::packaged_task` and returns its `std::future` object
+     * that holds a potential return value. All tasks passed to this functions are
+     * potentially executed in parallel unless this ThreadPool was initialized with only a
+     * single worker in the constructor or a subsequent call to #resize. The template
+     * parameters of this function are best to be automatically determined.
+     *
+     * \tparam T The type information of the `std::packaged_task` that is to be executed
+     * \tparam Args A variable list of arguments that can be passed to the \p task
+     * \param task The task that will be executed.
+     * \param arguments The potential list of arguments passed to the \p task
+     * \return A future containing the result of the evaluation of \p task with the
+     *         passed \p arguments.
+     */
     template <typename T, typename... Args>
     auto queue(std::packaged_task<T>&& task, Args&&... arguments)
         -> decltype(task.get_future());
@@ -295,13 +294,13 @@ private:
     /// A worker object that consists of a thread and a boolean flag that determines
     /// whether the worker should terminatate (or rather return out of the infinite loop).
     struct Worker {
-        // The thread that grabs a task from the ThreadPool or waits until there is a
-        // task. This is stored as a unique_ptr in order to make the storage in a vector
-        // easier
+        /// The thread that grabs a task from the ThreadPool or waits until there is a
+        /// task. This is stored as a unique_ptr in order to make the storage in a vector
+        /// easier
         std::unique_ptr<std::thread> thread;
-        // If this is 'true', the thread will return, and thus end, instead of working on
-        // a new task. This is stored as a shared_pointer as this value is used in the
-        // ThreadPool as well as the lambda expression that drives the thread.
+        /// If this is 'true', the thread will return, and thus end, instead of working on
+        /// a new task. This is stored as a shared_pointer as this value is used in the
+        /// ThreadPool as well as the lambda expression that drives the thread
         std::shared_ptr<std::atomic<bool>> shouldTerminate;
     };
 
@@ -345,17 +344,18 @@ private:
         int size() const;
 
     private:
-        // The queue of tasks
+        /// The queue of tasks
         std::queue<ThreadPool::Task> _queue;
-        // The mutex protecting the queue. As the mutex is also required by const
-        // functions, it is declared 'mutable'
+
+        /// The mutex protecting the queue. As the mutex is also required by const
+        /// functions, it is declared 'mutable'
         mutable std::mutex _queueMutex;
     };
 
     /**
-     * Activate the \p worker by creating a `std::thread` with the lambda
-     * expression that will do all of the work inside the Worker. This function will
-     * overwrite the values of the passed \p worker.
+     * Activate the \p worker by creating a `std::thread` with the lambda expression that
+     * will do all of the work inside the Worker. This function will overwrite the values
+     * of the passed \p worker.
      *
      * \param worker The worker to be set by this function
      */

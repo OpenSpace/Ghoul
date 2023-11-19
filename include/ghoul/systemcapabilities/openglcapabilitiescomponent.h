@@ -174,7 +174,7 @@ protected:
     /// Detect the maximum supported GLSL Version
     void detectGLSLVersion();
     /// Detect the vendor of the main GPU
-    /// \throws GPUVendorError if there was an error detecting the GPU vendor
+    /// \throw GPUVendorError if there was an error detecting the GPU vendor
     void detectGPUVendor();
     /// Get the vendor string from OpenGL
     void detectGLRenderer();
@@ -184,8 +184,8 @@ protected:
     /**
      * Use WMI (on Windows) to retrieve information about the installed driver.
      *
-     * \throws WMIError If there was an error accessing the Windows Management
-     *         Instrumentation
+     * \throw WMIError If there was an error accessing the Windows Management
+     *        Instrumentation
      */
     void detectDriverInformation();
 

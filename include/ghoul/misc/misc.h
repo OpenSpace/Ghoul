@@ -34,8 +34,7 @@ namespace ghoul {
 /**
  * Separates the provided \p input URI into separate parts. If \p input is
  * `a.b.c.d 1.e`, the returned vector will contain one entry for
- * `a`, `b`, `c`, `d 1`, and `e`.
- * If an error occurred, an exception will be thrown.
+ * `a`, `b`, `c`, `d 1`, and `e`. If an error occurred, an exception will be thrown.
  *
  * \param input The input URI that is to be tokenized using the \p separator
  * \param separator The separator that is used for tokenize the string

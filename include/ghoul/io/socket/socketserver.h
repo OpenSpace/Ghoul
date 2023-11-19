@@ -42,11 +42,16 @@ public:
     virtual void listen(int port) = 0;
     virtual bool isListening() const = 0;
     virtual bool hasPendingSockets() const = 0;
-    // Get next pending connection. Non-blocking. Can return nullptr.
+
+    /**
+     * Get next pending connection. Non-blocking. Can return nullptr.
+     */
     virtual std::unique_ptr<Socket> nextPendingSocket() = 0;
 
-    // Get next pending connection. Blocking.
-    // Only returns nullptr if the socket server closes.
+    /**
+     * Get next pending connection. Blocking. Only returns nullptr if the socket server
+     * closes.
+     */
     virtual std::unique_ptr<Socket> awaitPendingSocket() = 0;
 };
 

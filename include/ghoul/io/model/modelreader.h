@@ -39,10 +39,10 @@ namespace ghoul::io {
 class ModelReaderBase;
 
 /**
- * This class manages multiple ModelReaderBase and makes them available through one
- * method loadModel. ModelReaderBases are added through the method addReader. The
- * class provides a static member, but also allows users to create local variants.
- * ModelReaderBases can be reused between multiple ModelReaders
+ * This class manages multiple ModelReaderBase and makes them available through one method
+ * #loadModel. ModelReaderBases are added through the method addReader. The class provides
+ * a static member, but also allows users to create local variants. ModelReaderBases can
+ * be reused between multiple ModelReaders.
  */
 class ModelReader {
 public:
@@ -67,15 +67,15 @@ public:
 
     /**
      * Loads the provided \p filename into a ModelGeometry and returns it. The correct
-     * ModelReaderBase is determined by the extension of the \p filename. If a part of
-     * the model is invisible (has no texture or color) it will by default be dropped
-     * and not rendered at all. If the provided \p forceRenderInvisible is enabled the
-     * invisible parts will instead be forced to render with a colorful pink and green
-     * chessboard pattern. This material will also be forced if there is any error
-     * reading the texture or material.
+     * ModelReaderBase is determined by the extension of the \p filename. If a part of the
+     * model is invisible (has no texture or color) it will by default be dropped and not
+     * rendered at all. If the provided \p forceRenderInvisible is enabled the invisible
+     * parts will instead be forced to render with a colorful pink and green chessboard
+     * pattern. This material will also be forced if there is any error reading the
+     * texture or material.
      *
      * \param filename The name of the file which should be loaded into a ModelGeometry
-     * \param forceRenderInvisible Force invisible meshes to render or not.
+     * \param forceRenderInvisible Force invisible meshes to render or not
      * \param notifyInvisibleDropped Notify in log if invisible meshes were dropped
      *
      * \throw ModelLoadException If there was an error reading the \p filename

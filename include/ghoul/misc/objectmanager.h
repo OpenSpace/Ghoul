@@ -34,8 +34,10 @@
 
 namespace ghoul {
 
-// We need this intermediate class for the `using enum` declaration in the `BooleanType`
-// to not be a dependent type
+/**
+ * We need this intermediate class for the `using enum` declaration in the `BooleanType`
+ * to not be a dependent type.
+ */
 class Manager {
 public:
     BooleanType(Warnings);
@@ -83,7 +85,7 @@ public:
      */
     void releaseAll(Warnings emitWarnings = Warnings::Yes);
 
-    /*
+    /**
      * Requests a new object with a unique \p name and, if it has not been created
      * previously, calls the \p creationFunction whose responsibility it is to return a
      * newly created object, a pointer to which is returned by this function call and all

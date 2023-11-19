@@ -34,9 +34,9 @@ namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that passes logs to the provided callback function. The
- * callback is specified using `std::function`. Trying to log messages when the
- * callback object has been deleted results in undefined behavior. The formatting of the
- * log messages depends on the stamping settings. The different possibilities are:
+ * callback is specified using `std::function`. Trying to log messages when the callback
+ * object has been deleted results in undefined behavior. The formatting of the log
+ * messages depends on the stamping settings. The different possibilities are:
  * ```
  * [DATE | TIME] CATEGORY (LEVEL) MESSAGE
  * [DATE] CATEGORY (LEVEL) MESSAGE
@@ -52,12 +52,11 @@ public:
     /**
      * Constructor that calls the Log constructor and initializes this CallbackLog.
      *
-     * \param callbackFunction The callback function that is called for each log
-     *        message.
-     * \param timeStamping Determines if the log should print the time when a message
-     *        is logged
-     * \param dateStamping Determines if the log should print the time when a message
-     *        is logged
+     * \param callbackFunction The callback function that is called for each log message
+     * \param timeStamping Determines if the log should print the time when a message is
+     *        logged
+     * \param dateStamping Determines if the log should print the time when a message is
+     *        logged
      * \param categoryStamping Determines if the log should print the categories
      * \param logLevelStamping Determines if the log should print the log level
      * \param minimumLogLevel The minimum log level that this logger will accept

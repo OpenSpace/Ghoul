@@ -119,8 +119,8 @@ constexpr bool isGlmVector() {
 }
 
 /**
- * Compute a quaternion that represents the rotation looking from \p eye to
- * \p target, with the specified \p up direction
+ * Compute a quaternion that represents the rotation looking from \p eye to \p target,
+ * with the specified \p up direction.
  */
 template <typename valType>
 glm::tquat<valType> lookAtQuaternion(const glm::tvec3<valType> eye,
@@ -132,8 +132,8 @@ glm::tquat<valType> lookAtQuaternion(const glm::tvec3<valType> eye,
 }
 
 /**
- * Check if quaternion \p q1 and \p q2 represent the same spatial orientation.
- * The precision of the check can be controlled using the \p precision parameter
+ * Check if quaternion \p q1 and \p q2 represent the same spatial orientation. The
+ * precision of the check can be controlled using the \p precision parameter.
  */
 template <typename valType>
 bool isSameOrientation(const glm::tquat<valType> q1, const glm::tquat<valType> q2,
@@ -143,7 +143,7 @@ bool isSameOrientation(const glm::tquat<valType> q1, const glm::tquat<valType> q
 }
 
 /**
- * Compute a view direction vector from a quaternion representing a rotation
+ * Compute a view direction vector from a quaternion representing a rotation.
  */
 inline glm::dvec3 viewDirection(const glm::dquat& q) {
     return glm::normalize(q * glm::dvec3(0.0, 0.0, -1.0));

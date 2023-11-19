@@ -42,25 +42,25 @@ class Log;
 /**
  * The central singleton class that is responsible for handling Log%s and logging methods.
  * This singleton class provides methods to add new Log%s, remove Log%s, and relay
- * messages to all Log%s added to the LogManager. A log message consists of a
- * LogLevel, a category and a message. The category is mainly used as a prefix
- * and/or grouping within the log files and may have other meanings depending on the
- * specific Log%s. The LogManager instance has to be initialized with the #initialize
- * method and can be accessed using the #ref method afterwards. Initializing an instance
- * twice or accessing an uninitialized LogManager will result in an assertion. The logging
- * is performed thread-safe.
+ * messages to all Log%s added to the LogManager. A log message consists of a LogLevel, a
+ * category and a message. The category is mainly used as a prefix and/or grouping within
+ * the log files and may have other meanings depending on the specific Log%s. The
+ * LogManager instance has to be initialized with the #initialize method and can be
+ * accessed using the #ref method afterwards. Initializing an instance twice or accessing
+ * an uninitialized LogManager will result in an assertion. The logging is performed
+ * thread-safe.
  *
- * The different LogLevel available are: LogLevel::Debug,
- * LogLevel::Info, LogLevel::Warning, LogLevel::Error,
- * LogLevel::Fatal.
+ * The different LogLevel available are: LogLevel::Debug, LogLevel::Info,
+ * LogLevel::Warning, LogLevel::Error, LogLevel::Fatal.
+ *
  * If a LogManager was created with a LogLevel x, all messages with
  * LogLevel y <= x will be passed to Log handler.
  *
  * Macros are defined to make logging messages easier. These macros are: #LDEBUG,
  * #LDEBUGC, #LINFO, #LINFOC, #LWARNING, #LWARNINGC, #LERROR, #LERRORC, #LFATAL, #LFATALC.
  * The *C versions of the macros requires the category and the message as a parameter. The
- * versions without the C require an `std::string` variable named
- * `_loggerCat` to be defined in the scope of the macro "call".
+ * versions without the C require an `std::string` variable named `_loggerCat` to be
+ * defined in the scope of the macro "call".
  */
 class LogManager {
 public:
@@ -75,41 +75,39 @@ public:
     /**
      * Creates and initializes an empty LogManager with the passed LogLevel.
      *
-     * \param level The lowest LogLevel that will be passed to the containing
-     *        Log%s.
+     * \param level The lowest LogLevel that will be passed to the containing Log%s
      * \param immediateFlush Determines if all Log%s will be flushed out immediately
      *        after a message was received. In the case of file-backed logs, the files
      *        will be written out to disk and in case of a console log, the console will
      *        be updated. Passing `true` will slow down the execution but
      *        guarantees that a crash immediately after a log message won't lead to data
-     *        loss.
+     *        loss
      */
     LogManager(LogLevel level = LogLevel::Info,
         ImmediateFlush immediateFlush = ImmediateFlush::No);
 
     /**
-     * The main method to log messages. If the `level` is >= the level this
-     * LogManager was created with, the `message` will be passed to the stored
-     * Log%s. The `category` will be used in different ways depending on the
-     * Log in question, but examples are grouping or prepending to the message.
+     * The main method to log messages. If the `level` is >= the level this LogManager was
+     * created with, the `message` will be passed to the stored Log%s. The `category` will
+     * be used in different ways depending on the Log in question, but examples are
+     * grouping or prepending to the message.
      *
      * \param level The level of the message that should be passed to the Log%s
-     * \param category The category of the message, which will be used depending on
-     *        the Log%s
-     * \param message The message that will be passed to the Log%s. May contain
-     *        control sequences.
+     * \param category The category of the message, which will be used depending on the
+     *        Log%s
+     * \param message The message that will be passed to the Log%s. May contain control
+     *        sequences.
      */
     void logMessage(LogLevel level, std::string_view category, std::string_view message);
 
     /**
-     * The main method to log messages. If the `level` is >= the level this
-     * LogManager was created with, the `message` will be passed to the stored
-     * Log%s. The `category` of the message will be an empty string, which
-     * causes it to be ignored by most Log%s.
+     * The main method to log messages. If the `level` is >= the level this LogManager was
+     * created with, the `message` will be passed to the stored Log%s. The `category` of
+     * the message will be an empty string, which causes it to be ignored by most Log%s.
      *
      * \param level The level of the message that should be passed to the Log%s
-     * \param message The message that will be passed to the Log%s. May contain
-     *        control sequences.
+     * \param message The message that will be passed to the Log%s. May contain control
+     *        sequences
      */
     void logMessage(LogLevel level, std::string_view message);
 

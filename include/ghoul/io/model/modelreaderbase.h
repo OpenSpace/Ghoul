@@ -39,8 +39,8 @@ namespace ghoul::io {
 
 /**
  * Concrete instantiations of this abstract base class provide the ability to load
- * geometric models from a file on disk into a ModelGeometry.
- * A valid OpenGL context has to be present for the loadModel function.
+ * geometric models from a file on disk into a ModelGeometry. A valid OpenGL context has
+ * to be present for the loadModel function.
  */
 class ModelReaderBase {
 public:

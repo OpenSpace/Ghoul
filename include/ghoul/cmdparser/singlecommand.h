@@ -37,8 +37,7 @@ class SingleCommand : public CommandlineCommand {};
 
 /**
  * This class represents a command that can occur only once in a given commandline and has
- * a single argument of type \p T, which must be convertable using an
- * `std::stringstream`.
+ * a single argument of type \p T, which must be convertable using a `std::stringstream`.
  *
  * \tparam T The typename of the first argument type
  *
@@ -218,6 +217,7 @@ protected:
  * \tparam U The typename of the second argument type
  * \tparam V The typename of the third argument type
  * \tparam W The typename of the fourth argument type
+ *
  * \sa SingleCommandZeroArguments
  */
 template<typename T, typename U, typename V, typename W>

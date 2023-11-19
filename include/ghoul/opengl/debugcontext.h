@@ -36,11 +36,19 @@
 
 namespace ghoul::opengl::debug {
 
-/// A boolean value determining whether we want to enable or disable the debug output
+/**
+ * A boolean value determining whether we want to enable or disable the debug output.
+ */
 BooleanType(DebugOutput);
-/// A boolean value determining whether we want to force synchronous output
+
+/**
+ * A boolean value determining whether we want to force synchronous output.
+ */
 BooleanType(SynchronousOutput);
-/// A boolean value determining whether to enable individual or groups of messages
+
+/**
+ * A boolean value determining whether to enable individual or groups of messages.
+ */
 BooleanType(Enabled);
 
 /**
@@ -126,10 +134,11 @@ enum class Severity : std::underlying_type_t<GLenum> {
 /**
  * Enables the debug context mode for the currently active OpenGL context. Calling this
  * function outside of a valid OpenGL context is undefined behavior.
+ *
  * \param debug Determines whether the context's debug mode should be enabled or disabled
  * \param synchronous Determines whether the debug messages are provided synchronously
- * (i.e. on the same thread as the OpenGL context and in the same stack frame), or whether
- * debug callbacks can occur at any time.
+ *        (i.e. on the same thread as the OpenGL context and in the same stack frame), or
+ *        whether debug callbacks can occur at any time.
  */
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous);
 

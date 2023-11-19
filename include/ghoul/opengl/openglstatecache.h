@@ -36,9 +36,8 @@ namespace ghoul::opengl {
 
 /**
  * This class works as cache for the OpenGL most common properties defining the
- * current GL's state.
- * Be aware that not all OpenGL states are available for caching at this moment.
- * New states caching should be added as needed.
+ * current GL's state. Be aware that not all OpenGL states are available for caching at
+ * this moment. New states caching should be added as needed.
  */
 class OpenGLStateCache {
 public:

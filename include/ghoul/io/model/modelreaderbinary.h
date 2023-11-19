@@ -36,16 +36,15 @@ namespace ghoul::io {
 class ModelReaderBinary : public ModelReaderBase {
 public:
     /**
-     * Loads the 3D OpenSpace model file pointed to by \p filename
-     * and returns a constructed ModelGeometry from it.
+     * Loads the 3D OpenSpace model file pointed to by \p filename and returns a
+     * constructed ModelGeometry from it.
      *
      * \param filename The geometric model file to be loaded
      * \param forceRenderInvisible Force invisible meshes to render or not
      * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
      * \return The ModelGeometry containing the model
      *
-     * \throw ModelLoadException If there was an error loading the model
-     *        from \p filename
+     * \throw ModelLoadException If there was an error loading the model from \p filename
      * \pre \p filename must not be empty
      */
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(

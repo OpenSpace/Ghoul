@@ -41,7 +41,9 @@ class TextureReaderBase;
  * This class manages multiple TextureReaderBase and makes them available through one
  * method loadTexture. TextureReaderBases are added through the method addReader. The
  * class provides a static member, but also allows users to create local variants.
- * TextureReaderBases can be reused between multiple TextureReaders
+ * TextureReaderBases can be reused between multiple TextureReaders.
+ *
+ * \sa TextureReaderBase
  */
 class TextureReader {
 public:
@@ -77,7 +79,7 @@ public:
      *        using this function. This parameter is necessary as it is not always
      *        possible to automatically detect this based on the image information. For
      *        example, someone might want to load a 128x1 texture but use it as a 2D
-     *        texture instead.
+     *        texture instead
      *
      * \throw TextureLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
@@ -104,11 +106,11 @@ public:
      *        using this function. This parameter is necessary as it is not always
      *        possible to automatically detect this based on the image information. For
      *        example, someone might want to load a 128x1 texture but use it as a 2D
-     *        texture instead.
+     *        texture instead
      * \param format The format of the image pointed to by \p memory. This parameter
      *        should be the same as the usual file extension for the image. However, this
      *        parameter is only used to determine which TextureReader is used for this
-     *        memory, if multiple readers are registered.
+     *        memory, if multiple readers are registered
      *
      * \throw TextureLoadException If there was an error reading the \p memory
      * \throw MissingReaderException If there was no reader for the specified \p filename

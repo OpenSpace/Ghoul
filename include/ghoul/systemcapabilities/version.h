@@ -31,7 +31,9 @@
 
 namespace ghoul::systemcapabilities {
 
-/// This struct stores the detected version of the GLSL driver
+/**
+ * This struct stores the detected version of the GLSL driver.
+ */
 struct Version {
     std::strong_ordering operator<=>(const Version& rhs) const noexcept;
 

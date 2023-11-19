@@ -50,12 +50,16 @@ namespace ghoul::opengl {
  */
 class ShaderObject {
 public:
-    /// Main exception that is thrown by methods of the ShaderObject class
+    /**
+     * Main exception that is thrown by methods of the ShaderObject class.
+     */
     struct ShaderObjectError : public RuntimeError {
         explicit ShaderObjectError(std::string msg);
     };
 
-    /// The exception that is thrown if the compilation of a ShaderObject failed
+    /**
+     * The exception that is thrown if the compilation of a ShaderObject failed.
+     */
     struct ShaderCompileError : public ShaderObjectError {
         /**
          * The constructor constructing a ShaderCompileError containing the cause for the
@@ -94,9 +98,9 @@ public:
 
 
     /**
-    * A type definition for a callback function that is called if any of
-    * the tracked files is changed.
-    */
+     * A type definition for a callback function that is called if any of
+     * the tracked files is changed.
+     */
     using ShaderObjectCallback = std::function<void()>;
 
     /**
@@ -231,9 +235,9 @@ public:
     void setFilename(std::filesystem::path filename);
 
     /**
-    * Rebuild the shader object from file using the file set by setFilename and the
-    * dictionary set by setDictionary.
-    */
+     * Rebuild the shader object from file using the file set by setFilename and the
+     * dictionary set by setDictionary.
+     */
     void rebuildFromFile();
 
     /**

@@ -34,17 +34,18 @@
 namespace ghoul::opengl {
 
 /**
- * This class manages Texture Units and is a wrapper around `GL_TEXTURE0`,
- * `GL_TEXTURE1`, ... It manages which texture units are currently active and
- * which units are free to use. To use a TextureUnit, it has to be #activate%d, the
- * Texture has to be bound, and then the #unitNumber can be retrieved so that it can be
- * used in a uniform. A unit number is assigned as soon as the first call to #activate,
- * #glEnum, or #unitNumber is made. If there are no free unit numbers left, an
- * `std::runtime_error` will be thrown.
+ * This class manages Texture Units and is a wrapper around `GL_TEXTURE0`, `GL_TEXTURE1`,
+ * ... It manages which texture units are currently active and which units are free to
+ * use. To use a TextureUnit, it has to be #activate%d, the Texture has to be bound, and
+ * then the #unitNumber can be retrieved so that it can be used in a uniform. A unit
+ * number is assigned as soon as the first call to #activate, #glEnum, or #unitNumber is
+ * made. If there are no free unit numbers left, an `std::runtime_error` will be thrown.
  */
 class TextureUnit {
 public:
-    /// Main exception that is thrown if a new TextureUnit could not be assigned
+    /**
+     * Main exception that is thrown if a new TextureUnit could not be assigned.
+     */
     struct TextureUnitError : public RuntimeError {
         explicit TextureUnitError(std::string msg);
     };
@@ -71,9 +72,9 @@ public:
     void activate();
 
     /**
-    * This method will deactivate the enum assigned to this TextureUnit and mark it as
-    * free again.
-    */
+     * This method will deactivate the enum assigned to this TextureUnit and mark it as
+     * free again.
+     */
     void deactivate();
 
     /**
@@ -164,10 +165,8 @@ private:
     /// The maximum number of texture units
     static unsigned int _maxTexUnits;
 
-    /**
-     * This vector stores a bool at position `i` if the texture unit number
-     * `i` is currently in use
-     */
+    /// This vector stores a bool at position `i` if the texture unit number `i` is
+    /// currently in use
     static std::vector<bool> _busyUnits;
 };
 

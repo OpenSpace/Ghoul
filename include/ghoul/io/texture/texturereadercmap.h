@@ -33,8 +33,8 @@ namespace ghoul::io {
 /**
  * Reads a one dimensional texture from a cmap (color map) file. The format of the cmap
  * files have the width of the Texture in the first non-comment, non-empty line and is
- * followed by `width` number of lines that contain four values for red, green,
- * blue, and alpha each. If the file is malformed, an TextureLoadException is thrown
+ * followed by `width` number of lines that contain four values for red, green, blue, and
+ * alpha each. If the file is malformed, an TextureLoadException is thrown.
  */
 class TextureReaderCMAP : public TextureReaderBase {
 public:

@@ -43,8 +43,8 @@ namespace ghoul {
  * process' responsibility to #remove the shared memory at the end of its lifetime; then,
  * other processes can use the constructor with the same name to get access to the shared
  * memory. The overloaded operator void* makes the SharedMemory usable just like a
- * `void` pointer in the code. The size of the memory is accessible using the
- * #size method. Due to some necessary header information, the amount of memory that is
+ * `void` pointer in the code. The size of the memory is accessible using the #size
+ * method. Due to some necessary header information, the amount of memory that is
  * allocated will be slightly larger than the passed amount. The allocated memory
  * automatically provides storage for a thread-safe locking mechanism. In the current
  * implementation, this is using an atomic bool to provide thread-safety. It is possible
@@ -57,12 +57,16 @@ namespace ghoul {
  */
 class SharedMemory {
 public:
-    /// Superclass for all exceptions that are thrown by this class
+    /**
+     * Superclass for all exceptions that are thrown by this class.
+     */
     struct SharedMemoryError : public RuntimeError {
         explicit SharedMemoryError(std::string msg);
     };
 
-    /// Exception that is thrown if a specific shared memory did not exist
+    /**
+     * Exception that is thrown if a specific shared memory did not exist.
+     */
     struct SharedMemoryNotFoundError : public SharedMemoryError {
         explicit SharedMemoryNotFoundError();
     };
@@ -113,7 +117,7 @@ public:
      * the name is available.
      *
      * \param name The name of the shared memory block that should be tested
-     * \return `true` if a shared memory block exists with the given \p name,
+     * \return `true` if a shared memory block exists with the given \p name ,
      *         `false` otherwise
      *
      * \throw SharedMemoryError If there was an error retrieving the information about the
@@ -147,8 +151,7 @@ public:
 
     /**
      * Returns the pointer to the first usable address of the allocated memory. The
-     * transparently handled header is automatically skipped and is invisible to the
-     * user.
+     * transparently handled header is automatically skipped and is invisible to the user.
      *
      * \return A valid pointer into a memory block of the predefined size (#size).
      */
@@ -191,16 +194,14 @@ public:
     std::string name() const;
 
 private:
-    /**
-     * This pointer points to the location in local address space where the shared memory
-     * block has been attached to
-     */
+    /// This pointer points to the location in local address space where the shared memory
+    /// block has been attached to
     void* _memory = nullptr;
 
     /// The name for this SharedMemory block
     const std::string _name;
 
-    // on Windows it is not possible to query the size of a memory mapped file, so it
+    // On Windows it is not possible to query the size of a memory mapped file, so it
     // has to be stored in the block of memory itself. On POSIX systems, we can store
     // the size in this object itself.
 

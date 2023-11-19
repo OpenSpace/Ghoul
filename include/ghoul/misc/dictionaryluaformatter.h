@@ -33,7 +33,9 @@ namespace ghoul {
 
 class Dictionary;
 
-/// This exception is thrown if an unknown type is being converted.
+/**
+ * This exception is thrown if an unknown type is being converted.
+ */
 struct LuaFormattingError : public RuntimeError {
     explicit LuaFormattingError(const std::string& msg);
 };

@@ -35,12 +35,12 @@ namespace ghoul::logging {
 /**
  * A subclass of TextLog that logs the messages to a structured HTML file on hard disk.
  * The log containing all components will contain a table with the following format:
- * \verbatim
---------------------------------------------
-| DATE | TIME | CATEGORY | LEVEL | MESSAGE |
-|      |      |          |       |         |
-|      |      |          |       |         |
-\endverbatim
+ * ```
+ * --------------------------------------------
+ * | DATE | TIME | CATEGORY | LEVEL | MESSAGE |
+ * |      |      |          |       |         |
+ * |      |      |          |       |         |
+ * ```
  * If a specific value should not be stamped, the according table entry will be missing
  * from the HTML file. The file will be opened in the constructor and closed in the
  * destructor of this class. A HTMLLog is always created anew and cannot be appended to.
@@ -54,9 +54,8 @@ public:
      *
      * \param filename The path and filename of the file that will receive the log
      *        messages
-     * \param writeToAppend If this is `true`, the log messages will be
-     *        appended to the file. If it is `false` the file will be
-     *        overwritten without a warning.
+     * \param writeToAppend If this is `true`, the log messages will be appended to the
+     *        file. If it is `false` the file will be overwritten without a warning.
      * \param timeStamping Determines if the log should print the time when a message is
      *        logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
@@ -82,11 +81,13 @@ public:
         const std::vector<std::string>& jsIncludes = std::vector<std::string>(),
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
-    /// Destructor that closes and finalizes the HTML file
+    /**
+     * Destructor that closes and finalizes the HTML file
+     */
     virtual ~HTMLLog() override;
 
     /**
-     * Method that logs a message with a given `level` and `category` to the text file.
+     * Method that logs a message with a given \p level and \p category to the text file.
      *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
@@ -98,24 +99,24 @@ public:
 
 protected:
     /**
-     * Returns a css class string for the passed level
-     * LogLevel::Trace -> log-level-trace<br>
-     * LogLevel::Debug -> log-level-debug<br>
-     * LogLevel::Info -> log-level-info<br>
-     * LogLevel::Warning -> log-level-warning<br>
-     * LogLevel::Error -> log-level-error<br>
-     * LogLevel::Fatal -> log-level-fatal<br>
+     * Returns a css class string for the passed level:
+     *   - LogLevel::Trace -> `log-level-trace`
+     *   - LogLevel::Debug -> `log-level-debug`
+     *   - LogLevel::Info -> `log-level-info`
+     *   - LogLevel::Warning -> `log-level-warning`
+     *   - LogLevel::Error -> `log-level-error`
+     *   - LogLevel::Fatal -> `log-level-fatal`
      */
     static std::string classForLevel(LogLevel level);
 
     /**
-     * Returns a HTML color string for the passed color.
-     * LogLevel::Trace -> Grey<br>
-     * LogLevel::Debug -> Green<br>
-     * LogLevel::Info -> Black<br>
-     * LogLevel::Warning -> Yellow<br>
-     * LogLevel::Error -> Red<br>
-     * LogLevel::Fatal -> Cyan<br>
+     * Returns a HTML color string for the passed color:
+     *   - LogLevel::Trace -> Grey
+     *   - LogLevel::Debug -> Green
+     *   - LogLevel::Info -> Black
+     *   - LogLevel::Warning -> Yellow
+     *   - LogLevel::Error -> Red
+     *   - LogLevel::Fatal -> Cyan
      */
     static std::string colorForLevel(LogLevel level);
 

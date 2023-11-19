@@ -34,8 +34,8 @@ namespace ghoul {
 /**
  * Returns the stack trace at the calling site of the function. The vector that is
  * returned contains one line for each level of the stack trace. On Windows, the stack
- * trace is retrieved via StackWalker, whereas Unix and Mac uses the
- * `backtrace_symbols` function.
+ * trace is retrieved via StackWalker, whereas Unix and Mac uses the `backtrace_symbols`
+ * function.
  *
  * \return A list of the full stack trace at the calling site
  */

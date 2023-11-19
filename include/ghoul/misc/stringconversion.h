@@ -36,9 +36,10 @@ namespace ghoul {
  * conversion, a template specialization has to be created. This function is meant to be
  * analogous to the `std::to_string` function and should behave as such:
  *
- * `ghoul::to_string(ghoul::from_string(s)) == s`
- *
- * `ghoul::from_string(ghoul::to_string(v)) == v`
+ * ```
+ * ghoul::to_string(ghoul::from_string(s)) == s
+ * ghoul::from_string(ghoul::to_string(v)) == v
+ * ```
  */
 template <typename T>
 constexpr T from_string(std::string_view) {
@@ -49,8 +50,8 @@ constexpr T from_string(std::string_view) {
 
 /**
  * Converts the passed \p value to its string representation. The default implementation
- * calls the `std::to_string` function. User-defined types are supported by
- * creating a specialization of this function.
+ * calls the `std::to_string` function. User-defined types are supported by creating a
+ * specialization of this function.
  */
 template <typename T>
 std::string to_string(const T& value) {

@@ -33,8 +33,8 @@ namespace ghoul {
 
 /**
  * Superclass for all exceptions that are thrown in Ghoul. The total message of the
- * exception consists of the `message` prefixed with the `component`
- * that threw the exception if it was set.
+ * exception consists of the `message` prefixed with the `component` that threw the
+ * exception if it was set.
  */
 struct RuntimeError : public std::runtime_error {
     /**
@@ -56,7 +56,9 @@ struct RuntimeError : public std::runtime_error {
     const std::string component;
 };
 
-/// Exception that is thrown if an IO access failed because a file could was not found
+/**
+ * Exception that is thrown if an IO access failed because a file could was not found.
+ */
 struct FileNotFoundError : public RuntimeError {
     /**
      * Main constructor constructing the exception with the provided missing file \p f and

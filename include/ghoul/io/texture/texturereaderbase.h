@@ -57,7 +57,9 @@ public:
         const TextureReaderBase* reader;
     };
 
-    /// Default virtual destructor
+    /**
+     * Default virtual destructor.
+     */
     virtual ~TextureReaderBase() = default;
 
     /**

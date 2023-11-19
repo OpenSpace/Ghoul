@@ -48,11 +48,11 @@
 
 
 // HOW TO ADD MORE PARAMETERS:
-// 1. Add a new macro UniformCacheX, copying from X-1
-// 2. Add vX variable to argument list
-// 3. Add ,vX = -1 to the struct definition
-// 4. Add _X before NAME in the GET_MACRO macro
-// 5. Add UniformCacheX after __VA_ARGS__ in the UniformCache macro
+//   1. Add a new macro UniformCacheX, copying from X-1
+//   2. Add vX variable to argument list
+//   3. Add ,vX = -1 to the struct definition
+//   4. Add _X before NAME in the GET_MACRO macro
+//   5. Add UniformCacheX after __VA_ARGS__ in the UniformCache macro
 
 // OBS: Refrain from adding new values to the struct, or at the very least, update the
 //      updateUniformLocations method as it depends on the UniformCache's struct size

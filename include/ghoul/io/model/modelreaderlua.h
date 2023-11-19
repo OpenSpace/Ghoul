@@ -37,8 +37,8 @@ namespace ghoul::io {
  * whereas the `VertexAttribPointers` dictionary must contain tables with the `Position`,
  * `Size`, `Stride`, `Offset`, and `Normalized` arguments found in OpenGL's
  * `VertexAttribPointer` method. The default values for the `VertexAttribPointer` are:
- * `Position = 0`, `Size = 0`, `Stride = 0`, `Offset = 0`, and `Normalized = false`.
- * The value for the `type` is always `GL_FLOAT`.
+ * `Position = 0`, `Size = 0`, `Stride = 0`, `Offset = 0`, and `Normalized = false`. The
+ * value for the `type` is always `GL_FLOAT`.
  *
  * The allowed values for the `Mode` are the strings: `GL_LINES`, `GL_POINTS`,
  * `GL_LINE_STRIP`, `GL_LINE_LOOP`, `GL_LINES`, `GL_LINE_STRIP_ADJACENCY`,

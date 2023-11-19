@@ -42,11 +42,11 @@ namespace ghoul::logging {
  * "[DATE] CATEGORY (LEVEL) MESSAGE"
  * "[TIME] CATEGORY (LEVEL) MESSAGE"
  * ```
- * And the remaining possibilities with `CATEGORY` and `LEVEL`
- * missing. Only the #log method needs to be overwritten in a subclass, if a
- * different output format is required. The file will be opened in the constructor and
- * closed in the destructor of this class. A parameter in the constructor controls of the
- * file will be reset before writing the first time.
+ * And the remaining possibilities with `CATEGORY` and `LEVEL` missing. Only the #log
+ * method needs to be overwritten in a subclass, if a different output format is required.
+ * The file will be opened in the constructor and closed in the destructor of this class.
+ * A parameter in the constructor controls of the file will be reset before writing the
+ * first time.
  */
 class TextLog : public Log {
 public:
@@ -61,7 +61,7 @@ public:
      *        messages
      * \param writeToAppend If this is `true`, the log messages will be appended
      *        to the file. If it is `false` the file will be overwritten without
-     *        a warning.
+     *        a warning
      * \param timeStamping Determines if the log should print the time when a message is
      *        logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
@@ -82,7 +82,9 @@ public:
         LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
-    /// Destructor closing and releasing the file handle
+    /**
+     * Destructor closing and releasing the file handle.
+     */
     virtual ~TextLog() override;
 
     /**
@@ -96,7 +98,9 @@ public:
     void log(LogLevel level, std::string_view category,
         std::string_view message) override;
 
-    /// Flushes the text file and, thereby, all messages that are in the associated buffer
+    /**
+     * Flushes the text file and, thereby, all messages that are in the associated buffer.
+     */
     void flush() override;
 
 protected:

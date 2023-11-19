@@ -116,7 +116,7 @@ public:
      * \return The SystemCapabilitiesComponent that should be retrieved or
      *         `nullptr` if no such type exists
      *
-     * \throws CapabilitiesComponentNotFoundError If no component of type T could be found
+     * \throw CapabilitiesComponentNotFoundError If no component of type T could be found
      */
     template <typename T>
     T& component();
