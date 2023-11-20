@@ -32,6 +32,20 @@
 namespace ghoul {
 
 /**
+ * Convert a string to contain only upper case letters
+ *
+ * \param s The string to convert to only upper case letters
+ */
+void toUpperCase(std::string& s);
+
+/**
+ * Convert a string to contain only lower case letters
+ *
+ * \param s The string to convert to only lower case letters
+ */
+void toLowerCase(std::string& s);
+
+/**
  * Separates the provided \p input URI into separate parts. If \p input is
  * `a.b.c.d 1.e`, the returned vector will contain one entry for
  * `a`, `b`, `c`, `d 1`, and `e`. If an error occurred, an exception will be thrown.
