@@ -30,6 +30,18 @@
 
 namespace ghoul {
 
+void toUpperCase(std::string& s) {
+    for (size_t i = 0; i < s.size(); i++) {
+        s[i] = static_cast<char>(toupper(s[i]));
+    }
+}
+
+void toLowerCase(std::string& s) {
+    for (size_t i = 0; i < s.size(); i++) {
+        s[i] = static_cast<char>(tolower(s[i]));
+    }
+}
+
 std::vector<std::string> tokenizeString(const std::string& input, char separator) {
     size_t separatorPos = input.find(separator);
     if (separatorPos == std::string::npos) {
