@@ -32,14 +32,14 @@
 namespace ghoul {
 
 /**
- * Convert a string to contain only upper case letters
+ * Convert a string to contain only upper case letters.
  *
  * \param s The string to convert to only upper case letters
  */
 void toUpperCase(std::string& s);
 
 /**
- * Convert a string to contain only lower case letters
+ * Convert a string to contain only lower case letters.
  *
  * \param s The string to convert to only lower case letters
  */
