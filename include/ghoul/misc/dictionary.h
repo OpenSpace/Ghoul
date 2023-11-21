@@ -109,9 +109,7 @@ public:
     template <SupportedByDictionary T>
     void setValue(std::string key, T value);
 
-    /**
-     * \overload void setValue(std::string key, T value)
-     */
+    /// \overload void setValue(std::string key, T value)
     //void setValue(std::string key, const char value[]);
 
     /**
