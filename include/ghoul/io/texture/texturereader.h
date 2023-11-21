@@ -43,7 +43,7 @@ class TextureReaderBase;
  * class provides a static member, but also allows users to create local variants.
  * TextureReaderBases can be reused between multiple TextureReaders.
  *
- * \sa TextureReaderBase
+ * \see TextureReaderBase
  */
 class TextureReader {
 public:

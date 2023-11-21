@@ -45,7 +45,7 @@ namespace ghoul::io {
  * `GL_LINES_ADJACENCY`, `GL_TRIANGLE_STRIP`, `GL_TRIANGLE_FAN`, `GL_TRIANGLES`,
  * `GL_TRIANGLE_STRIP_ADJACENCY`, `GL_TRIANGLES_ADJACENCY`, or `GL_PATCHES`.
  *
- * \sa https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
+ * \see https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
  */
 class ModelReaderLua : public ModelReaderBase {
 public:

@@ -56,7 +56,7 @@ public:
      * This enum specifies the allowed formats for the Texture%s. These are directly
      * mapped to the appropriate OpenGL constants.
      *
-     * \sa http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
+     * \see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
      */
     enum class Format : std::underlying_type_t<GLenum> {
         Red = static_cast<std::underlying_type_t<GLenum>>(GL_RED),

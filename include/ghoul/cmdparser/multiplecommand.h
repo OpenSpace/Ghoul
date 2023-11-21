@@ -43,7 +43,7 @@ class MultipleCommand : public CommandlineCommand {};
  *
  * \tparam T The typename of the first argument type
  *
- * \sa MultipleCommandZeroArguments
+ * \see MultipleCommandZeroArguments
  */
 template<class T>
 class MultipleCommand<T> : public CommandlineCommand {
@@ -100,7 +100,7 @@ protected:
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
  *
- * \sa MultipleCommandZeroArguments
+ * \see MultipleCommandZeroArguments
  */
 template<class T, class U>
 class MultipleCommand<T, U> : public CommandlineCommand {
@@ -162,7 +162,7 @@ protected:
  * \tparam U The typename of the second argument type
  * \tparam V The typename of the third argument type
  *
- * \sa MultipleCommandZeroArguments
+ * \see MultipleCommandZeroArguments
  */
 template<class T, class U, class V>
 class MultipleCommand<T, U, V> : public CommandlineCommand {
@@ -228,7 +228,7 @@ protected:
  * \tparam V The typename of the third argument type
  * \tparam W The typename of the fourth argument type
  *
- * \sa MultipleCommandZeroArguments
+ * \see MultipleCommandZeroArguments
  */
 template<class T, class U, class V, class W>
 class MultipleCommand<T, U, V, W> : public CommandlineCommand {
@@ -290,7 +290,7 @@ protected:
  * in a given commandline. The `int` pointer will contain the number of how
  * often the command was present in the command-line.
  *
- * \sa MultipleCommand
+ * \see MultipleCommand
  */
 class MultipleCommandZeroArguments : public CommandlineCommand {
 public:

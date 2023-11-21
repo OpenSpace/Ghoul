@@ -41,7 +41,7 @@ class SingleCommand : public CommandlineCommand {};
  *
  * \tparam T The typename of the first argument type
  *
- * \sa SingleCommandZeroArguments
+ * \see SingleCommandZeroArguments
  */
 template<typename T>
 class SingleCommand<T> : public CommandlineCommand {
@@ -95,7 +95,7 @@ protected:
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
  *
- * \sa SingleCommandZeroArguments
+ * \see SingleCommandZeroArguments
  */
 template<typename T, typename U>
 class SingleCommand<T, U> : public CommandlineCommand {
@@ -154,7 +154,7 @@ protected:
  * \tparam U The typename of the second argument type
  * \tparam V The typename of the third argument type
  *
- * \sa SingleCommandZeroArguments
+ * \see SingleCommandZeroArguments
  */
 template<typename T, typename U, typename V>
 class SingleCommand<T, U, V> : public CommandlineCommand {
@@ -218,7 +218,7 @@ protected:
  * \tparam V The typename of the third argument type
  * \tparam W The typename of the fourth argument type
  *
- * \sa SingleCommandZeroArguments
+ * \see SingleCommandZeroArguments
  */
 template<typename T, typename U, typename V, typename W>
 class SingleCommand<T, U, V, W> : public CommandlineCommand {

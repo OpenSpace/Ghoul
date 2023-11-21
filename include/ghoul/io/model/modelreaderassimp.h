@@ -40,7 +40,7 @@ namespace ghoul::io {
  * loads multiple shapes, from different 3D file formats. All supported formats are listed
  * in ModelReaderAssimp::supportedExtensions().
  *
- * \sa https://github.com/assimp/assimp
+ * \see https://github.com/assimp/assimp
  */
 class ModelReaderAssimp : public ModelReaderBase {
 public:
