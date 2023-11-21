@@ -32,6 +32,7 @@
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/misc.h>
 #include <ghoul/fmt.h>
 #include <algorithm>
 #include <filesystem>
@@ -147,12 +148,8 @@ void ModelReader::addReader(std::unique_ptr<ModelReaderBase> reader) {
 
 ModelReaderBase* ModelReader::readerForExtension(const std::string& extension) {
     std::string lowerExtension = extension;
-    std::transform(
-        extension.cbegin(),
-        extension.cend(),
-        lowerExtension.begin(),
-        [](char v) { return static_cast<char>(tolower(v)); }
-    );
+    toLowerCase(lowerExtension);
+
     for (const std::unique_ptr<ModelReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();
         auto it = std::find(extensions.cbegin(), extensions.cend(), lowerExtension);

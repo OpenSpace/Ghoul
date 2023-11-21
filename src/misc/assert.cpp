@@ -26,6 +26,7 @@
 #include <ghoul/misc/assert.h>
 
 #include <ghoul/fmt.h>
+#include <ghoul/misc/misc.h>
 #include <ghoul/misc/stacktrace.h>
 #include <algorithm>
 #include <iostream>
@@ -102,13 +103,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 continue;
             }
 
-            // Transform to lower case
-            std::transform(
-                inputLine.cbegin(),
-                inputLine.cend(),
-                inputLine.begin(),
-                [](char v) { return static_cast<char>(tolower(v)); }
-            );
+            toLowerCase(inputLine);
 
             if (inputLine[0] == 'i') {
                 break;

@@ -29,6 +29,7 @@
 #include <ghoul/filesystem/file.h>
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/misc.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
 #include <filesystem>
@@ -111,12 +112,8 @@ void TextureReader::addReader(std::unique_ptr<TextureReaderBase> reader) {
 
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
     std::string lowerExtension = extension;
-    std::transform(
-        extension.cbegin(),
-        extension.cend(),
-        lowerExtension.begin(),
-        [](char v) { return static_cast<char>(::tolower(v)); }
-    );
+    toLowerCase(lowerExtension);
+
     for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();
         auto it = std::find(extensions.cbegin(), extensions.cend(), lowerExtension);
