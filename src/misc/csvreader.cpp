@@ -28,7 +28,7 @@
 #include <ghoul/fmt.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 #include <algorithm>
 #include <fstream>
 

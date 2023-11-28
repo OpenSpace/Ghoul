@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MISC___H__
-#define __GHOUL___MISC___H__
+#ifndef __GHOUL___STRINGHELPER___H__
+#define __GHOUL___STRINGHELPER___H__
 
 #include <string>
 #include <vector>
@@ -35,15 +35,17 @@ namespace ghoul {
  * Convert a string to contain only upper case letters.
  *
  * \param s The string to convert to only upper case letters
+ * \return The resulting string, after conversion
  */
-void toUpperCase(std::string& s);
+std::string toUpperCase(const std::string& s);
 
 /**
  * Convert a string to contain only lower case letters.
  *
  * \param s The string to convert to only lower case letters
+ * \return The resulting string, after conversion
  */
-void toLowerCase(std::string& s);
+std::string toLowerCase(const std::string& s);
 
 /**
  * Separates the provided \p input URI into separate parts. If \p input is
@@ -109,4 +111,4 @@ std::string encodeUrl(const std::string& string);
 
 } // namespace ghoul
 
-#endif // __GHOUL___MISC___H__
+#endif // __GHOUL___STRINGHELPER___H__

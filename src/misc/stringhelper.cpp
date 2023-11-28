@@ -23,23 +23,35 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 
 #include <algorithm>
 #include <cctype>
 
 namespace ghoul {
 
-void toUpperCase(std::string& s) {
-    for (size_t i = 0; i < s.size(); i++) {
-        s[i] = static_cast<char>(toupper(s[i]));
-    }
+std::string toUpperCase(const std::string& s) {
+    std::string t;
+    t.resize(s.size());
+    std::transform(
+        s.begin(),
+        s.end(),
+        t.begin(),
+        [](unsigned char c) { return std::toupper(c); }
+    );
+    return t;
 }
 
-void toLowerCase(std::string& s) {
-    for (size_t i = 0; i < s.size(); i++) {
-        s[i] = static_cast<char>(tolower(s[i]));
-    }
+std::string toLowerCase(const std::string& s) {
+    std::string t;
+    t.resize(s.size());
+    std::transform(
+        s.begin(),
+        s.end(),
+        t.begin(),
+        [](unsigned char c) { return std::tolower(c); }
+    );
+    return t;
 }
 
 std::vector<std::string> tokenizeString(const std::string& input, char separator) {
