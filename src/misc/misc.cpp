@@ -32,13 +32,13 @@ namespace ghoul {
 
 void toUpperCase(std::string& s) {
     for (size_t i = 0; i < s.size(); i++) {
-        s[i] = static_cast<char>(toupper(s[i]));
+        s[i] = static_cast<char>(std::toupper((static_cast<unsigned char>(s[i]))));
     }
 }
 
 void toLowerCase(std::string& s) {
     for (size_t i = 0; i < s.size(); i++) {
-        s[i] = static_cast<char>(tolower(s[i]));
+        s[i] = static_cast<char>(std::tolower((static_cast<unsigned char>(s[i]))));
     }
 }
 
