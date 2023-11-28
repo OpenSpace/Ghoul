@@ -26,8 +26,8 @@
 #include <ghoul/misc/assert.h>
 
 #include <ghoul/fmt.h>
-#include <ghoul/misc/misc.h>
 #include <ghoul/misc/stacktrace.h>
+#include <ghoul/misc/stringhelper.h>
 #include <algorithm>
 #include <iostream>
 #include <vector>

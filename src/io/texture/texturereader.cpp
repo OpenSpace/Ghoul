@@ -29,7 +29,7 @@
 #include <ghoul/filesystem/file.h>
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
 #include <filesystem>

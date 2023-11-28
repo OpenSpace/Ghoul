@@ -32,7 +32,7 @@
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/fmt.h>
 #include <algorithm>
 #include <filesystem>

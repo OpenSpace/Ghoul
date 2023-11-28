@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 
 namespace ghoul::cmdparser {
 

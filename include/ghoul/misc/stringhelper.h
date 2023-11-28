@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MISC___H__
-#define __GHOUL___MISC___H__
+#ifndef __GHOUL___STRINGHELPER___H__
+#define __GHOUL___STRINGHELPER___H__
 
 #include <string>
 #include <vector>
@@ -109,4 +109,4 @@ std::string encodeUrl(const std::string& string);
 
 } // namespace ghoul
 
-#endif // __GHOUL___MISC___H__
+#endif // __GHOUL___STRINGHELPER___H__

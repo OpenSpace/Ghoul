@@ -31,7 +31,7 @@
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 #include <filesystem>
 #include <fstream>
 #include <sstream>

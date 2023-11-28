@@ -91,13 +91,13 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/profiling.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stacktrace.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stringconversion.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stringhelper.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/supportmacros.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
@@ -144,9 +144,9 @@ target_sources(
     misc/easing.cpp
     misc/exception.cpp
     misc/interpolator.cpp
-    misc/misc.cpp
     misc/sharedmemory.cpp
     misc/stacktrace.cpp
+    misc/stringhelper.cpp
     misc/templatefactory.cpp
     misc/thread.cpp
     misc/threadpool.cpp
