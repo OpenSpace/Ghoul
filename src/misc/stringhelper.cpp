@@ -31,15 +31,21 @@
 namespace ghoul {
 
 void toUpperCase(std::string& s) {
-    for (size_t i = 0; i < s.size(); i++) {
-        s[i] = static_cast<char>(std::toupper((static_cast<unsigned char>(s[i]))));
-    }
+    std::transform(
+        s.begin(),
+        s.end(),
+        s.begin(),
+        [](unsigned char c) { return std::toupper(c); }
+    );
 }
 
 void toLowerCase(std::string& s) {
-    for (size_t i = 0; i < s.size(); i++) {
-        s[i] = static_cast<char>(std::tolower((static_cast<unsigned char>(s[i]))));
-    }
+    std::transform(
+        s.begin(),
+        s.end(),
+        s.begin(),
+        [](unsigned char c) { return std::tolower(c); }
+    );
 }
 
 std::vector<std::string> tokenizeString(const std::string& input, char separator) {
