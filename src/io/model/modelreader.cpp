@@ -147,8 +147,7 @@ void ModelReader::addReader(std::unique_ptr<ModelReaderBase> reader) {
 }
 
 ModelReaderBase* ModelReader::readerForExtension(const std::string& extension) {
-    std::string lowerExtension = extension;
-    toLowerCase(lowerExtension);
+    std::string lowerExtension = toLowerCase(extension);
 
     for (const std::unique_ptr<ModelReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();

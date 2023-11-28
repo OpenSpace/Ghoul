@@ -103,7 +103,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 continue;
             }
 
-            toLowerCase(inputLine);
+            inputLine = toLowerCase(inputLine);
 
             if (inputLine[0] == 'i') {
                 break;

@@ -30,22 +30,28 @@
 
 namespace ghoul {
 
-void toUpperCase(std::string& s) {
+std::string toUpperCase(const std::string& s) {
+    std::string t;
+    t.resize(s.size());
     std::transform(
         s.begin(),
         s.end(),
-        s.begin(),
+        t.begin(),
         [](unsigned char c) { return std::toupper(c); }
     );
+    return t;
 }
 
-void toLowerCase(std::string& s) {
+std::string toLowerCase(const std::string& s) {
+    std::string t;
+    t.resize(s.size());
     std::transform(
         s.begin(),
         s.end(),
-        s.begin(),
+        t.begin(),
         [](unsigned char c) { return std::tolower(c); }
     );
+    return t;
 }
 
 std::vector<std::string> tokenizeString(const std::string& input, char separator) {

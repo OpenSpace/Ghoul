@@ -111,8 +111,7 @@ void TextureReader::addReader(std::unique_ptr<TextureReaderBase> reader) {
 }
 
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
-    std::string lowerExtension = extension;
-    toLowerCase(lowerExtension);
+    std::string lowerExtension = toLowerCase(extension);
 
     for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();

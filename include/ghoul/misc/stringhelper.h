@@ -35,15 +35,17 @@ namespace ghoul {
  * Convert a string to contain only upper case letters.
  *
  * \param s The string to convert to only upper case letters
+ * \return The resulting string, after conversion
  */
-void toUpperCase(std::string& s);
+std::string toUpperCase(const std::string& s);
 
 /**
  * Convert a string to contain only lower case letters.
  *
  * \param s The string to convert to only lower case letters
+ * \return The resulting string, after conversion
  */
-void toLowerCase(std::string& s);
+std::string toLowerCase(const std::string& s);
 
 /**
  * Separates the provided \p input URI into separate parts. If \p input is
