@@ -79,7 +79,7 @@ public:
     /**
      * Returns if this CommandlineParser allows unknown commands, which do not have a
      * CommandlineCommand associated with them, in the command-line set by
-     * #setCommandline.
+     * #setCommandLine.
      *
      * \return `true` if unknown command-line arguments are allowed by this
      *         CommandlineParser; `false` otherwise
