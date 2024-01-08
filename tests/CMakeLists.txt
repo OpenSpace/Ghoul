@@ -58,6 +58,10 @@ endif ()
 
 target_link_libraries(GhoulTest PRIVATE Catch2 Ghoul)
 
+target_precompile_headers(GhoulTest PRIVATE
+  <catch2/catch_test_macros.hpp>
+)
+
 if (APPLE)
   target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
 endif ()
