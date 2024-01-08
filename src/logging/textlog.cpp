@@ -26,10 +26,11 @@
 #include <ghoul/logging/textlog.h>
 
 #include <ghoul/misc/assert.h>
+#include <filesystem>
 
 namespace ghoul::logging {
 
-TextLog::TextLog(const std::string& filename, Append writeToAppend,
+TextLog::TextLog(const std::string& filename, int nLogRotation, Append writeToAppend,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
                  LogLevel minimumLogLevel)
@@ -37,8 +38,40 @@ TextLog::TextLog(const std::string& filename, Append writeToAppend,
     , _printFooter(writeToAppend)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
+    ghoul_assert(nLogRotation > 0, "Log rotation must be positive");
+    if (nLogRotation > 0) {
+        ghoul_assert(writeToAppend == Append::No, "We can't log rotate when appending");
+    }
 
     _file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+
+    while (nLogRotation > 0) {
+        // Move all of the existing logs one position up
+
+        std::filesystem::path file = filename;
+        std::string fname = file.stem().string();
+        std::string ext = file.extension().string();
+
+        std::filesystem::path newCandidate = file;
+        newCandidate.replace_filename(fmt::format("{}-{}{}", fname, nLogRotation, ext));
+
+        std::filesystem::path oldCandidate = file;
+        if (nLogRotation > 1) {
+            // We don't actually have a -0 version, it is just the base name
+            oldCandidate.replace_filename(
+                fmt::format("{}-{}{}", fname, nLogRotation - 1, ext)
+            );
+        }
+
+        if (std::filesystem::exists(newCandidate)) {
+            std::filesystem::remove(newCandidate);
+        }
+        if (std::filesystem::exists(oldCandidate)) {
+            std::filesystem::rename(oldCandidate, newCandidate);
+        }
+
+        nLogRotation--;
+    }
 
     if (writeToAppend) {
         _file.open(filename, std::ofstream::out | std::ofstream::app);

@@ -31,14 +31,15 @@
 
 namespace ghoul::logging {
 
-HTMLLog::HTMLLog(std::string filename, Append writeToAppend,
+HTMLLog::HTMLLog(std::string filename, int nLogRotation,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
                  const std::vector<std::string>& cssIncludes,
                  const std::vector<std::string>& jsIncludes, LogLevel minimumLogLevel)
     : TextLog(
         std::move(filename),
-        writeToAppend,
+        nLogRotation,
+        Append::No,
         timeStamping,
         dateStamping,
         categoryStamping,

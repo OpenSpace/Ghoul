@@ -59,6 +59,10 @@ public:
      *
      * \param filename The path and filename of the file that will receive the log
      *        messages
+     * \param nLogRotation The number of log files that should be kept. If this is 0, only
+     *        a single file will be used. If this is 3, there will be files
+     *        `filename.ext`, `filename-1.ext`, and `filename-2.ext` with the numbered
+     *        files being the previous versions of the log file.
      * \param writeToAppend If this is `true`, the log messages will be appended
      *        to the file. If it is `false` the file will be overwritten without
      *        a warning
@@ -74,9 +78,11 @@ public:
      *
      * \throw std::ios_base::failure If the opening of the file failed
      * \pre \p filename must not be empty
+     * \pre \p nLogRotation must be >= 0
+     * \pre If \p nLogRotation is > 0 \p writeToAppend must be Append::No
      */
-    TextLog(const std::string& filename, Append writeToAppend = Append::Yes,
-        TimeStamping timeStamping = TimeStamping::Yes,
+    TextLog(const std::string& filename, int nLogRotation = 0,
+        Append writeToAppend = Append::Yes, TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
         LogLevelStamping logLevelStamping = LogLevelStamping::Yes,

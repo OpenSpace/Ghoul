@@ -54,8 +54,10 @@ public:
      *
      * \param filename The path and filename of the file that will receive the log
      *        messages
-     * \param writeToAppend If this is `true`, the log messages will be appended to the
-     *        file. If it is `false` the file will be overwritten without a warning.
+     * \param nLogRotation The number of log files that should be kept. If this is 0, only
+     *        a single file will be used. If this is 3, there will be files
+     *        `filename.ext`, `filename-1.ext`, and `filename-2.ext` with the numbered
+     *        files being the previous versions of the log file.
      * \param timeStamping Determines if the log should print the time when a message is
      *        logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
@@ -72,7 +74,7 @@ public:
      *
      * \pre \p filename must not be empty
      */
-    HTMLLog(std::string filename, Append writeToAppend = Append::Yes,
+    HTMLLog(std::string filename, int nLogRotation,
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
