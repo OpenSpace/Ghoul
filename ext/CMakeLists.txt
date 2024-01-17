@@ -117,6 +117,14 @@ if (GHOUL_MODULE_LUA)
   add_subdirectory(lua)
   target_link_libraries(Ghoul PUBLIC Lua)
   set_target_properties(Lua PROPERTIES FOLDER "External")
+
+  if (MSVC)
+    target_compile_options(Lua PRIVATE "/W0")
+    target_compile_definitions(Lua PRIVATE "_SCL_SECURE_NO_WARNINGS")
+  else ()
+    target_compile_options(Lua PRIVATE "-w")
+  endif ()
+
   end_module("Lua")
 endif ()
 
