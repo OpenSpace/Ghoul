@@ -51,7 +51,7 @@ std::string licenseText() {
     return "GHOUL\n\
 General Helpful Open Utility Library\n\
 \n\
-Copyright(c) 2012 - 2021\n\
+Copyright(c) 2012 - 2024\n\
 \n\
 Permission is hereby granted, free of charge, to any person obtaining a copy of this\n\
 software and associated documentation files(the \"Software\"), to deal in the Software\n\
