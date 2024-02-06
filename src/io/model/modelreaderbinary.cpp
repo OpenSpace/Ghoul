@@ -242,7 +242,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
                 if (version == CurrentModelVersion) {
-                    fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
+                    fileStream.read(
+                        reinterpret_cast<char*>(&texture.color.a),
+                        sizeof(float)
+                    );
                     // isTransparent
                     uint8_t isT;
                     fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
