@@ -115,18 +115,18 @@ namespace {
     out vec2 texCoords;
     out vec2 outlineTexCoords;
 
-    uniform dmat4 mvpMatrix;
-    uniform dmat4 modelViewTransform;
+    uniform mat4 mvpMatrix;
+    uniform mat4 modelViewTransform;
 
     out float depth;
     out vec3 vsPosition;
     void main() {
         texCoords = in_texCoords;
         outlineTexCoords = in_outlineTexCoords;
-        vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0));
+        vec4 finalPos = vec4(mvpMatrix * vec4(in_position.xyz, 1.0));
         depth = finalPos.w;
         finalPos.z = 0.0;
-        vsPosition = vec3(modelViewTransform * dvec4(in_position.xyz, 1.0));
+        vsPosition = vec3(modelViewTransform * vec4(in_position.xyz, 1.0));
         gl_Position = finalPos;
     })";
 
@@ -735,10 +735,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
     _program->setUniform(_uniformCacheProjection.texture, atlasUnit);
     _program->setUniform(_uniformCacheProjection.hasOutline, font.hasOutline());
-    _program->setUniform(_uniformMvp, labelInfo.mvpMatrix);
+    _program->setUniform(_uniformMvp, static_cast<glm::mat4>(labelInfo.mvpMatrix));
     _program->setUniform(
         _uniformCacheProjection.modelViewTransform,
-        labelInfo.modelViewMatrix
+        static_cast<glm::mat4>(labelInfo.modelViewMatrix)
     );
     _program->setUniform(
         _uniformCacheProjection.enableFalseDepth,

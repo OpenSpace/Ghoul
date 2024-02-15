@@ -1943,14 +1943,14 @@ void ProgramObject::setUniform(GLint location, const glm::dvec2& value) {
 void ProgramObject::setUniform(GLint location, const glm::dvec3& value) {
     ghoul_assert(location != -1, "Location must not be -1");
 
-    if (glbinding::Binding::ProgramUniform3dv.isResolved()) {
-        glProgramUniform3dv(_id, location, 1, value_ptr(value));
+    if (glbinding::Binding::ProgramUniform3fv.isResolved()) {
+        glProgramUniform3fv(_id, location, 1, value_ptr(static_cast<const glm::vec3&>(value)));
     }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform3dv(location, 1, value_ptr(value));
+        glUniform3fv(location, 1, value_ptr(static_cast<const glm::vec3&>(value)));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -2544,24 +2544,24 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value,
 {
     ghoul_assert(location != -1, "Location must not be -1");
 
-    if (glbinding::Binding::ProgramUniformMatrix4dv.isResolved()) {
-        glProgramUniformMatrix4dv(
+    if (glbinding::Binding::ProgramUniformMatrix4fv.isResolved()) {
+        glProgramUniformMatrix4fv(
             _id,
             location,
             1,
             transpose ? GL_TRUE : GL_FALSE,
-            value_ptr(value)
+            value_ptr(static_cast<const glm::mat4x4&>(value))
         );
     }
     else {
         GLint oldProgram;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniformMatrix4dv(
+        glUniformMatrix4fv(
             location,
             1,
             transpose ? GL_TRUE : GL_FALSE,
-            value_ptr(value)
+            value_ptr(static_cast<const glm::mat4x4&>(value))
         );
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
