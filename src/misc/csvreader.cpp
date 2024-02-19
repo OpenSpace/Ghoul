@@ -33,15 +33,48 @@
 #include <fstream>
 
 namespace {
+    bool startsWith(std::string lhs, std::string_view rhs) noexcept {
+        return (rhs.size() <= lhs.size()) && (lhs.substr(0, rhs.size()) == rhs);
+    }
+
+    std::string readFirstValidLine(std::ifstream& file) {
+        std::string line;
+        while (std::getline(file, line)) {
+            ghoul::trimWhitespace(line);
+            if (!line.empty() && !startsWith(line, "#")) {
+                break;
+            }
+
+        }
+        return line;
+    }
+
     std::vector<std::vector<std::string>> internalLoadCSV(std::ifstream& file,
+                                                          bool includeFirstLine,
                                                           const std::vector<int>& indices)
     {
         ghoul_assert(file.good(), "File handle should be good");
 
         std::vector<std::vector<std::string>> result;
 
+        bool hasFoundFirstValidLine = false;
         std::string line;
         while (std::getline(file, line)) {
+            ghoul::trimWhitespace(line);
+
+            // Skip comments and empty lines
+            if (line.empty() || startsWith(line, "#")) {
+                continue;
+            }
+
+            if (!hasFoundFirstValidLine) {
+                hasFoundFirstValidLine = true;
+                if (!includeFirstLine) {
+                    // Skip the first line containing the column names
+                    continue;
+                }
+            }
+
             std::vector<std::string> lineValues = ghoul::tokenizeString(line, ',');
 
             // The user might have needed to use a , inside a value and needed to escape
@@ -126,13 +159,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     file.exceptions(std::ifstream::badbit);
     file.open(fileName);
 
-    // Just skip over the first line if we don't want to include it
-    if (!includeFirstLine) {
-        std::string line;
-        std::getline(file, line);
-    }
-
-    return internalLoadCSV(file, std::vector<int>());
+    return internalLoadCSV(file, includeFirstLine, std::vector<int>());
 }
 
 std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
@@ -146,9 +173,9 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     file.exceptions(std::ifstream::badbit);
     file.open(fileName);
 
-    // Get the file line that contains the column names
-    std::string line;
-    std::getline(file, line);
+    // Get the file line that contains the column names (the first one)
+    std::string line = readFirstValidLine(file);
+
     std::vector<std::string> elements = ghoul::tokenizeString(line, ',');
     if (elements.empty()) {
         throw ghoul::RuntimeError(
@@ -179,7 +206,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
         file.seekg(0);
     }
 
-    return internalLoadCSV(file, indices);
+    return internalLoadCSV(file, includeFirstLine, indices);
 }
 
 std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
@@ -193,13 +220,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     file.exceptions(std::ifstream::badbit);
     file.open(fileName);
 
-    // Just skip over the first line if we don't want to include it
-    if (!includeFirstLine) {
-        std::string line;
-        std::getline(file, line);
-    }
-
-    return internalLoadCSV(file, columns);
+    return internalLoadCSV(file, includeFirstLine, columns);
 }
 
 } // namespace ghoul
