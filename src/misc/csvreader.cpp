@@ -33,15 +33,11 @@
 #include <fstream>
 
 namespace {
-    bool startsWith(std::string lhs, std::string_view rhs) noexcept {
-        return (rhs.size() <= lhs.size()) && (lhs.substr(0, rhs.size()) == rhs);
-    }
-
     std::string readFirstValidLine(std::ifstream& file) {
         std::string line;
         while (std::getline(file, line)) {
             ghoul::trimWhitespace(line);
-            if (!line.empty() && !startsWith(line, "#")) {
+            if (!line.empty() && line.starts_with("#")) {
                 break;
             }
 
@@ -63,7 +59,7 @@ namespace {
             ghoul::trimWhitespace(line);
 
             // Skip comments and empty lines
-            if (line.empty() || startsWith(line, "#")) {
+            if (line.empty() || line.starts_with("#")) {
                 continue;
             }
 
