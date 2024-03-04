@@ -98,7 +98,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
             std::cerr <<
                 "(I)gnore / Ignore (P)ermanently / (A)ssertion / (S)tacktrace / (E)xit: ";
             std::string inputLine;
-            std::getline(std::cin, inputLine);
+            ghoul::getline(std::cin, inputLine);
             if (inputLine.empty()) {
                 continue;
             }

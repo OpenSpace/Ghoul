@@ -41,7 +41,7 @@ namespace {
         std::vector<std::vector<std::string>> result;
 
         std::string line;
-        while (std::getline(file, line)) {
+        while (ghoul::getline(file, line)) {
             std::vector<std::string> lineValues = ghoul::tokenizeString(line, ',');
 
             // The user might have needed to use a , inside a value and needed to escape
@@ -129,7 +129,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     // Just skip over the first line if we don't want to include it
     if (!includeFirstLine) {
         std::string line;
-        std::getline(file, line);
+        ghoul::getline(file, line);
     }
 
     return internalLoadCSV(file, std::vector<int>());
@@ -148,7 +148,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
 
     // Get the file line that contains the column names
     std::string line;
-    std::getline(file, line);
+    ghoul::getline(file, line);
     std::vector<std::string> elements = ghoul::tokenizeString(line, ',');
     if (elements.empty()) {
         throw ghoul::RuntimeError(
@@ -196,7 +196,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     // Just skip over the first line if we don't want to include it
     if (!includeFirstLine) {
         std::string line;
-        std::getline(file, line);
+        ghoul::getline(file, line);
     }
 
     return internalLoadCSV(file, columns);
