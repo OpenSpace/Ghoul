@@ -143,4 +143,24 @@ std::string encodeUrl(const std::string& string) {
     return result;
 }
 
+std::istream& getline(std::istream& inputStream, std::string& str) {
+    std::getline(inputStream, str);
+#ifndef WIN32
+    if (!str.empty() && (str.back() == '\r')) {
+        str.pop_back();
+    }
+#endif //WIN32
+    return inputStream;
+}
+
+std::istream& getline(std::istream& inputStream, std::string& str, char delim) {
+    std::getline(inputStream, str, delim);
+#ifndef WIN32
+    if (!str.empty() && (str.back() == '\r')) {
+        str.pop_back();
+    }
+#endif //WIN32
+    return inputStream;
+}
+
 } // namespace ghoul
