@@ -37,10 +37,9 @@ namespace {
         std::string line;
         while (std::getline(file, line)) {
             ghoul::trimWhitespace(line);
-            if (!line.empty() && line.starts_with("#")) {
+            if (!line.empty() && !line.starts_with("#")) {
                 break;
             }
-
         }
         return line;
     }
