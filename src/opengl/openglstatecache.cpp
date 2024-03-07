@@ -73,14 +73,14 @@ void OpenGLStateCache::loadCurrentGLState() {
     _blending.enabled = glIsEnabled(GL_BLEND);
 
     if (_blending.enabledArray.empty()) {
-        for (int i = 0; i < _maxAttachBuffers; ++i) {
+        for (int i = 0; i < _maxAttachBuffers; i++) {
             _blending.enabledArray.push_back(glIsEnabledi(GL_BLEND, i));
         }
     }
     else {
         std::vector<GLboolean>::iterator blendBufferIt = _blending.enabledArray.begin();
         std::vector<GLboolean>::iterator endBlendBuffer = _blending.enabledArray.end();
-        for (int i = 0; blendBufferIt < endBlendBuffer; ++ blendBufferIt, ++i) {
+        for (int i = 0; blendBufferIt < endBlendBuffer; blendBufferIt++, i++) {
             *blendBufferIt = glIsEnabledi(GL_BLEND, i);
         }
     }
@@ -119,7 +119,7 @@ void OpenGLStateCache::resetBlendState() const {
     }
 
     auto it  = _blending.enabledArray.cbegin();
-    for (int i = 0; it < _blending.enabledArray.cend(); ++it, ++i) {
+    for (int i = 0; it < _blending.enabledArray.cend(); it++, i++) {
         if (*it) {
             glEnablei(GL_BLEND, i);
         }

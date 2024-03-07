@@ -147,7 +147,7 @@ void ThreadPool::resize(int nThreads) {
 
         // We only want to activate the new workers if we are not currently running
         if (*_isRunning) {
-            for (int i = oldNThreads; i < nThreads; ++i) {
+            for (int i = oldNThreads; i < nThreads; i++) {
                 activateWorker(_workers[i]);
             }
         }

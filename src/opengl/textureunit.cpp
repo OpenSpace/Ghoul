@@ -98,7 +98,7 @@ void TextureUnit::assignUnit() {
 
     _assigned = true;
 
-    for (size_t i = 0; i < _maxTexUnits; ++i) {
+    for (size_t i = 0; i < _maxTexUnits; i++) {
         if (!_busyUnits[i]) {
             _number = static_cast<GLint>(i);
             _glEnum = GL_TEXTURE0 + _number;

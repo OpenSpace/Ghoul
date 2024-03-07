@@ -396,7 +396,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     bool hasMonitorMWait = false;
     bool hasCplQualifiedDebugStore = false;
     bool hasThermalMonitor2 = false;
-    for (unsigned i = 0; i <= nIds; ++i) {
+    for (unsigned i = 0; i <= nIds; i++) {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU feature information.
@@ -418,7 +418,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     std::memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
     // Get the information associated with each extended ID.
-    for (unsigned i = 0x80000000; i <= nExIds; ++i) {
+    for (unsigned i = 0x80000000; i <= nExIds; i++) {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU brand string and cache information.
@@ -454,7 +454,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
         extensions << "tm2 ";
     }
 
-    for (size_t i = 0; i < szFeatures.size(); ++i, nIds <<= 1) {
+    for (size_t i = 0; i < szFeatures.size(); i++, nIds <<= 1) {
         if (nFeatureInfo & nIds) {
             extensions << szFeatures[i] << " ";
         }

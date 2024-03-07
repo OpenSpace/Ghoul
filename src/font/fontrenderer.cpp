@@ -469,7 +469,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
-        for (size_t j = 0; j < line.size(); ++j) {
+        for (size_t j = 0; j < line.size(); j++) {
             wchar_t character = line[j];
             if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
@@ -591,7 +591,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         //movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
-        for (size_t j = 0; j < line.size(); ++j) {
+        for (size_t j = 0; j < line.size(); j++) {
             wchar_t character = line[j];
             if (character == wchar_t('\t')) {
                 character = wchar_t(' ');

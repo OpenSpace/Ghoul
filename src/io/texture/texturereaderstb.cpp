@@ -61,7 +61,7 @@ namespace {
 
         // As we only need to flip in y direction, we can take entire scanlines and move
         // the ith line to the (y-i-1)th line
-        for (int i = 0; i < y; ++i) {
+        for (int i = 0; i < y; i++) {
             std::memmove(newData + (i * x * n), data + ((y-i-1) * x * n), x * n);
         }
         // We don't need the original data anymore, so we can free it

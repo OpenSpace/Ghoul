@@ -42,7 +42,7 @@ TEST_CASE("CSVReader: Full Load", "[csvreader]") {
     REQUIRE(noHeader.size() == 351);
     REQUIRE(header.size() == 352);
 
-    for (size_t i = 1; i < header.size(); ++i) {
+    for (size_t i = 1; i < header.size(); i++) {
         REQUIRE(noHeader[i - 1].size() == 19);
         REQUIRE(header[i].size() == 19);
         REQUIRE(noHeader[i - 1] == header[i]);
@@ -70,7 +70,7 @@ TEST_CASE("CSVReader: Column Number", "[csvreader]") {
     REQUIRE(noHeader.size() == 351);
     REQUIRE(header.size() == 352);
 
-    for (size_t i = 1; i < header.size(); ++i) {
+    for (size_t i = 1; i < header.size(); i++) {
         REQUIRE(noHeader[i - 1].size() == 4);
         REQUIRE(header[i].size() == 4);
         REQUIRE(noHeader[i - 1] == header[i]);
@@ -93,7 +93,7 @@ TEST_CASE("CSVReader: Column Name", "[csvreader]") {
     REQUIRE(noHeader.size() == 351);
     REQUIRE(header.size() == 352);
 
-    for (size_t i = 1; i < header.size(); ++i) {
+    for (size_t i = 1; i < header.size(); i++) {
         REQUIRE(noHeader[i - 1].size() == 3);
         REQUIRE(header[i].size() == 3);
         REQUIRE(noHeader[i - 1] == header[i]);

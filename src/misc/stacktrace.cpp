@@ -81,7 +81,7 @@ std::vector<std::string> stackTrace() {
     char** strs = backtrace_symbols(reinterpret_cast<void**>(callstack), nFrames);
 
     stackFrames.reserve(nFrames);
-    for (int i = 0; i < nFrames; ++i) {
+    for (int i = 0; i < nFrames; i++) {
         const int MaxFunctionSymbolLength = 1024;
         const int MaxModuleNameLength = 1024;
         const int MaxAddressLength = 48;

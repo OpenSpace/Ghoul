@@ -3620,7 +3620,7 @@ vector<string> ProgramObject::activeSubroutineUniformNames(
         &countActiveSubroutineUniforms
     );
     vector<string> result(countActiveSubroutineUniforms);
-    for (GLuint i = 0; i < static_cast<GLuint>(countActiveSubroutineUniforms); ++i) {
+    for (GLuint i = 0; i < static_cast<GLuint>(countActiveSubroutineUniforms); i++) {
         glGetActiveSubroutineUniformName(
             _id,
             static_cast<GLenum>(shaderType),
@@ -3674,7 +3674,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
         GL_COMPATIBLE_SUBROUTINES,
         indices.data()
     );
-    for (GLuint i = 0; i < static_cast<GLuint>(numCompatibleSubroutines); ++i) {
+    for (GLuint i = 0; i < static_cast<GLuint>(numCompatibleSubroutines); i++) {
         glGetActiveSubroutineName(
             _id,
             static_cast<GLenum>(shaderType),
@@ -3759,7 +3759,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
 
     vector<GLuint> uniformIndices(values.size());
     const vector<string>& uniformSubroutines = activeSubroutineUniformNames(shaderType);
-    for (size_t i = 0; i < uniformSubroutines.size(); ++i) {
+    for (size_t i = 0; i < uniformSubroutines.size(); i++) {
         const string& uniformSubroutine = uniformSubroutines[i];
         map<string,string>::const_iterator subroutine = values.find(uniformSubroutine);
 #ifdef GHL_DEBUG

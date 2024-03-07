@@ -166,7 +166,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     int bestWidth = std::numeric_limits<int>::max();
     int bestIndex = -1;
 
-    for (size_t i = 0; i < _nodes.size(); ++i) {
+    for (size_t i = 0; i < _nodes.size(); i++) {
         const int y = atlasFit(i, width, height);
         if (y >= 0) {
             const glm::ivec3& node = _nodes[i];
@@ -190,7 +190,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
 
     _nodes.insert(_nodes.begin() + bestIndex, {region.x, region.y + height, width});
 
-    for (size_t i = bestIndex + 1; i < _nodes.size(); ++i) {
+    for (size_t i = bestIndex + 1; i < _nodes.size(); i++) {
         glm::ivec3& node = _nodes[i];
         const glm::ivec3& prev = _nodes[i-1];
 
@@ -258,7 +258,7 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
     // As the incoming data is a single stream of bytes, we need to chop it up into chunks
     // of length 'width'. We have 'height' of these chunks that need to be copied into our
     // atlas
-    for (int i = 0; i < height; ++i) {
+    for (int i = 0; i < height; i++) {
         void* dst = _data.data() + ((y + i) * _size.x + x) * sizeof(char) * _size.z;
         void* src = reinterpret_cast<unsigned char*>(data) + (i * width) * sizeof(char);
         size_t nBytes = width * sizeof(char) * _size.z;
@@ -312,13 +312,13 @@ int TextureAtlas::atlasFit(size_t index, int width, int height) const {
             return -1;
         }
         remainingWidth -= node.z;
-        ++index;
+        index++;
     }
     return y;
 }
 
 void TextureAtlas::atlasMerge() {
-    for (size_t i = 0; i < _nodes.size() - 1; ++i) {
+    for (size_t i = 0; i < _nodes.size() - 1; i++) {
         glm::ivec3& node = _nodes[i];
         const glm::ivec3& next = _nodes[i+1];
         if (node.y == next.y) {

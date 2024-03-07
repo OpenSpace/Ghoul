@@ -185,7 +185,7 @@ bool Dictionary::hasValue(std::string_view key) const {
             }
 
             // Check whether we have all keys and they are of the correct type
-            for (int i = 1; i <= ghoul::glm_components<T>::value; ++i) {
+            for (int i = 1; i <= ghoul::glm_components<T>::value; i++) {
                 if (!d.hasValue<typename T::value_type>(std::to_string(i))) {
                     return false;
                 }

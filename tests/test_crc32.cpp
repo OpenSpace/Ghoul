@@ -249,11 +249,11 @@ TEST_CASE("CRC32: HashRandomEquality", "[crc32]") {
     std::uniform_int_distribution<int> dist(0, static_cast<int>(alphanum.size() - 1));
 
     // Create nTests number of random strings to test
-    for (int i = 0; i < nTests; ++i) {
-        for (int j = 0; j < nTests; ++j) {
+    for (int i = 0; i < nTests; i++) {
+        for (int j = 0; j < nTests; j++) {
             std::vector<char> data(j);
 
-            for (int k = 0; k < j; ++k) {
+            for (int k = 0; k < j; k++) {
                 data[k] = alphanum[dist(e)];
             }
 

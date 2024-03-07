@@ -153,7 +153,7 @@ void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
     std::memset(newData, 0, nChannelsNew * bytesPerChannel * nPixels);
 
     // Conversion
-    for (int i = 0; i < nPixels; ++i) {
+    for (int i = 0; i < nPixels; i++) {
         const char* oldPtr = oldData + i * bytesPerChannel * nChannelsOld;
         char* newPtr = newData + i * bytesPerChannel * nChannelsNew;
 

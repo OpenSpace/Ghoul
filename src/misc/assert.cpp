@@ -129,7 +129,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 std::vector<std::string> stackTrace = ghoul::stackTrace();
 
                 std::cerr << '\n';
-                for (size_t i = 0; i < stackTrace.size(); ++i) {
+                for (size_t i = 0; i < stackTrace.size(); i++) {
                     std::cerr << i << ": " << stackTrace[i] << '\n';
                 }
                 std::cerr << '\n';

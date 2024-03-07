@@ -415,8 +415,8 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
             const int widthOffset = (width - insideBitmap->bitmap.width) / 2;
             const int heightOffset = (height - insideBitmap->bitmap.rows) / 2;
 
-            for (unsigned int j = 0; j < height; ++j) {
-                for (unsigned int i = 0; i < width; ++i) {
+            for (unsigned int j = 0; j < height; j++) {
+                for (unsigned int i = 0; i < width; i++) {
                     const int k = i - widthOffset;
                     const int l = j - heightOffset;
 
@@ -486,12 +486,12 @@ void Font::generateKerning() {
 
     // For each combination of Glyphs, determine the kerning factors. The index starts at
     // 1 as 0 is reserved for the special background glyph
-    for (size_t i = 1; i < _glyphs.size(); ++i) {
+    for (size_t i = 1; i < _glyphs.size(); i++) {
         Glyph& glyph = _glyphs[i];
         FT_UInt glyphIndex = FT_Get_Char_Index(face, glyph.charcode);
         glyph._kerning.clear();
 
-        for (size_t j = 1; j < _glyphs.size(); ++j) {
+        for (size_t j = 1; j < _glyphs.size(); j++) {
             const Glyph& prevGlyph = _glyphs[j];
             FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph.charcode);
             FT_Vector kerning;

@@ -206,7 +206,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             std::vector<unsigned int> indexArray;
             indexArray.reserve(nIndices);
 
-            for (int32_t i = 0; i < nIndices; ++i) {
+            for (int32_t i = 0; i < nIndices; i++) {
                 uint32_t index;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
                 indexArray.push_back(index);

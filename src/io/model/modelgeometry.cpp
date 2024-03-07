@@ -325,7 +325,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             std::vector<unsigned int> indexArray;
             indexArray.reserve(nIndices);
 
-            for (int32_t i = 0; i < nIndices; ++i) {
+            for (int32_t i = 0; i < nIndices; i++) {
                 uint32_t index;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
                 indexArray.push_back(index);
@@ -706,7 +706,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             }
             fileStream.write(reinterpret_cast<const char*>(&nIndices), sizeof(int32_t));
 
-            for (int32_t i = 0; i < nIndices; ++i) {
+            for (int32_t i = 0; i < nIndices; i++) {
                 uint32_t index = static_cast<uint32_t>(mesh.indices()[i]);
                 fileStream.write(reinterpret_cast<const char*>(&index), sizeof(uint32_t));
             }

@@ -53,7 +53,7 @@ std::string_view nameForEasingFunction(EasingFunction func) {
 }
 
 EasingFunction easingFunctionFromName(std::string_view name) {
-    for (size_t i = 0; i < EaseFuncNames.size(); ++i) {
+    for (size_t i = 0; i < EaseFuncNames.size(); i++) {
         if (EaseFuncNames[i] == name) {
             return EasingFunction(i);
         }

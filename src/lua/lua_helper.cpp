@@ -207,7 +207,7 @@ std::string stackInformation(lua_State* state) {
     }
 
     std::string result = "Lua Stack\n";
-    for (int i = 1; i <= top; ++i) {
+    for (int i = 1; i <= top; i++) {
         result += fmt::format("{}: ", i);
         const int t = lua_type(state, i);
         switch (t) {
@@ -466,7 +466,7 @@ ghoul::Dictionary luaDictionaryFromState(lua_State* state, int location) {
 void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
     const int nValues = lua_gettop(state);
 
-    for (int i = 1; i <= nValues; ++i) {
+    for (int i = 1; i <= nValues; i++) {
         switch (lua_type(state, i)) {
             case LUA_TNUMBER: {
                 double value = lua_tonumber(state, i);

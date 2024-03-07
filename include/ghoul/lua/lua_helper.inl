@@ -398,7 +398,7 @@ void push(lua_State* L, T value) {
                        std::is_same_v<T, std::vector<float>>)
     {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushnumber(L, std::move(value[i]));
             lua_settable(L, -3);
@@ -406,7 +406,7 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (std::is_same_v<T, std::vector<int>>) {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushinteger(L, std::move(value[i]));
             lua_settable(L, -3);
@@ -414,7 +414,7 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (std::is_same_v<T, std::vector<const char*>>) {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushstring(L, value[i]);
             lua_settable(L, -3);
@@ -422,7 +422,7 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushstring(L, value[i].c_str());
             lua_settable(L, -3);
@@ -434,7 +434,7 @@ void push(lua_State* L, T value) {
     else if constexpr (isGlmVector<T>()) {
         lua_newtable(L);
         int number = 1;
-        for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; ++i) {
+        for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; i++) {
             lua_pushnumber(L, static_cast<lua_Number>(value[i]));
             lua_rawseti(L, -2, number);
             ++number;
@@ -443,8 +443,8 @@ void push(lua_State* L, T value) {
     else if constexpr (isGlmMatrix<T>()) {
         lua_newtable(L);
         int number = 1;
-        for (glm::length_t i = 0; i < T::type::row_type::length(); ++i) {
-            for (glm::length_t j = 0; j < T::type::col_type::length(); ++j) {
+        for (glm::length_t i = 0; i < T::type::row_type::length(); i++) {
+            for (glm::length_t j = 0; j < T::type::col_type::length(); j++) {
                 lua_pushnumber(L, static_cast<lua_Number>(value[i][j]));
                 lua_rawseti(L, -2, number);
                 ++number;
@@ -1040,7 +1040,7 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location, PopValue shouldPo
     internal::extractValues(L, result, location, n, argumentsFound);
 
     if (shouldPopValue) {
-        for (int i = 0; i < argumentsFound; ++i) {
+        for (int i = 0; i < argumentsFound; i++) {
             lua_remove(L, location);
         }
     }

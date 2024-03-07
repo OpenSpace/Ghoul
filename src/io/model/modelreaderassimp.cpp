@@ -58,8 +58,8 @@ static bool isTextureTransparent(const ModelMesh::Texture texture) {
     }
 
     // Check if there is at least one pixel that is somewhat transparent
-    for (unsigned int j = 0; j < texture.texture->dimensions().x; ++j) {
-        for (unsigned int k = 0; k < texture.texture->dimensions().y; ++k) {
+    for (unsigned int j = 0; j < texture.texture->dimensions().x; j++) {
+        for (unsigned int k = 0; k < texture.texture->dimensions().y; k++) {
             float alpha = texture.texture->texelAsFloat(glm::vec2(j, k)).a;
             if (alpha < 1.f) {
                 return true;
@@ -76,7 +76,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                   std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                                                     std::filesystem::path& modelDirectory)
 {
-    for (unsigned int i = 0; i < material.GetTextureCount(type); ++i) {
+    for (unsigned int i = 0; i < material.GetTextureCount(type); i++) {
         ModelMesh::Texture meshTexture;
         meshTexture.type = enumType;
         aiString path;
@@ -202,12 +202,12 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
 
         // Check if the entire texture is transparent
         bool isOpaque = false;
-        for (unsigned int j = 0; j < meshTexture.texture->dimensions().x; ++j) {
+        for (unsigned int j = 0; j < meshTexture.texture->dimensions().x; j++) {
             if (isOpaque) {
                 break;
             }
 
-            for (unsigned int k = 0; k < meshTexture.texture->dimensions().y; ++k) {
+            for (unsigned int k = 0; k < meshTexture.texture->dimensions().y; k++) {
                 float alpha = meshTexture.texture->texelAsFloat(glm::vec2(j, k)).a;
                 if (alpha > 0.f) {
                     isOpaque = true;
@@ -298,10 +298,10 @@ static ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
     // Reserve space, every face has usually three indices
     unsigned int nIndices = mesh.mNumFaces * 3u;
     indexArray.reserve(nIndices);
-    for (unsigned int i = 0; i < mesh.mNumFaces; ++i) {
+    for (unsigned int i = 0; i < mesh.mNumFaces; i++) {
         aiFace face = mesh.mFaces[i];
 
-        for (unsigned int j = 0; j < face.mNumIndices; ++j) {
+        for (unsigned int j = 0; j < face.mNumIndices; j++) {
             indexArray.push_back(face.mIndices[j]);
         }
     }
