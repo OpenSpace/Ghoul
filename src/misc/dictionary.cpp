@@ -124,7 +124,7 @@ T Dictionary::value(std::string_view key) const {
                     throw ValueError(
                         std::string(key),
                         fmt::format(
-                            "Invalid key {} outside range [0,{}]", k, d._storage.size()
+                            "Invalid key '{}' outside range [0,{}]", k, d._storage.size()
                         )
                     );
                 }
@@ -135,7 +135,7 @@ T Dictionary::value(std::string_view key) const {
             throw ValueError(
                 std::string(key),
                 fmt::format(
-                    "Requested {} but did not contain {} or {}",
+                    "Requested '{}' but did not contain '{}' or '{}'",
                     typeid(T).name(), typeid(T).name(),
                     typeid(std::vector<typename T::value_type>).name()
                 )

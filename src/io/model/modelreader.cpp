@@ -46,7 +46,7 @@ namespace ghoul::io {
 ModelReader::MissingReaderException::MissingReaderException(std::string extension,
                                                             std::filesystem::path f)
     : RuntimeError(fmt::format(
-        "No reader was found for extension '{}' with file {}", extension, f
+        "No reader was found for extension '{}' with file '{}'", extension, f
     ))
     , fileExtension(std::move(extension))
     , file(std::move(f))
@@ -78,7 +78,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
 
     if (!reader->needsCache()) {
-        LINFO(fmt::format("Loading ModelGeometry file {}", filename));
+        LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
         return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
     }
 
@@ -86,7 +86,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
         LINFO(fmt::format(
-            "Cached file {} used for ModelGeometry file {}", cachedFile, filename
+            "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename
         ));
 
         try {
@@ -100,7 +100,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         }
         catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
             LINFO(fmt::format(
-                "Encountered problem: '{}' while loading model from cache file: {}. "
+                "Encountered problem '{}' while loading model from cache file '{}'. "
                 "Deleting cache", e.errorMessage, cachedFile
             ));
             FileSys.cacheManager()->removeCacheFile(filename);
@@ -110,10 +110,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
     }
     else {
-        LINFO(fmt::format("Cache for ModelGeometry file {} not found", filename));
+        LINFO(fmt::format("Cache for ModelGeometry file '{}' not found", filename));
     }
 
-    LINFO(fmt::format("Loading ModelGeometry file {}", filename));
+    LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
 
     std::unique_ptr<modelgeometry::ModelGeometry> model =
         reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
@@ -124,7 +124,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
     catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
         LINFO(fmt::format(
-            "Encountered problem: '{}' while saving model to cache file: {}. "
+            "Encountered problem '{}' while saving model to cache file '{}'. "
             "Deleting cache", e.errorMessage, e.filename
         ));
 

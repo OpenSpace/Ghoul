@@ -42,7 +42,8 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 
     if (nDimensions != 1) {
         throw ghoul::RuntimeError(fmt::format(
-            "The number of dimensions for {} must be 1, but was {}", filename, nDimensions
+            "The number of dimensions for '{}' must be 1, but was {}",
+            filename, nDimensions
         ));
     }
 
@@ -119,7 +120,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             case 3: return GL_TEXTURE_3D;
             default:
                 throw ghoul::RuntimeError(fmt::format(
-                    "Unsupported dimensionality {}", d
+                    "Unsupported dimensionality '{}'", d
                 ));
         }
     }(nDimensions);

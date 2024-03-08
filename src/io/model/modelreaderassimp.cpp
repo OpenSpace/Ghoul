@@ -147,7 +147,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
                 }
                 catch (const TextureReaderBase::TextureLoadException& e) {
                     LWARNING(fmt::format(
-                        "Failed to load texture from '{}' with error: '{}': "
+                        "Failed to load texture from '{}' with error '{}': "
                         "Replacing with flashy color", e.filename, e.message
                     ));
                     ModelMesh::generateDebugTexture(meshTexture);
@@ -191,7 +191,7 @@ static bool loadMaterialTextures(const aiScene& scene, const aiMaterial& materia
             }
             catch (const TextureReaderBase::TextureLoadException& e) {
                 LWARNING(fmt::format(
-                    "Failed to load texture from '{}' with error: '{}': Replacing with "
+                    "Failed to load texture from '{}' with error '{}': Replacing with "
                     "flashy color", e.filename, e.message
                 ));
                 ModelMesh::generateDebugTexture(meshTexture);

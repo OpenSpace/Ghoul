@@ -57,7 +57,8 @@ namespace {
         if (!std::filesystem::is_regular_file(path)) {
             throw ghoul::RuntimeError(
                 fmt::format(
-                    "Error retrieving last-modified date for {}. File did not exist", path
+                    "Error retrieving last-modified date for '{}'. File did not exist",
+                    path
                 ),
                 "Cache"
             );
@@ -84,7 +85,7 @@ namespace {
             std::string msg(buffer.data());
             throw ghoul::RuntimeError(
                 fmt::format(
-                    "Could not retrieve last-modified date for {}: {}", path, msg
+                    "Could not retrieve last-modified date for '{}': {}", path, msg
                 ),
                 "Cache"
             );
@@ -106,7 +107,7 @@ namespace {
                 );
                 std::string msg(buffer.data());
                 throw ghoul::RuntimeError(
-                    fmt::format("'FileTimeToSystemTime' failed for {}: {}", path, msg),
+                    fmt::format("'FileTimeToSystemTime' failed for '{}': {}", path, msg),
                     "Cache"
                 );
             }
@@ -146,8 +147,8 @@ namespace {
             if (thisFilename != parentFilename) {
                 throw ghoul::RuntimeError(
                     fmt::format(
-                        "File contained in cache directory {} contains a file "
-                        "with name {} instead of expected {}",
+                        "File contained in cache directory '{}' contains a file "
+                        "with name '{}' instead of expected '{}'",
                         path, thisFilename, parentFilename
                     ),
                     "Cache"
@@ -205,7 +206,7 @@ CacheManager::~CacheManager() {
     const std::filesystem::path path = _directory / CacheFile;
     std::ofstream file(path, std::ofstream::out);
     if (!file.good()) {
-        LERROR(fmt::format("Could not open {} for writing cache version file", path));
+        LERROR(fmt::format("Could not open '{}' for writing cache version file", path));
     }
 
     file << CacheVersion;
@@ -218,7 +219,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument {} contains an illegal character", file.filename()),
+            fmt::format("Argument '{}' contains an illegal character", file.filename()),
             "Cache"
         );
     }
@@ -274,7 +275,7 @@ bool CacheManager::hasCachedFile(const std::filesystem::path& file,
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument {} contains an illegal character", file.filename()),
+            fmt::format("Argument '{}' contains an illegal character", file.filename()),
             "Cache"
         );
     }
@@ -298,7 +299,7 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument {} contains an illegal character", file.filename()),
+            fmt::format("Argument '{}' contains an illegal character", file.filename()),
             "Cache"
         );
     }

@@ -97,7 +97,7 @@ namespace {
                 case 3: return GL_TEXTURE_3D;
                 default:
                     throw ghoul::RuntimeError(fmt::format(
-                        "Unsupported dimensionality {}", d
+                        "Unsupported dimensionality '{}'", d
                     ));
             }
         }(nDimensions);

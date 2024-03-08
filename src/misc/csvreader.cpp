@@ -174,7 +174,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     std::vector<std::string> elements = ghoul::tokenizeString(line, ',');
     if (elements.empty()) {
         throw ghoul::RuntimeError(
-            fmt::format("CSV file {} did not contain any lines", fileName)
+            fmt::format("CSV file '{}' did not contain any lines", fileName)
         );
     }
 
@@ -188,7 +188,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
             const auto it = std::find(elements.cbegin(), elements.cend(), column);
             if (it == elements.cend()) {
                 throw ghoul::RuntimeError(fmt::format(
-                    "CSV file {} did not contain the requested key {}", fileName, column
+                    "CSV file '{}' did not contain the requested key {}", fileName, column
                 ));
             }
 

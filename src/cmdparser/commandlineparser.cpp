@@ -213,7 +213,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             {
                 throw ghoul::RuntimeError(
                     fmt::format(
-                        "{} does not allow multiple calls in a single line",
+                        "'{}' does not allow multiple calls in a single line",
                         currentCmd->name()
                     ),
                     "CommandlineParser"

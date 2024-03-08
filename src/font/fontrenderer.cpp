@@ -318,20 +318,20 @@ FontRenderer::~FontRenderer() {
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     std::filesystem::path vsPath = absPath(DefaultVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
+        LDEBUG(fmt::format("Skipping creation of existing vertex shader '{}'", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default vertex shader to {}", vsPath));
+        LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
         std::ofstream file(vsPath);
         file << DefaultVertexShaderSource;
     }
 
     std::filesystem::path fsPath = absPath(DefaultFragmentShaderPath);
     if (std::filesystem::is_regular_file(fsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", fsPath));
+        LDEBUG(fmt::format("Skipping creation of existing fragment shader '{}'", fsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default fragment shader to {}", fsPath));
+        LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
         std::ofstream file(fsPath);
         file << DefaultFragmentShaderSource;
     }
@@ -358,20 +358,20 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     std::filesystem::path vsPath = absPath(ProjectionVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
+        LDEBUG(fmt::format("Skipping creation of existing vertex shader '{}'", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default vertex shader to {}", vsPath));
+        LDEBUG(fmt::format("Writing default vertex shader to '{}'", vsPath));
         std::ofstream file(vsPath);
         file << ProjectionVertexShaderSource;
     }
 
     std::filesystem::path fsPath = absPath(ProjectionFragmentShaderPath);
     if (std::filesystem::is_regular_file(fsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", vsPath));
+        LDEBUG(fmt::format("Skipping creation of existing fragment shader '{}'", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default fragment shader to {}", fsPath));
+        LDEBUG(fmt::format("Writing default fragment shader to '{}'", fsPath));
         std::ofstream file(fsPath);
         file << ProjectionFragmentShaderSource;
     }

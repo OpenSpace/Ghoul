@@ -63,7 +63,8 @@ namespace {
         fontrendering::Error e = fontrendering::error(error);
         throw RuntimeError(
             fmt::format(
-                "Error loading font {} for size {}: {} {}", name, size, e.code, e.message
+                "Error loading font '{}' for size '{}': {} {}",
+                name, size, e.code, e.message
             ),
             "Font"
         );

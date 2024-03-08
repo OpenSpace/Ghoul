@@ -64,7 +64,7 @@ int FileSystem::addFileListener(std::filesystem::path path,
     std::filesystem::path dir = path.parent_path();
     auto f = _directories.find(dir);
     if (f == _directories.end()) {
-        LDEBUG(fmt::format("Started watching: {}", dir));
+        LDEBUG(fmt::format("Started watching '{}'", dir));
         DirectoryHandle* handle = new DirectoryHandle;
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;

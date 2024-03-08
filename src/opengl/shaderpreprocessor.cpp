@@ -170,7 +170,7 @@ ShaderPreprocessor::ShaderPreprocessor(std::string shaderPath, Dictionary dictio
 
 ShaderPreprocessor::IncludeError::IncludeError(std::filesystem::path f)
     : ShaderPreprocessorError(
-        fmt::format("Could not resolve file path for include file {}", f)
+        fmt::format("Could not resolve file path for include file '{}'", f)
     )
     , file(std::move(f))
 {}
@@ -289,7 +289,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
 
     std::ifstream stream(path);
     if (!stream.good()) {
-        throw ghoul::RuntimeError(fmt::format("Error loading include file {}", path));
+        throw ghoul::RuntimeError(fmt::format("Error loading include file '{}'", path));
     }
     ghoul_assert(stream.good() , "Input stream is not good");
 
@@ -306,7 +306,8 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
     while (parseLine(environment)) {
         if (!environment.success) {
             throw ParserError(fmt::format(
-                "Could not parse line. {}: {}", path, environment.inputs.back().lineNumber
+                "Could not parse line. '{}': {}",
+                path, environment.inputs.back().lineNumber
             ));
         }
     }
@@ -320,7 +321,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
             int lineNumber = forStatement.lineNumber;
 
             throw ParserError(fmt::format(
-                "Unexpected end of file. Still processing #for loop from {}: {}. {}",
+                "Unexpected end of file. Still processing #for loop from '{}': {}. {}",
                 p.string(), lineNumber, debugString(environment)
             ));
         }

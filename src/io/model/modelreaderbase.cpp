@@ -33,7 +33,7 @@ ModelReaderBase::ModelLoadException::ModelLoadException(std::filesystem::path na
                                                         std::string msg,
                                                         const ModelReaderBase* r)
     : RuntimeError(fmt::format(
-        "Error: '{}' while loading model from file: {}", msg, name), "ModelLoader"
+        "Error '{}' while loading model from file '{}'", msg, name), "ModelLoader"
     )
     , filename(std::move(name))
     , errorMessage(std::move(msg))

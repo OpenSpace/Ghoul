@@ -74,7 +74,7 @@ FileSystem* FileSystem::_instance = nullptr;
 
 FileSystem::FileSystem() {
     std::filesystem::path temporaryPath = std::filesystem::temp_directory_path();
-    LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to {}", temporaryPath));
+    LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to '{}'", temporaryPath));
     registerPathToken("${TEMPORARY}", temporaryPath);
 
 #if !defined(WIN32) && !defined(__APPLE__)
