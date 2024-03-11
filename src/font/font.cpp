@@ -355,7 +355,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
             );
             handleError(e4, library, face, nullptr, _name, _pointSize);
 
-            FT_BitmapGlyph outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
+            auto outlineBitmap = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
             topBearing = static_cast<float>(outlineBitmap->top);
             leftBearing = static_cast<float>(outlineBitmap->left);
 
@@ -384,7 +384,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         );
         handleError(e2, library, face, nullptr, _name, _pointSize);
 
-        FT_BitmapGlyph insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
+        auto insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
         topBearing = std::max(topBearing, static_cast<float>(insideBitmap->top));
         if (!_hasOutline) {
             leftBearing = static_cast<float>(insideBitmap->left);

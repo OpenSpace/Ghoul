@@ -40,7 +40,7 @@ namespace ghoul {
 unsigned int hashCRC32File(const std::string& file) {
     std::fstream f(file);
     f.seekg(0, std::ios::end);
-    unsigned int length = static_cast<int>(f.tellg());
+    const unsigned int length = static_cast<int>(f.tellg());
     f.seekg(0, std::ios::beg);
     std::vector<char> buffer(length);
     f.read(buffer.data(), length);
