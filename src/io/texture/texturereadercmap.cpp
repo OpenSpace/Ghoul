@@ -113,7 +113,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         );
     }
 
-    GLenum type = [](int d) {
+    const GLenum type = [](int d) {
         switch (d) {
             case 1: return GL_TEXTURE_1D;
             case 2: return GL_TEXTURE_2D;
