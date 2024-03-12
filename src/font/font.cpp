@@ -248,6 +248,8 @@ const Font::Glyph* Font::glyph(wchar_t character) {
 }
 
 void Font::loadGlyphs(std::vector<wchar_t> characters) {
+    using namespace opengl;
+
     ZoneScoped;
     TracyGpuZone("loadGlyph")
 
@@ -362,17 +364,17 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
             width = outlineBitmap->bitmap.width / atlasDepth;
             height = outlineBitmap->bitmap.rows;
 
-            opengl::TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
+            TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
             if (outlineBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, outlineBitmap->bitmap.buffer);
             }
-            opengl::TextureAtlas::TextureCoordinatesResult res =
+            const TextureAtlas::TextureCoordinatesResult res =
                 _atlas.textureCoordinates(handle);
             outlineTopLeft = res.topLeft;
             outlineBottomRight = res.bottomRight;
         }
 
-        FT_Glyph insideGlyph;
+        FT_Glyph insideGlyph = nullptr;
         const FT_Error e1 = FT_Get_Glyph(face->glyph, &insideGlyph);
         handleError(e1, library, face, nullptr, _name, _pointSize);
 
@@ -384,7 +386,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         );
         handleError(e2, library, face, nullptr, _name, _pointSize);
 
-        auto insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
+        const FT_BitmapGlyph insideBitmap = reinterpret_cast<FT_BitmapGlyph>(insideGlyph);
         topBearing = std::max(topBearing, static_cast<float>(insideBitmap->top));
         if (!_hasOutline) {
             leftBearing = static_cast<float>(insideBitmap->left);
@@ -395,7 +397,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         width = std::max(width, insideBitmap->bitmap.width / atlasDepth);
         height = std::max(height, insideBitmap->bitmap.rows);
 
-        opengl::TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
+        const TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
 
         // If we don't have an outline for this font, our current 'width' and 'height'
         // corresponds to the buffer, so we can just use it straight away.
@@ -406,7 +408,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
             if (insideBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);
             }
-            opengl::TextureAtlas::TextureCoordinatesResult res =
+            TextureAtlas::TextureCoordinatesResult res =
                 _atlas.textureCoordinates(handle);
             topLeft = res.topLeft;
             bottomRight = res.bottomRight;
@@ -416,8 +418,8 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
             const int widthOffset = (width - insideBitmap->bitmap.width) / 2;
             const int heightOffset = (height - insideBitmap->bitmap.rows) / 2;
 
-            for (unsigned int j = 0; j < height; j++) {
-                for (unsigned int i = 0; i < width; i++) {
+            for (int j = 0; j < static_cast<int>(height); j++) {
+                for (int i = 0; i < static_cast<int>(width); i++) {
                     const int k = i - widthOffset;
                     const int l = j - heightOffset;
 
@@ -438,7 +440,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
 
             // We need to offset the texture coordinates by half of the width and height
             // differences
-            opengl::TextureAtlas::TextureCoordinatesResult res =
+            const TextureAtlas::TextureCoordinatesResult res =
                 _atlas.textureCoordinates(
                     handle,
                     glm::ivec4(
@@ -489,12 +491,12 @@ void Font::generateKerning() {
     // 1 as 0 is reserved for the special background glyph
     for (size_t i = 1; i < _glyphs.size(); i++) {
         Glyph& glyph = _glyphs[i];
-        FT_UInt glyphIndex = FT_Get_Char_Index(face, glyph.charcode);
+        const FT_UInt glyphIndex = FT_Get_Char_Index(face, glyph.charcode);
         glyph._kerning.clear();
 
         for (size_t j = 1; j < _glyphs.size(); j++) {
             const Glyph& prevGlyph = _glyphs[j];
-            FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph.charcode);
+            const FT_UInt prevIndex = FT_Get_Char_Index(face, prevGlyph.charcode);
             FT_Vector kerning;
             FT_Get_Kerning(face, prevIndex, glyphIndex, FT_KERNING_DEFAULT, &kerning);
             if (kerning.x != 0) {

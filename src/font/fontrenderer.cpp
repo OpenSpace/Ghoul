@@ -189,7 +189,7 @@ namespace {
         std::string_view::size_type p = view.find('\n');
         if (p == std::string_view::npos) {
             // No new line found
-            std::string_view res = view;
+            const std::string_view res = view;
             view = std::string_view();
             return res;
         }
@@ -465,7 +465,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glm::vec2 size = glm::vec2(0.f);
     glm::vec2 movingPos = pos;
     do {
-        std::string_view line = extractLine(text);
+        const std::string_view line = extractLine(text);
         movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
@@ -586,7 +586,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glm::vec2 size = glm::vec2(0.f);
     float heightInPixels = 0.f;
     do {
-        std::string_view line = extractLine(text);
+        const std::string_view line = extractLine(text);
         //movingPos.x = 0.f;
         //movingPos.x = pos.x;
         float width = 0.f;
@@ -602,19 +602,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
 
-            float x0 = movingPos.x + glyph->leftBearing;
-            float y0 = movingPos.y + glyph->topBearing;
-            float s0 = glyph->topLeft.x;
-            float t0 = glyph->topLeft.y;
-            float outlineS0 = glyph->outlineTopLeft.x;
-            float outlineT0 = glyph->outlineTopLeft.y;
+            const float x0 = movingPos.x + glyph->leftBearing;
+            const float y0 = movingPos.y + glyph->topBearing;
+            const float s0 = glyph->topLeft.x;
+            const float t0 = glyph->topLeft.y;
+            const float outlineS0 = glyph->outlineTopLeft.x;
+            const float outlineT0 = glyph->outlineTopLeft.y;
 
-            float x1 = x0 + glyph->width;
-            float y1 = y0 - glyph->height;
-            float s1 = glyph->bottomRight.x;
-            float t1 = glyph->bottomRight.y;
-            float outlineS1 = glyph->outlineBottomRight.x;
-            float outlineT1 = glyph->outlineBottomRight.y;
+            const float x1 = x0 + glyph->width;
+            const float y1 = y0 - glyph->height;
+            const float s1 = glyph->bottomRight.x;
+            const float t1 = glyph->bottomRight.y;
+            const float outlineS1 = glyph->outlineBottomRight.x;
+            const float outlineT1 = glyph->outlineBottomRight.y;
 
             glm::vec3 p0;
             glm::vec3 p1;
@@ -632,9 +632,13 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                     labelInfo.scale + pos;
             }
             else {
-                glm::dvec3 normal = glm::normalize(labelInfo.cameraPos - glm::dvec3(pos));
-                glm::vec3 right = glm::vec3(glm::cross(labelInfo.cameraLookUp, normal));
-                glm::vec3 up = glm::vec3(glm::cross(normal, glm::dvec3(right)));
+                const glm::dvec3 normal = glm::normalize(
+                    labelInfo.cameraPos - glm::dvec3(pos)
+                );
+                const glm::vec3 right = glm::vec3(
+                    glm::cross(labelInfo.cameraLookUp, normal)
+                );
+                const glm::vec3 up = glm::vec3(glm::cross(normal, glm::dvec3(right)));
 
                 p0 = (x0 * right + y0 * up) * labelInfo.scale + pos;
                 p1 = (x0 * right + y1 * up) * labelInfo.scale + pos;
@@ -643,7 +647,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             }
 
 
-            glm::vec4 projPos[2] = {
+            std::array<glm::vec4, 2> projPos = {
                 glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p0, 1.0)),
                 glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p1, 1.0))
             };
@@ -812,7 +816,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
                      const glm::vec4& outlineColor)
 {
     using FR = ghoul::fontrendering::FontRenderer;
-    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+    const FR::BoundingBoxInformation res = FR::defaultRenderer().render(
         font,
         pos,
         text,
@@ -838,7 +842,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
                      const glm::vec4& outlineColor)
 {
     using FR = ghoul::fontrendering::FontRenderer;
-    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+    const FR::BoundingBoxInformation res = FR::defaultRenderer().render(
         font,
         pos,
         text,
