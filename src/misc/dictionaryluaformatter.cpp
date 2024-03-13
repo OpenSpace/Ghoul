@@ -61,11 +61,12 @@ namespace {
         };
 
         std::vector<std::string> keys;
-        for (std::string_view k : d.keys()) {
+        keys.reserve(d.keys().size());
+        for (const std::string_view k : d.keys()) {
             keys.emplace_back(k);
         }
 
-        std::string lua = std::accumulate(
+        const std::string lua = std::accumulate(
             std::next(keys.begin()),
             keys.end(),
             convert(*keys.begin()),
