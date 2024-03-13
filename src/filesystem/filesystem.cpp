@@ -54,19 +54,18 @@ namespace {
 
 std::filesystem::path absPath(std::string path) {
     ghoul_assert(!path.empty(), "Path must not be empty");
-    std::filesystem::path expanded = FileSys.expandPathTokens(std::move(path));
-    std::filesystem::path absolute = std::filesystem::absolute(std::move(expanded));
+    const std::filesystem::path expanded = FileSys.expandPathTokens(std::move(path));
+    const std::filesystem::path absolute = std::filesystem::absolute(expanded);
     return absolute.lexically_normal();
 }
 
-std::filesystem::path absPath(std::filesystem::path path) {
+std::filesystem::path absPath(const std::filesystem::path& path) {
     return absPath(path.string());
 }
 
 std::filesystem::path absPath(const char* path) {
     return absPath(std::string(path));
 }
-
 
 namespace ghoul::filesystem {
 
@@ -150,7 +149,7 @@ std::filesystem::path FileSystem::expandPathTokens(std::string path,
         size_t currentPosition = 0;
         while (true) {
             const size_t beginning = path.find("${", currentPosition);
-            const size_t closing = path.find("}", beginning + 2);
+            const size_t closing = path.find('}', beginning + 2);
             const size_t closingLocation = closing + 1;
 
             if (beginning == std::string::npos || closing == std::string::npos) {
@@ -185,7 +184,7 @@ std::filesystem::path FileSystem::expandPathTokens(std::string path,
             );
         }
 
-        std::string replacement = it->second.string();
+        const std::string replacement = it->second.string();
         path.replace(tokenInformation.beginning, tokenInformation.length, replacement);
     }
 
@@ -208,8 +207,8 @@ bool FileSystem::hasRegisteredToken(const std::string& token) const {
 bool FileSystem::containsToken(const std::string& path) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
 
-    bool hasOpeningBrace = path.find("${") != std::string::npos;
-    bool hasClosingBrace = path.find("}") != std::string::npos;
+    const bool hasOpeningBrace = path.find("${") != std::string::npos;
+    const bool hasClosingBrace = path.find('}') != std::string::npos;
     return hasOpeningBrace && hasClosingBrace;
 }
 

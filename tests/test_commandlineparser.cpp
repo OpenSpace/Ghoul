@@ -3484,7 +3484,7 @@ TEST_CASE(
     }
 
     SECTION("010") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3598,7 +3598,7 @@ TEST_CASE(
     }
 
     SECTION("000 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",

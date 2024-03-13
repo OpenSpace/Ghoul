@@ -305,7 +305,7 @@ std::filesystem::path absPath(std::string path);
 /**
  * \overload std::filesystem::path absPath(std::string path)
  */
-std::filesystem::path absPath(std::filesystem::path path);
+std::filesystem::path absPath(const std::filesystem::path& path);
 
 /**
  * \overload std::filesystem::path absPath(std::string path)
