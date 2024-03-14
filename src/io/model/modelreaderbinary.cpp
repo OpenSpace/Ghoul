@@ -125,7 +125,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         const opengl::Texture::Format format = stringToFormat(formatString);
 
         // internal format
-        uint32_t rawInternalFormat;
+        uint32_t rawInternalFormat = 0;
         fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(uint32_t));
         const GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
@@ -310,7 +310,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             reinterpret_cast<char*>(rawAnimTransform.data()),
             16 * sizeof(GLfloat)
         );
-        glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform.data());
+        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform.data());
 
         // Parent
         int32_t parent = 0;
@@ -348,7 +348,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     // Animation
     uint8_t anim = 0;
     fileStream.read(reinterpret_cast<char*>(&anim), sizeof(uint8_t));
-    bool hasAnimation = (anim == 1);
+    const bool hasAnimation = (anim == 1);
 
     if (hasAnimation) {
         // Name

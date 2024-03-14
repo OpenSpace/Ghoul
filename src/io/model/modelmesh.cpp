@@ -53,7 +53,7 @@ ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> ind
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
-    , _isInvisible(std::move(isInvisible))
+    , _isInvisible(isInvisible)
 {}
 
 void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
@@ -63,7 +63,7 @@ void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
     texture.type = ModelMesh::TextureType::ColorDiffuse;
 }
 
-void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
+void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTransform,
                        bool isFullyTexturedModel, bool isProjection) const
 {
     // Count how many textures have image textures
