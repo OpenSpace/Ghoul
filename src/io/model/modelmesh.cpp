@@ -98,7 +98,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
                     break;
                 }
 
-                std::string name = textureTypeToString(texture.type);
+                const std::string name = textureTypeToString(texture.type);
                 // Use texture or color
                 if (texture.hasTexture) {
                     // Activate proper texture unit before binding
@@ -174,7 +174,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
 
     // Transform mesh
     program.setUniform("meshTransform", meshTransform);
-    glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
+    const glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
     program.setUniform("meshNormalTransform", glm::mat4(normalTransform));
 
     // Render the mesh object

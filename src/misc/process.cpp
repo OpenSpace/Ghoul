@@ -37,8 +37,8 @@ Process::Process(const std::string& command, const std::string& path,
     _process = std::make_unique<TinyProcessLib::Process>(
         command,
         path,
-        readStdout,
-        readStderr,
+        std::move(readStdout),
+        std::move(readStderr),
         openStdin
     );
 }

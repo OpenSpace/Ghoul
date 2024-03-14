@@ -123,7 +123,7 @@ public:
      * \param normalized flag weather the attribute should be normalized
      */
     void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLsizei stride,
-        GLuint offset, GLboolean normalized = GL_FALSE);
+        GLuint offset, GLboolean normalized = GL_FALSE) const;
 
     /**
      * Binds the VBO.
