@@ -207,14 +207,14 @@ constexpr Data TestStrings[] = {
     { "WxeFIFoXPL", 2000045289 }, { "hr2LmF9FjL", 3241800974 }, { "AMv6Kg4gaJ", 2316368142 },
     { "T33FH0acrS", 203057196 },  { "v94eDwXkeq", 3905846404 }
 };
-}
+} // namespace
 
 
 TEST_CASE("HashFixedEquality", "[crc32]") {
     for (const Data& d : TestStrings) {
-        unsigned int stringHash = ghoul::hashCRC32(std::string(d.string));
-        unsigned int charHash = ghoul::hashCRC32(d.string);
-        unsigned int bufferHash = ghoul::hashCRC32(
+        const unsigned int stringHash = ghoul::hashCRC32(std::string(d.string));
+        const unsigned int charHash = ghoul::hashCRC32(d.string);
+        const unsigned int bufferHash = ghoul::hashCRC32(
             d.string,
             static_cast<unsigned int>(strlen(d.string))
         );
@@ -258,9 +258,9 @@ TEST_CASE("CRC32: HashRandomEquality", "[crc32]") {
             }
 
             std::string string(data.begin(), data.end());
-            unsigned int stringHash = ghoul::hashCRC32(string);
-            unsigned int charHash = ghoul::hashCRC32(string.data());
-            unsigned int bufferHash = ghoul::hashCRC32(data.data(), j);
+            const unsigned int stringHash = ghoul::hashCRC32(string);
+            const unsigned int charHash = ghoul::hashCRC32(string.data());
+            const unsigned int bufferHash = ghoul::hashCRC32(data.data(), j);
             CHECK(stringHash == charHash);
             CHECK(stringHash == bufferHash);
         }

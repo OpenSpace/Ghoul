@@ -186,7 +186,7 @@ namespace {
     // Extracts the next line from the string view and returns it, the passed string_view
     // is modified to remove the new line *and* the \n character
     std::string_view extractLine(std::string_view& view) {
-        std::string_view::size_type p = view.find('\n');
+        const std::string_view::size_type p = view.find('\n');
         if (p == std::string_view::npos) {
             // No new line found
             const std::string_view res = view;

@@ -33,7 +33,7 @@ namespace {
         if (n > 0) {
             // The top value is the error message
             std::string msg = lua_tostring(L, -1);
-            throw ghoul::lua::LuaRuntimeException(msg);
+            throw ghoul::lua::LuaRuntimeException(std::move(msg));
         }
         throw ghoul::lua::LuaRuntimeException("empty stack");
     }

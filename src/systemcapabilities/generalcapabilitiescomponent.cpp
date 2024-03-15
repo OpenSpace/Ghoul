@@ -325,7 +325,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         ghoul::to_string(_operatingSystem) + ' ' + _operatingSystemExtra;
 #else
     utsname name;
-    int res = uname(&name);
+    const int res = uname(&name);
     if (res != 0) {
         throw OperatingSystemError(
             "OS detection failed. 'uname' returned non-null value", std::to_string(res)
@@ -561,7 +561,9 @@ void GeneralCapabilitiesComponent::detectCPU() {
     file = fopen("/proc/cpuinfo", "r");
     if (file) {
         while (fgets(line, maxSize, file) != nullptr) {
-            if (strncmp(line, "processor", 9) == 0) ++_cores;
+            if (strncmp(line, "processor", 9) == 0) {
+                ++_cores;
+            }
             if (strncmp(line, "model name", 10) == 0) {
                 _cpu = line;
                 _cpu = _cpu.substr(18, _cpu.length()-19);
