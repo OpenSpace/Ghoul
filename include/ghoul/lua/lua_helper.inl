@@ -54,7 +54,7 @@ template <typename T> struct is_vector : std::false_type {};
 template <typename T> struct is_vector<std::vector<T>> : std::true_type {};
 
 template <typename T> struct is_array : std::false_type {};
-template <typename T, std::size_t N>
+template <typename T, size_t N>
 struct is_array<std::array<T, N>> : std::true_type {};
 
 template <typename T> struct is_tuple : std::false_type {};

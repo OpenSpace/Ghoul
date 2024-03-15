@@ -1228,13 +1228,13 @@ TEST_CASE("LuaConversion: StringMap", "[luaconversion]") {
         REQUIRE(v.size() == 2);
         REQUIRE(v.find("a") != v.end());
         {
-            ghoul::Dictionary e = v["a"];
+            const ghoul::Dictionary e = v["a"];
             REQUIRE(e.hasKey("foo"));
             REQUIRE(e.hasValue<std::string>("foo"));
             CHECK(e.value<std::string>("foo") == "bar"sv);
         }
         {
-            ghoul::Dictionary e = v["b"];
+            const ghoul::Dictionary e = v["b"];
             REQUIRE(e.hasKey("bar"));
             REQUIRE(e.hasValue<std::string>("bar"));
             CHECK(e.value<std::string>("bar") == "foo"sv);
