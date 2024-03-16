@@ -164,7 +164,7 @@ void SharedMemory::remove(const std::string& name) {
     }
 #else // ^^^^ WIN32 // !WIN32 vvvv
     const unsigned int h = hashCRC32(name);
-    const int result = shmget(h, 0, IPC_R | IPC_W | IPC_M);
+    int result = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (result == -1) {
         const std::string errorMsg = strerror(errno);
         throw SharedMemoryError("Error while retrieving shared memory: " + errorMsg);
