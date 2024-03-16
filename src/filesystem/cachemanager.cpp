@@ -44,12 +44,16 @@ namespace {
 
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;
 
-    unsigned int generateHash(std::filesystem::path file, std::string_view information) {
+    unsigned int generateHash(const std::filesystem::path& file,
+                              std::string_view information)
+    {
         // something that cannot occur in the filesystem
         constexpr char HashDelimiter = '|';
 
-        std::string s = fmt::format("{}{}{}", file.string(), HashDelimiter, information);
-        unsigned int hash = ghoul::hashCRC32(s);
+        const std::string s = fmt::format(
+            "{}{}{}", file.string(), HashDelimiter, information
+        );
+        const unsigned int hash = ghoul::hashCRC32(s);
         return hash;
     }
 
@@ -122,9 +126,9 @@ namespace {
         struct stat attrib;
         stat(path.string().c_str(), &attrib);
         struct tm* time = gmtime(&attrib.st_ctime);
-        char buffer[128];
-        strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S", time);
-        return buffer;
+        std::array<char, 128> buffer;
+        strftime(buffer.data(), 128, "%Y-%m-%dT%H:%M:%S", time);
+        return buffer.data();
 #endif // WIN32
     }
 
@@ -140,22 +144,22 @@ namespace {
                 continue;
             }
 
-            fs::path thisFilename = e.path().filename();
-            fs::path hashName = e.path().parent_path().filename();
-            fs::path parentFilename = e.path().parent_path().parent_path().filename();
+            const fs::path thisFilename = e.path().filename();
+            const fs::path hashName = e.path().parent_path().filename();
+            const fs::path parent = e.path().parent_path().parent_path().filename();
 
-            if (thisFilename != parentFilename) {
+            if (thisFilename != parent) {
                 throw ghoul::RuntimeError(
                     fmt::format(
                         "File contained in cache directory '{}' contains a file "
                         "with name '{}' instead of expected '{}'",
-                        path, thisFilename, parentFilename
+                        path, thisFilename, parent
                     ),
                     "Cache"
                 );
             }
 
-            unsigned long hash = std::stoul(hashName.string());
+            const unsigned long hash = std::stoul(hashName.string());
             result[hash] = e.path();
         }
 

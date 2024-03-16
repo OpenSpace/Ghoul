@@ -50,7 +50,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <errno.h>
+#include <cerrno>
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
 #endif
@@ -108,12 +108,12 @@ TcpSocketServer::~TcpSocketServer() {
 }
 
 int TcpSocketServer::port() const {
-    std::lock_guard settingsLock(_settingsMutex);
+    const std::lock_guard settingsLock(_settingsMutex);
     return _port;
 }
 
 void TcpSocketServer::close() {
-    std::lock_guard settingsLock(_settingsMutex);
+    const std::lock_guard settingsLock(_settingsMutex);
     _listening = false;
 
     // Notify all threads waiting for connections.
@@ -132,7 +132,7 @@ void TcpSocketServer::listen(int port) {
         TcpSocket::initializeNetworkApi();
     }
 
-    std::lock_guard settingsLock(_settingsMutex);
+    const std::lock_guard settingsLock(_settingsMutex);
     _port = port;
 
     struct addrinfo* result = nullptr;
@@ -198,7 +198,7 @@ void TcpSocketServer::listen(int port) {
 }
 
 bool TcpSocketServer::isListening() const {
-    std::lock_guard settingsLock(_settingsMutex);
+    const std::lock_guard settingsLock(_settingsMutex);
     return _listening;
 }
 
@@ -206,7 +206,7 @@ bool TcpSocketServer::hasPendingSockets() const {
     if (!_listening) {
         return false;
     }
-    std::lock_guard connectionLock(_connectionMutex);
+    const std::lock_guard connectionLock(_connectionMutex);
     return !_pendingConnections.empty();
 }
 
@@ -214,7 +214,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingTcpSocket() {
     if (!_listening) {
         return nullptr;
     }
-    std::lock_guard connectionLock(_connectionMutex);
+    const std::lock_guard connectionLock(_connectionMutex);
     if (!_pendingConnections.empty()) {
         std::unique_ptr<TcpSocket> connection = std::move(_pendingConnections.front());
         _pendingConnections.pop_front();
@@ -257,7 +257,7 @@ void TcpSocketServer::waitForConnections() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif // __GNUC__
-        _SOCKET socketHandle = accept(
+        const _SOCKET socketHandle = accept(
             static_cast<int>(_serverSocket),
             reinterpret_cast<sockaddr*>(&clientInfo),
             &clientInfoSize
@@ -270,16 +270,16 @@ void TcpSocketServer::waitForConnections() {
             continue;
         }
 
-        char addressBuffer[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer, INET_ADDRSTRLEN);
-        std::string address = addressBuffer;
-        int port = static_cast<int>(clientInfo.sin_port);
+        std::array<char, INET_ADDRSTRLEN> addressBuffer;
+        inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer.data(), INET_ADDRSTRLEN);
+        const std::string address = addressBuffer.data();
+        const int port = static_cast<int>(clientInfo.sin_port);
 
         // @CLEANUP(abock): Can the _pendingConnections be moved to Socket instead of
         //                  unique_ptr?
         auto socket = std::make_unique<TcpSocket>(address, port, socketHandle);
 
-        std::lock_guard lock(_connectionMutex);
+        const std::lock_guard lock(_connectionMutex);
         _pendingConnections.push_back(std::move(socket));
 
         // Notify `awaitPendingConnection` to return the acquired connection.

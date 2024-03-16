@@ -30,7 +30,7 @@
 #include <string>
 
 TEST_CASE("DictionaryLuaFormatter: Empty Dictionary", "[dictionaryluaformatter]") {
-    ghoul::Dictionary d;
+    const ghoul::Dictionary d;
     std::string res = ghoul::formatLua(d);
     CHECK(res == "{}");
 }

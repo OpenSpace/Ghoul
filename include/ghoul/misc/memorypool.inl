@@ -107,8 +107,8 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::housekeeping() {
 }
 
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
-void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(std::size_t bytes,
-                                                                    std::size_t alignment)
+void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(size_t bytes,
+                                                                        size_t alignment)
 {
     ZoneScoped;
 
@@ -172,8 +172,8 @@ T* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::alloc(Types&&... args) 
 
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
 void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p,
-                                                                        std::size_t bytes,
-                                                                std::size_t /*alignment*/)
+                                                                        size_t bytes,
+                                                                     size_t /*alignment*/)
 {
     ZoneScoped;
 

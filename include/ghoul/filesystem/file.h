@@ -107,7 +107,7 @@ private:
      * Removes the platform-dependent listener. If there is no listener present, this
      * operation is a no-op.
      */
-    void removeFileChangeListener();
+    void removeFileChangeListener() const;
 
     /// The filename of this File
     std::filesystem::path _filename;

@@ -156,13 +156,13 @@ void BufferLog::log(unsigned long long timestamp, const std::string& message) {
 
     Header& h = header(_buffer);
     // This is the full size of the incoming message. +1 for the terminating \0 character
-    size_t fullSize = sizeof(unsigned long long) + message.length() + 1;
+    const size_t fullSize = sizeof(unsigned long long) + message.length() + 1;
 
     // if test_and_set returns 'true', someone else is in the critical section
     while (h.mutex.test_and_set()) {}
     // the moment we return, we own the mutex
 
-    size_t requestedSize = h.firstEmptyByte + sizeof(Header) + fullSize;
+    const size_t requestedSize = h.firstEmptyByte + sizeof(Header) + fullSize;
 
     // If this message would exceed the available memory...
     if (requestedSize > _totalSize) {

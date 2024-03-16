@@ -88,14 +88,16 @@ namespace {
                 if (lineValues[i].front() == '"') {
                     // First check if the " is terminated in the same value
 
-                    if (size_t p = lineValues[i].find('"', 1);  p != std::string::npos) {
+                    if (const size_t p = lineValues[i].find('"', 1);
+                        p != std::string::npos)
+                    {
                         // It is terminated here, so we can advance the i counter as there
                         // is nothing to be done. This was just a ".." pair without a ,
                         continue;
                     }
                     std::string totalValue = lineValues[i];
                     for (size_t j = i + 1; j < lineValues.size(); j++) {
-                        size_t p = lineValues[j].find('"');
+                        const size_t p = lineValues[j].find('"');
                         if (p == std::string::npos) {
                             // No " found, so accumualate the text and continue next j
                             totalValue += lineValues[j];
@@ -132,7 +134,7 @@ namespace {
             if (!indices.empty()) {
                 std::vector<std::string> copy = lineValues;
                 lineValues.clear();
-                for (int idx : indices) {
+                for (const int idx : indices) {
                     lineValues.push_back(copy[idx]);
                 }
             }
@@ -169,9 +171,9 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     file.open(fileName);
 
     // Get the file line that contains the column names (the first one)
-    std::string line = readFirstValidLine(file);
+    const std::string line = readFirstValidLine(file);
 
-    std::vector<std::string> elements = ghoul::tokenizeString(line, ',');
+    const std::vector<std::string> elements = ghoul::tokenizeString(line, ',');
     if (elements.empty()) {
         throw ghoul::RuntimeError(
             fmt::format("CSV file '{}' did not contain any lines", fileName)

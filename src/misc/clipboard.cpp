@@ -44,11 +44,11 @@ namespace {
         }
 
         constexpr int BufferSize = 1024;
-        char buffer[BufferSize];
+        std::array<char, BufferSize> buffer = {};
         value.clear();
         while (!feof(pipe)) {
-            if (fgets(buffer, BufferSize, pipe) != nullptr) {
-                value += buffer;
+            if (fgets(buffer.data(), BufferSize, pipe) != nullptr) {
+                value += buffer.data();
             }
         }
         pclose(pipe);
@@ -138,7 +138,7 @@ void setClipboardText(const std::string& text) {
     }
 #else
     std::string buf;
-    bool success = exec(fmt::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
+    const bool success = exec(fmt::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }

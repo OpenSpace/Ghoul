@@ -29,15 +29,17 @@
 #include <ghoul/misc/csvreader.h>
 
 TEST_CASE("CSVReader: Initial", "[csvreader]") {
-    std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
+    const std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
     ghoul::loadCSVFile(test0.string());
 }
 
 TEST_CASE("CSVReader: Full Load", "[csvreader]") {
-    std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
-    std::string test0str = test0.string();
-    std::vector<std::vector<std::string>> noHeader = ghoul::loadCSVFile(test0str);
-    std::vector<std::vector<std::string>> header = ghoul::loadCSVFile(test0str, true);
+    using DataSet = std::vector<std::vector<std::string>>;
+
+    const std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
+    const std::string test0str = test0.string();
+    const DataSet noHeader = ghoul::loadCSVFile(test0str);
+    const DataSet header =ghoul::loadCSVFile(test0str, true);
 
     REQUIRE(noHeader.size() == 351);
     REQUIRE(header.size() == 352);
@@ -55,17 +57,12 @@ TEST_CASE("CSVReader: Full Load", "[csvreader]") {
 }
 
 TEST_CASE("CSVReader: Column Number", "[csvreader]") {
-    std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
-    std::vector<int> col = { 1, 2, 4, 6 };
-    std::vector<std::vector<std::string>> noHeader = ghoul::loadCSVFile(
-        test0.string(),
-        col
-    );
-    std::vector<std::vector<std::string>> header = ghoul::loadCSVFile(
-        test0.string(),
-        col,
-        true
-    );
+    using DataSet = std::vector<std::vector<std::string>>;
+
+    const std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
+    const std::vector<int> col = { 1, 2, 4, 6 };
+    const DataSet noHeader = ghoul::loadCSVFile(test0.string(), col);
+    const DataSet header = ghoul::loadCSVFile(test0.string(), col, true);
 
     REQUIRE(noHeader.size() == 351);
     REQUIRE(header.size() == 352);
@@ -83,12 +80,14 @@ TEST_CASE("CSVReader: Column Number", "[csvreader]") {
 }
 
 TEST_CASE("CSVReader: Column Name", "[csvreader]") {
-    std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
-    std::string test0s = test0.string();
+    using DataSet = std::vector<std::vector<std::string>>;
+
+    const std::filesystem::path test0 = absPath("${UNIT_TEST}/csvreader/test0.csv");
+    const std::string test0s = test0.string();
     //   4, 7, 2
-    std::vector<std::string> col = { "slope_g", "obs_num", "designation" };
-    std::vector<std::vector<std::string>> noHeader = ghoul::loadCSVFile(test0s, col);
-    std::vector<std::vector<std::string>> header = ghoul::loadCSVFile(test0s, col, true);
+    const std::vector<std::string> col = { "slope_g", "obs_num", "designation" };
+    const DataSet noHeader = ghoul::loadCSVFile(test0s, col);
+    const DataSet header = ghoul::loadCSVFile(test0s, col, true);
 
     REQUIRE(noHeader.size() == 351);
     REQUIRE(header.size() == 352);

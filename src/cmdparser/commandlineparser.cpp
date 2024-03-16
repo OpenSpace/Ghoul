@@ -148,7 +148,12 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             // The rest of the commands until the next '-' are for the nameless command
             // if we have one
             if (_commandForNamelessArguments) {
-                int number = extractArguments(_arguments, argumentsForNameless, i, -2);
+                const int number = extractArguments(
+                    _arguments,
+                    argumentsForNameless,
+                    i,
+                    -2
+                );
                 i += (number - 1);
             }
             else {
@@ -157,7 +162,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 // available as this is done later
                 if (_allowUnknownCommands) {
                     std::vector<std::string> arguments;
-                    int number = extractArguments(_arguments, arguments, i, -2);
+                    const int number = extractArguments(_arguments, arguments, i, -2);
                     for (const std::string& arg : arguments) {
                         _remainingArguments.push_back(arg);
                     }
@@ -186,7 +191,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 if (_allowUnknownCommands) {
                     // Extract the rest of the arguments
                     std::vector<std::string> arguments;
-                    int number = extractArguments(_arguments, arguments, i + 1, -2);
+                    const int number = extractArguments(_arguments, arguments, i + 1, -2);
                     _remainingArguments.push_back(_arguments[i]);
                     for (const std::string& arg : arguments) {
                         _remainingArguments.push_back(arg);
@@ -203,7 +208,12 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             }
 
             std::vector<std::string> params;
-            int n = extractArguments(_arguments, params, i, currentCmd->argumentNumber());
+            const int n = extractArguments(
+                _arguments,
+                params,
+                i,
+                currentCmd->argumentNumber()
+            );
             i += (n + 1);
 
             // don't insert if the command doesn't allow multiple calls and already is in
@@ -343,14 +353,16 @@ std::string CommandlineParser::usageInformation() const {
     return result;
 }
 
-std::string CommandlineParser::usageInformationForCommand(const std::string& cmd) const {
-    ghoul_assert(!cmd.empty(), "Command must not be empty");
+std::string CommandlineParser::usageInformationForCommand(
+                                                         const std::string& command) const
+{
+    ghoul_assert(!command.empty(), "Command must not be empty");
 
     const auto it = std::find_if(
         _commands.cbegin(),
         _commands.cend(),
-        [cmd](const std::unique_ptr<CommandlineCommand>& i) {
-            return i->name() == cmd || i->shortName() == cmd;
+        [command](const std::unique_ptr<CommandlineCommand>& i) {
+            return i->name() == command || i->shortName() == command;
         }
     );
     ghoul_assert(it != _commands.cend(), "Command must name a valid name or shortname");

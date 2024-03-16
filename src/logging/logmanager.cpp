@@ -93,7 +93,7 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
     }
 
     if (level >= _level) {
-        std::lock_guard lock(_mutex);
+        const std::lock_guard lock(_mutex);
 
         _consoleLog.log(level, category, message);
         if (_immediateFlush) {
@@ -108,7 +108,7 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
             }
         }
 
-        const int l = std::underlying_type<LogLevel>::type(level);
+        const int l = std::underlying_type_t<LogLevel>(level);
         ++(_logCounters[l]);
     }
 }
@@ -122,7 +122,7 @@ LogLevel LogManager::logLevel() const {
 }
 
 int LogManager::messageCounter(LogLevel level) {
-    return _logCounters[std::underlying_type<LogLevel>::type(level)];
+    return _logCounters[std::underlying_type_t<LogLevel>(level)];
 }
 
 void LogManager::resetMessageCounters() {

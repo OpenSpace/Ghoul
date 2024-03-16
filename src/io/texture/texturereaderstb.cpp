@@ -67,8 +67,8 @@ namespace {
         // We don't need the original data anymore, so we can free it
         stbi_image_free(data);
 
-        ghoul::opengl::Texture::Format format;
-        GLenum internalFormat;
+        ghoul::opengl::Texture::Format format = ghoul::opengl::Texture::Format::RGB;
+        GLenum internalFormat = GL_RGB;
         switch (n) {
             // @TODO (2020-06-15), abock) At some point we should look into compressed
             // formats here as well
@@ -90,7 +90,7 @@ namespace {
                 break;
         }
 
-        GLenum type = [](int d) {
+        const GLenum type = [](int d) {
             switch (d) {
                 case 1: return GL_TEXTURE_1D;
                 case 2: return GL_TEXTURE_2D;
@@ -119,9 +119,9 @@ std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(
                                                               const std::string& filename,
                                                                     int nDimensions) const
 {
-    int x;
-    int y;
-    int n;
+    int x = 0;
+    int y = 0;
+    int n = 0;
     unsigned char* data = stbi_load(filename.c_str(), &x, &y, &n, 0);
 
     return load(data, x, y, n, filename, this, nDimensions);
@@ -130,9 +130,9 @@ std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(
 std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory, size_t size,
                                                                int nDimensions) const
 {
-    int x;
-    int y;
-    int n;
+    int x = 0;
+    int y = 0;
+    int n = 0;
     unsigned char* data = stbi_load_from_memory(
         reinterpret_cast<unsigned char*>(memory),
         static_cast<int>(size),

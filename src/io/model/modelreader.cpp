@@ -83,7 +83,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
 
     std::filesystem::path cachedFile = FileSys.cacheManager()->cachedFilename(filename);
-    bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
+    const bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
         LINFO(fmt::format(
             "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename
@@ -147,7 +147,7 @@ void ModelReader::addReader(std::unique_ptr<ModelReaderBase> reader) {
 }
 
 ModelReaderBase* ModelReader::readerForExtension(const std::string& extension) {
-    std::string lowerExtension = toLowerCase(extension);
+    const std::string lowerExtension = toLowerCase(extension);
 
     for (const std::unique_ptr<ModelReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();

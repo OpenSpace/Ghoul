@@ -109,8 +109,8 @@ void TextureAtlas::initialize() {
             default: throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
         }
     }(_size.z);
-    GLenum internalFormat = GLenum(format);
-    GLenum dataType = GL_UNSIGNED_BYTE;
+    const GLenum internalFormat = GLenum(format);
+    const GLenum dataType = GL_UNSIGNED_BYTE;
 
     _texture = std::make_unique<Texture>(
         glm::uvec3(glm::ivec2(_size), 1),
@@ -229,11 +229,10 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
         "Invalid region"
     );
 
-    _handleInformation.push_back(glm::u16vec4(region));
+    _handleInformation.emplace_back(region);
 
     // Since we push_back the region, the current handle is the last valid array index
-    RegionHandle handle = static_cast<RegionHandle>(_handleInformation.size() - 1);
-    return handle;
+    return static_cast<RegionHandle>(_handleInformation.size() - 1);
 }
 
 void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
@@ -261,7 +260,7 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
     for (int i = 0; i < height; i++) {
         void* dst = _data.data() + ((y + i) * _size.x + x) * sizeof(char) * _size.z;
         void* src = reinterpret_cast<unsigned char*>(data) + (i * width) * sizeof(char);
-        size_t nBytes = width * sizeof(char) * _size.z;
+        const size_t nBytes = width * sizeof(char) * _size.z;
 
         if (src && dst) {
             memcpy(dst, src, nBytes);

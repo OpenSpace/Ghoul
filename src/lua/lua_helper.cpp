@@ -36,10 +36,9 @@
 #include <fstream>
 #include <sstream>
 
-static lua_State* _state = nullptr;
-
 namespace {
 
+lua_State* _state = nullptr;
 constexpr int KeyTableIndex = -2;
 constexpr int ValueTableIndex = -1;
 
@@ -191,7 +190,7 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
     }
     lua_pop(state, 1);
 
-    if (values.size() == 0) {
+    if (!values.empty()) {
         return "{}";
     }
 
@@ -368,7 +367,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
 
     TableType type = TableType::Undefined;
 
-    int location = luaAbsoluteLocation(state, relativeLocation);
+    const int location = luaAbsoluteLocation(state, relativeLocation);
 
     const int size = lua_gettop(state);
     if (size == 0) {
@@ -418,23 +417,23 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
         const int valueType = lua_type(state, ValueTableIndex);
         switch (valueType) {
             case LUA_TNUMBER: {
-                double value = lua_tonumber(state, ValueTableIndex);
+                const double value = lua_tonumber(state, ValueTableIndex);
                 dictionary.setValue(key, value);
                 break;
             }
             case LUA_TBOOLEAN: {
-                bool value = (lua_toboolean(state, ValueTableIndex) == 1);
+                const bool value = (lua_toboolean(state, ValueTableIndex) == 1);
                 dictionary.setValue(key, value);
                 break;
             }
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, ValueTableIndex);
-                dictionary.setValue(key, value);
+                dictionary.setValue(key, std::move(value));
                 break;
             }
             case LUA_TTABLE: {
                 Dictionary d = luaDictionaryFromState(state);
-                dictionary.setValue(key, d);
+                dictionary.setValue(key, std::move(d));
                 break;
             }
             case LUA_TLIGHTUSERDATA:
@@ -469,18 +468,18 @@ void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
     for (int i = 1; i <= nValues; i++) {
         switch (lua_type(state, i)) {
             case LUA_TNUMBER: {
-                double value = lua_tonumber(state, i);
+                const double value = lua_tonumber(state, i);
                 dictionary.setValue(std::to_string(i), value);
                 break;
             }
             case LUA_TBOOLEAN: {
-                bool value = (lua_toboolean(state, i) == 1);
+                const bool value = (lua_toboolean(state, i) == 1);
                 dictionary.setValue(std::to_string(i), value);
                 break;
             }
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, i);
-                dictionary.setValue(std::to_string(i), value);
+                dictionary.setValue(std::to_string(i), std::move(value));
                 break;
             }
             case LUA_TTABLE: {
@@ -553,17 +552,17 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename) {
         "Filename must be a file that exists"
     );
 
-    std::string fn = filename.string();
+    const std::string fn = filename.string();
     int status = luaL_loadfile(state, fn.c_str());
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaLoadingException(error);
+        throw LuaLoadingException(std::move(error));
     }
 
     status = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(error);
+        throw LuaExecutionException(std::move(error));
     }
 }
 
@@ -574,25 +573,25 @@ void runScript(lua_State* state, const std::string& script) {
     const int loadStatus = luaL_loadstring(state, script.c_str());
     if (loadStatus != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaLoadingException(error);
+        throw LuaLoadingException(std::move(error));
     }
 
     const int callStatus = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (callStatus != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(error);
+        throw LuaExecutionException(std::move(error));
     }
 }
 
 void runScript(lua_State* state, std::string_view script) {
-    std::string s = std::string(script);
+    const std::string s = std::string(script);
     runScript(state, s);
 }
 
 int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
     const int nArguments = lua_gettop(L);
     if (nArguments != expected) {
-        std::string s = fmt::format(
+        const std::string s = fmt::format(
             "Expected {} arguments, got {}", expected, nArguments
         );
         LERRORC(component ? component : "Lua", s);
@@ -606,11 +605,11 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
 {
     const int nArguments = lua_gettop(L);
     if ((nArguments != expected1) && (nArguments != expected2)) {
-        std::string s = fmt::format(
+        const std::string s = fmt::format(
             "Expected {} or {} arguments, got {}", expected1, expected2, nArguments
         );
         LERRORC(component ? component : "Lua", s);
-        return luaError(L, std::move(s));
+        return luaError(L, s);
     }
     return nArguments;
 }
@@ -619,11 +618,11 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* 
 {
     const int nArguments = lua_gettop(L);
     if ((nArguments < range.first) || (nArguments > range.second)) {
-        std::string s = fmt::format(
+        const std::string s = fmt::format(
             "Expected {}-{} arguments, got {}", range.first, range.second, nArguments
         );
         LERRORC(component ? component : "Lua", s);
-        return luaError(L, std::move(s));
+        return luaError(L, s);
     }
     return nArguments;
 }
@@ -636,13 +635,13 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
     if (nArguments != expected &&
        (nArguments < range.first) && (nArguments > range.second))
     {
-        std::string s = fmt::format(
+        const std::string s = fmt::format(
             "Expected {} or {}-{} arguments, got {}",
             expected, range.first, range.second, nArguments
         );
 
         LERRORC(component ? component : "Lua", s);
-        return luaError(L, std::move(s));
+        return luaError(L, s);
     }
     return nArguments;
 }

@@ -48,7 +48,7 @@ TextLog::TextLog(const std::string& filename, int nLogRotation, Append writeToAp
     while (nLogRotation > 0) {
         // Move all of the existing logs one position up
 
-        std::filesystem::path file = filename;
+        const std::filesystem::path file = filename;
         std::string fname = file.stem().string();
         std::string ext = file.extension().string();
 
@@ -83,7 +83,7 @@ TextLog::TextLog(const std::string& filename, int nLogRotation, Append writeToAp
 
 TextLog::~TextLog() {
     if (_printFooter) {
-        _file << "--------" << std::endl;
+        _file << "--------\n";
     }
 }
 
@@ -100,8 +100,8 @@ void TextLog::flush() {
     _file.flush();
 }
 
-void TextLog::writeLine(std::string line) {
-    _file << std::move(line);
+void TextLog::writeLine(const std::string& line) {
+    _file << line;
 }
 
 } // namespace ghoul::logging

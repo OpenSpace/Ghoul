@@ -116,7 +116,7 @@ protected:
      *
      * \param line The line of text that should be printed to the file
      */
-    void writeLine(std::string line);
+    void writeLine(const std::string& line);
 
     /// Should a line be printed at the end after the file is closed?
     const bool _printFooter;

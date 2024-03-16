@@ -51,7 +51,7 @@ void loadRenderDoc() {
 #endif // WIN32
 
     if (getApi) {
-        int ret = getApi(
+        const int ret = getApi(
             eRENDERDOC_API_Version_1_6_0,
             reinterpret_cast<void**>(&renderdocApi)
         );

@@ -84,7 +84,7 @@ LogLevel Log::logLevel() const {
     return _logLevel;
 }
 
-std::string Log::timeString() const {
+std::string Log::timeString() {
 #ifdef WIN32
     SYSTEMTIME t = {};
     GetLocalTime(&t);
@@ -103,7 +103,7 @@ std::string Log::timeString() const {
 #endif
 }
 
-std::string Log::dateString() const {
+std::string Log::dateString() {
 #ifdef WIN32
     SYSTEMTIME t = {};
     GetLocalTime(&t);
@@ -111,7 +111,7 @@ std::string Log::dateString() const {
     return fmt::format("{}-{:0>2}-{:0>2}", t.wYear, t.wMonth, t.wDay);
 #else
     auto now = std::chrono::system_clock::now();
-    time_t time = std::chrono::system_clock::to_time_t(now);
+    const time_t time = std::chrono::system_clock::to_time_t(now);
 
     std::stringstream ss;
 

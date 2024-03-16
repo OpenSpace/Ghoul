@@ -30,7 +30,7 @@
 #include <string>
 
 TEST_CASE("DictionaryJsonFormatter: Empty Dictionary", "[dictionaryjsonformatter]") {
-    ghoul::Dictionary d;
+    const ghoul::Dictionary d;
     std::string res = ghoul::formatJson(d);
     CHECK(res == "{}");
 }

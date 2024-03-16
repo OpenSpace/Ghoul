@@ -159,7 +159,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
 TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
     ghoul::MemoryPool<2048> pool;
 
-    unsigned long long alignment = alignof(max_align_t);
+    const unsigned long long alignment = alignof(max_align_t);
     // For the rest:  X used memory; O memory allocated due to alignment; F free memory
 
     CHECK(pool.totalOccupancy() == 0);
@@ -200,7 +200,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
 }
 
 TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memorypool]") {
-    unsigned long long alignment = alignof(max_align_t);
+    const unsigned long long alignment = alignof(max_align_t);
     if (alignment == 8) {
         ghoul::MemoryPool<32> pool;
         REQUIRE(pool.occupancies().size() == 1);

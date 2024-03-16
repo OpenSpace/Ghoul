@@ -61,11 +61,12 @@ namespace {
         };
 
         std::vector<std::string> keys;
-        for (std::string_view k : d.keys()) {
-            keys.push_back(std::string(k));
+        keys.reserve(d.keys().size());
+        for (const std::string_view k : d.keys()) {
+            keys.emplace_back(k);
         }
 
-        std::string lua = std::accumulate(
+        const std::string lua = std::accumulate(
             std::next(keys.begin()),
             keys.end(),
             convert(*keys.begin()),
@@ -103,7 +104,7 @@ namespace {
                             int indentationSteps)
     {
         if (dictionary.hasValue<Dictionary>(key)) {
-            Dictionary subDictionary = dictionary.value<Dictionary>(key);
+            const Dictionary subDictionary = dictionary.value<Dictionary>(key);
             return format(subDictionary, prettyPrint, indentation, indentationSteps);
         }
 
@@ -113,27 +114,27 @@ namespace {
         }
 
         if (dictionary.hasValue<int>(key)) {
-            int value = dictionary.value<int>(key);
+            const int value = dictionary.value<int>(key);
             return std::to_string(value);
         }
 
         if (dictionary.hasValue<bool>(key)) {
-            bool value = dictionary.value<bool>(key);
+            const bool value = dictionary.value<bool>(key);
             return value ? "true" : "false";
         }
 
         if (dictionary.hasValue<std::vector<int>>(key)) {
-            std::vector<int> vec = dictionary.value<std::vector<int>>(key);
+            const std::vector<int> vec = dictionary.value<std::vector<int>>(key);
             return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::vector<double>>(key)) {
-            std::vector<double> vec = dictionary.value<std::vector<double>>(key);
+            const std::vector<double> vec = dictionary.value<std::vector<double>>(key);
             return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::string>(key)) {
-            std::string value = dictionary.value<std::string>(key);
+            const std::string value = dictionary.value<std::string>(key);
 
             std::string luaString;
             for (const char c : value) {

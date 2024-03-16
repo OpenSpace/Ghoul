@@ -112,7 +112,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             reinterpret_cast<char*>(dimensionStorage.data()),
             3 * sizeof(int32_t)
         );
-        glm::uvec3 dimensions = glm::uvec3(
+        const glm::uvec3 dimensions = glm::uvec3(
             static_cast<unsigned int>(dimensionStorage[0]),
             static_cast<unsigned int>(dimensionStorage[1]),
             static_cast<unsigned int>(dimensionStorage[2])
@@ -122,18 +122,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         std::string formatString;
         formatString.resize(FormatStringSize);
         fileStream.read(formatString.data(), FormatStringSize * sizeof(char));
-        opengl::Texture::Format format = stringToFormat(formatString);
+        const opengl::Texture::Format format = stringToFormat(formatString);
 
         // internal format
-        uint32_t rawInternalFormat;
+        uint32_t rawInternalFormat = 0;
         fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(uint32_t));
-        GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
+        const GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
         // data type
         std::string dataTypeString;
         dataTypeString.resize(FormatStringSize);
         fileStream.read(dataTypeString.data(), FormatStringSize * sizeof(char));
-        GLenum dataType = stringToDataType(dataTypeString);
+        const GLenum dataType = stringToDataType(dataTypeString);
 
         // data
         int32_t textureSize = 0;
@@ -207,15 +207,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             indexArray.reserve(nIndices);
 
             for (int32_t i = 0; i < nIndices; i++) {
-                uint32_t index;
+                uint32_t index = 0;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
                 indexArray.push_back(index);
             }
 
             // IsInvisible
-            uint8_t inv;
+            uint8_t inv = 0;
             fileStream.read(reinterpret_cast<char*>(&inv), sizeof(uint8_t));
-            bool isInvisible = (inv == 1);
+            const bool isInvisible = (inv == 1);
 
             // Textures
             int32_t nTextures = 0;
@@ -233,7 +233,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 fileStream.read(reinterpret_cast<char*>(&texture.type), sizeof(uint8_t));
 
                 // hasTexture
-                uint8_t h;
+                uint8_t h = 0;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
                 texture.hasTexture = (h == 1);
 
@@ -247,7 +247,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                         sizeof(float)
                     );
                     // isTransparent
-                    uint8_t isT;
+                    uint8_t isT = 0;
                     fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
                     texture.isTransparent = (isT == 1);
                 }
@@ -257,7 +257,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 if (texture.hasTexture) {
                     // Read which index in the textureStorageArray that this texture
                     // should point to
-                    uint32_t index;
+                    uint32_t index = 0;
                     fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
 
                     if (index >= textureStorageArray.size()) {
@@ -288,25 +288,29 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             }
 
             // Make mesh
-            meshArray.push_back(io::ModelMesh(
+            meshArray.emplace_back(
                 std::move(vertexArray),
                 std::move(indexArray),
                 std::move(textureArray),
                 isInvisible
-            ));
+            );
         }
 
         // Transform
-        glm::mat4x4 transform;
-        GLfloat rawTransform[16];
-        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        transform = glm::make_mat4(rawTransform);
+        std::array<GLfloat, 16> rawTransform;
+        fileStream.read(
+            reinterpret_cast<char*>(rawTransform.data()),
+            16 * sizeof(GLfloat)
+        );
+        glm::mat4x4 transform = glm::make_mat4(rawTransform.data());
 
         // AnimationTransform
-        glm::mat4x4 animationTransform;
-        GLfloat rawAnimTransform[16];
-        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
-        animationTransform = glm::make_mat4(rawAnimTransform);
+        std::array<GLfloat, 16> rawAnimTransform;
+        fileStream.read(
+            reinterpret_cast<char*>(rawAnimTransform.data()),
+            16 * sizeof(GLfloat)
+        );
+        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform.data());
 
         // Parent
         int32_t parent = 0;
@@ -320,15 +324,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         std::vector<int> childrenArray;
         nodeArray.reserve(nChildren);
         for (int32_t c = 0; c < nChildren; ++c) {
-            int child;
+            int child = 0;
             fileStream.read(reinterpret_cast<char*>(&child), sizeof(int32_t));
             childrenArray.push_back(child);
         }
 
         // HasAnimation
-        uint8_t a;
+        uint8_t a = 0;
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
-        bool hasAnimation = (a == 1);
+        const bool hasAnimation = (a == 1);
 
         // Create Node
         io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
@@ -342,9 +346,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     }
 
     // Animation
-    uint8_t anim;
+    uint8_t anim = 0;
     fileStream.read(reinterpret_cast<char*>(&anim), sizeof(uint8_t));
-    bool hasAnimation = (anim == 1);
+    const bool hasAnimation = (anim == 1);
 
     if (hasAnimation) {
         // Name
@@ -354,7 +358,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         fileStream.read(name.data(), nameSize);
 
         // Duration
-        double duration;
+        double duration = 0.0;
         fileStream.read(reinterpret_cast<char*>(&duration), sizeof(double));
 
         // Read how many NodeAnimations to read
@@ -372,12 +376,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
             // Node index
-            int32_t nodeIndex;
+            int32_t nodeIndex = 0;
             fileStream.read(reinterpret_cast<char*>(&nodeIndex), sizeof(int32_t));
             nodeAnimation.node = nodeIndex;
 
             // Positions
-            uint32_t nPos;
+            uint32_t nPos = 0;
             fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint32_t));
             nodeAnimation.positions.reserve(nPos);
             for (uint32_t p = 0; p < nPos; ++p) {
@@ -391,7 +395,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 posKeyframe.position = pos;
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 posKeyframe.time = time;
 
@@ -399,14 +403,17 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             }
 
             // Rotations
-            uint32_t nRot;
+            uint32_t nRot = 0;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
             for (uint32_t p = 0; p < nRot; ++p) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                float rotW, rotX, rotY, rotZ;
+                float rotW = 0.f;
+                float rotX = 0.f;
+                float rotY = 0.f;
+                float rotZ = 0.f;
                 fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotY), sizeof(float));
@@ -414,7 +421,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 rotKeyframe.rotation = glm::quat(rotW, rotX, rotY, rotZ);
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 rotKeyframe.time = time;
 
@@ -422,7 +429,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             }
 
             // Scales
-            uint32_t nScale;
+            uint32_t nScale = 0;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
             for (uint32_t p = 0; p < nScale; ++p) {
@@ -436,7 +443,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 scaleKeyframe.scale = scale;
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 scaleKeyframe.time = time;
 
