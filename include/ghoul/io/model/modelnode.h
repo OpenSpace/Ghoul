@@ -50,8 +50,8 @@ public:
     int parent() const;
     std::vector<int>& children();
     const std::vector<int>& children() const;
-    const glm::mat4x4 transform() const;
-    const glm::mat4x4 animationTransform() const;
+    glm::mat4x4 transform() const;
+    glm::mat4x4 animationTransform() const;
     bool hasAnimation() const;
 
 private:

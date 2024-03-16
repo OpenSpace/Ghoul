@@ -29,7 +29,7 @@
 
 namespace {
     int luaPanicFunction(lua_State* L) {
-        int n = lua_gettop(L);
+        const int n = lua_gettop(L);
         if (n > 0) {
             // The top value is the error message
             std::string msg = lua_tostring(L, -1);

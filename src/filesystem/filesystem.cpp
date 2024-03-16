@@ -34,14 +34,14 @@
 #include <Shlwapi.h>
 #include <Windows.h>
 #else
+#include <cerrno>
+#include <cstring>
 #include <dirent.h>
-#include <unistd.h>
+#include <pwd.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <pwd.h>
-#include <string.h>
-#include <errno.h>
+#include <unistd.h>
 #endif
 
 #if !defined(WIN32) && !defined(__APPLE__)

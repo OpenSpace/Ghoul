@@ -553,7 +553,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     _L2Associativity = static_cast<unsigned int>(intValue);
 //    delete[] p;
 #else
-    FILE* file;
+    FILE* file = nullptr;
     const unsigned int maxSize = 2048;
     char line[maxSize];
 

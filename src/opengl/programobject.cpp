@@ -31,9 +31,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <filesystem>
 
-using std::map;
-using std::string;
-using std::vector;
 using glm::bvec2;
 using glm::bvec3;
 using glm::bvec4;
@@ -212,7 +209,7 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) noexcept {
         _ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
         _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
         _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
-        _programIsDirty = std::move(rhs._programIsDirty);
+        _programIsDirty = rhs._programIsDirty;
 
         _shaderObjects.clear();
         _shaderObjects = std::move(rhs._shaderObjects);
@@ -220,7 +217,7 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) noexcept {
     return *this;
 }
 
-void ProgramObject::setName(string name) {
+void ProgramObject::setName(std::string name) {
     _programName = std::move(name);
     _loggerCat = fmt::format("ProgramObject['{}']", _programName);
     if (glbinding::Binding::ObjectLabel.isResolved()) {
@@ -233,7 +230,7 @@ void ProgramObject::setName(string name) {
     }
 }
 
-const string& ProgramObject::name() const{
+const std::string& ProgramObject::name() const{
     return _programName;
 }
 
@@ -251,7 +248,7 @@ Dictionary ProgramObject::dictionary() const {
 }
 
 void ProgramObject::setProgramObjectCallback(ProgramObjectCallback changeCallback) {
-    ShaderObject::ShaderObjectCallback c = [this, changeCallback](){
+    const ShaderObject::ShaderObjectCallback c = [this, changeCallback](){
         _programIsDirty = true;
         changeCallback(this);
     };
@@ -289,10 +286,10 @@ void ProgramObject::compileShaderObjects() {
 void ProgramObject::linkProgramObject() {
     glLinkProgram(_id);
 
-    GLint linkStatus;
+    GLint linkStatus = 0;
     glGetProgramiv(_id, GL_LINK_STATUS, &linkStatus);
     if (static_cast<GLboolean>(linkStatus) == GL_FALSE) {
-        GLint logLength;
+        GLint logLength = 0;
         glGetProgramiv(_id, GL_INFO_LOG_LENGTH, &logLength);
 
         if (logLength == 0) {
@@ -301,7 +298,7 @@ void ProgramObject::linkProgramObject() {
 
         std::vector<GLchar> rawLog(logLength);
         glGetProgramInfoLog(_id, logLength, nullptr, rawLog.data());
-        string log(rawLog.data());
+        const std::string log = std::string(rawLog.data());
         throw ProgramObjectLinkingError(log, name());
     }
     _programIsDirty = false;
@@ -324,18 +321,18 @@ bool ProgramObject::isDirty() const {
     return _programIsDirty;
 }
 
-void ProgramObject::activate() {
+void ProgramObject::activate() const {
     glUseProgram(_id);
 }
 
-void ProgramObject::deactivate() {
+void ProgramObject::deactivate() const {
     glUseProgram(0);
 }
 
 std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                             const std::filesystem::path& vertexShaderPath,
                                           const std::filesystem::path& fragmentShaderPath,
-                                                    Dictionary dictionary)
+                                                             const Dictionary& dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
@@ -371,7 +368,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                             const std::filesystem::path& vertexShaderPath,
                                           const std::filesystem::path& fragmentShaderPath,
                                           const std::filesystem::path& geometryShaderPath,
-                                                                    Dictionary dictionary)
+                                                             const Dictionary& dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
@@ -420,7 +417,7 @@ std::unique_ptr<ProgramObject> ProgramObject::Build(const std::string& name,
                                           const std::filesystem::path& geometryShaderPath,
                             const std::filesystem::path& tessellationEvaluationShaderPath,
                                const std::filesystem::path& tessellationControlShaderPath,
-                                                                    Dictionary dictionary)
+                                                             const Dictionary& dictionary)
 {
     ghoul_assert(!vertexShaderPath.empty(), "VertexShaderPath must not be empty");
     ghoul_assert(
@@ -2601,7 +2598,11 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value,
 }
 
 bool ProgramObject::setSsboBinding(std::string_view name, GLuint binding) const {
-    GLuint index = glGetProgramResourceIndex(_id, GL_SHADER_STORAGE_BLOCK, name.data());
+    const GLuint index = glGetProgramResourceIndex(
+        _id,
+        GL_SHADER_STORAGE_BLOCK,
+        name.data()
+    );
     if (index == GL_INVALID_INDEX) {
         return false;
     }
@@ -3633,7 +3634,7 @@ GLint ProgramObject::subroutineUniformLocation(ShaderObject::ShaderType shaderTy
     return location;
 }
 
-vector<string> ProgramObject::activeSubroutineUniformNames(
+std::vector<std::string> ProgramObject::activeSubroutineUniformNames(
                                                 ShaderObject::ShaderType shaderType) const
 {
     GLint maximumUniformNameLength = 0;
@@ -3652,7 +3653,7 @@ vector<string> ProgramObject::activeSubroutineUniformNames(
         GL_ACTIVE_SUBROUTINE_UNIFORMS,
         &countActiveSubroutineUniforms
     );
-    vector<string> result(countActiveSubroutineUniforms);
+    std::vector<std::string> result(countActiveSubroutineUniforms);
     for (GLuint i = 0; i < static_cast<GLuint>(countActiveSubroutineUniforms); i++) {
         glGetActiveSubroutineUniformName(
             _id,
@@ -3662,13 +3663,13 @@ vector<string> ProgramObject::activeSubroutineUniformNames(
             nullptr,
             buffer.data()
         );
-        result[i] = string(buffer.data());
+        result[i] = std::string(buffer.data());
     }
 
     return result;
 }
 
-vector<string> ProgramObject::compatibleSubroutineNames(
+std::vector<std::string> ProgramObject::compatibleSubroutineNames(
                                                       ShaderObject::ShaderType shaderType,
                                                    GLuint subroutineUniformLocation) const
 {
@@ -3694,10 +3695,10 @@ vector<string> ProgramObject::compatibleSubroutineNames(
         &numCompatibleSubroutines
     );
     if (numCompatibleSubroutines == 0) {
-        return vector<string>();
+        return std::vector<std::string>();
     }
 
-    vector<string> result(numCompatibleSubroutines);
+    std::vector<std::string> result(numCompatibleSubroutines);
     std::vector<GLint> indices(numCompatibleSubroutines);
     std::vector<char> buffer(maximumUniformNameLength);
     glGetActiveSubroutineUniformiv(
@@ -3716,12 +3717,12 @@ vector<string> ProgramObject::compatibleSubroutineNames(
             nullptr,
             buffer.data()
         );
-        result[i] = string(buffer.data());
+        result[i] = std::string(buffer.data());
     }
     return result;
 }
 
-vector<string> ProgramObject::compatibleSubroutineNames(
+std::vector<std::string> ProgramObject::compatibleSubroutineNames(
                                                       ShaderObject::ShaderType shaderType,
                                            const std::string& subroutineUniformName) const
 {
@@ -3729,7 +3730,7 @@ vector<string> ProgramObject::compatibleSubroutineNames(
 
     const GLint index = subroutineUniformLocation(shaderType, subroutineUniformName);
     if (index == -1) {
-        return vector<string>();
+        return std::vector<std::string>();
     }
     else {
         return compatibleSubroutineNames(shaderType, static_cast<GLuint>(index));
@@ -3790,10 +3791,12 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
     }
 #endif // GHL_DEBUG
 
-    vector<GLuint> uniformIndices(values.size());
-    const vector<string>& uniformSubroutines = activeSubroutineUniformNames(shaderType);
+    std::vector<GLuint> uniformIndices = std::vector<GLuint>(values.size());
+    const std::vector<std::string>& uniformSubroutines = activeSubroutineUniformNames(
+        shaderType
+    );
     for (size_t i = 0; i < uniformSubroutines.size(); i++) {
-        const string& uniformSubroutine = uniformSubroutines[i];
+        const std::string& uniformSubroutine = uniformSubroutines[i];
         auto subroutine = values.find(uniformSubroutine);
 #ifdef GHL_DEBUG
         if (subroutine == values.end()) {
@@ -3803,7 +3806,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
             return false;
         }
 #endif // GHL_DEBUG
-        const string& nameSubroutine = subroutine->second;
+        const std::string& nameSubroutine = subroutine->second;
         const GLuint idxSubroutine = subroutineIndex(shaderType, nameSubroutine);
 #ifdef GHL_DEBUG
         if (idxSubroutine == GL_INVALID_INDEX) {

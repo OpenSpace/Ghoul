@@ -250,13 +250,13 @@ public:
      * Activates this ProgramObject for use in the OpenGL. Will call the OpenGL function
      * `glUseProgram`.
      */
-    void activate();
+    void activate() const;
 
     /**
      * Deactivates this ProgramObject by activating OpenGL program object `0`. Will call
      * the OpenGL function `glUseProgram`.
      */
-    void deactivate();
+    void deactivate() const;
 
     /**
      * Constructs and links a ProgramObject built from the provided \p vertexShaderPath
@@ -283,7 +283,7 @@ public:
     static std::unique_ptr<ProgramObject> Build(const std::string& name,
         const std::filesystem::path& vertexShaderPath,
         const std::filesystem::path& fragmentShaderPath,
-        Dictionary dictionary = Dictionary());
+        const Dictionary& dictionary = Dictionary());
 
     /**
      * Constructs and links a ProgramObject built from the provided \p vertexShaderPath
@@ -316,7 +316,7 @@ public:
         const std::filesystem::path& vertexShaderPath,
         const std::filesystem::path& fragmentShaderPath,
         const std::filesystem::path& geometryShaderPath,
-        Dictionary dictionary = Dictionary());
+        const Dictionary& dictionary = Dictionary());
 
     /**
      * Constructs and links a ProgramObject built from the provided \p vertexShaderPath
@@ -361,7 +361,7 @@ public:
         const std::filesystem::path& geometryShaderPath,
         const std::filesystem::path& tessellationEvaluationShaderPath,
         const std::filesystem::path& tessellationControlShaderPath,
-        Dictionary dictionary = Dictionary());
+        const Dictionary& dictionary = Dictionary());
 
     //////////////////////////////////////////////////////////////////////////////////////
     ////// Uniforms
