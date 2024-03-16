@@ -327,7 +327,7 @@ private:
          *
          * \param task The task to be pushed onto the queue
          */
-        void push(Task&& task);
+        void push(const Task& task);
 
         /**
          * Returns whether the queue is empty.
