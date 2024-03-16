@@ -32,8 +32,8 @@
 #ifdef WIN32
 #include <Windows.h>
 #else // ^^^^ WIN32 // !WIN32 vvvv
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 #include <sys/shm.h>
 // Common access type bits, used with ipcperm()
 constexpr int IPC_R = 000400; // read permission

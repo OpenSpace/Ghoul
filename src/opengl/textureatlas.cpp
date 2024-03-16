@@ -229,7 +229,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
         "Invalid region"
     );
 
-    _handleInformation.emplace_back(glm::u16vec4(region));
+    _handleInformation.emplace_back(region);
 
     // Since we push_back the region, the current handle is the last valid array index
     return static_cast<RegionHandle>(_handleInformation.size() - 1);

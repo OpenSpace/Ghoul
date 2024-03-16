@@ -194,7 +194,7 @@ namespace {
             return res;
         }
 
-        std::string_view res = view.substr(0, p);
+        const std::string_view res = view.substr(0, p);
         view = view.substr(p + 1);
         return res;
     }
@@ -573,7 +573,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                               const ProjectedLabelsInformation& labelInfo,
                                                             const glm::vec2& offset) const
 {
-    float h = font.height();
+    const float h = font.height();
 
     _vertexBuffer.clear();
     _indexBuffer.clear();
@@ -673,7 +673,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             }
 
             if (heightInPixels > labelInfo.maxSize) {
-                float scaleFix = static_cast<float>(labelInfo.maxSize) / heightInPixels;
+                const float scaleFix =
+                    static_cast<float>(labelInfo.maxSize) / heightInPixels;
                 if (labelInfo.renderType == 0) {
                     p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *
                         labelInfo.scale * scaleFix + pos;

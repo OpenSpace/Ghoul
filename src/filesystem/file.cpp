@@ -84,7 +84,7 @@ void File::installFileChangeListener() {
     _indx = FileSys.addFileListener(path(), _fileChangedCallback);
 }
 
-void File::removeFileChangeListener() {
+void File::removeFileChangeListener() const {
     FileSys.removeFileListener(_indx);
 }
 

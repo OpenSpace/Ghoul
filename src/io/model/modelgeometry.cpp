@@ -244,7 +244,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         const opengl::Texture::Format format = stringToFormat(formatString);
 
         // internal format
-        uint32_t rawInternalFormat;
+        uint32_t rawInternalFormat = 0;
         fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(uint32_t));
         const GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
@@ -401,18 +401,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Make mesh
-            meshArray.push_back(io::ModelMesh(
+            meshArray.emplace_back(
                 std::move(vertexArray),
                 std::move(indexArray),
                 std::move(textureArray),
                 isInvisible
-            ));
+            );
         }
 
         // Transform
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        const glm::mat4x4 transform = glm::make_mat4(rawTransform);
+        glm::mat4x4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         GLfloat rawAnimTransform[16];
@@ -431,7 +431,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::vector<int> childrenArray;
         nodeArray.reserve(nChildren);
         for (int32_t c = 0; c < nChildren; ++c) {
-            int32_t child;
+            int32_t child = 0;
             fileStream.read(reinterpret_cast<char*>(&child), sizeof(int32_t));
             childrenArray.push_back(child);
         }

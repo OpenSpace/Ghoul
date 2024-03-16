@@ -138,7 +138,7 @@ void setClipboardText(const std::string& text) {
     }
 #else
     std::string buf;
-    bool success = exec(fmt::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
+    const bool success = exec(fmt::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }
