@@ -210,7 +210,7 @@ void ShaderObject::setFilename(const std::filesystem::path& filename) {
         throw FileNotFoundError(filename.string());
     }
 
-    _preprocessor.setFilename(std::move(filename));
+    _preprocessor.setFilename(filename);
 }
 
 std::filesystem::path ShaderObject::filename() const {
