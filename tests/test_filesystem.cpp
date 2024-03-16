@@ -73,9 +73,10 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     REQUIRE_FALSE(b2);
 
     // overwrite the file
-    f.open(path);
-    f << "tmp";
-    f.close();
+    {
+        std::ofstream f = std::ofstream(path);
+        f << "tmp";
+    }
     FileSys.triggerFilesystemEvents();
 
     // Sleep the main thread to make sure the filesystem have time to respond
