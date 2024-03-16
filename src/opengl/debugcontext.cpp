@@ -96,7 +96,7 @@ void setDebugCallback(CallbackFunction callback) {
     // In a perfect world, we'd want to capture the function pointer, but the OpenGL
     // callback only allows pure C functions
     static CallbackFunction storage;
-    storage = callback;
+    storage = std::move(callback);
     glDebugMessageCallback(internalCallback, &storage);
 }
 

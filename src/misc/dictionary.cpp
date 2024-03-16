@@ -115,7 +115,7 @@ T Dictionary::value(std::string_view key) const {
             vec = std::get<VT>(it->second);
         }
         else if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
             vec.resize(d._storage.size());
             for (const auto& kv : d._storage) {
                 // Lua is 1-based index, the rest of the world is 0-based
@@ -178,7 +178,7 @@ bool Dictionary::hasValue(std::string_view key) const {
     }
     else if constexpr (isGLMType<T>::value) {
         if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
 
             if (d.size() != ghoul::glm_components<T>::value) {
                 return false;

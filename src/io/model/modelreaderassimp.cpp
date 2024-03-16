@@ -47,9 +47,8 @@
 namespace {
     constexpr std::string_view _loggerCat = "ModelReaderAssimp";
 
-
-    bool isTextureTransparent(const ghoul::io::ModelMesh::Texture texture) {
-        int nChannels = texture.texture->numberOfChannels();
+    bool isTextureTransparent(const ghoul::io::ModelMesh::Texture& texture) {
+        const int nChannels = texture.texture->numberOfChannels();
 
         if (nChannels < 4) {
             return false;
@@ -58,7 +57,7 @@ namespace {
         // Check if there is at least one pixel that is somewhat transparent
         for (unsigned int j = 0; j < texture.texture->dimensions().x; j++) {
             for (unsigned int k = 0; k < texture.texture->dimensions().y; k++) {
-                float alpha = texture.texture->texelAsFloat(glm::vec2(j, k)).a;
+                const float alpha = texture.texture->texelAsFloat({ j, k }).a;
                 if (alpha < 1.f) {
                     return true;
                 }
@@ -169,8 +168,8 @@ namespace {
             else {
                 // Local texture
                 try {
-                    std::string pathString(path.C_Str());
-                    std::string absolutePath = fmt::format(
+                    const std::string pathString(path.C_Str());
+                    const std::string absolutePath = fmt::format(
                         "{}/{}", modelDirectory.string(), pathString
                     );
 
@@ -209,7 +208,7 @@ namespace {
                 }
 
                 for (unsigned int k = 0; k < meshTexture.texture->dimensions().y; k++) {
-                    float alpha = meshTexture.texture->texelAsFloat(glm::vec2(j, k)).a;
+                    const float alpha = meshTexture.texture->texelAsFloat({ j, k }).a;
                     if (alpha > 0.f) {
                         isOpaque = true;
                         break;
@@ -300,10 +299,10 @@ namespace {
 
         // Indices
         // Reserve space, every face has usually three indices
-        unsigned int nIndices = mesh.mNumFaces * 3u;
+        const unsigned int nIndices = mesh.mNumFaces * 3u;
         indexArray.reserve(nIndices);
         for (unsigned int i = 0; i < mesh.mNumFaces; i++) {
-            aiFace face = mesh.mFaces[i];
+            const aiFace face = mesh.mFaces[i];
 
             for (unsigned int j = 0; j < face.mNumIndices; j++) {
                 indexArray.push_back(face.mIndices[j]);
@@ -332,7 +331,7 @@ namespace {
 
         // Opacity
         float opacity = 0.f;
-        aiReturn result = material->Get(AI_MATKEY_OPACITY, opacity);
+        const aiReturn result = material->Get(AI_MATKEY_OPACITY, opacity);
         const bool hasOpacity = result == AI_SUCCESS && opacity < 1.f;
         if (hasOpacity && opacity < std::numeric_limits<float>::epsilon()) {
             // If the material is transparent then do not add it
@@ -369,7 +368,7 @@ namespace {
         else {
             // Load embedded simple material instead of textures
             aiColor4D color4 = aiColor4D(0.f, 0.f, 0.f, 0.f);
-            aiReturn hasColor4 = material->Get(AI_MATKEY_COLOR_DIFFUSE, color4);
+            const aiReturn hasColor4 = material->Get(AI_MATKEY_COLOR_DIFFUSE, color4);
             if (hasColor4 == AI_SUCCESS) {
                 // Only add the color if it is not transparent
                 if (color4.a != 0.f) {
@@ -386,7 +385,7 @@ namespace {
             }
             else {
                 aiColor3D color3 = aiColor3D(0.f, 0.f, 0.f);
-                aiReturn hasColor3 = material->Get(AI_MATKEY_COLOR_DIFFUSE, color3);
+                const aiReturn hasColor3 = material->Get(AI_MATKEY_COLOR_DIFFUSE, color3);
                 if (hasColor3 == AI_SUCCESS) {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
@@ -407,7 +406,7 @@ namespace {
 
         // Specular
         if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-            bool success = loadMaterialTextures(
+            const bool success = loadMaterialTextures(
                 scene,
                 *material,
                 aiTextureType_SPECULAR,
@@ -427,8 +426,8 @@ namespace {
         }
         else {
             // Load embedded simple material instead of textures
-            aiColor4D color4(0.f, 0.f, 0.f, 0.f);
-            aiReturn hasColor4 = material->Get(AI_MATKEY_COLOR_SPECULAR, color4);
+            aiColor4D color4 = aiColor4D(0.f, 0.f, 0.f, 0.f);
+            const aiReturn hasColor4 = material->Get(AI_MATKEY_COLOR_SPECULAR, color4);
             if (hasColor4 == AI_SUCCESS && !color4.IsBlack()) {
                 // Only add the color if it is not transparent
                 if (color4.a != 0.f) {
@@ -443,9 +442,9 @@ namespace {
                 }
             }
             else {
-                aiColor3D color3(0.f, 0.f, 0.f);
-                aiReturn hasColor3 = material->Get(AI_MATKEY_COLOR_SPECULAR, color3);
-                if (hasColor3 == AI_SUCCESS && !color3.IsBlack()) {
+                aiColor3D color3 = aiColor3D(0.f, 0.f, 0.f);
+                const aiReturn hasColor = material->Get(AI_MATKEY_COLOR_SPECULAR, color3);
+                if (hasColor == AI_SUCCESS && !color3.IsBlack()) {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorSpecular;
@@ -460,7 +459,7 @@ namespace {
 
         // Normal
         if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
-            bool success = loadMaterialTextures(
+            const bool success = loadMaterialTextures(
                 scene,
                 *material,
                 aiTextureType_NORMALS,
