@@ -38,11 +38,11 @@ public:
     FramebufferObject();
     ~FramebufferObject();
 
-    void activate();
+    void activate() const;
     static void deactivate();
 
     bool isComplete() const;
-    bool isActive();
+    bool isActive() const;
 
     void attachTexture(Texture* texture, GLenum attachment = GL_COLOR_ATTACHMENT0,
         int mipLevel = 0, int zSlice = 0);

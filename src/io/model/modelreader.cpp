@@ -83,7 +83,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
 
     std::filesystem::path cachedFile = FileSys.cacheManager()->cachedFilename(filename);
-    bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
+    const bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
         LINFO(fmt::format(
             "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename

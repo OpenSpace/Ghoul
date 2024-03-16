@@ -31,7 +31,7 @@
 
 namespace ghoul::logging {
 
-HTMLLog::HTMLLog(const std::string& filename, int nLogRotation,
+HTMLLog::HTMLLog(std::string filename, int nLogRotation,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
                  const std::vector<std::string>& cssIncludes,

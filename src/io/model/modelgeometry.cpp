@@ -107,11 +107,11 @@ namespace {
         glm::mat4x4 globalTransform = parentTransform * node->transform();
 
         for (const ghoul::io::ModelMesh& mesh : node->meshes()) {
-            float d = mesh.calculateBoundingRadius(globalTransform);
+            const float d = mesh.calculateBoundingRadius(globalTransform);
             maximumDistanceSquared = std::max(d, maximumDistanceSquared);
         }
 
-        for (int child : node->children()) {
+        for (const int child : node->children()) {
             calculateBoundingRadiusRecursive(
                 nodes,
                 &nodes[child],
@@ -146,7 +146,7 @@ namespace {
             mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
         }
 
-        for (int child : node->children()) {
+        for (const int child : node->children()) {
             renderRecursive(
                 nodes,
                 &nodes[child],
@@ -175,8 +175,8 @@ ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
     : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
     , _animation(std::move(animation))
-    , _hasCalcTransparency(std::move(hasCalcTransparency))
-    , _isTransparent(std::move(isTransparent))
+    , _hasCalcTransparency(hasCalcTransparency)
+    , _isTransparent(isTransparent)
 {
     if (!_hasCalcTransparency) {
         calculateTransparency();
@@ -231,7 +231,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             reinterpret_cast<char*>(dimensionStorage.data()),
             3 * sizeof(int32_t)
         );
-        glm::uvec3 dimensions = glm::uvec3(
+        const glm::uvec3 dimensions = glm::uvec3(
             static_cast<unsigned int>(dimensionStorage[0]),
             static_cast<unsigned int>(dimensionStorage[1]),
             static_cast<unsigned int>(dimensionStorage[2])
@@ -241,18 +241,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::string formatString;
         formatString.resize(FormatStringSize);
         fileStream.read(formatString.data(), FormatStringSize * sizeof(char));
-        opengl::Texture::Format format = stringToFormat(formatString);
+        const opengl::Texture::Format format = stringToFormat(formatString);
 
         // internal format
         uint32_t rawInternalFormat;
         fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(uint32_t));
-        GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
+        const GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
         // data type
         std::string dataTypeString;
         dataTypeString.resize(FormatStringSize);
         fileStream.read(dataTypeString.data(), FormatStringSize * sizeof(char));
-        GLenum dataType = stringToDataType(dataTypeString);
+        const GLenum dataType = stringToDataType(dataTypeString);
 
         // data
         int32_t textureSize = 0;
@@ -326,15 +326,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             indexArray.reserve(nIndices);
 
             for (int32_t i = 0; i < nIndices; i++) {
-                uint32_t index;
+                uint32_t index = 0;
                 fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
                 indexArray.push_back(index);
             }
 
             // IsInvisible
-            uint8_t inv;
+            uint8_t inv = 0;
             fileStream.read(reinterpret_cast<char*>(&inv), sizeof(uint8_t));
-            bool isInvisible = (inv == 1);
+            const bool isInvisible = (inv == 1);
 
             // Textures
             int32_t nTextures = 0;
@@ -352,7 +352,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 fileStream.read(reinterpret_cast<char*>(&texture.type), sizeof(uint8_t));
 
                 // hasTexture
-                uint8_t h;
+                uint8_t h = 0;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
                 texture.hasTexture = (h == 1);
 
@@ -363,7 +363,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
 
                 // isTransparent
-                uint8_t isT;
+                uint8_t isT = 0;
                 fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
                 texture.isTransparent = (isT == 1);
 
@@ -371,7 +371,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 if (texture.hasTexture) {
                     // Read which index in the textureStorageArray that this texture
                     // should point to
-                    uint32_t index;
+                    uint32_t index = 0;
                     fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
 
                     if (index >= textureStorageArray.size()) {
@@ -412,12 +412,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Transform
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        glm::mat4x4 transform = glm::make_mat4(rawTransform);
+        const glm::mat4x4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         GLfloat rawAnimTransform[16];
         fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
-        glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
+        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
         int32_t parent = 0;
@@ -437,9 +437,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // HasAnimation
-        uint8_t a;
+        uint8_t a = 0;
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
-        bool hasAnimation = (a == 1);
+        const bool hasAnimation = (a == 1);
 
         // Create Node
         io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
@@ -453,9 +453,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     }
 
     // Animation
-    uint8_t anim;
+    uint8_t anim = 0;
     fileStream.read(reinterpret_cast<char*>(&anim), sizeof(uint8_t));
-    bool hasAnimation = (anim == 1);
+    const bool hasAnimation = (anim == 1);
 
     if (hasAnimation) {
         // Name
@@ -465,7 +465,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         fileStream.read(name.data(), nameSize);
 
         // Duration
-        double duration;
+        double duration = 0.0;
         fileStream.read(reinterpret_cast<char*>(&duration), sizeof(double));
 
         // Read how many NodeAnimations to read
@@ -476,19 +476,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // NodeAnimations
-        std::unique_ptr<io::ModelAnimation> animation =
-            std::make_unique<io::ModelAnimation>(io::ModelAnimation(name, duration));
+        auto animation = std::make_unique<io::ModelAnimation>(name, duration);
         animation->nodeAnimations().reserve(nNodeAnimations);
         for (int32_t na = 0; na < nNodeAnimations; ++na) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
             // Node index
-            int32_t nodeIndex;
+            int32_t nodeIndex = 0;
             fileStream.read(reinterpret_cast<char*>(&nodeIndex), sizeof(int32_t));
             nodeAnimation.node = nodeIndex;
 
             // Positions
-            uint32_t nPos;
+            uint32_t nPos = 0;
             fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint32_t));
             nodeAnimation.positions.reserve(nPos);
             for (uint32_t p = 0; p < nPos; ++p) {
@@ -502,7 +501,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 posKeyframe.position = pos;
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 posKeyframe.time = time;
 
@@ -510,14 +509,17 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Rotations
-            uint32_t nRot;
+            uint32_t nRot = 0;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
             for (uint32_t p = 0; p < nRot; ++p) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                float rotW, rotX, rotY, rotZ;
+                float rotW = 0.f;
+                float rotX = 0.f;
+                float rotY = 0.f;
+                float rotZ = 0.f;;
                 fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotY), sizeof(float));
@@ -525,7 +527,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 rotKeyframe.rotation = glm::quat(rotW, rotX, rotY, rotZ);
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 rotKeyframe.time = time;
 
@@ -533,7 +535,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Scales
-            uint32_t nScale;
+            uint32_t nScale = 0;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
             for (uint32_t p = 0; p < nScale; ++p) {
@@ -547,7 +549,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 scaleKeyframe.scale = scale;
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 scaleKeyframe.time = time;
 
@@ -558,14 +560,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // _isTransparent
-        uint8_t isT;
+        uint8_t isT = 0;
         fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
-        bool isTransparent = (isT == 1);
+        const bool isTransparent = (isT == 1);
 
         // _hasCalcTransparency
-        uint8_t hasCalcT;
+        uint8_t hasCalcT = 0;
         fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
-        bool hasCalcTransparency = (hasCalcT == 1);
+        const bool hasCalcTransparency = (hasCalcT == 1);
 
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
@@ -578,14 +580,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     }
     else {
         // _isTransparent
-        uint8_t isT;
+        uint8_t isT = 0;
         fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
-        bool isTransparent = (isT == 1);
+        const bool isTransparent = (isT == 1);
 
         // _hasCalcTransparency
-        uint8_t hasCalcT;
+        uint8_t hasCalcT = 0;
         fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
-        bool hasCalcTransparency = (hasCalcT == 1);
+        const bool hasCalcTransparency = (hasCalcT == 1);
 
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
@@ -978,7 +980,7 @@ void ModelGeometry::calculateBoundingRadius() {
         return;
     }
 
-    glm::mat4x4 parentTransform = glm::mat4x4(1.f);
+    const glm::mat4x4 parentTransform = glm::mat4x4(1.f);
     float maximumDistanceSquared = 0.f;
     calculateBoundingRadiusRecursive(
         _nodes,
@@ -1065,7 +1067,7 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedM
         return;
     }
 
-    glm::mat4x4 parentTransform = glm::mat4x4(1.f);
+    const glm::mat4x4 parentTransform = glm::mat4x4(1.f);
     renderRecursive(
         _nodes,
         _nodes.data(),
