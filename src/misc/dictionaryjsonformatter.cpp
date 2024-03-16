@@ -91,7 +91,7 @@ namespace {
 
         for (size_t i = 0; i < vec.size() - 1; i++) {
             if constexpr (std::is_arithmetic_v<T>) {
-                double v = static_cast<double>(vec[i]);
+                const double v = static_cast<double>(vec[i]);
                 values << formatNumber(v) << ",";
             }
             else {
@@ -184,7 +184,7 @@ std::string formatJson(const Dictionary& dictionary) {
         keys.end(),
         convert(*keys.begin(), dictionary),
         [convert, dictionary](const std::string& a, const std::string& key) {
-            return fmt::format("{},{}", a, convert(std::move(key), dictionary));
+            return fmt::format("{},{}", a, convert(key, dictionary));
         }
     );
 

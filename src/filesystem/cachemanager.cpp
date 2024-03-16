@@ -126,9 +126,9 @@ namespace {
         struct stat attrib;
         stat(path.string().c_str(), &attrib);
         struct tm* time = gmtime(&attrib.st_ctime);
-        char buffer[128];
-        strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S", time);
-        return buffer;
+        std::array<char, 128> buffer;
+        strftime(buffer.data(), 128, "%Y-%m-%dT%H:%M:%S", time);
+        return buffer.data();
 #endif // WIN32
     }
 

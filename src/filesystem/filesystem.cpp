@@ -71,16 +71,16 @@ namespace ghoul::filesystem {
 
 FileSystem* FileSystem::_instance = nullptr;
 
-FileSystem::FileSystem() {
+FileSystem::FileSystem()
+#if !defined(WIN32) && !defined(__APPLE__)
+    : _inotifyHandle(inotify_init())
+    , _keepGoing(true)
+    , _t(inotifyWatcher)
+#endif
+{
     std::filesystem::path temporaryPath = std::filesystem::temp_directory_path();
     LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to '{}'", temporaryPath));
     registerPathToken("${TEMPORARY}", temporaryPath);
-
-#if !defined(WIN32) && !defined(__APPLE__)
-    _inotifyHandle = inotify_init();
-    _keepGoing = true;
-    _t = std::thread(inotifyWatcher);
-#endif
 }
 
 FileSystem::~FileSystem() {

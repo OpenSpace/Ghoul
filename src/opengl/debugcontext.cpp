@@ -76,7 +76,7 @@ void setDebugMessageControl(Source source, Type type,
     ghoul_assert(type != Type::DontCare, "type must not be Type::Dontcare");
 
     static_assert(
-        std::is_same<unsigned int, GLuint>::value,
+        std::is_same_v<unsigned int, GLuint>,
         "We exploit that 'int' and 'GLsizei' are the same for glDebugMessageControl"
     );
 

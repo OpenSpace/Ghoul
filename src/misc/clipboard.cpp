@@ -44,11 +44,11 @@ namespace {
         }
 
         constexpr int BufferSize = 1024;
-        char buffer[BufferSize];
+        std::array<char, BufferSize> buffer = {};
         value.clear();
         while (!feof(pipe)) {
-            if (fgets(buffer, BufferSize, pipe) != nullptr) {
-                value += buffer;
+            if (fgets(buffer.get(), BufferSize, pipe) != nullptr) {
+                value += buffer.get();
             }
         }
         pclose(pipe);

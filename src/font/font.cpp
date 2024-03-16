@@ -115,7 +115,7 @@ Font::Glyph::Glyph(wchar_t character_, int width_, int height_, float leftBearin
                    glm::vec2 texCoordTopLeft_, glm::vec2 texCoordBottomRight_,
                    glm::vec2 outlineTexCoordTopLeft_,
                    glm::vec2 outlineTexCoordBottomRight_)
-    : charcode(std::move(character_))
+    : charcode(character_)
     , width(width_)
     , height(height_)
     , leftBearing(leftBearing_)

@@ -78,7 +78,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
             << padding << "File:       " << file << ", line " << line << '\n'
             << padding << "Function:   " << function << '\n'
             << padding << "Assertion:  " << expression
-            << padding << message << std::endl;
+            << padding << message << '\n';
 
         if (AlwaysAssert) {
 #ifdef _MSC_VER

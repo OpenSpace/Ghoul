@@ -270,9 +270,9 @@ void TcpSocketServer::waitForConnections() {
             continue;
         }
 
-        char addressBuffer[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer, INET_ADDRSTRLEN);
-        const std::string address = addressBuffer;
+        std::array<char, INET_ADDRSTRLEN> addressBuffer;
+        inet_ntop(AF_INET, &(clientInfo.sin_addr), addressBuffer.data(), INET_ADDRSTRLEN);
+        const std::string address = addressBuffer.data();
         const int port = static_cast<int>(clientInfo.sin_port);
 
         // @CLEANUP(abock): Can the _pendingConnections be moved to Socket instead of
