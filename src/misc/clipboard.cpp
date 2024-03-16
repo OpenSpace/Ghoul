@@ -47,8 +47,8 @@ namespace {
         std::array<char, BufferSize> buffer = {};
         value.clear();
         while (!feof(pipe)) {
-            if (fgets(buffer.get(), BufferSize, pipe) != nullptr) {
-                value += buffer.get();
+            if (fgets(buffer.data(), BufferSize, pipe) != nullptr) {
+                value += buffer.data();
             }
         }
         pclose(pipe);
