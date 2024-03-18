@@ -75,7 +75,7 @@ std::vector<std::string> stackTrace() {
     int callstack[MaxCallStackDepth] = {};
 
     // Get the full stacktrace
-    int nFrames = backtrace(reinterpret_cast<void**>(callstack), MaxCallStackDepth);
+    const int nFrames = backtrace(reinterpret_cast<void**>(callstack), MaxCallStackDepth);
 
     // Unmangle the stacktrace to get it in a human-readable format
     char** strs = backtrace_symbols(reinterpret_cast<void**>(callstack), nFrames);

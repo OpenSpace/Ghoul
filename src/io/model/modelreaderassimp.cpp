@@ -779,7 +779,7 @@ std::vector<std::string> ModelReaderAssimp::supportedExtensions() const {
         "lws", "mot",    // LightWave Scene
         "lxo",           // Modo
         "ac", "ac3d",    // AC3D
-        "acc"            // AC3D
+        "acc",           // AC3D
         "ms3d",          // Milkshape 3D
         "cob", "scn",    // * TrueSpace
         "amf",           // * Additive manufacturing file format

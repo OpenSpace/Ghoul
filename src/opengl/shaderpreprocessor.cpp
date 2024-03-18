@@ -438,7 +438,7 @@ bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
 {
     std::string beforeDot;
     std::string afterDot;
-    if (size_t firstDotPos = in.find('.');  firstDotPos != std::string::npos) {
+    if (const size_t firstDotPos = in.find('.');  firstDotPos != std::string::npos) {
         beforeDot = in.substr(0, firstDotPos);
         afterDot = in.substr(firstDotPos);
     }
