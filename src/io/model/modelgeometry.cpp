@@ -1124,4 +1124,4 @@ void ModelGeometry::deinitialize() {
     }
 }
 
-}  // namespace openspace::modelgeometry
+}  // namespace ghoul::modelgeometry

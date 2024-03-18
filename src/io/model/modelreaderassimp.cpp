@@ -106,7 +106,7 @@ namespace {
                     meshTexture.texture = texture.texture.get();
                     meshTexture.texture->setName(path.C_Str());
                     meshTexture.hasTexture = true;
-                    textureArray.push_back(std::move(meshTexture));
+                    textureArray.push_back(meshTexture);
                     shouldSkip = true;
                     break;
                 }
@@ -762,53 +762,53 @@ std::vector<std::string> ModelReaderAssimp::supportedExtensions() const {
     // Taken from https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
     // (An asterisk * indicates limited support)
     return {
-        "obj",          // * Wavefront Object
-        "fbx",          // Autodesk
-        "gltf", "glb",  // glTF
-        "dae", "zae",   // Collada
-        "blend",        // * Blender 3D
-        "3ds", "prj",   // * 3ds Max 3DS
-        "ase", "ask",   // 3ds Max ASE
-        "x",            // DirectX X
-        "stl",          // Stereolithography
-        "ifc", "ifczip" // Industry Foundation Classes (IFC / Step)
-        "xgl", "zgl"    // XGL
-        "ply",          // Stanford Polygon Library
-        "dxf",          // AutoCAD DXF
-        "lwo",          // LightWave
-        "lws", "mot",   // LightWave Scene
-        "lxo",          // Modo
-        "ac", "ac3d",   // AC3D
-        "acc"           // AC3D
-        "ms3d",         // Milkshape 3D
-        "cob", "scn",   // * TrueSpace
-        "amf",          // * Additive manufacturing file format
-        "md3",          // Quake III Mesh
-        "mdl",          // Quake Mesh / 3D GameStudio Mesh
-        "md2",          // Quake II Mesh
-        "smd", "vta",   // Valve SMD
-        "mdc",          // Return To Castle Wolfenstein Mesh
-        "md5anim",      // Doom 3 / MD5 Mesh
-        "md5mesh",      // Doom 3 / MD5 Mesh
-        "md5camera",    // Doom 3 / MD5 Mesh
-        "nff", "enff",  // Neutral File Format
-        "raw",          // Raw
-        "sib",          // * Silo SIB
-        "off",          // OFF
-        "irr",          // Irrlicht Scene
-        "irrmesh",      // Irrlicht Mesh
-        "q3o", "q3s",   // Quick3D
-        "b3d",          // BlitzBasic 3D
-        "3d", "uc",     // Unreal Mesh
-        "mesh",         // Ogre3D Mesh
-        "mesh.xml",     // Ogre3D Mesh
-        "ogex",         // Open Game Engine Exchange
-        "pk3", "bsp",   // Quake III BSP
-        "ndo",          // Nendo Mesh
-        "assbin",       // Assimp Binary
-        "3mf",          // 3D Manufacturing Format
-        "x3d", "x3db",  // * Extensible 3D
-        "m3d"           // Model 3D
+        "obj",           // * Wavefront Object
+        "fbx",           // Autodesk
+        "gltf", "glb",   // glTF
+        "dae", "zae",    // Collada
+        "blend",         // * Blender 3D
+        "3ds", "prj",    // * 3ds Max 3DS
+        "ase", "ask",    // 3ds Max ASE
+        "x",             // DirectX X
+        "stl",           // Stereolithography
+        "ifc", "ifczip", // Industry Foundation Classes (IFC / Step)
+        "xgl", "zgl",    // XGL
+        "ply",           // Stanford Polygon Library
+        "dxf",           // AutoCAD DXF
+        "lwo",           // LightWave
+        "lws", "mot",    // LightWave Scene
+        "lxo",           // Modo
+        "ac", "ac3d",    // AC3D
+        "acc",           // AC3D
+        "ms3d",          // Milkshape 3D
+        "cob", "scn",    // * TrueSpace
+        "amf",           // * Additive manufacturing file format
+        "md3",           // Quake III Mesh
+        "mdl",           // Quake Mesh / 3D GameStudio Mesh
+        "md2",           // Quake II Mesh
+        "smd", "vta",    // Valve SMD
+        "mdc",           // Return To Castle Wolfenstein Mesh
+        "md5anim",       // Doom 3 / MD5 Mesh
+        "md5mesh",       // Doom 3 / MD5 Mesh
+        "md5camera",     // Doom 3 / MD5 Mesh
+        "nff", "enff",   // Neutral File Format
+        "raw",           // Raw
+        "sib",           // * Silo SIB
+        "off",           // OFF
+        "irr",           // Irrlicht Scene
+        "irrmesh",       // Irrlicht Mesh
+        "q3o", "q3s",    // Quick3D
+        "b3d",           // BlitzBasic 3D
+        "3d", "uc",      // Unreal Mesh
+        "mesh",          // Ogre3D Mesh
+        "mesh.xml",      // Ogre3D Mesh
+        "ogex",          // Open Game Engine Exchange
+        "pk3", "bsp",    // Quake III BSP
+        "ndo",           // Nendo Mesh
+        "assbin",        // Assimp Binary
+        "3mf",           // 3D Manufacturing Format
+        "x3d", "x3db",   // * Extensible 3D
+        "m3d"            // Model 3D
     };
 }
 

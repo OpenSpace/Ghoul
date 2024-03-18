@@ -343,4 +343,4 @@ int ThreadPool::TaskQueue::size() const {
     return static_cast<int>(_queue.size());
 }
 
-} // namespace openspace
+} // namespace ghoul

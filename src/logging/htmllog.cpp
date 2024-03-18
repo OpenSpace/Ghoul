@@ -98,7 +98,7 @@ HTMLLog::HTMLLog(const std::string& filename, int nLogRotation,
     output += "\t\t\t\t<th class=\"log-message\">Message</th>\n\
               \t\t\t</tr>\n\
               \t\t<tbody>\n";
-    writeLine(std::move(output));
+    writeLine(output);
 }
 
 HTMLLog::~HTMLLog() {
@@ -152,7 +152,7 @@ void HTMLLog::log(LogLevel level, std::string_view category, std::string_view me
     }
 
     output += "</td>\n\t\t\t</tr>\n";
-    writeLine(std::move(output));
+    writeLine(output);
 }
 
 std::string HTMLLog::classForLevel(LogLevel level) {

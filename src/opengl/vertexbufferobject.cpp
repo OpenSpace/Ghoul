@@ -118,11 +118,11 @@ void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum ty
     glBindVertexArray(0);
 }
 
-void VertexBufferObject::bind() {
+void VertexBufferObject::bind() const {
     glBindVertexArray(_vaoID);
 }
 
-void VertexBufferObject::unbind() {
+void VertexBufferObject::unbind() const {
     glBindVertexArray(0);
 }
 

@@ -37,13 +37,13 @@
 namespace ghoul::io {
 
 TextureReader::MissingReaderException::MissingReaderException(std::string extension,
-                                                              std::string f)
+                                                              std::string file)
     : RuntimeError(
-        fmt::format("No reader found for extension '{}' with file '{}'", extension, f),
+        fmt::format("No reader found for extension '{}' with file '{}'", extension, file),
         "IO"
     )
     , fileExtension(std::move(extension))
-    , file(std::move(f))
+    , file(std::move(file))
 {}
 
 TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
@@ -82,7 +82,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
 }
 
 std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t size,
-                                                            int nDimension,
+                                                            int nDimensions,
                                                             const std::string& format)
 {
     ghoul_assert(memory, "Memory must not be nullptr");
@@ -94,7 +94,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
         throw InvalidLoadException(memory, size);
     }
 
-    return reader->loadTexture(memory, size, nDimension);
+    return reader->loadTexture(memory, size, nDimensions);
 }
 
 std::vector<std::string> TextureReader::supportedExtensions() {

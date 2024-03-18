@@ -128,12 +128,12 @@ public:
     /**
      * Binds the VBO.
      */
-    void bind();
+    void bind() const;
 
     /**
      * Unbinds the VBO.
      */
-    void unbind();
+    void unbind() const;
 
     /**
      * Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
