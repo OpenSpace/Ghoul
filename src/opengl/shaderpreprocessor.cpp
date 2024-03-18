@@ -436,10 +436,9 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
 bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
                                       ShaderPreprocessor::Env& env)
 {
-    size_t firstDotPos = 0;
     std::string beforeDot;
     std::string afterDot;
-    if ((firstDotPos = in.find('.')) != std::string::npos) {
+    if (size_t firstDotPos = in.find('.');  firstDotPos != std::string::npos) {
         beforeDot = in.substr(0, firstDotPos);
         afterDot = in.substr(firstDotPos);
     }

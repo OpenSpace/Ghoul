@@ -195,18 +195,18 @@ void OpenGLStateCache::resetColorState() const {
     );
 }
 
-void OpenGLStateCache::setColorState(GLfloat color[4], GLboolean clampColor)  {
-    ghoul_assert(color != nullptr, "color must not be nullptr");
+void OpenGLStateCache::setColorState(GLfloat clearColor[4], GLboolean clampColor) {
+    ghoul_assert(clearColor != nullptr, "color must not be nullptr");
 
-    if (!std::equal_to<>()(color[0], _colorClearValue[0]) ||
-        !std::equal_to<>()(color[1], _colorClearValue[1]) ||
-        !std::equal_to<>()(color[2], _colorClearValue[2]) ||
-        !std::equal_to<>()(color[3], _colorClearValue[3]))
+    if (!std::equal_to<>()(clearColor[0], _colorClearValue[0]) ||
+        !std::equal_to<>()(clearColor[1], _colorClearValue[1]) ||
+        !std::equal_to<>()(clearColor[2], _colorClearValue[2]) ||
+        !std::equal_to<>()(clearColor[3], _colorClearValue[3]))
     {
-        _colorClearValue[0] = color[0];
-        _colorClearValue[1] = color[1];
-        _colorClearValue[2] = color[2];
-        _colorClearValue[3] = color[3];
+        _colorClearValue[0] = clearColor[0];
+        _colorClearValue[1] = clearColor[1];
+        _colorClearValue[2] = clearColor[2];
+        _colorClearValue[3] = clearColor[3];
     }
 
     if (clampColor != _clampColorEnabled) {

@@ -83,7 +83,7 @@ namespace {
         }
     }
 #endif // WIN32
-}
+} // namespace
 
 SharedMemory::SharedMemoryError::SharedMemoryError(std::string msg)
     : RuntimeError(std::move(msg), "SharedMemory")

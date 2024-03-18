@@ -53,8 +53,11 @@ Dictionary::KeyError::KeyError(std::string msg)
     : RuntimeError(std::move(msg), "Dictionary")
 {}
 
-Dictionary::ValueError::ValueError(std::string k, std::string m)
-    : RuntimeError(fmt::format("Key '{}': {}", std::move(k), std::move(m)), "Dictionary")
+Dictionary::ValueError::ValueError(std::string key, std::string msg)
+    : RuntimeError(
+        fmt::format("Key '{}': {}", std::move(key), std::move(msg)),
+        "Dictionary"
+    )
 {}
 
 bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
