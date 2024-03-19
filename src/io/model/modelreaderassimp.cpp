@@ -138,8 +138,8 @@ namespace {
                     }
                     catch (const TextureReader::InvalidLoadException& e) {
                         LWARNING(fmt::format(
-                            "Could not load unsupported texture from '{}' with size '{}': "
-                            "Replacing with flashy color", e._memory, e._size
+                            "Could not load unsupported texture from '{}' with size "
+                            "'{}': Replacing with flashy color", e._memory, e._size
                         ));
                         ModelMesh::generateDebugTexture(meshTexture);
                         textureArray.push_back(std::move(meshTexture));
@@ -182,8 +182,8 @@ namespace {
                 }
                 catch (const TextureReader::MissingReaderException& e) {
                     LWARNING(fmt::format(
-                        "Could not load unsupported texture from '{}' with extension '{}': "
-                        "Replacing with flashy color", e.file, e.fileExtension
+                        "Could not load unsupported texture from '{}' with extension "
+                        "'{}': Replacing with flashy color", e.file, e.fileExtension
                     ));
                     ModelMesh::generateDebugTexture(meshTexture);
                     textureArray.push_back(std::move(meshTexture));
@@ -191,8 +191,8 @@ namespace {
                 }
                 catch (const TextureReaderBase::TextureLoadException& e) {
                     LWARNING(fmt::format(
-                        "Failed to load texture from '{}' with error '{}': Replacing with "
-                        "flashy color", e.filename, e.message
+                        "Failed to load texture from '{}' with error '{}': Replacing "
+                        "with flashy color", e.filename, e.message
                     ));
                     ModelMesh::generateDebugTexture(meshTexture);
                     textureArray.push_back(std::move(meshTexture));
@@ -322,11 +322,11 @@ namespace {
         }
 
         // We assume a convention for sampler names in the shaders. Each diffuse texture
-        // should be named as 'texture_diffuse', at the moment only one texture per type is
-        // supported. Same applies to other textures as the following
+        // should be named as 'texture_diffuse', at the moment only one texture per type
+        // is supported. Same applies to other textures as the following
         // list summarizes:
-        // diffuse: texture_diffuse or color_diffuse if embedded simple material instead
-        // specular: texture_specular or color_specular if embedded simple material instead
+        // diffuse: texture_diffuse or color_diffuse if embedded simple material
+        // specular: texture_specular or color_specular if embedded simple material
         // normal: texture_normal
 
         // Opacity
@@ -540,14 +540,14 @@ namespace {
 
             if (mesh->HasBones()) {
                 LWARNING(
-                    "Detected unsupported animation type: 'Bones', currently only keyframe "
-                    "animations are supported"
+                    "Detected unsupported animation type: 'Bones', currently only "
+                    "keyframe animations are supported"
                 );
             }
             if (mesh->mNumAnimMeshes > 0) {
                 LWARNING(
-                    "Detected unsupported animation type: 'Mesh', currently only keyframe "
-                    "animations are supported"
+                    "Detected unsupported animation type: 'Mesh', currently only "
+                    "keyframe animations are supported"
                 );
             }
 
@@ -594,36 +594,36 @@ namespace {
                         for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; ++p) {
                             const aiVectorKey posKey = nodeAnim->mPositionKeys[p];
 
-                            ModelAnimation::PositionKeyframe positionKeyframe;
-                            positionKeyframe.time =
+                            ModelAnimation::PositionKeyframe positionKf;
+                            positionKf.time =
                                 std::abs(animation->mTicksPerSecond) <
                                 std::numeric_limits<double>::epsilon() ? posKey.mTime :
                                 posKey.mTime / animation->mTicksPerSecond;
-                            positionKeyframe.position = glm::vec3(
+                            positionKf.position = glm::vec3(
                                 posKey.mValue.x,
                                 posKey.mValue.y,
                                 posKey.mValue.z
                             );
 
-                            nodeAnimation.positions.push_back(std::move(positionKeyframe));
+                            nodeAnimation.positions.push_back(std::move(positionKf));
                         }
 
                         for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; ++r) {
                             const aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
 
-                            ModelAnimation::RotationKeyframe rotationKeyframe;
-                            rotationKeyframe.time =
+                            ModelAnimation::RotationKeyframe rotationKf;
+                            rotationKf.time =
                                 std::abs(animation->mTicksPerSecond) <
                                 std::numeric_limits<double>::epsilon() ? rotKey.mTime :
                                 rotKey.mTime / animation->mTicksPerSecond;
-                            rotationKeyframe.rotation = glm::quat(
+                            rotationKf.rotation = glm::quat(
                                 rotKey.mValue.w,
                                 rotKey.mValue.x,
                                 rotKey.mValue.y,
                                 rotKey.mValue.z
                             );
 
-                            nodeAnimation.rotations.push_back(std::move(rotationKeyframe));
+                            nodeAnimation.rotations.push_back(std::move(rotationKf));
                         }
 
                         for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; ++s) {
@@ -643,7 +643,9 @@ namespace {
                             nodeAnimation.scales.push_back(std::move(scaleKeyframe));
                         }
 
-                        modelAnimation->nodeAnimations().push_back(std::move(nodeAnimation));
+                        modelAnimation->nodeAnimations().push_back(
+                            std::move(nodeAnimation)
+                        );
                         break;
                     }
                 }
