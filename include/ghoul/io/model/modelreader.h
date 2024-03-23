@@ -52,7 +52,7 @@ public:
     /// Exception that gets thrown when there is no reader for the provided \p extension
     struct MissingReaderException : public RuntimeError {
         explicit MissingReaderException(std::string extension,
-            std::filesystem::path file);
+            std::filesystem::path file_);
 
         const std::string fileExtension;
         const std::filesystem::path file;

@@ -49,7 +49,7 @@ class TextureReader {
 public:
     /// Exception that gets thrown when there is no reader for the provided \p extension
     struct MissingReaderException : public RuntimeError {
-        explicit MissingReaderException(std::string extension, std::string file);
+        explicit MissingReaderException(std::string extension, std::string file_);
 
         const std::string fileExtension;
         const std::string file;

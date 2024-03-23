@@ -519,7 +519,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 float rotW = 0.f;
                 float rotX = 0.f;
                 float rotY = 0.f;
-                float rotZ = 0.f;;
+                float rotZ = 0.f;
                 fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
                 fileStream.read(reinterpret_cast<char*>(&rotY), sizeof(float));
