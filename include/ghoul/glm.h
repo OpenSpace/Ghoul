@@ -76,15 +76,6 @@ namespace {
     struct is_any : std::disjunction<std::is_same<T, Ts>...> {};
 } // namespace
 
-namespace glm {
-
-template <typename genType>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR genType tau() {
-    return genType(6.28318530717958647692528676655900576);
-}
-
-} // namespace glm
-
 namespace ghoul {
 
 template <typename T>
