@@ -39,11 +39,13 @@ namespace ghoul::io {
 TextureReader::MissingReaderException::MissingReaderException(std::string extension,
                                                               std::string file_)
     : RuntimeError(
-        fmt::format("No reader found for extension '{}' with file '{}'", extension, file),
+        fmt::format(
+            "No reader found for extension '{}' with file '{}'", extension, file_
+        ),
         "IO"
     )
     , fileExtension(std::move(extension))
-    , file(std::move(file))
+    , file(std::move(file_))
 {}
 
 TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
