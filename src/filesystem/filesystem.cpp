@@ -71,16 +71,19 @@ namespace ghoul::filesystem {
 
 FileSystem* FileSystem::_instance = nullptr;
 
-FileSystem::FileSystem()
-#if !defined(WIN32) && !defined(__APPLE__)
-    : _inotifyHandle(inotify_init())
-    , _keepGoing(true)
-    , _t(inotifyWatcher)
-#endif
-{
+FileSystem::FileSystem() {
     std::filesystem::path temporaryPath = std::filesystem::temp_directory_path();
     LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to '{}'", temporaryPath));
     registerPathToken("${TEMPORARY}", temporaryPath);
+
+#if !defined(WIN32) && !defined(__APPLE__)
+    // This code can't be moved to the initializer list as the inotifyWatcher function
+    // passed into the thread will be called immediately. This will try to access the
+    // FileSys global and lead to an assertion as the global object has not yet finished
+    _inotifyHandle = inotify_init();
+    _keepGoing = true;
+    _t = std::thread(inotifyWatcher);
+#endif
 }
 
 FileSystem::~FileSystem() {

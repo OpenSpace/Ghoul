@@ -198,10 +198,10 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
         }
     );
 
-    // Reset the file stream if we want to include the first line
-    if (includeFirstLine) {
-        file.seekg(0);
-    }
+    // Reset the file stream. The internalLoadCSV function will hop over invalid lines
+    // again. If we conditionally seek, there was a case where we'd skip over the first
+    // valid line while trying to find the first valid line
+    file.seekg(0);
 
     return internalLoadCSV(file, includeFirstLine, indices);
 }

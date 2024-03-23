@@ -44,7 +44,7 @@ namespace {
 namespace ghoul::io {
 
 ModelReader::MissingReaderException::MissingReaderException(std::string extension,
-                                                            std::filesystem::path file)
+                                                            std::filesystem::path file_)
     : RuntimeError(fmt::format(
         "No reader was found for extension '{}' with file '{}'", extension, file
     ))
