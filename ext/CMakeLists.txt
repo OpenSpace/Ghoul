@@ -172,7 +172,7 @@ if (GHOUL_MODULE_ASSIMP)
     set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
   endif ()
 
-  if (UNIX)
+  if (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # Clang started throwing these warnings in assimp
     target_compile_options(assimp PRIVATE "-Wdeprecated-non-prototype")
   endif ()
