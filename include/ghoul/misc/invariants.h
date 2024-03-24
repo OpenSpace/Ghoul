@@ -39,8 +39,8 @@
 
 #else
 
-#define ghoul_precondition(__condition__, __message__) {}
-#define ghoul_postcondition(__condition__, __message__) {}
+#define ghoul_precondition(__condition__, __message__)
+#define ghoul_postcondition(__condition__, __message__)
 
 #endif // NDEBUG
 
