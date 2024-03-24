@@ -72,7 +72,7 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
 
         if (registeredPath != filePath) {
             throw RuntimeError(
-                fmt::format(
+                std::format(
                     "Font '{}' was registered with path '{}' before, trying '{}' now",
                     fontName, registeredPath, filePath
                 ),
@@ -102,7 +102,7 @@ std::shared_ptr<Font> FontManager::font(std::string_view name, float fontSize,
         else {
             // The name has not neen previously registered and it is not a valid path
             throw RuntimeError(
-                fmt::format("Name '{}' is not a valid font or file", name),
+                std::format("Name '{}' is not a valid font or file", name),
                 "FontManager"
             );
         }
@@ -119,7 +119,7 @@ std::shared_ptr<Font> FontManager::font(unsigned int hashName, float fontSize,
     const auto itPath = _fontPaths.find(hashName);
     if (itPath == _fontPaths.cend()) {
         throw RuntimeError(
-            fmt::format(
+            std::format(
                 "Error retrieving font with hash '{}' for size '{}'", hashName, fontSize
             ),
             "FontManager"

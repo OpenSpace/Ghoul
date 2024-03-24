@@ -59,7 +59,7 @@ namespace ghoul {
 
 AssertionException::AssertionException(std::string exp, std::string msg,
                                        std::string file, std::string func, int line)
-    : std::runtime_error(fmt::format("{}, \"{}\" ({}:{} ({})",
+    : std::runtime_error(std::format("{}, \"{}\" ({}:{} ({})",
         std::move(exp), std::move(msg), std::move(file), line, std::move(func)
     ))
 {}

@@ -45,7 +45,7 @@ namespace ghoul::io {
 
 ModelReader::MissingReaderException::MissingReaderException(std::string extension,
                                                             std::filesystem::path file_)
-    : RuntimeError(fmt::format(
+    : RuntimeError(std::format(
         "No reader was found for extension '{}' with file '{}'", extension, file_
     ))
     , fileExtension(std::move(extension))
@@ -78,14 +78,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
 
     if (!reader->needsCache()) {
-        LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
+        LINFO(std::format("Loading ModelGeometry file '{}'", filename));
         return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
     }
 
     std::filesystem::path cachedFile = FileSys.cacheManager()->cachedFilename(filename);
     const bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
-        LINFO(fmt::format(
+        LINFO(std::format(
             "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename
         ));
 
@@ -99,7 +99,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
             return model;
         }
         catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
-            LINFO(fmt::format(
+            LINFO(std::format(
                 "Encountered problem '{}' while loading model from cache file '{}'. "
                 "Deleting cache", e.errorMessage, cachedFile
             ));
@@ -110,10 +110,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
     }
     else {
-        LINFO(fmt::format("Cache for ModelGeometry file '{}' not found", filename));
+        LINFO(std::format("Cache for ModelGeometry file '{}' not found", filename));
     }
 
-    LINFO(fmt::format("Loading ModelGeometry file '{}'", filename));
+    LINFO(std::format("Loading ModelGeometry file '{}'", filename));
 
     std::unique_ptr<modelgeometry::ModelGeometry> model =
         reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
@@ -123,7 +123,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         model->saveToCacheFile(cachedFile);
     }
     catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
-        LINFO(fmt::format(
+        LINFO(std::format(
             "Encountered problem '{}' while saving model to cache file '{}'. "
             "Deleting cache", e.errorMessage, e.filename
         ));

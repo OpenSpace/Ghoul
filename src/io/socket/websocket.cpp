@@ -140,7 +140,7 @@ void WebSocket::onMessage(const websocketpp::connection_hdl&,
 }
 
 void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
-    LDEBUG(fmt::format(
+    LDEBUG(std::format(
         "onOpen: WebSocket opened. Client: {}:{}",
         _tcpSocket->address(), _tcpSocket->port()
     ));
@@ -151,7 +151,7 @@ void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
 }
 
 void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
-    LDEBUG(fmt::format(
+    LDEBUG(std::format(
         "onClose: WebSocket closing. Client: {}:{}",
         _tcpSocket->address(), _tcpSocket->port()
     ));

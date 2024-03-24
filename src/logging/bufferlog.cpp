@@ -91,7 +91,7 @@ namespace ghoul::logging {
 BufferLog::MemoryExhaustionException::MemoryExhaustionException(int sizeTotal,
                                                                 int sizeRequested)
     : RuntimeError(
-        fmt::format("Exhausted BufferLog ({} of {} byte)", sizeRequested, sizeTotal),
+        std::format("Exhausted BufferLog ({} of {} byte)", sizeRequested, sizeTotal),
         "BufferLog"
     )
     , totalSize(sizeTotal)

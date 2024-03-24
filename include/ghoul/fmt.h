@@ -26,17 +26,35 @@
 #ifndef __GHOUL___FMT___H__
 #define __GHOUL___FMT___H__
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#endif // __GNUC__
+#include <filesystem>
+#include <format>
+#include <optional>
 
-#include <fmt/format.h>
-#include <fmt/std.h>
-#include <fmt/ostream.h>
+template <>
+struct std::formatter<std::filesystem::path> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif // __GNUC__
+    auto format(const std::filesystem::path& path, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{}", path.string());
+    }
+};
+
+template <typename T>
+struct std::formatter<std::optional<T>> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const std::optional<T>& opt, std::format_context& ctx) const {
+        if (opt) {
+            return std::format_to(ctx.out(), "{}", *opt);
+        }
+        else {
+            return std::format_to(ctx.out(), "<none>");
+        }
+    }
+};
 
 #endif // __GHOUL___FMT___H__

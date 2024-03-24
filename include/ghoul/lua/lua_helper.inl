@@ -181,7 +181,7 @@ constexpr Variant variantValue(lua_State* L, int location) {
     else {
         // We have reached the end of the variant list and haven't found the type in
         // here, so we're done
-        throw LuaFormatException(fmt::format(
+        throw LuaFormatException(std::format(
             "Unable to extract requested value '{}' out of the variant with type '{}' at "
             "parameter {}", typeid(T).name(), typeid(Variant).name(), location
         ));
@@ -580,7 +580,7 @@ T valueInner(lua_State* L, int location) {
     if (!hasValue<T>(L, location)) {
         std::string name = Name<T>();
         // If we get this far, none of the previous return statements were hit
-        std::string error = fmt::format(
+        std::string error = std::format(
             "Expected type '{}' for parameter {} but got wrong type '{}' instead",
             name, location, luaTypeToString(lua_type(L, location))
         );
@@ -878,7 +878,7 @@ T valueInner(lua_State* L, int location) {
             // The list of values that was passed in was of different length then what was
             // requested out of it
             std::string name = Name<T>();
-            std::string error = fmt::format(
+            std::string error = std::format(
                 "Expected '{}' values for '{}' but got '{}' instead",
                 res.size(), name, r.size()
             );

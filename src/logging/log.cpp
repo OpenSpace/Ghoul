@@ -89,7 +89,7 @@ std::string Log::timeString() {
     SYSTEMTIME t = {};
     GetLocalTime(&t);
 
-    return fmt::format(
+    return std::format(
         "{:0>2}:{:0>2}:{:0>2}.{:0<3}", t.wHour, t.wMinute, t.wSecond, t.wMilliseconds
     );
 #else
@@ -97,7 +97,7 @@ std::string Log::timeString() {
     gettimeofday(&t, nullptr);
     tm* m = gmtime(&t.tv_sec);
 
-    return fmt::format(
+    return std::format(
         "{:0>2}:{:0>2}:{:0>2}.{:0<3}", m->tm_hour, m->tm_min, m->tm_sec, t.tv_usec / 1000
     );
 #endif
@@ -108,7 +108,7 @@ std::string Log::dateString() {
     SYSTEMTIME t = {};
     GetLocalTime(&t);
 
-    return fmt::format("{}-{:0>2}-{:0>2}", t.wYear, t.wMonth, t.wDay);
+    return std::format("{}-{:0>2}-{:0>2}", t.wYear, t.wMonth, t.wDay);
 #else
     auto now = std::chrono::system_clock::now();
     const time_t time = std::chrono::system_clock::to_time_t(now);
@@ -125,13 +125,13 @@ std::string Log::createFullMessageString(LogLevel level, std::string_view catego
 {
     std::string output;
     if (_dateStamping && !_timeStamping) {
-        output += fmt::format("[{}] ", dateString());
+        output += std::format("[{}] ", dateString());
     }
     else if (!_dateStamping && _timeStamping) {
-        output += fmt::format("[{}] ", timeString());
+        output += std::format("[{}] ", timeString());
     }
     else if (_dateStamping && _timeStamping) {
-        output += fmt::format("[{} | {}] ", dateString(), timeString());
+        output += std::format("[{} | {}] ", dateString(), timeString());
     }
 
     if (isCategoryStamping() && (!category.empty())) {
@@ -139,7 +139,7 @@ std::string Log::createFullMessageString(LogLevel level, std::string_view catego
         output += ' ';
     }
     if (isLogLevelStamping()) {
-        output += fmt::format("({})", to_string(level));
+        output += std::format("({})", to_string(level));
     }
     if (!output.empty()) {
         output += '\t';

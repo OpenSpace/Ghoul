@@ -26,7 +26,7 @@
 #include <ghoul/opengl/renderdoc.h>
 
 #include <ghoul/logging/logmanager.h>
-#include <fmt/format.h>
+#include <format>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -64,7 +64,7 @@ void loadRenderDoc() {
         int minor = 0;
         int patch = 0;
         renderdocApi->GetAPIVersion(&major, &minor, &patch);
-        LINFOC("RenderDoc", fmt::format("Loaded API {}.{}.{}", major, minor, patch));
+        LINFOC("RenderDoc", std::format("Loaded API {}.{}.{}", major, minor, patch));
     }
 }
 

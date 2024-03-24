@@ -38,7 +38,7 @@ using std::string;
 namespace ghoul::io {
 
 TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
-    : RuntimeError(fmt::format("No writer was found for extension '{}'", extension), "IO")
+    : RuntimeError(std::format("No writer was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
 {}
 

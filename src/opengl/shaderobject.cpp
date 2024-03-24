@@ -44,8 +44,8 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
                                                      std::string name)
     : ShaderObjectError(
         name.empty() ?
-        fmt::format("Error linking program object: {}\n{}", error, ident) :
-        fmt::format("Error linking program object [{}]: {}\n{}", name, error, ident)
+        std::format("Error linking program object: {}\n{}", error, ident) :
+        std::format("Error linking program object [{}]: {}\n{}", name, error, ident)
     )
     , compileError(std::move(error))
     , fileIdentifiers(std::move(ident))
@@ -59,7 +59,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
     , _loggerCat(
         _shaderName.empty() ?
             "ShaderObject" :
-            fmt::format("ShaderObject('{}')", _shaderName)
+            std::format("ShaderObject('{}')", _shaderName)
     )
 {
     const bool hasFilename = !filename.empty();
@@ -180,7 +180,7 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) noexcept {
 
 void ShaderObject::setName(std::string name) {
     _shaderName = std::move(name);
-    _loggerCat = fmt::format("ShaderObject['{}']", _shaderName);
+    _loggerCat = std::format("ShaderObject['{}']", _shaderName);
 #ifdef GL_VERSION_4_3
     if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(

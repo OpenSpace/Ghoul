@@ -184,16 +184,6 @@ if (GHOUL_MODULE_ASSIMP)
   end_module("AssImp")
 endif ()
 
-# fmt
-begin_dependency("fmt")
-set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
-set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
-set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-add_subdirectory(cppformat)
-target_link_libraries(Ghoul PUBLIC fmt)
-set_target_properties(fmt PROPERTIES FOLDER "External")
-end_dependency("fmt")
-
 # scnlib
 begin_dependency("scnlib")
 add_subdirectory(scnlib SYSTEM)

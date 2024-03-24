@@ -58,7 +58,7 @@ EasingFunction easingFunctionFromName(std::string_view name) {
             return EasingFunction(i);
         }
     }
-    throw std::invalid_argument(fmt::format(
+    throw std::invalid_argument(std::format(
         "Could not find easing function with name '{}'", name
     ));
 }

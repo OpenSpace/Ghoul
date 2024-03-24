@@ -62,7 +62,7 @@ namespace {
         using namespace ghoul;
         fontrendering::Error e = fontrendering::error(error);
         throw RuntimeError(
-            fmt::format(
+            std::format(
                 "Error loading font '{}' for size '{}': {} {}",
                 name, size, e.code, e.message
             ),
@@ -283,7 +283,7 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
             // invalid glyph; replace with a space
             LWARNINGC(
                 "Font",
-                fmt::format(
+                std::format(
                     "Invalid glyph '{}' found and replaced", static_cast<int>(charcode)
                 )
             );

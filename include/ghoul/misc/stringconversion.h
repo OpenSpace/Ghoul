@@ -26,6 +26,7 @@
 #ifndef __GHOUL___STRINGCONVERSION___H__
 #define __GHOUL___STRINGCONVERSION___H__
 
+#include <format>
 #include <string>
 #include <string_view>
 
@@ -55,12 +56,15 @@ constexpr T from_string(std::string_view) {
  */
 template <typename T>
 std::string to_string(const T& value) {
+    // (2024-03-24, abock)  I think we can probably get rid of this function by now and
+    // replace it with std::formatter overloads
+
     // std::string does not define the identity transformation so we have to handle that
     if constexpr (std::is_same_v<T, std::string>) {
         return value;
     }
     else {
-        return std::to_string(value);
+        return std::format("{}", value);
     }
 }
 

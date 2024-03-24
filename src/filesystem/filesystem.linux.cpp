@@ -98,7 +98,7 @@ void FileSystem::removeFileListener(int callbackIdentifier) {
         }
     }
 
-    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
+    LWARNING(std::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void FileSystem::inotifyWatcher() {

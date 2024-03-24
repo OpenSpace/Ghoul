@@ -185,223 +185,515 @@ glm::tmat4x3<valType> createFillMat4x3(valType v) {
     return glm::tmat4x3<valType>(v, v, v, v, v, v, v, v, v, v, v, v);
 }
 
-inline std::string to_string(const glm::bvec2& _val) {
-    return fmt::format("{{{},{}}}", _val.x, _val.y);
-}
-
-inline std::string to_string(const glm::bvec3& _val) {
-    return fmt::format("{{{},{},{}}}", _val.x, _val.y, _val.z);
-}
-
-inline std::string to_string(const glm::bvec4& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w);
-}
-
-inline std::string to_string(const glm::vec2& _val) {
-    return fmt::format("{{{},{}}}", _val.x, _val.y);
-}
-
-inline std::string to_string(const glm::vec3& _val) {
-    return fmt::format("{{{},{},{}}}", _val.x, _val.y, _val.z);
-}
-
-inline std::string to_string(const glm::vec4& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w);
-}
-
-inline std::string to_string(const glm::quat& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w);
-}
-
-inline std::string to_string(const glm::dvec2& _val) {
-    return fmt::format("{{{},{}}}", _val.x, _val.y);
-}
-
-inline std::string to_string(const glm::dvec3& _val) {
-    return fmt::format("{{{},{},{}}}", _val.x, _val.y, _val.z);
-}
-
-inline std::string to_string(const glm::dvec4& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w);
-}
-
-inline std::string to_string(const glm::dquat& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w);
-}
-
-inline std::string to_string(const glm::ivec2& _val) {
-    return fmt::format("{{{},{}}}", _val.x, _val.y);
-}
-
-inline std::string to_string(const glm::ivec3& _val) {
-    return fmt::format("{{{},{},{}}}", _val.x, _val.y, _val.z);
-}
-
-inline std::string to_string(const glm::ivec4& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w);
-}
-
-inline std::string to_string(const glm::uvec2& _val) {
-    return fmt::format("{{{},{}}}", _val.x, _val.y);
-}
-
-inline std::string to_string(const glm::uvec3& _val) {
-    return fmt::format("{{{},{},{}}}", _val.x, _val.y, _val.z);
-}
-
-inline std::string to_string(const glm::uvec4& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w);
-}
-
-inline std::string to_string(const glm::mat2& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val[0].x, _val[0].y, _val[1].x, _val[1].y);
-}
-
-inline std::string to_string(const glm::mat2x3& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[1].x, _val[1].y, _val[1].z
-    );
-}
-
-inline std::string to_string(const glm::mat2x4& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[0].w,
-        _val[1].x, _val[1].y, _val[1].z, _val[1].w
-    );
-}
-
-inline std::string to_string(const glm::mat3x2& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[1].x, _val[1].y, _val[2].x, _val[2].y
-    );
-}
-
-inline std::string to_string(const glm::mat3& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z,
-        _val[1].x, _val[1].y, _val[1].z,
-        _val[2].x, _val[2].y, _val[2].z
-    );
-}
-
-inline std::string to_string(const glm::mat3x4& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[0].w,
-        _val[1].x, _val[1].y, _val[1].z, _val[1].w,
-        _val[2].x, _val[2].y, _val[2].z, _val[2].w
-    );
-}
-
-inline std::string to_string(const glm::mat4x2& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y,
-        _val[1].x, _val[1].y,
-        _val[2].x, _val[2].y,
-        _val[3].x, _val[3].y
-    );
-}
-
-inline std::string to_string(const glm::mat4x3& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z,
-        _val[1].x, _val[1].y, _val[1].z,
-        _val[2].x, _val[2].y, _val[2].z,
-        _val[3].x, _val[3].y, _val[3].z
-    );
-}
-
-inline std::string to_string(const glm::mat4& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[0].w,
-        _val[1].x, _val[1].y, _val[1].z, _val[1].w,
-        _val[2].x, _val[2].y, _val[2].z, _val[2].w,
-        _val[3].x, _val[3].y, _val[3].z, _val[3].w
-    );
-}
-
-inline std::string to_string(const glm::dmat2& _val) {
-    return fmt::format("{{{},{},{},{}}}", _val[0].x, _val[0].y, _val[1].x, _val[1].y);
-}
-
-inline std::string to_string(const glm::dmat2x3& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[1].x, _val[1].y, _val[1].z
-    );
-}
-
-inline std::string to_string(const glm::dmat2x4& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[0].w,
-        _val[1].x, _val[1].y, _val[1].z, _val[1].w
-    );
-}
-
-inline std::string to_string(const glm::dmat3x2& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[1].x, _val[1].y, _val[2].x, _val[2].y
-    );
-}
-
-inline std::string to_string(const glm::dmat3& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z,
-        _val[1].x, _val[1].y, _val[1].z,
-        _val[2].x, _val[2].y, _val[2].z
-    );
-}
-
-inline std::string to_string(const glm::dmat3x4& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[0].w,
-        _val[1].x, _val[1].y, _val[1].z, _val[1].w,
-        _val[2].x, _val[2].y, _val[2].z, _val[2].w
-    );
-}
-
-inline std::string to_string(const glm::dmat4x2& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y,
-        _val[1].x, _val[1].y,
-        _val[2].x, _val[2].y,
-        _val[3].x, _val[3].y
-    );
-}
-
-inline std::string to_string(const glm::dmat4x3& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z,
-        _val[1].x, _val[1].y, _val[1].z,
-        _val[2].x, _val[2].y, _val[2].z,
-        _val[3].x, _val[3].y, _val[3].z
-    );
-}
-
-inline std::string to_string(const glm::dmat4& _val) {
-    return fmt::format(
-        "{{{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}}}",
-        _val[0].x, _val[0].y, _val[0].z, _val[0].w,
-        _val[1].x, _val[1].y, _val[1].z, _val[1].w,
-        _val[2].x, _val[2].y, _val[2].z, _val[2].w,
-        _val[3].x, _val[3].y, _val[3].z, _val[3].w
-    );
-}
-
 } // namespace ghoul
+
+template <>
+struct std::formatter<glm::bvec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::bvec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::bvec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::bvec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::bvec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::bvec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::vec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::vec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::vec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::vec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::vec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::vec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::quat> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::quat& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dvec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dvec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::dvec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dvec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::dvec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dvec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dquat> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dquat& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::ivec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::ivec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::ivec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::ivec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::ivec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::ivec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::uvec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::uvec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::uvec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::uvec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::uvec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::uvec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val[0].x, _val[0].y, _val[1].x, _val[1].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat2x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat2x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[1].x, _val[1].y, _val[1].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat2x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat2x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat3x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat3x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[1].x, _val[1].y, _val[2].x, _val[2].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat3x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat3x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat4x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat4x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y,
+            _val[1].x, _val[1].y,
+            _val[2].x, _val[2].y,
+            _val[3].x, _val[3].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat4x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat4x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z,
+            _val[3].x, _val[3].y, _val[3].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w,
+            _val[3].x, _val[3].y, _val[3].z, _val[3].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val[0].x, _val[0].y, _val[1].x, _val[1].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat2x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat2x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[1].x, _val[1].y, _val[1].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat2x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat2x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat3x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat3x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[1].x, _val[1].y, _val[2].x, _val[2].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat3x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat3x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat4x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat4x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y,
+            _val[1].x, _val[1].y,
+            _val[2].x, _val[2].y,
+            _val[3].x, _val[3].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat4x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat4x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z,
+            _val[3].x, _val[3].y, _val[3].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w,
+            _val[3].x, _val[3].y, _val[3].z, _val[3].w
+        );
+    }
+};
+
+
+
+
 
 template <>
 struct std::less<glm::vec2> {

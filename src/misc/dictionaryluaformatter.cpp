@@ -92,11 +92,11 @@ namespace {
 
         std::string values;
         for (size_t i = 0; i < vec.size() - 1; i++) {
-            values += fmt::format("{},", vec[i]);
+            values += std::format("{},", vec[i]);
         }
-        values += fmt::format("{}", vec.back());
+        values += std::format("{}", vec.back());
 
-        return fmt::format("{{{}}}", values);
+        return std::format("{{{}}}", values);
     }
 
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
@@ -110,7 +110,7 @@ namespace {
 
         if (dictionary.hasValue<double>(key)) {
             const double value = dictionary.value<double>(key);
-            return fmt::format("{}", value);
+            return std::format("{}", value);
         }
 
         if (dictionary.hasValue<int>(key)) {
@@ -168,7 +168,7 @@ namespace {
             return "\"" + luaString + "\"";
         }
 
-        throw LuaFormattingError(fmt::format(
+        throw LuaFormattingError(std::format(
             "Key '{}' has invalid type for formatting dictionary as Lua", key
         ));
     }

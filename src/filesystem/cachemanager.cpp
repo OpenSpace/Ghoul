@@ -50,7 +50,7 @@ namespace {
         // something that cannot occur in the filesystem
         constexpr char HashDelimiter = '|';
 
-        const std::string s = fmt::format(
+        const std::string s = std::format(
             "{}{}{}", file.string(), HashDelimiter, information
         );
         const unsigned int hash = ghoul::hashCRC32(s);
@@ -60,7 +60,7 @@ namespace {
     std::string lastModifiedDate(std::filesystem::path path) {
         if (!std::filesystem::is_regular_file(path)) {
             throw ghoul::RuntimeError(
-                fmt::format(
+                std::format(
                     "Error retrieving last-modified date for '{}'. File did not exist",
                     path
                 ),
@@ -88,7 +88,7 @@ namespace {
             );
             std::string msg(buffer.data());
             throw ghoul::RuntimeError(
-                fmt::format(
+                std::format(
                     "Could not retrieve last-modified date for '{}': {}", path, msg
                 ),
                 "Cache"
@@ -111,12 +111,12 @@ namespace {
                 );
                 std::string msg(buffer.data());
                 throw ghoul::RuntimeError(
-                    fmt::format("'FileTimeToSystemTime' failed for '{}': {}", path, msg),
+                    std::format("'FileTimeToSystemTime' failed for '{}': {}", path, msg),
                     "Cache"
                 );
             }
             else {
-                return fmt::format(
+                return std::format(
                     "{}-{}-{}T{}:{}:{}.{}", time.wYear, time.wMonth, time.wDay,
                     time.wHour, time.wMinute, time.wSecond, time.wMilliseconds
                 );
@@ -150,7 +150,7 @@ namespace {
 
             if (thisFilename != parent) {
                 throw ghoul::RuntimeError(
-                    fmt::format(
+                    std::format(
                         "File contained in cache directory '{}' contains a file "
                         "with name '{}' instead of expected '{}'",
                         path, thisFilename, parent
@@ -180,7 +180,7 @@ CacheManager::CacheManager(std::filesystem::path directory)
         std::string line;
         std::getline(file, line);
         if (line != std::to_string(CacheVersion)) {
-            LINFO(fmt::format(
+            LINFO(std::format(
                 "Cache version has changed. Current: {}; New: {}", line, CacheVersion
             ));
             file.close();
@@ -210,7 +210,7 @@ CacheManager::~CacheManager() {
     const std::filesystem::path path = _directory / CacheFile;
     std::ofstream file(path, std::ofstream::out);
     if (!file.good()) {
-        LERROR(fmt::format("Could not open '{}' for writing cache version file", path));
+        LERROR(std::format("Could not open '{}' for writing cache version file", path));
     }
 
     file << CacheVersion;
@@ -223,7 +223,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument '{}' contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", file.filename()),
             "Cache"
         );
     }
@@ -248,7 +248,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
         std::filesystem::create_directory(destinationBase);
     }
 
-    const std::string destination = fmt::format("{}/{}", destinationBase.string(), hash);
+    const std::string destination = std::format("{}/{}", destinationBase.string(), hash);
 
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
@@ -265,7 +265,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
     }
 
     // Generate and output the newly generated cache name
-    const std::string cachedName = fmt::format("{}/{}", destination, baseName.string());
+    const std::string cachedName = std::format("{}/{}", destination, baseName.string());
 
     // Store the cache information in the map
     _files[hash] = cachedName;
@@ -279,7 +279,7 @@ bool CacheManager::hasCachedFile(const std::filesystem::path& file,
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument '{}' contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", file.filename()),
             "Cache"
         );
     }
@@ -303,7 +303,7 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
     const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument '{}' contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", file.filename()),
             "Cache"
         );
     }

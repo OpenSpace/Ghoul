@@ -176,7 +176,7 @@ void TcpSocketServer::listen(int port) {
         WSACleanup();
 #endif // WIN32
         throw TcpSocket::TcpSocketError(
-            fmt::format("Bind failed (returned '{}') with error: {}", iResult, error)
+            std::format("Bind failed (returned '{}') with error: {}", iResult, error)
         );
     }
 

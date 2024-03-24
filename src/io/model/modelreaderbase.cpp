@@ -32,7 +32,7 @@ namespace ghoul::io {
 ModelReaderBase::ModelLoadException::ModelLoadException(std::filesystem::path name,
                                                         std::string msg,
                                                         const ModelReaderBase* r)
-    : RuntimeError(fmt::format(
+    : RuntimeError(std::format(
         "Error '{}' while loading model from file '{}'", msg, name), "ModelLoader"
     )
     , filename(std::move(name))

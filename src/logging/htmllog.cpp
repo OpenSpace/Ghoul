@@ -125,7 +125,7 @@ void HTMLLog::log(LogLevel level, std::string_view category, std::string_view me
         output += "</td>\n";
     }
     if (isLogLevelStamping()) {
-        output += fmt::format(
+        output += std::format(
             "\t\t\t\t<td class=\"log-level\">{}</td>\n", to_string(level)
         );
     }

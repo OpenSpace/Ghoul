@@ -42,7 +42,7 @@ namespace {
         if (!data) {
             throw ghoul::io::TextureReaderBase::TextureLoadException(
                 message,
-                fmt::format("Error reading image data: {}", stbi_failure_reason()),
+                std::format("Error reading image data: {}", stbi_failure_reason()),
                 r
             );
         }
@@ -96,7 +96,7 @@ namespace {
                 case 2: return GL_TEXTURE_2D;
                 case 3: return GL_TEXTURE_3D;
                 default:
-                    throw ghoul::RuntimeError(fmt::format(
+                    throw ghoul::RuntimeError(std::format(
                         "Unsupported dimensionality '{}'", d
                     ));
             }

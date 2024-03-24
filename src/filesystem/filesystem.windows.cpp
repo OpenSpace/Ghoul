@@ -64,7 +64,7 @@ int FileSystem::addFileListener(std::filesystem::path path,
     std::filesystem::path dir = path.parent_path();
     auto f = _directories.find(dir);
     if (f == _directories.end()) {
-        LDEBUG(fmt::format("Started watching '{}'", dir));
+        LDEBUG(std::format("Started watching '{}'", dir));
         DirectoryHandle* handle = new DirectoryHandle;
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;
@@ -82,7 +82,7 @@ int FileSystem::addFileListener(std::filesystem::path path,
         if (handle->_handle == INVALID_HANDLE_VALUE) {
             delete handle;
             throw ghoul::RuntimeError(
-                fmt::format("Directory handle for '{}' could not be obtained", dir)
+                std::format("Directory handle for '{}' could not be obtained", dir)
             );
         }
 
@@ -110,7 +110,7 @@ void FileSystem::removeFileListener(int callbackIdentifier) {
         }
     }
 
-    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
+    LWARNING(std::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,

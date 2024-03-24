@@ -73,7 +73,7 @@ FileSystem* FileSystem::_instance = nullptr;
 
 FileSystem::FileSystem() {
     std::filesystem::path temporaryPath = std::filesystem::temp_directory_path();
-    LINFO(fmt::format("Set temporary path ${{TEMPORARY}} to '{}'", temporaryPath));
+    LINFO(std::format("Set temporary path ${{TEMPORARY}} to '{}'", temporaryPath));
     registerPathToken("${TEMPORARY}", temporaryPath);
 
 #if !defined(WIN32) && !defined(__APPLE__)
@@ -182,7 +182,7 @@ std::filesystem::path FileSystem::expandPathTokens(std::string path,
         const auto it = _tokenMap.find(tokenInformation.token);
         if (it == _tokenMap.end()) {
             throw RuntimeError(
-                fmt::format("Token '{}' could not be resolved", tokenInformation.token),
+                std::format("Token '{}' could not be resolved", tokenInformation.token),
                 "FileSystem"
             );
         }

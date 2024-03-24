@@ -216,7 +216,7 @@ constexpr opengl::debug::Source from_string(std::string_view value) {
     if (value == "Other") { return opengl::debug::Source::Other; }
     if (value == "Don't care") { return opengl::debug::Source::DontCare; }
 
-    throw ghoul::RuntimeError(fmt::format("Unrecognized debug source '{}'", value));
+    throw ghoul::RuntimeError(std::format("Unrecognized debug source '{}'", value));
 }
 
 /**
@@ -242,7 +242,7 @@ constexpr opengl::debug::Type from_string(std::string_view value) {
     if (value == "Other") { return opengl::debug::Type::Other; }
     if (value == "Don't care") { return opengl::debug::Type::DontCare; }
 
-    throw ghoul::RuntimeError(fmt::format("Unrecognized debug type '{}'", value));
+    throw ghoul::RuntimeError(std::format("Unrecognized debug type '{}'", value));
 }
 
 /**
@@ -261,7 +261,7 @@ constexpr opengl::debug::Severity from_string(std::string_view value) {
     if (value == "Low") { return opengl::debug::Severity::Low; }
     if (value == "Notification") { return opengl::debug::Severity::Notification; }
 
-    throw ghoul::RuntimeError(fmt::format("Unrecognized debug severity '{}'", value));
+    throw ghoul::RuntimeError(std::format("Unrecognized debug severity '{}'", value));
 }
 
 /**

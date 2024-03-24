@@ -108,12 +108,12 @@ void SharedMemory::create(const std::string& name, size_t size) {
     const DWORD error = GetLastError();
     if (!handle) {
         std::string errorMsg = lastErrorToString(error);
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error creating shared memory '{}': {}", name, errorMsg
         ));
     }
     if (error == ERROR_ALREADY_EXISTS) {
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error creating shared memory '{}': Section exists", name
         ));
     }
@@ -121,7 +121,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
     void* memory = MapViewOfFileEx(handle, FILE_MAP_ALL_ACCESS, 0, 0, 0, nullptr);
     if (!memory) {
         std::string errorMsg = lastErrorToString(error);
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error creating a view on shared memory '{}': {}", name, errorMsg
         ));
     }
@@ -136,7 +136,7 @@ void SharedMemory::create(const std::string& name, size_t size) {
     const int result = shmget(h, size, IPC_CREAT | IPC_EXCL | IPC_R | IPC_W | IPC_M);
     if (result == -1) {
         const std::string errorMsg = strerror(errno);
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error creating shared memory '{}': {}", name, errorMsg
         ));
     }
@@ -212,7 +212,7 @@ SharedMemory::SharedMemory(std::string name)
     _sharedMemoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, _name.c_str());
     if (!_sharedMemoryHandle) {
         std::string errorMsg = lastErrorToString(GetLastError());
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error accessing shared memory '{}': {}", _name, errorMsg
         ));
     }
@@ -222,7 +222,7 @@ SharedMemory::SharedMemory(std::string name)
         CloseHandle(_sharedMemoryHandle);
 
         std::string errorMsg = lastErrorToString(GetLastError());
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error creating view for shared memory '{}': {}", _name, errorMsg
         ));
     }
@@ -231,7 +231,7 @@ SharedMemory::SharedMemory(std::string name)
     _sharedMemoryHandle = shmget(h, 0, IPC_R | IPC_W | IPC_M);
     if (_sharedMemoryHandle == -1) {
         const std::string errorMsg = strerror(errno);
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error accessing shared memory '{}': {}", name, errorMsg
         ));
     }
@@ -239,7 +239,7 @@ SharedMemory::SharedMemory(std::string name)
     _memory = shmat(_sharedMemoryHandle, nullptr, SHM_R | SHM_W);
     if (_memory == reinterpret_cast<void*>(-1)) {
         const std::string errorMsg = strerror(errno);
-        throw SharedMemoryError(fmt::format(
+        throw SharedMemoryError(std::format(
             "Error mapping shared memory '{}': {}", name, errorMsg
         ));
     }

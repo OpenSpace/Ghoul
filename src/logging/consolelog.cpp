@@ -128,7 +128,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
 
         const size_t nDots = std::min<size_t>(category.length() - CategoryLength, 2);
         // 20(length) - 4(remaining four characters at the end) - number of dots
-        res += fmt::format(
+        res += std::format(
             "{}{}{} ",
             category.substr(0, CategoryLength - 4 - nDots),
             std::string(nDots, '.'),

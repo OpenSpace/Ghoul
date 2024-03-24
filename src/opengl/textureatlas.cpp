@@ -183,7 +183,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     }
 
     if (bestIndex == -1) {
-        throw InvalidRegionException(fmt::format(
+        throw InvalidRegionException(std::format(
             "Could not fit new region of size ({},{})", width, height
         ));
     }

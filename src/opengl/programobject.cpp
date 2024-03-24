@@ -76,8 +76,8 @@ ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string 
                                                                          std::string name)
     : ProgramObjectError(
         name.empty() ?
-        fmt::format("Error linking program object: {}", msg) :
-        fmt::format("Error linking program object [{}]: {}", name, msg)
+        std::format("Error linking program object: {}", msg) :
+        std::format("Error linking program object [{}]: {}", name, msg)
       )
     , linkerError(std::move(msg))
     , programName(std::move(name))
@@ -94,7 +94,7 @@ ProgramObject::ProgramObject()
 ProgramObject::ProgramObject(std::string name)
     : _id(glCreateProgram())
     , _programName(std::move(name))
-    , _loggerCat(fmt::format("ProgramObject('{}')", _programName))
+    , _loggerCat(std::format("ProgramObject('{}')", _programName))
 {
     if (_id == 0) {
         throw ProgramObjectError("glCreateProgram returned 0");
@@ -219,7 +219,7 @@ ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) noexcept {
 
 void ProgramObject::setName(std::string name) {
     _programName = std::move(name);
-    _loggerCat = fmt::format("ProgramObject['{}']", _programName);
+    _loggerCat = std::format("ProgramObject['{}']", _programName);
     if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
             GL_PROGRAM,
@@ -501,7 +501,7 @@ GLint ProgramObject::uniformLocation(const std::string& name) const {
 
     const GLint location = glGetUniformLocation(_id, name.c_str());
     if (!_ignoreUniformLocationError && location == -1) {
-        LWARNING(fmt::format("Failed to locate uniform location for '{}'", name));
+        LWARNING(std::format("Failed to locate uniform location for '{}'", name));
     }
     return location;
 }
@@ -2617,7 +2617,7 @@ void ProgramObject::setSsboBinding(GLuint index, GLuint binding) const {
 GLuint ProgramObject::attributeLocation(const std::string& name) const {
     const GLint location = glGetAttribLocation(_id, name.data());
     if (!_ignoreAttributeLocationError && location == -1) {
-        LWARNING(fmt::format("Failed to locate attribute location for '{}'", name));
+        LWARNING(std::format("Failed to locate attribute location for '{}'", name));
         return GL_INVALID_INDEX;
     }
     return static_cast<GLuint>(location);
@@ -3751,7 +3751,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         &countActiveSubroutineUniforms
     );
     if (static_cast<size_t>(countActiveSubroutineUniforms) != indices.size()) {
-        LWARNING(fmt::format(
+        LWARNING(std::format(
             "Number of active subroutine uniforms ({}) is different from passed uniform "
             "subroutine indices ({})",
             countActiveSubroutineUniforms, indices.size()
@@ -3781,7 +3781,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         &countActiveSubroutineUniforms
     );
     if (static_cast<size_t>(countActiveSubroutineUniforms) != values.size()) {
-        LWARNING(fmt::format(
+        LWARNING(std::format(
             "Number of active subroutine uniforms ({}) is different from passed uniform "
             "subroutine indices ({})",
             countActiveSubroutineUniforms,
@@ -3800,7 +3800,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         auto subroutine = values.find(uniformSubroutine);
 #ifdef GHL_DEBUG
         if (subroutine == values.end()) {
-            LWARNING(fmt::format(
+            LWARNING(std::format(
                 "Uniform subroutine name '{}' was not present in map", uniformSubroutine
             ));
             return false;
@@ -3810,7 +3810,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         const GLuint idxSubroutine = subroutineIndex(shaderType, nameSubroutine);
 #ifdef GHL_DEBUG
         if (idxSubroutine == GL_INVALID_INDEX) {
-            LWARNING(fmt::format(
+            LWARNING(std::format(
                 "Subroutine name '{}' was not found in shader object", nameSubroutine
             ));
             return false;
@@ -3837,7 +3837,7 @@ void ProgramObject::bindFragDataLocation(const std::string& name, GLuint colorNu
     GLint maxBuffers = 0;
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxBuffers);
     if (colorNumber >= static_cast<GLuint>(maxBuffers)) {
-        LWARNING(fmt::format(
+        LWARNING(std::format(
             "ColorNumber '{}' is bigger than the maximum of simultaneous outputs '{}'",
             colorNumber, maxBuffers
         ));

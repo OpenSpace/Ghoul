@@ -101,7 +101,7 @@ GeneralCapabilitiesComponent::GeneralCapabilitiesComponentError::
 
 GeneralCapabilitiesComponent::OperatingSystemError::OperatingSystemError(std::string desc,
                                                                      std::string errorMsg)
-    : GeneralCapabilitiesComponentError(fmt::format("{}. Error: {}", desc, errorMsg))
+    : GeneralCapabilitiesComponentError(std::format("{}. Error: {}", desc, errorMsg))
     , description(std::move(desc))
     , errorMessage(std::move(errorMsg))
 {}
@@ -333,7 +333,7 @@ void GeneralCapabilitiesComponent::detectOS() {
     }
 
     _operatingSystem = OperatingSystem::Unknown;
-    _operatingSystemExtra = fmt::format(
+    _operatingSystemExtra = std::format(
         "{} {} {} {}", name.sysname, name.release, name.version, name.machine
     );
     _fullOperatingSystem = _operatingSystemExtra;
@@ -347,7 +347,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
         queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
     }
     catch (const WMIError& e) {
-        throw MainMemoryError(fmt::format(
+        throw MainMemoryError(std::format(
             "Error reading physical memory from WMI. {} ({})", e.message, e.errorCode
         ));
     }

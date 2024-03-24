@@ -32,7 +32,7 @@ namespace ghoul::io {
 TextureReaderBase::TextureLoadException::TextureLoadException(std::string name,
                                                               std::string msg,
                                                               const TextureReaderBase* r)
-    : RuntimeError(fmt::format("Error loading texture '{}'", name), "TextureLoader")
+    : RuntimeError(std::format("Error loading texture '{}'", name), "TextureLoader")
     , filename(std::move(name))
     , errorMessage(std::move(msg))
     , reader(r)

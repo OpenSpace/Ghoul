@@ -99,7 +99,7 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
         _vendor = Vendor::Intel;
     }
     else {
-        LINFO(fmt::format(
+        LINFO(std::format(
             "Vendor of graphics card is not in the enum 'Vendor'. Vendor information: {}",
             _glslCompiler
         ));
@@ -130,7 +130,7 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
     std::string date;
     queryWMI("Win32_VideoController", "DriverDate", date);
 
-    _driverDate = fmt::format(
+    _driverDate = std::format(
         "{}-{}-{}", date.substr(0, 4), date.substr(4, 2), date.substr(6, 2)
     );
 

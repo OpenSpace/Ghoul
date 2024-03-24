@@ -172,7 +172,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     // We have found an unknown command but we don't allow them, so we
                     // have to bail out here
                     throw ghoul::RuntimeError(
-                        fmt::format(
+                        std::format(
                             "Found unknown command '{}' but none are allowed",
                             _arguments[i]
                         ),
@@ -201,7 +201,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 }
                 else {
                     throw ghoul::RuntimeError(
-                        fmt::format("{} is not a valid command", _arguments[i]),
+                        std::format("{} is not a valid command", _arguments[i]),
                         "CommandlineParser"
                     );
                 }
@@ -222,7 +222,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 parameterMap.find(currentCmd) != parameterMap.end())
             {
                 throw ghoul::RuntimeError(
-                    fmt::format(
+                    std::format(
                         "'{}' does not allow multiple calls in a single line",
                         currentCmd->name()
                     ),
@@ -266,14 +266,14 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
     for (const std::string& arg : argumentsForNameless) {
         s << " " << arg;
     }
-    LDEBUG(fmt::format("(Nameless argument: {})", s.str()));
+    LDEBUG(std::format("(Nameless argument: {})", s.str()));
 
     for (const std::pair<const K, V>& it : parameterMap) {
         s.clear();
         for (const std::string& arg : it.second) {
             s << " " << arg;
         }
-        LDEBUG(fmt::format("({}: {})", it.first->name(), s.str()));
+        LDEBUG(std::format("({}: {})", it.first->name(), s.str()));
     }
 
     // Third step: Execute the nameless command if there are any arguments available
@@ -367,7 +367,7 @@ std::string CommandlineParser::usageInformationForCommand(
     );
     ghoul_assert(it != _commands.cend(), "Command must name a valid name or shortname");
 
-    return fmt::format("Usage: \n{}", (*it)->usage());
+    return std::format("Usage: \n{}", (*it)->usage());
 }
 
 std::string CommandlineParser::usageInformationForNamelessCommand() const {
@@ -379,7 +379,7 @@ std::string CommandlineParser::usageInformationForNamelessCommand() const {
 }
 
 std::string CommandlineParser::helpText() const {
-    std::string result = fmt::format("{}\n\nHelp:\n-----\n", usageInformation());
+    std::string result = std::format("{}\n\nHelp:\n-----\n", usageInformation());
     for (const std::unique_ptr<CommandlineCommand>& it : _commands) {
         result += it->help() + '\n';
     }

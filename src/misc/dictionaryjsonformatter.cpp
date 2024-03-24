@@ -35,13 +35,13 @@ namespace ghoul {
 
 namespace {
     std::string formatNumber(double d) {
-        // fmt::format will represent infinite values with 'inf' and NaNs with 'nan'.
+        // std::format will represent infinite values with 'inf' and NaNs with 'nan'.
         // These are not valid in JSON, so use 'null' instead
         if (!std::isfinite(d)) {
             return "null";
         }
 
-        return fmt::format("{}", d);
+        return std::format("{}", d);
     }
 
     std::string formatString(const std::string& value) {
@@ -100,7 +100,7 @@ namespace {
         }
         values << vec.back();
 
-        return fmt::format("[{}]", values.str());
+        return std::format("[{}]", values.str());
     }
 
     /**
@@ -154,7 +154,7 @@ namespace {
             return formatString(value);
         }
 
-        throw JsonFormattingError(fmt::format(
+        throw JsonFormattingError(std::format(
             "Key '{}' has invalid type for formatting dictionary as JSON", key
         ));
     }
@@ -184,7 +184,7 @@ std::string formatJson(const Dictionary& dictionary) {
         keys.end(),
         convert(*keys.begin(), dictionary),
         [convert, dictionary](const std::string& a, const std::string& key) {
-            return fmt::format("{},{}", a, convert(key, dictionary));
+            return std::format("{},{}", a, convert(key, dictionary));
         }
     );
 

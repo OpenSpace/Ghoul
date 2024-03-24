@@ -39,7 +39,7 @@ namespace ghoul::io {
 TextureReader::MissingReaderException::MissingReaderException(std::string extension,
                                                               std::string file_)
     : RuntimeError(
-        fmt::format(
+        std::format(
             "No reader found for extension '{}' with file '{}'", extension, file_
         ),
         "IO"
@@ -50,7 +50,7 @@ TextureReader::MissingReaderException::MissingReaderException(std::string extens
 
 TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
     : RuntimeError(
-        fmt::format("Error loading texture at location {} with size {}", memory, size),
+        std::format("Error loading texture at location {} with size {}", memory, size),
         "IO"
     )
     , _memory(memory)

@@ -137,7 +137,7 @@ namespace {
                         meshTexture.texture->setName(path.C_Str());
                     }
                     catch (const TextureReader::InvalidLoadException& e) {
-                        LWARNING(fmt::format(
+                        LWARNING(std::format(
                             "Could not load unsupported texture from '{}' with size "
                             "'{}': Replacing with flashy color", e._memory, e._size
                         ));
@@ -146,7 +146,7 @@ namespace {
                         return false;
                     }
                     catch (const TextureReaderBase::TextureLoadException& e) {
-                        LWARNING(fmt::format(
+                        LWARNING(std::format(
                             "Failed to load texture from '{}' with error '{}': "
                             "Replacing with flashy color", e.filename, e.message
                         ));
@@ -169,7 +169,7 @@ namespace {
                 // Local texture
                 try {
                     const std::string pathString(path.C_Str());
-                    const std::string absolutePath = fmt::format(
+                    const std::string absolutePath = std::format(
                         "{}/{}", modelDirectory.string(), pathString
                     );
 
@@ -181,7 +181,7 @@ namespace {
                     meshTexture.texture->setName(path.C_Str());
                 }
                 catch (const TextureReader::MissingReaderException& e) {
-                    LWARNING(fmt::format(
+                    LWARNING(std::format(
                         "Could not load unsupported texture from '{}' with extension "
                         "'{}': Replacing with flashy color", e.file, e.fileExtension
                     ));
@@ -190,7 +190,7 @@ namespace {
                     return false;
                 }
                 catch (const TextureReaderBase::TextureLoadException& e) {
-                    LWARNING(fmt::format(
+                    LWARNING(std::format(
                         "Failed to load texture from '{}' with error '{}': Replacing "
                         "with flashy color", e.filename, e.message
                     ));
@@ -489,7 +489,7 @@ namespace {
             }
             // If not forced to render, drop invisible mesh
             else if (notifyInvisibleDropped) {
-                LINFO(fmt::format("Invisible mesh '{}' dropped", mesh.mName.C_Str()));
+                LINFO(std::format("Invisible mesh '{}' dropped", mesh.mName.C_Str()));
             }
         }
 

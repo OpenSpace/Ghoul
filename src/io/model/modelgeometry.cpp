@@ -163,7 +163,7 @@ namespace ghoul::modelgeometry {
 
 ModelGeometry::ModelCacheException::ModelCacheException(std::filesystem::path file,
                                                         std::string msg)
-    : RuntimeError(fmt::format("Error '{}' with cache file '{}'", msg, file))
+    : RuntimeError(std::format("Error '{}' with cache file '{}'", msg, file))
     , filename(std::move(file))
     , errorMessage(std::move(msg))
 {}
@@ -856,7 +856,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
             // Positions
             if (nodeAnimation.positions.size() >= std::numeric_limits<uint32_t>::max()) {
-                LWARNING(fmt::format(
+                LWARNING(std::format(
                     "A maximum number of '{}' position keyframes are supported",
                     std::numeric_limits<uint32_t>::max())
                 );
@@ -890,7 +890,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             // Rotations
             uint32_t nRot = static_cast<uint32_t>(nodeAnimation.rotations.size());
             if (nodeAnimation.rotations.size() >= std::numeric_limits<uint32_t>::max()) {
-                LWARNING(fmt::format(
+                LWARNING(std::format(
                     "A maximum number of '{}' rotation keyframes are supported",
                     std::numeric_limits<uint32_t>::max())
                 );
@@ -927,7 +927,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             // Scales
             uint32_t nScale = static_cast<uint32_t>(nodeAnimation.scales.size());
             if (nodeAnimation.scales.size() >= std::numeric_limits<uint32_t>::max()) {
-                LWARNING(fmt::format(
+                LWARNING(std::format(
                     "A maximum number of '{}' scale keyframes are supported",
                     std::numeric_limits<uint32_t>::max())
                 );

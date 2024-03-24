@@ -42,7 +42,7 @@ namespace {
     /// Management Instrumentation
     struct WMIError : public ghoul::RuntimeError {
         explicit WMIError(std::string msg, HRESULT code)
-            : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
+            : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
             , message(std::move(msg))
             , errorCode(std::move(code))
         {}
@@ -94,7 +94,7 @@ namespace {
 
         VARIANT* result = nullptr;
         IEnumWbemClassObject* enumerator = nullptr;
-        std::string query = fmt::format("SELECT {} FROM {}", attribute, wmiClass);
+        std::string query = std::format("SELECT {} FROM {}", attribute, wmiClass);
         HRESULT hRes = services->ExecQuery(
             bstr_t("WQL"),
             bstr_t(query.c_str()),
@@ -153,7 +153,7 @@ IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 static_assert(std::is_same_v<HRESULT, long>);
 
 SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, long code)
-    : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
+    : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
     , message(std::move(msg))
     , errorCode(std::move(code))
 {}

@@ -132,13 +132,13 @@ void setClipboardText(const std::string& text) {
     CloseClipboard();
 #elif defined(__APPLE__)
     std::string buf;
-    bool success = exec(fmt::format("echo \"{}\" | pbcopy", text), buf);
+    bool success = exec(std::format("echo \"{}\" | pbcopy", text), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }
 #else
     std::string buf;
-    const bool success = exec(fmt::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
+    const bool success = exec(std::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }

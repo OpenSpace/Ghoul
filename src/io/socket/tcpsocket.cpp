@@ -247,13 +247,13 @@ void TcpSocket::establishConnection(addrinfo* info) {
     // Disable Nagle's algorithm.
     result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
-        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+        LWARNING(std::format("Socket error: {}", _ERRNO));
     }
 
     // Disable address reuse
     result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &falseFlag, sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
-        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+        LWARNING(std::format("Socket error: {}", _ERRNO));
         freeaddrinfo(info);
         _isConnecting = false;
         _isConnected = false;

@@ -41,7 +41,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     if (nDimensions != 1) {
-        throw ghoul::RuntimeError(fmt::format(
+        throw ghoul::RuntimeError(std::format(
             "The number of dimensions for '{}' must be 1, but was {}",
             filename, nDimensions
         ));
@@ -93,7 +93,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             delete[] values;
             throw TextureLoadException(
                 filename,
-                fmt::format("Header assured '{}' values but more were found", width),
+                std::format("Header assured '{}' values but more were found", width),
                 this
             );
         }
@@ -108,7 +108,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         delete[] values;
         throw TextureLoadException(
             filename,
-            fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
+            std::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
             this
         );
     }
@@ -119,7 +119,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             case 2: return GL_TEXTURE_2D;
             case 3: return GL_TEXTURE_3D;
             default:
-                throw ghoul::RuntimeError(fmt::format(
+                throw ghoul::RuntimeError(std::format(
                     "Unsupported dimensionality '{}'", d
                 ));
         }
