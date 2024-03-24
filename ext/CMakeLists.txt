@@ -140,6 +140,8 @@ if (GHOUL_MODULE_ASSIMP)
     set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "Set to have assimp build minizip" FORCE)
   endif ()
 
+  set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
+
   add_subdirectory(assimp)
   target_link_libraries(Ghoul PRIVATE assimp)
   set_target_properties(assimp PROPERTIES FOLDER "External")
@@ -168,8 +170,6 @@ if (GHOUL_MODULE_ASSIMP)
       "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
       <string.h>
     )
-  else ()
-    set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
   endif ()
 
   if (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
