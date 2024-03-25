@@ -25,7 +25,7 @@
 
 #include "ghoul/systemcapabilities/openglcapabilitiescomponent.h"
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>

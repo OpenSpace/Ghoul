@@ -25,8 +25,8 @@
 
 #include <ghoul/logging/consolelog.h>
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/fmt.h>
 #include <iostream>
 #include <string_view>
 

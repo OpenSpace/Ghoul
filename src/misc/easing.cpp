@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/easing.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <array>
 #include <string_view>
 

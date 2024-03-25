@@ -26,7 +26,7 @@
 #ifndef __GHOUL___GLM___H__
 #define __GHOUL___GLM___H__
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/stringconversion.h>
 
 #ifdef __APPLE__

@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 
 namespace ghoul {

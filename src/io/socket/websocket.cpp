@@ -25,8 +25,8 @@
 
 #include <ghoul/io/socket/websocket.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
 #include <websocketpp/common/functional.hpp>
 #include <chrono>
 #include <functional>

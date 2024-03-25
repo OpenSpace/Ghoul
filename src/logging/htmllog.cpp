@@ -25,8 +25,8 @@
 
 #include <ghoul/logging/htmllog.h>
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/fmt.h>
 #include <iterator>
 
 namespace ghoul::logging {

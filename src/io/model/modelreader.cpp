@@ -28,12 +28,12 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/format.h>
 #include <ghoul/io/model/modelreaderbase.h>
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stringhelper.h>
-#include <ghoul/fmt.h>
 #include <algorithm>
 #include <filesystem>
 

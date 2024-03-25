@@ -26,7 +26,7 @@
 #include <ghoul/misc/clipboard.h>
 
 #include <ghoul/misc/exception.h>
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <algorithm>
 #include <sstream>
 

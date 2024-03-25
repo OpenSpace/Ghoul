@@ -25,8 +25,8 @@
 
 #include <ghoul/io/texture/texturereader.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/format.h>
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stringhelper.h>

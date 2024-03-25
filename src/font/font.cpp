@@ -25,9 +25,9 @@
 
 #include <ghoul/font/font.h>
 
-#include <ghoul/fmt.h>
-#include <ghoul/freetype.h>
 #include <ghoul/font/fonterrors.h>
+#include <ghoul/format.h>
+#include <ghoul/freetype.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>

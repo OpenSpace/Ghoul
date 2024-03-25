@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/sharedmemory.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/crc32.h>
 #include <atomic>
 

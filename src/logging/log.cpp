@@ -25,7 +25,7 @@
 
 #include <ghoul/logging/log.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <chrono>
 
 #ifdef WIN32

@@ -25,8 +25,8 @@
 
 #include <ghoul/filesystem/file.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <filesystem>
 

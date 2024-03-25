@@ -25,7 +25,7 @@
 
 #include <ghoul/opengl/openglstatecache.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 

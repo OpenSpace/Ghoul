@@ -25,8 +25,8 @@
 
 #include <ghoul/io/model/modelnode.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace ghoul::io {

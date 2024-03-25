@@ -26,7 +26,7 @@
 #include <ghoul/io/volume/rawvolumereader.h>
 
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <iostream>
 #include <fstream>
 

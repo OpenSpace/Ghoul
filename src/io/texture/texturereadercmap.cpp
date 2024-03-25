@@ -25,7 +25,7 @@
 
 #include <ghoul/io/texture/texturereadercmap.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/texture.h>

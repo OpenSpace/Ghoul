@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/assert.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/stacktrace.h>
 #include <ghoul/misc/stringhelper.h>
 #include <algorithm>

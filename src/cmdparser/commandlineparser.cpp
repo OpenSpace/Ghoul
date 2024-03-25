@@ -25,8 +25,8 @@
 
 #include <ghoul/cmdparser/commandlineparser.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/cmdparser/commandlinecommand.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>

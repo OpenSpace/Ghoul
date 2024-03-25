@@ -25,7 +25,7 @@
 
 #include <ghoul/logging/callbacklog.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 
 namespace ghoul::logging {
 

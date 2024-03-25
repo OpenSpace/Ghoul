@@ -25,9 +25,9 @@
 
 #include <ghoul/opengl/shaderpreprocessor.h>
 
-#include <ghoul/fmt.h>
-#include <ghoul/glm.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/format.h>
+#include <ghoul/glm.h>
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
