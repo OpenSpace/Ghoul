@@ -48,18 +48,18 @@ TextLog::TextLog(const std::string& filename, int nLogRotation, Append writeToAp
     while (nLogRotation > 0) {
         // Move all of the existing logs one position up
 
-        std::filesystem::path file = filename;
+        const std::filesystem::path file = filename;
         std::string fname = file.stem().string();
         std::string ext = file.extension().string();
 
         std::filesystem::path newCandidate = file;
-        newCandidate.replace_filename(fmt::format("{}-{}{}", fname, nLogRotation, ext));
+        newCandidate.replace_filename(std::format("{}-{}{}", fname, nLogRotation, ext));
 
         std::filesystem::path oldCandidate = file;
         if (nLogRotation > 1) {
             // We don't actually have a -0 version, it is just the base name
             oldCandidate.replace_filename(
-                fmt::format("{}-{}{}", fname, nLogRotation - 1, ext)
+                std::format("{}-{}{}", fname, nLogRotation - 1, ext)
             );
         }
 
@@ -83,7 +83,7 @@ TextLog::TextLog(const std::string& filename, int nLogRotation, Append writeToAp
 
 TextLog::~TextLog() {
     if (_printFooter) {
-        _file << "--------" << std::endl;
+        _file << "--------\n";
     }
 }
 
@@ -100,8 +100,8 @@ void TextLog::flush() {
     _file.flush();
 }
 
-void TextLog::writeLine(std::string line) {
-    _file << std::move(line);
+void TextLog::writeLine(const std::string& line) {
+    _file << line;
 }
 
 } // namespace ghoul::logging

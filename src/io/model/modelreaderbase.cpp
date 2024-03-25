@@ -25,15 +25,15 @@
 
 #include <ghoul/io/model/modelreaderbase.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 
 namespace ghoul::io {
 
 ModelReaderBase::ModelLoadException::ModelLoadException(std::filesystem::path name,
                                                         std::string msg,
                                                         const ModelReaderBase* r)
-    : RuntimeError(fmt::format(
-        "Error: '{}' while loading model from file: {}", msg, name), "ModelLoader"
+    : RuntimeError(std::format(
+        "Error '{}' while loading model from file '{}'", msg, name), "ModelLoader"
     )
     , filename(std::move(name))
     , errorMessage(std::move(msg))

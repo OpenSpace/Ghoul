@@ -293,7 +293,8 @@ ghoul::Dictionary loadArrayDictionaryFromString(const std::string& script,
  * \param state The Lua state that is used to populate the \p dictionary
  * \param dictionary The #ghoul::Dictionary into which the values from the stack are
  *        added
- * \param location The stack index of the item to extract. Defaults to -1 (topmost item)
+ * \param relativeLocation The stack index of the item to extract. Defaults to -1 (topmost
+ *        item)
  *
  * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
  *        `string` and type `number`
@@ -301,7 +302,7 @@ ghoul::Dictionary loadArrayDictionaryFromString(const std::string& script,
  * \post \p state%'s stack is unchanged
  */
 void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary,
-    int location = -1);
+    int relativeLocation = -1);
 
 /**
  * Uses the Lua \p state to populate the return ghoul::Dictionary%. The \p state must have

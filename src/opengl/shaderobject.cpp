@@ -44,22 +44,22 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
                                                      std::string name)
     : ShaderObjectError(
         name.empty() ?
-        fmt::format("Error linking program object: {}\n{}", error, ident) :
-        fmt::format("Error linking program object [{}]: {}\n{}", name, error, ident)
+        std::format("Error linking program object: {}\n{}", error, ident) :
+        std::format("Error linking program object [{}]: {}\n{}", name, error, ident)
     )
     , compileError(std::move(error))
     , fileIdentifiers(std::move(ident))
     , shaderName(std::move(name))
 {}
 
-ShaderObject::ShaderObject(ShaderType shaderType, std::filesystem::path filename,
+ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& filename,
                            std::string name, Dictionary dictionary)
     : _type(shaderType)
     , _shaderName(std::move(name))
     , _loggerCat(
         _shaderName.empty() ?
             "ShaderObject" :
-            fmt::format("ShaderObject('{}')", _shaderName)
+            std::format("ShaderObject('{}')", _shaderName)
     )
 {
     const bool hasFilename = !filename.empty();
@@ -79,7 +79,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, std::filesystem::path filename
         );
     }
 #endif
-    _preprocessor.setFilename(std::move(filename));
+    _preprocessor.setFilename(filename);
     _preprocessor.setDictionary(std::move(dictionary));
 
     if (hasFilename) {
@@ -114,7 +114,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
 
 ShaderObject::ShaderObject(ShaderObject&& rhs) noexcept {
     if (this != &rhs) {
-        _id = std::move(rhs._id);
+        _id = rhs._id;
 
         _type = rhs._type;
         _shaderName = std::move(rhs._shaderName);
@@ -165,7 +165,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
 
 ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) noexcept {
     if (this != &rhs) {
-        _id = std::move(rhs._id);
+        _id = rhs._id;
         _type = rhs._type;
         _shaderName = std::move(rhs._shaderName);
         _loggerCat = std::move(rhs._loggerCat);
@@ -180,7 +180,7 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) noexcept {
 
 void ShaderObject::setName(std::string name) {
     _shaderName = std::move(name);
-    _loggerCat = fmt::format("ShaderObject['{}']", _shaderName);
+    _loggerCat = std::format("ShaderObject['{}']", _shaderName);
 #ifdef GL_VERSION_4_3
     if (glbinding::Binding::ObjectLabel.isResolved()) {
         glObjectLabel(
@@ -204,7 +204,7 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
     _preprocessor.setCallback(_onChangeCallback);
 }
 
-void ShaderObject::setFilename(std::filesystem::path filename) {
+void ShaderObject::setFilename(const std::filesystem::path& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     if (!std::filesystem::is_regular_file(filename)) {
         throw FileNotFoundError(filename.string());
@@ -270,10 +270,10 @@ void ShaderObject::deleteShader() {
 void ShaderObject::compile() {
     glCompileShader(_id);
 
-    GLint compilationStatus;
+    GLint compilationStatus = 0;
     glGetShaderiv(_id, GL_COMPILE_STATUS, &compilationStatus);
     if (static_cast<GLboolean>(compilationStatus) == GL_FALSE) {
-        GLint logLength;
+        GLint logLength = 0;
         glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &logLength);
 
         if (logLength == 0) {
@@ -286,7 +286,7 @@ void ShaderObject::compile() {
 
         std::vector<GLchar> log(logLength);
         glGetShaderInfoLog(_id, logLength, nullptr, log.data());
-        std::string logMessage(log.data());
+        const std::string logMessage = std::string(log.data());
         throw ShaderCompileError(
             logMessage,
             _preprocessor.getFileIdentifiersString(),

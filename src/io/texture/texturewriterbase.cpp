@@ -25,14 +25,14 @@
 
 #include <ghoul/io/texture/texturewriterbase.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 
 namespace ghoul::io {
 
 TextureWriterBase::TextureWriteException::TextureWriteException(std::string name,
                                                                 std::string msg,
                                                                const TextureWriterBase& w)
-    : RuntimeError(fmt::format("Error writing texture '{}'", name), "TextureWriter")
+    : RuntimeError(std::format("Error writing texture '{}'", name), "TextureWriter")
     , filename(std::move(name))
     , errorMessage(std::move(msg))
     , writer(w)

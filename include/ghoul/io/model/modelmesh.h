@@ -71,7 +71,7 @@ public:
 
     void initialize();
     void deinitialize();
-    void render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
+    void render(opengl::ProgramObject& program, const glm::mat4x4& meshTransform,
         bool isFullyTexturedModel = true, bool isProjection = false) const;
     float calculateBoundingRadius(glm::mat4x4& transform) const;
 

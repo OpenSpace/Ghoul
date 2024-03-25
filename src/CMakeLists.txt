@@ -32,7 +32,7 @@ target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_sources(
   Ghoul
   PRIVATE
-    ${PROJECT_SOURCE_DIR}/include/ghoul/fmt.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/format.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/freetype.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/glm.h
@@ -283,7 +283,7 @@ endif ()
 
 
 target_precompile_headers(Ghoul PRIVATE
-  [["ghoul/fmt.h"]]
+  [["ghoul/format.h"]]
   [["ghoul/glm.h"]]
   [["ghoul/misc/assert.h"]]
   [["ghoul/misc/boolean.h"]]

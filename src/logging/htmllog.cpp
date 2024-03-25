@@ -25,19 +25,19 @@
 
 #include <ghoul/logging/htmllog.h>
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/fmt.h>
 #include <iterator>
 
 namespace ghoul::logging {
 
-HTMLLog::HTMLLog(std::string filename, int nLogRotation,
+HTMLLog::HTMLLog(const std::string& filename, int nLogRotation,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
                  const std::vector<std::string>& cssIncludes,
                  const std::vector<std::string>& jsIncludes, LogLevel minimumLogLevel)
     : TextLog(
-        std::move(filename),
+        filename,
         nLogRotation,
         Append::No,
         timeStamping,
@@ -54,7 +54,7 @@ HTMLLog::HTMLLog(std::string filename, int nLogRotation,
         \t\t<title>Log File</title>\
         \t\t<style>\n";
 
-    std::back_insert_iterator<std::string> backInserter(output);
+    const std::back_insert_iterator<std::string> backInserter(output);
 
     for (const std::string& c : cssIncludes) {
         std::ifstream cssInput(c);
@@ -98,7 +98,7 @@ HTMLLog::HTMLLog(std::string filename, int nLogRotation,
     output += "\t\t\t\t<th class=\"log-message\">Message</th>\n\
               \t\t\t</tr>\n\
               \t\t<tbody>\n";
-    writeLine(std::move(output));
+    writeLine(output);
 }
 
 HTMLLog::~HTMLLog() {
@@ -125,13 +125,13 @@ void HTMLLog::log(LogLevel level, std::string_view category, std::string_view me
         output += "</td>\n";
     }
     if (isLogLevelStamping()) {
-        output += fmt::format(
+        output += std::format(
             "\t\t\t\t<td class=\"log-level\">{}</td>\n", to_string(level)
         );
     }
 
     output += "\t\t\t\t<td class=\"log-message\">";
-    for (char c : message) {
+    for (const char c : message) {
         switch (c) {
             case '<':
                 output += "&lt;";
@@ -152,7 +152,7 @@ void HTMLLog::log(LogLevel level, std::string_view category, std::string_view me
     }
 
     output += "</td>\n\t\t\t</tr>\n";
-    writeLine(std::move(output));
+    writeLine(output);
 }
 
 std::string HTMLLog::classForLevel(LogLevel level) {

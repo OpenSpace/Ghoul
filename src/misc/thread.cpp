@@ -106,7 +106,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
     SetPriorityClass(h, convertThreadPriorityClass(priorityClass));
     SetThreadPriority(h, convertThreadPriorityLevel(priorityClass, priorityLevel));
 #else // ^^^^ WIN32 // !WIN32 vvvv
-    int policy;
+    int policy = 0;
     struct sched_param param;
     int res = pthread_getschedparam(t.native_handle(), &policy, &param);
     if (res != 0) {

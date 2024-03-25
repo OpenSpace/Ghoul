@@ -93,7 +93,7 @@ protected:
      *
      * \param level The level that determines the color scheme for the console
      */
-    void setColorForLevel(LogLevel level);
+    static void setColorForLevel(LogLevel level);
 
     /**
      * Resets the console to the default color scheme (*nix) or the color scheme it had

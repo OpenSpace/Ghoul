@@ -50,7 +50,7 @@
 TEST_CASE("CommandlineParser: Unknown Commands Unhandled", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
 
-    std::vector<std::string> argv = {
+    const std::vector<std::string> argv = {
         "tests",
         "-cmd1",
         "arg",
@@ -66,7 +66,7 @@ TEST_CASE("CommandlineParser: Unknown Commands Handled Correctly", "[commandline
 {
     ghoul::cmdparser::CommandlineParser p;
 
-    std::vector<std::string> argv = {
+    const std::vector<std::string> argv = {
         "tests",
         "-cmd1",
         "arg",
@@ -84,7 +84,7 @@ TEST_CASE("CommandlineParser: Unknown Commands Handled Correctly", "[commandline
 TEST_CASE("CommandlineParser: Unknown Commands Interspersed", "[commandlineparser]") {
     ghoul::cmdparser::CommandlineParser p;
 
-    std::vector<std::string> argv = {
+    const std::vector<std::string> argv = {
         "tests",
         "-cmd1",
         "arg",
@@ -123,7 +123,7 @@ TEST_CASE("CommandlineParser: Single Zero Command Arguments", "[commandlineparse
     using T = ghoul::cmdparser::SingleCommandZeroArguments;
     p.addCommand(std::make_unique<T>(v, "-zero"));
 
-    std::vector<std::string> argv = {
+    const std::vector<std::string> argv = {
         "tests",
         "-zero"
     };
@@ -143,7 +143,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Bool", "[commandlinepa
     p.addCommand(std::make_unique<T>(v, "-single"));
 
     SECTION("false") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
@@ -155,7 +155,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Bool", "[commandlinepa
         CHECK_FALSE(*v);
     }
     SECTION("true") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
@@ -179,7 +179,7 @@ TEST_CASE(
     using T = ghoul::cmdparser::SingleCommand<bool>;
     p.addCommand(std::make_unique<T>(v, "-single"));
 
-    std::vector<std::string> argv = {
+    const std::vector<std::string> argv = {
         "tests",
         "-single",
         "0",
@@ -205,7 +205,7 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
     p.addCommand(std::make_unique<T>(v3, "-cmd3"));
 
     SECTION("123") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-cmd1",
             "1",
@@ -226,7 +226,7 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
     }
 
     SECTION("213") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-cmd2",
             "2",
@@ -247,7 +247,7 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
     }
 
     SECTION("321") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-cmd3",
             "3",
@@ -268,7 +268,7 @@ TEST_CASE("CommandlineParser: Multiple Commands Permutation", "[commandlineparse
     }
 
     SECTION("312") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-cmd3",
             "3",
@@ -297,7 +297,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Int", "[commandlinepar
     p.addCommand(std::make_unique<T>(v, "-single"));
 
     SECTION("1") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
@@ -309,7 +309,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument Int", "[commandlinepar
         CHECK(*v == 1);
     }
     SECTION("2") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
@@ -331,7 +331,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument String", "[commandline
     p.addCommand(std::make_unique<T>(v, "-single"));
 
     SECTION("foo") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo"
@@ -344,7 +344,7 @@ TEST_CASE("CommandlineParser: Single Command One Argument String", "[commandline
     }
 
     SECTION("bar") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar"
@@ -369,7 +369,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -384,7 +384,7 @@ TEST_CASE(
         CHECK_FALSE(*v2);
     }
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -399,7 +399,7 @@ TEST_CASE(
         CHECK_FALSE(*v2);
     }
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -414,7 +414,7 @@ TEST_CASE(
         CHECK(*v2);
     }
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -441,7 +441,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -456,7 +456,7 @@ TEST_CASE(
         CHECK(*v2 == 0);
     }
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -471,7 +471,7 @@ TEST_CASE(
         CHECK(*v2 == 0);
     }
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -486,7 +486,7 @@ TEST_CASE(
         CHECK(*v2 == 1);
     }
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -514,7 +514,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -530,7 +530,7 @@ TEST_CASE(
     }
     
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -545,7 +545,7 @@ TEST_CASE(
         CHECK(*v2 == "0");
     }
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -560,7 +560,7 @@ TEST_CASE(
         CHECK(*v2 == "1");
     }
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -588,7 +588,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -603,7 +603,7 @@ TEST_CASE(
         CHECK(*v2 == 0);
     }
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -618,7 +618,7 @@ TEST_CASE(
         CHECK(*v2 == 0);
     }
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -633,7 +633,7 @@ TEST_CASE(
         CHECK(*v2 == 1);
     }
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -660,7 +660,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -675,7 +675,7 @@ TEST_CASE(
         CHECK_FALSE(*v2);
     }
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -690,7 +690,7 @@ TEST_CASE(
         CHECK_FALSE(*v2);
     }
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -705,7 +705,7 @@ TEST_CASE(
         CHECK(*v2);
     }
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -733,7 +733,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -748,7 +748,7 @@ TEST_CASE(
         CHECK(*v2 == "0");
     }
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -763,7 +763,7 @@ TEST_CASE(
         CHECK(*v2 == "0");
     }
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -778,7 +778,7 @@ TEST_CASE(
         CHECK(*v2 == "1");
     }
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -806,7 +806,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -821,7 +821,7 @@ TEST_CASE(
         CHECK(*v2 == 0);
     }
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -836,7 +836,7 @@ TEST_CASE(
         CHECK(*v2 == 0);
     }
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -851,7 +851,7 @@ TEST_CASE(
         CHECK(*v2 == 1);
     }
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -880,7 +880,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, v3, "-single"));
 
     SECTION("000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -898,7 +898,7 @@ TEST_CASE(
         CHECK(*v3 == "0");
     }
     SECTION("100") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -916,7 +916,7 @@ TEST_CASE(
         CHECK(*v3 == "0");
     }
     SECTION("010") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -934,7 +934,7 @@ TEST_CASE(
         CHECK(*v3 == "0");
     }
     SECTION("110") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -953,7 +953,7 @@ TEST_CASE(
     }
 
     SECTION("001") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -971,7 +971,7 @@ TEST_CASE(
         CHECK(*v3 == "1");
     }
     SECTION("101") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -989,7 +989,7 @@ TEST_CASE(
         CHECK(*v3 == "1");
     }
     SECTION("011") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1007,7 +1007,7 @@ TEST_CASE(
         CHECK(*v3 == "1");
     }
     SECTION("111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1041,7 +1041,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, v3, v4, "-single"));
 
     SECTION("0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1062,7 +1062,7 @@ TEST_CASE(
         CHECK(*v4 == 0.f);
     }
     SECTION("1000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1083,7 +1083,7 @@ TEST_CASE(
         CHECK(*v4 == 0.f);
     }
     SECTION("0100") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1104,7 +1104,7 @@ TEST_CASE(
         CHECK(*v4 == 0.f);
     }
     SECTION("1100") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1126,7 +1126,7 @@ TEST_CASE(
     }
 
     SECTION("0010") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1147,7 +1147,7 @@ TEST_CASE(
         CHECK(*v4 == 0.f);
     }
     SECTION("1010") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1168,7 +1168,7 @@ TEST_CASE(
         CHECK(*v4 == 0.f);
     }
     SECTION("0110") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1189,7 +1189,7 @@ TEST_CASE(
         CHECK(*v4 == 0.f);
     }
     SECTION("1110") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1211,7 +1211,7 @@ TEST_CASE(
     }
 
     SECTION("0001") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1232,7 +1232,7 @@ TEST_CASE(
         CHECK(*v4 == 1.f);
     }
     SECTION("1001") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1253,7 +1253,7 @@ TEST_CASE(
         CHECK(*v4 == 1.f);
     }
     SECTION("0101") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1274,7 +1274,7 @@ TEST_CASE(
         CHECK(*v4 == 1.f);
     }
     SECTION("1101") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1296,7 +1296,7 @@ TEST_CASE(
     }
 
     SECTION("0011") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1317,7 +1317,7 @@ TEST_CASE(
         CHECK(*v4 == 1.f);
     }
     SECTION("1011") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1338,7 +1338,7 @@ TEST_CASE(
         CHECK(*v4 == 1.f);
     }
     SECTION("0111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1359,7 +1359,7 @@ TEST_CASE(
         CHECK(*v4 == 1.f);
     }
     SECTION("1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1392,7 +1392,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v, "-zero"));
 
     SECTION("zero zero") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-zero",
             "-zero"
@@ -1404,7 +1404,7 @@ TEST_CASE(
     }
 
     SECTION("6x zero") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-zero",
             "-zero",
@@ -1429,7 +1429,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
     p.addCommand(std::make_unique<T>(v, "-single"));
 
     SECTION("0") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
@@ -1442,7 +1442,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
     }
 
     SECTION("1") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
@@ -1455,7 +1455,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
     }
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1471,7 +1471,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1487,7 +1487,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1503,7 +1503,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Bool", "[commandline
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1527,7 +1527,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
     p.addCommand(std::make_unique<T>(v, "-single"));
 
     SECTION("1") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1"
@@ -1540,7 +1540,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
     }
 
     SECTION("0") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0"
@@ -1553,7 +1553,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1569,7 +1569,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
     }
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1585,7 +1585,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1601,7 +1601,7 @@ TEST_CASE("CommandlineParser: Multiple Command One Argument Int", "[commandlinep
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1628,7 +1628,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v, "-single"));
 
     SECTION("foo") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo"
@@ -1641,7 +1641,7 @@ TEST_CASE(
     }
 
     SECTION("bar") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar"
@@ -1654,7 +1654,7 @@ TEST_CASE(
     }
 
     SECTION("foo foo") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo",
@@ -1670,7 +1670,7 @@ TEST_CASE(
     }
 
     SECTION("bar foo") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar",
@@ -1686,7 +1686,7 @@ TEST_CASE(
     }
 
     SECTION("foo bar") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "foo",
@@ -1702,7 +1702,7 @@ TEST_CASE(
     }
 
     SECTION("bar bar") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "bar",
@@ -1730,7 +1730,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1746,7 +1746,7 @@ TEST_CASE(
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1762,7 +1762,7 @@ TEST_CASE(
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1778,7 +1778,7 @@ TEST_CASE(
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1794,7 +1794,7 @@ TEST_CASE(
     }
 
     SECTION("00 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1815,7 +1815,7 @@ TEST_CASE(
     }
 
     SECTION("10 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1836,7 +1836,7 @@ TEST_CASE(
     }
 
     SECTION("01 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1857,7 +1857,7 @@ TEST_CASE(
     }
 
     SECTION("11 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1878,7 +1878,7 @@ TEST_CASE(
     }
 
     SECTION("00 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1899,7 +1899,7 @@ TEST_CASE(
     }
 
     SECTION("10 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1920,7 +1920,7 @@ TEST_CASE(
     }
 
     SECTION("01 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1941,7 +1941,7 @@ TEST_CASE(
     }
 
     SECTION("11 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -1975,7 +1975,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -1991,7 +1991,7 @@ TEST_CASE(
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2007,7 +2007,7 @@ TEST_CASE(
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2023,7 +2023,7 @@ TEST_CASE(
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2039,7 +2039,7 @@ TEST_CASE(
     }
 
     SECTION("00 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2060,7 +2060,7 @@ TEST_CASE(
     }
 
     SECTION("10 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2081,7 +2081,7 @@ TEST_CASE(
     }
 
     SECTION("01 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2102,7 +2102,7 @@ TEST_CASE(
     }
 
     SECTION("11 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2123,7 +2123,7 @@ TEST_CASE(
     }
 
     SECTION("00 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2144,7 +2144,7 @@ TEST_CASE(
     }
 
     SECTION("10 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2165,7 +2165,7 @@ TEST_CASE(
     }
 
     SECTION("01 11"){
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2186,7 +2186,7 @@ TEST_CASE(
     }
 
     SECTION("11 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2220,7 +2220,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2236,7 +2236,7 @@ TEST_CASE(
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2252,7 +2252,7 @@ TEST_CASE(
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2268,7 +2268,7 @@ TEST_CASE(
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2284,7 +2284,7 @@ TEST_CASE(
     }
 
     SECTION("00 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2305,7 +2305,7 @@ TEST_CASE(
     }
 
     SECTION("10 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2326,7 +2326,7 @@ TEST_CASE(
     }
 
     SECTION("01 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2347,7 +2347,7 @@ TEST_CASE(
     }
 
     SECTION("11 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2368,7 +2368,7 @@ TEST_CASE(
     }
 
     SECTION("00 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2389,7 +2389,7 @@ TEST_CASE(
     }
 
     SECTION("10 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2410,7 +2410,7 @@ TEST_CASE(
     }
 
     SECTION("01 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2431,7 +2431,7 @@ TEST_CASE(
     }
 
     SECTION("11 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2465,7 +2465,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2481,7 +2481,7 @@ TEST_CASE(
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2497,7 +2497,7 @@ TEST_CASE(
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2513,7 +2513,7 @@ TEST_CASE(
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2529,7 +2529,7 @@ TEST_CASE(
     }
 
     SECTION("00 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2550,7 +2550,7 @@ TEST_CASE(
     }
 
     SECTION("10 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2571,7 +2571,7 @@ TEST_CASE(
     }
 
     SECTION("01 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2592,7 +2592,7 @@ TEST_CASE(
     }
 
     SECTION("11 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2613,7 +2613,7 @@ TEST_CASE(
     }
 
     SECTION("00 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2634,7 +2634,7 @@ TEST_CASE(
     }
 
     SECTION("10 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2655,7 +2655,7 @@ TEST_CASE(
     }
 
     SECTION("01 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2676,7 +2676,7 @@ TEST_CASE(
     }
 
     SECTION("11 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2710,7 +2710,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2726,7 +2726,7 @@ TEST_CASE(
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2742,7 +2742,7 @@ TEST_CASE(
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2758,7 +2758,7 @@ TEST_CASE(
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2774,7 +2774,7 @@ TEST_CASE(
     }
 
     SECTION("00 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2795,7 +2795,7 @@ TEST_CASE(
     }
 
     SECTION("10 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2816,7 +2816,7 @@ TEST_CASE(
     }
 
     SECTION("01 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2837,7 +2837,7 @@ TEST_CASE(
     }
 
     SECTION("11 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2858,7 +2858,7 @@ TEST_CASE(
     }
 
     SECTION("00 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2879,7 +2879,7 @@ TEST_CASE(
     }
 
     SECTION("10 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2900,7 +2900,7 @@ TEST_CASE(
     }
 
     SECTION("01 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2921,7 +2921,7 @@ TEST_CASE(
     }
 
     SECTION("11 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2955,7 +2955,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -2971,7 +2971,7 @@ TEST_CASE(
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -2987,7 +2987,7 @@ TEST_CASE(
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3003,7 +3003,7 @@ TEST_CASE(
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3019,7 +3019,7 @@ TEST_CASE(
     }
 
     SECTION("00 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3040,7 +3040,7 @@ TEST_CASE(
     }
 
     SECTION("10 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3061,7 +3061,7 @@ TEST_CASE(
     }
 
     SECTION("01 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3082,7 +3082,7 @@ TEST_CASE(
     }
 
     SECTION("11 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3103,7 +3103,7 @@ TEST_CASE(
     }
 
     SECTION("00 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3124,7 +3124,7 @@ TEST_CASE(
     }
 
     SECTION("10 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3145,7 +3145,7 @@ TEST_CASE(
     }
 
     SECTION("01 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3166,7 +3166,7 @@ TEST_CASE(
     }
 
     SECTION("11 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3200,7 +3200,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, "-single"));
 
     SECTION("00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3216,7 +3216,7 @@ TEST_CASE(
     }
 
     SECTION("10") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3232,7 +3232,7 @@ TEST_CASE(
     }
 
     SECTION("01") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3248,7 +3248,7 @@ TEST_CASE(
     }
 
     SECTION("11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3264,7 +3264,7 @@ TEST_CASE(
     }
 
     SECTION("00 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3285,7 +3285,7 @@ TEST_CASE(
     }
 
     SECTION("10 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3306,7 +3306,7 @@ TEST_CASE(
     }
 
     SECTION("01 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3327,7 +3327,7 @@ TEST_CASE(
     }
 
     SECTION("11 00") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3348,7 +3348,7 @@ TEST_CASE(
     }
 
     SECTION("00 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3369,7 +3369,7 @@ TEST_CASE(
     }
 
     SECTION("10 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3390,7 +3390,7 @@ TEST_CASE(
     }
 
     SECTION("01 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3411,7 +3411,7 @@ TEST_CASE(
     }
 
     SECTION("11 11") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3446,7 +3446,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, v3, "-single"));
 
     SECTION("000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3465,7 +3465,7 @@ TEST_CASE(
     }
 
     SECTION("100") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3484,7 +3484,7 @@ TEST_CASE(
     }
 
     SECTION("010") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3503,7 +3503,7 @@ TEST_CASE(
     }
 
     SECTION("110") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3522,7 +3522,7 @@ TEST_CASE(
     }
 
     SECTION("001") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3541,7 +3541,7 @@ TEST_CASE(
     }
 
     SECTION("101") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3560,7 +3560,7 @@ TEST_CASE(
     }
 
     SECTION("011") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3579,7 +3579,7 @@ TEST_CASE(
     }
 
     SECTION("111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3598,7 +3598,7 @@ TEST_CASE(
     }
 
     SECTION("000 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3624,7 +3624,7 @@ TEST_CASE(
     }
 
     SECTION("100 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3650,7 +3650,7 @@ TEST_CASE(
     }
 
     SECTION("010 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3676,7 +3676,7 @@ TEST_CASE(
     }
 
     SECTION("110 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3702,7 +3702,7 @@ TEST_CASE(
     }
 
     SECTION("001 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3728,7 +3728,7 @@ TEST_CASE(
     }
 
     SECTION("101 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3754,7 +3754,7 @@ TEST_CASE(
     }
 
     SECTION("011 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3780,7 +3780,7 @@ TEST_CASE(
     }
 
     SECTION("111 000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3806,7 +3806,7 @@ TEST_CASE(
     }
 
     SECTION("000 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3832,7 +3832,7 @@ TEST_CASE(
     }
 
     SECTION("100 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3858,7 +3858,7 @@ TEST_CASE(
     }
 
     SECTION("010 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3884,7 +3884,7 @@ TEST_CASE(
     }
 
     SECTION("110 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3910,7 +3910,7 @@ TEST_CASE(
     }
 
     SECTION("001 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3936,7 +3936,7 @@ TEST_CASE(
     }
 
     SECTION("101 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -3962,7 +3962,7 @@ TEST_CASE(
     }
 
     SECTION("011 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -3988,7 +3988,7 @@ TEST_CASE(
     }
 
     SECTION("111 111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4029,7 +4029,7 @@ TEST_CASE(
     p.addCommand(std::make_unique<T>(v1, v2, v3, v4, "-single"));
 
     SECTION("0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4051,7 +4051,7 @@ TEST_CASE(
     }
 
     SECTION("1000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4073,7 +4073,7 @@ TEST_CASE(
     }
 
     SECTION("0100") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4095,7 +4095,7 @@ TEST_CASE(
     }
 
     SECTION("1100") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4117,7 +4117,7 @@ TEST_CASE(
     }
 
     SECTION("0010") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4139,7 +4139,7 @@ TEST_CASE(
     }
 
     SECTION("1010") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4161,7 +4161,7 @@ TEST_CASE(
     }
 
     SECTION("0110") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4183,7 +4183,7 @@ TEST_CASE(
     }
 
     SECTION("1110") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4205,7 +4205,7 @@ TEST_CASE(
     }
 
     SECTION("0001") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4227,7 +4227,7 @@ TEST_CASE(
     }
 
     SECTION("1001") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4249,7 +4249,7 @@ TEST_CASE(
     }
 
     SECTION("0101") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4271,7 +4271,7 @@ TEST_CASE(
     }
 
     SECTION("1101") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4293,7 +4293,7 @@ TEST_CASE(
     }
 
     SECTION("0011") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4315,7 +4315,7 @@ TEST_CASE(
     }
 
     SECTION("1011") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4337,7 +4337,7 @@ TEST_CASE(
     }
 
     SECTION("0111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4359,7 +4359,7 @@ TEST_CASE(
     }
 
     SECTION("1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4381,7 +4381,7 @@ TEST_CASE(
     }
 
     SECTION("0000 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4412,7 +4412,7 @@ TEST_CASE(
     }
 
     SECTION("1000 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4443,7 +4443,7 @@ TEST_CASE(
     }
 
     SECTION("0100 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4474,7 +4474,7 @@ TEST_CASE(
     }
 
     SECTION("1100 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4505,7 +4505,7 @@ TEST_CASE(
     }
 
     SECTION("0010 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4536,7 +4536,7 @@ TEST_CASE(
     }
 
     SECTION("1010 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4567,7 +4567,7 @@ TEST_CASE(
     }
 
     SECTION("0110 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4598,7 +4598,7 @@ TEST_CASE(
     }
 
     SECTION("1110 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4629,7 +4629,7 @@ TEST_CASE(
     }
 
     SECTION("0001 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4660,7 +4660,7 @@ TEST_CASE(
     }
 
     SECTION("1001 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4691,7 +4691,7 @@ TEST_CASE(
     }
 
     SECTION("0101 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4722,7 +4722,7 @@ TEST_CASE(
     }
 
     SECTION("1101 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4753,7 +4753,7 @@ TEST_CASE(
     }
 
     SECTION("0011 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4784,7 +4784,7 @@ TEST_CASE(
     }
 
     SECTION("1011 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4815,7 +4815,7 @@ TEST_CASE(
     }
 
     SECTION("0111 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4846,7 +4846,7 @@ TEST_CASE(
     }
 
     SECTION("1111 0000") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4877,7 +4877,7 @@ TEST_CASE(
     }
 
     SECTION("0000 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4908,7 +4908,7 @@ TEST_CASE(
     }
 
     SECTION("1000 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -4939,7 +4939,7 @@ TEST_CASE(
     }
 
     SECTION("0100 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -4970,7 +4970,7 @@ TEST_CASE(
     }
 
     SECTION("1100 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5001,7 +5001,7 @@ TEST_CASE(
     }
 
     SECTION("0010 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5032,7 +5032,7 @@ TEST_CASE(
     }
 
     SECTION("1010 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5063,7 +5063,7 @@ TEST_CASE(
     }
 
     SECTION("0110 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5094,7 +5094,7 @@ TEST_CASE(
     }
 
     SECTION("1110 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5125,7 +5125,7 @@ TEST_CASE(
     }
 
     SECTION("0001 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5156,7 +5156,7 @@ TEST_CASE(
     }
 
     SECTION("1001 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5187,7 +5187,7 @@ TEST_CASE(
     }
 
     SECTION("0101 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5218,7 +5218,7 @@ TEST_CASE(
     }
 
     SECTION("1101 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5249,7 +5249,7 @@ TEST_CASE(
     }
 
     SECTION("0011 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5280,7 +5280,7 @@ TEST_CASE(
     }
 
     SECTION("1011 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",
@@ -5311,7 +5311,7 @@ TEST_CASE(
     }
 
     SECTION("0111 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "0",
@@ -5342,7 +5342,7 @@ TEST_CASE(
     }
 
     SECTION("1111 1111") {
-        std::vector<std::string> argv = {
+        const std::vector<std::string> argv = {
             "tests",
             "-single",
             "1",

@@ -23,7 +23,7 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/glm.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/assert.h>
@@ -54,7 +54,7 @@ template <typename T> struct is_vector : std::false_type {};
 template <typename T> struct is_vector<std::vector<T>> : std::true_type {};
 
 template <typename T> struct is_array : std::false_type {};
-template <typename T, std::size_t N>
+template <typename T, size_t N>
 struct is_array<std::array<T, N>> : std::true_type {};
 
 template <typename T> struct is_tuple : std::false_type {};
@@ -181,7 +181,7 @@ constexpr Variant variantValue(lua_State* L, int location) {
     else {
         // We have reached the end of the variant list and haven't found the type in
         // here, so we're done
-        throw LuaFormatException(fmt::format(
+        throw LuaFormatException(std::format(
             "Unable to extract requested value '{}' out of the variant with type '{}' at "
             "parameter {}", typeid(T).name(), typeid(Variant).name(), location
         ));
@@ -398,7 +398,7 @@ void push(lua_State* L, T value) {
                        std::is_same_v<T, std::vector<float>>)
     {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushnumber(L, std::move(value[i]));
             lua_settable(L, -3);
@@ -406,7 +406,7 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (std::is_same_v<T, std::vector<int>>) {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushinteger(L, std::move(value[i]));
             lua_settable(L, -3);
@@ -414,7 +414,7 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (std::is_same_v<T, std::vector<const char*>>) {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushstring(L, value[i]);
             lua_settable(L, -3);
@@ -422,7 +422,7 @@ void push(lua_State* L, T value) {
     }
     else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
         lua_newtable(L);
-        for (size_t i = 0; i < value.size(); ++i) {
+        for (size_t i = 0; i < value.size(); i++) {
             lua_pushinteger(L, i + 1);
             lua_pushstring(L, value[i].c_str());
             lua_settable(L, -3);
@@ -434,7 +434,7 @@ void push(lua_State* L, T value) {
     else if constexpr (isGlmVector<T>()) {
         lua_newtable(L);
         int number = 1;
-        for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; ++i) {
+        for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; i++) {
             lua_pushnumber(L, static_cast<lua_Number>(value[i]));
             lua_rawseti(L, -2, number);
             ++number;
@@ -443,8 +443,8 @@ void push(lua_State* L, T value) {
     else if constexpr (isGlmMatrix<T>()) {
         lua_newtable(L);
         int number = 1;
-        for (glm::length_t i = 0; i < T::type::row_type::length(); ++i) {
-            for (glm::length_t j = 0; j < T::type::col_type::length(); ++j) {
+        for (glm::length_t i = 0; i < T::type::row_type::length(); i++) {
+            for (glm::length_t j = 0; j < T::type::col_type::length(); j++) {
                 lua_pushnumber(L, static_cast<lua_Number>(value[i][j]));
                 lua_rawseti(L, -2, number);
                 ++number;
@@ -580,7 +580,7 @@ T valueInner(lua_State* L, int location) {
     if (!hasValue<T>(L, location)) {
         std::string name = Name<T>();
         // If we get this far, none of the previous return statements were hit
-        std::string error = fmt::format(
+        std::string error = std::format(
             "Expected type '{}' for parameter {} but got wrong type '{}' instead",
             name, location, luaTypeToString(lua_type(L, location))
         );
@@ -878,7 +878,7 @@ T valueInner(lua_State* L, int location) {
             // The list of values that was passed in was of different length then what was
             // requested out of it
             std::string name = Name<T>();
-            std::string error = fmt::format(
+            std::string error = std::format(
                 "Expected '{}' values for '{}' but got '{}' instead",
                 res.size(), name, r.size()
             );
@@ -1040,7 +1040,7 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location, PopValue shouldPo
     internal::extractValues(L, result, location, n, argumentsFound);
 
     if (shouldPopValue) {
-        for (int i = 0; i < argumentsFound; ++i) {
+        for (int i = 0; i < argumentsFound; i++) {
             lua_remove(L, location);
         }
     }

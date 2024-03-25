@@ -25,7 +25,7 @@
 
 #include <ghoul/io/texture/texturereadercmap.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stringhelper.h>
@@ -42,8 +42,9 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     if (nDimensions != 1) {
-        throw ghoul::RuntimeError(fmt::format(
-            "The number of dimensions for {} must be 1, but was {}", filename, nDimensions
+        throw ghoul::RuntimeError(std::format(
+            "The number of dimensions for '{}' must be 1, but was {}",
+            filename, nDimensions
         ));
     }
 
@@ -93,7 +94,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             delete[] values;
             throw TextureLoadException(
                 filename,
-                fmt::format("Header assured '{}' values but more were found", width),
+                std::format("Header assured '{}' values but more were found", width),
                 this
             );
         }
@@ -108,19 +109,19 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         delete[] values;
         throw TextureLoadException(
             filename,
-            fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
+            std::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
             this
         );
     }
 
-    GLenum type = [](int d) {
+    const GLenum type = [](int d) {
         switch (d) {
             case 1: return GL_TEXTURE_1D;
             case 2: return GL_TEXTURE_2D;
             case 3: return GL_TEXTURE_3D;
             default:
-                throw ghoul::RuntimeError(fmt::format(
-                    "Unsupported dimensionality {}", d
+                throw ghoul::RuntimeError(std::format(
+                    "Unsupported dimensionality '{}'", d
                 ));
         }
     }(nDimensions);

@@ -118,7 +118,7 @@ std::string replaceAll(std::string string, const std::string& from,
         string.replace(pos, from.length(), to);
 
         // In case 'to' contains 'from', ex replacing 'x' with 'yx'
-        size_t offset = pos + to.length();
+        const size_t offset = pos + to.length();
         pos = string.find(from, offset);
     }
     return string;

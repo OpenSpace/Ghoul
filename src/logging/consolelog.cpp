@@ -25,8 +25,8 @@
 
 #include <ghoul/logging/consolelog.h>
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/fmt.h>
 #include <iostream>
 #include <string_view>
 
@@ -79,7 +79,8 @@ ConsoleLog::ConsoleLog(ColorOutput colorOutput, LogLevel minimumLogLevel)
     , _colorOutput(colorOutput)
 {}
 
-void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view msg) {
+void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view message)
+{
     constexpr int CategoryLength = 20;
     constexpr char FillerCharacter = ' ';
 
@@ -92,7 +93,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
     //  3  20                message.size()
     // + 2 for spaces in between
 
-    const int totalLength = 5 + CategoryLength + static_cast<int>(msg.size());
+    const int totalLength = 5 + CategoryLength + static_cast<int>(message.size());
 
     std::string res;
     res.reserve(totalLength);
@@ -125,9 +126,9 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
         // shorterstillinthisline ->
         // shorterstillin..line
 
-        size_t nDots = std::min<size_t>(category.length() - CategoryLength, 2);
+        const size_t nDots = std::min<size_t>(category.length() - CategoryLength, 2);
         // 20(length) - 4(remaining four characters at the end) - number of dots
-        res += fmt::format(
+        res += std::format(
             "{}{}{} ",
             category.substr(0, CategoryLength - 4 - nDots),
             std::string(nDots, '.'),
@@ -135,8 +136,8 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
         );
     }
 
-    res += msg;
-    std::cout << std::move(res) << '\n';
+    res += message;
+    std::cout << res << '\n';
 
 
     if (_colorOutput) {

@@ -26,7 +26,7 @@
 #include <ghoul/io/model/modelmesh.h>
 
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/io/texture/texturereader.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/programobject.h>
@@ -53,7 +53,7 @@ ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> ind
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
-    , _isInvisible(std::move(isInvisible))
+    , _isInvisible(isInvisible)
 {}
 
 void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
@@ -63,7 +63,7 @@ void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
     texture.type = ModelMesh::TextureType::ColorDiffuse;
 }
 
-void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
+void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTransform,
                        bool isFullyTexturedModel, bool isProjection) const
 {
     // Count how many textures have image textures
@@ -98,7 +98,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
                     break;
                 }
 
-                std::string name = textureTypeToString(texture.type);
+                const std::string name = textureTypeToString(texture.type);
                 // Use texture or color
                 if (texture.hasTexture) {
                     // Activate proper texture unit before binding
@@ -174,7 +174,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
 
     // Transform mesh
     program.setUniform("meshTransform", meshTransform);
-    glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
+    const glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
     program.setUniform("meshNormalTransform", glm::mat4(normalTransform));
 
     // Render the mesh object

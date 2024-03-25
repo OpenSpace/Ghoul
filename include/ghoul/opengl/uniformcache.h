@@ -232,8 +232,7 @@ struct UniformCacheBase {};
     }
 
 #define UniformCache26(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
-                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25,                 \
-                       v26)                                                              \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26)            \
     struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
@@ -242,8 +241,7 @@ struct UniformCacheBase {};
     }
 
 #define UniformCache27(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
-                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25,                 \
-                       v26, v27)                                                         \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27)       \
     struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
@@ -252,8 +250,7 @@ struct UniformCacheBase {};
     }
 
 #define UniformCache28(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
-                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25,                 \
-                       v26, v27, v28)                                                    \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28)  \
     struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
@@ -261,8 +258,8 @@ struct UniformCacheBase {};
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1;        \
     }
 #define UniformCache29(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
-                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25,                 \
-                       v26, v27, v28, v29)                                               \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                        v29)                                                             \
     struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
@@ -271,8 +268,8 @@ struct UniformCacheBase {};
             v29 = -1;                                                                    \
     }
 #define UniformCache30(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
-                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25,                 \
-                       v26, v27, v28, v29, v30)                                          \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30)                                                         \
     struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
@@ -281,8 +278,8 @@ struct UniformCacheBase {};
             v29 = -1, v30 = -1;                                                          \
     }
 #define UniformCache31(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
-                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25,                 \
-                       v26, v27, v28, v29, v30, v31)                                     \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31)                                                    \
     struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
@@ -291,14 +288,99 @@ struct UniformCacheBase {};
             v29 = -1, v30 = -1, v31 = -1;                                                \
     }
 #define UniformCache32(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
-                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25,                 \
-                       v26, v27, v28, v29, v30, v31, v32)                                \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32)                                               \
     struct : public UniformCacheBase {                                                   \
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1;                                      \
+    }
+#define UniformCache33(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33)                                          \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1;                            \
+    }
+#define UniformCache34(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33, v34)                                     \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1;                  \
+    }
+#define UniformCache35(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33, v34, v35)                                \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1;        \
+    }
+#define UniformCache36(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33, v34, v35, v36)                           \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
+            v36 = -1;                                                                    \
+    }
+#define UniformCache37(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33, v34, v35, v36, v37)                      \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
+            v36 = -1, v37 = -1;                                                          \
+    }
+#define UniformCache38(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33, v34, v35, v36, v37, v38)                 \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
+            v36 = -1, v37 = -1, v38 = -1;                                                \
+    }
+#define UniformCache39(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39)            \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
+            v36 = -1, v37 = -1, v38 = -1, v39 = -1;                                      \
+    }
+#define UniformCache40(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
+                       v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
+                       v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40)       \
+    struct : public UniformCacheBase {                                                   \
+        int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
+             v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
+            v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
+            v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
+            v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
+            v36 = -1, v37 = -1, v38 = -1, v39 = -1, v40 = -1;                            \
     }
 
 namespace ghoul::opengl {
@@ -325,7 +407,7 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
     constexpr int nValues = sizeof(T) / sizeof(int);
 
     int* uniformLocations = reinterpret_cast<int*>(&uniformCache);
-    for (int i = 0; i < nValues; ++i) {
+    for (int i = 0; i < nValues; i++) {
         // We skip empty uniform names
         if (uniformNames[i]) {
             uniformLocations[i] = program.uniformLocation(uniformNames[i]);
@@ -340,12 +422,15 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
 #define EXPAND(x) x
 #define GET_MACRO( _1,  _2,  _3,  _4,  _5,  _6,  _7,  _8,  _9, _10, _11, _12, _13, _14,  \
                   _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28,  \
-                  _29, _30, _31, _32, NAME, ...) NAME
+                  _29, _30, _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, NAME, ...) \
+                  NAME
 
 #define UniformCache(...)                                                                \
     EXPAND(                                                                              \
         GET_MACRO(                                                                       \
             __VA_ARGS__,                                                                 \
+            UniformCache40, UniformCache39, UniformCache38, UniformCache37,              \
+            UniformCache36, UniformCache35, UniformCache34, UniformCache33,              \
             UniformCache32, UniformCache31, UniformCache30, UniformCache29,              \
             UniformCache28, UniformCache27, UniformCache26, UniformCache25,              \
             UniformCache24, UniformCache23, UniformCache22, UniformCache21,              \

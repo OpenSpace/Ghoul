@@ -25,7 +25,7 @@
 
 #include "ghoul/systemcapabilities/openglcapabilitiescomponent.h"
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
@@ -99,7 +99,7 @@ void OpenGLCapabilitiesComponent::detectGPUVendor() {
         _vendor = Vendor::Intel;
     }
     else {
-        LINFO(fmt::format(
+        LINFO(std::format(
             "Vendor of graphics card is not in the enum 'Vendor'. Vendor information: {}",
             _glslCompiler
         ));
@@ -112,12 +112,12 @@ void OpenGLCapabilitiesComponent::detectGLRenderer() {
 }
 
 void OpenGLCapabilitiesComponent::detectExtensions() {
-    GLint nExtensions;
+    GLint nExtensions = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &nExtensions);
-    for (GLint i = 0; i < nExtensions; ++i) {
+    for (GLint i = 0; i < nExtensions; i++) {
         const GLubyte* ext = glGetStringi(GL_EXTENSIONS, i);
         if (ext) {
-            std::string extension = std::string(reinterpret_cast<const char*>(ext));
+            const std::string extension = reinterpret_cast<const char*>(ext);
             _extensions.push_back(extension);
         }
     }
@@ -130,7 +130,7 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
     std::string date;
     queryWMI("Win32_VideoController", "DriverDate", date);
 
-    _driverDate = fmt::format(
+    _driverDate = std::format(
         "{}-{}-{}", date.substr(0, 4), date.substr(4, 2), date.substr(6, 2)
     );
 
@@ -204,7 +204,7 @@ OpenGLCapabilitiesComponent::capabilities() const
 
     std::stringstream s;
     if (!_extensions.empty()) {
-        for (size_t i = 0; i < _extensions.size() - 1; ++i) {
+        for (size_t i = 0; i < _extensions.size() - 1; i++) {
             s << _extensions[i] << ", ";
         }
         s << _extensions[_extensions.size() - 1] << "\n";

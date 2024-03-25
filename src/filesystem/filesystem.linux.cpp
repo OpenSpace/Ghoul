@@ -27,9 +27,9 @@
 
 #include <ghoul/filesystem/filesystem.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
@@ -75,9 +75,9 @@ int FileSystem::addFileListener(std::filesystem::path path,
 {
 
     const std::string filename = path.string();
-    int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
+    const int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
 
-    int idx = FileChangeInfo::NextIdentifier;
+    const int idx = FileChangeInfo::NextIdentifier;
 
     FileChangeInfo info;
     info.identifier = idx;
@@ -98,11 +98,11 @@ void FileSystem::removeFileListener(int callbackIdentifier) {
         }
     }
 
-    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
+    LWARNING(std::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void FileSystem::inotifyWatcher() {
-    int fd = FileSys._inotifyHandle;
+    const int fd = FileSys._inotifyHandle;
     char buffer[BufferLength];
     struct timeval tv;
     tv.tv_sec = 1;
@@ -127,7 +127,7 @@ void FileSystem::inotifyWatcher() {
                 case IN_MODIFY:
                 case IN_ATTRIB:
                 {
-                    int wd = e->wd;
+                    const int wd = e->wd;
                     for (const FileChangeInfo& info : FileSys._trackedFiles) {
                         if (info.inotifyHandle == wd) {
                             info.callback();
@@ -137,7 +137,7 @@ void FileSystem::inotifyWatcher() {
                 }
                 case IN_IGNORED:
                 {
-                    int wd = e->wd;
+                    const int wd = e->wd;
 
                     // remove tracking of the removed descriptor
                     inotify_rm_watch(fd, wd);

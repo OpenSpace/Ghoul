@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/easing.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <array>
 #include <string_view>
 
@@ -53,12 +53,12 @@ std::string_view nameForEasingFunction(EasingFunction func) {
 }
 
 EasingFunction easingFunctionFromName(std::string_view name) {
-    for (size_t i = 0; i < EaseFuncNames.size(); ++i) {
+    for (size_t i = 0; i < EaseFuncNames.size(); i++) {
         if (EaseFuncNames[i] == name) {
             return EasingFunction(i);
         }
     }
-    throw std::invalid_argument(fmt::format(
+    throw std::invalid_argument(std::format(
         "Could not find easing function with name '{}'", name
     ));
 }

@@ -25,9 +25,9 @@
 
 #include <ghoul/io/texture/texturewriter.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/format.h>
 #include <ghoul/io/texture/texturewriterbase.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
@@ -38,7 +38,7 @@ using std::string;
 namespace ghoul::io {
 
 TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
-    : RuntimeError(fmt::format("No writer was found for extension '{}'", extension), "IO")
+    : RuntimeError(std::format("No writer was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
 {}
 

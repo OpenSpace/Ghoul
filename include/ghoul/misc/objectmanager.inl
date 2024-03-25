@@ -23,9 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
 
 namespace ghoul {
 
@@ -67,7 +67,7 @@ void ObjectManager<T>::releaseAll(Warnings emitWarnings) {
     for (std::pair<const std::string, Info>& p : _objects) {
         LWARNINGC(
             p.first,
-            fmt::format("Remaining reference counter: {}", p.second.refCount)
+            std::format("Remaining reference counter: {}", p.second.refCount)
         );
         // We have to destroy the ProgramObject now; otherwise it will destroyed when this
         // ProgramObjectManager leaves scope, at which point there might not be a valid

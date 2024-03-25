@@ -23,9 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/dictionary.h>
-#include <ghoul/fmt.h>
 #include <type_traits>
 
 namespace ghoul {
@@ -61,7 +61,7 @@ BaseClass* createDefault(bool useDictionary, const Dictionary& dict, MemoryPoolB
     // Dictionary
     if (useDictionary || dict.size() != 0) {
         std::string className = typeid(Class).name();
-        throw TemplateConstructionError(fmt::format(
+        throw TemplateConstructionError(std::format(
             "Class '{}' does not provide a constructor receiving a Dictionary", className
         ));
     }
@@ -107,7 +107,7 @@ BaseClass* createDictionary(bool useDictionary, const Dictionary& dict,
 {
     if (!useDictionary) {
         std::string className = typeid(Class).name();
-        throw TemplateConstructionError(fmt::format(
+        throw TemplateConstructionError(std::format(
             "Class '{}' does only provide a Dictionary constructor but was called using "
             "the default constructor", className
         ));
@@ -238,7 +238,7 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
 
     if (_map.find(className) != _map.end()) {
         throw TemplateFactoryError(
-            fmt::format("Class '{}' was registered before", className)
+            std::format("Class '{}' was registered before", className)
         );
     }
     else {

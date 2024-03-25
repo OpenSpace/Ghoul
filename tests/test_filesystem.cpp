@@ -43,11 +43,11 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     using ghoul::filesystem::FileSystem;
 
     const char* cpath = "${TEMPORARY}/tmpfil.txt";
-    std::filesystem::path path = absPath(cpath);
-    std::ofstream f(path);
-    f.open(path);
-    f << "tmp";
-    f.close();
+    const std::filesystem::path path = absPath(cpath);
+    {
+        std::ofstream f = std::ofstream(path);
+        f << "tmp";
+    }
     bool b1 = false;
     bool b2 = false;
 
@@ -73,9 +73,10 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     REQUIRE_FALSE(b2);
 
     // overwrite the file
-    f.open(path);
-    f << "tmp";
-    f.close();
+    {
+        std::ofstream f = std::ofstream(path);
+        f << "tmp";
+    }
     FileSys.triggerFilesystemEvents();
 
     // Sleep the main thread to make sure the filesystem have time to respond
@@ -88,7 +89,7 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     }
 #else
     int count = 0;
-    while ((b1 == false || b2 == false) && count < 10000 * seconds) {
+    while ((!b1 || !b2) && count < 10000 * seconds) {
         usleep(100);
         FileSys.triggerFilesystemEvents();
         ++count;
@@ -127,6 +128,6 @@ TEST_CASE("FileSystem: Override Non Existing Path Token", "[filesystem]") {
 }
 
 TEST_CASE("FileSystem: ExpandingTokensNonExistingToken", "[filesystem]") {
-    std::string p = "${NOTFOUND}";
+    const std::string p = "${NOTFOUND}";
     REQUIRE_THROWS_AS(FileSys.expandPathTokens(p), ghoul::RuntimeError);
 }

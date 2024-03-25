@@ -74,7 +74,7 @@ public:
      *
      * \pre \p filename must not be empty
      */
-    HTMLLog(std::string filename, int nLogRotation,
+    HTMLLog(const std::string& filename, int nLogRotation,
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,

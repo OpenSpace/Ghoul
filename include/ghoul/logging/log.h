@@ -146,14 +146,14 @@ protected:
      *
      * \return The current time as a string
      */
-    std::string timeString() const;
+    static std::string timeString();
 
     /**
      * Returns the current date as a string. The date format is "YYYY-MM-DD".
      *
      * \return The current date as a string
      */
-    std::string dateString() const;
+    static std::string dateString();
 
     std::string createFullMessageString(LogLevel level,
         std::string_view category, std::string_view message) const;

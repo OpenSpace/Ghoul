@@ -98,7 +98,7 @@ public:
     template <typename T, class... Types>
     T* alloc(Types&&... args);
 
-    virtual void* do_allocate(std::size_t bytes, std::size_t alignment) final;
+    virtual void* do_allocate(size_t bytes, size_t alignment) final;
     virtual void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
     virtual bool do_is_equal(const pmr::memory_resource& other) const noexcept final;
 

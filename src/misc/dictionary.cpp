@@ -53,8 +53,11 @@ Dictionary::KeyError::KeyError(std::string msg)
     : RuntimeError(std::move(msg), "Dictionary")
 {}
 
-Dictionary::ValueError::ValueError(std::string k, std::string m)
-    : RuntimeError(fmt::format("Key '{}': {}", std::move(k), std::move(m)), "Dictionary")
+Dictionary::ValueError::ValueError(std::string key, std::string msg)
+    : RuntimeError(
+        std::format("Key '{}': {}", std::move(key), std::move(msg)),
+        "Dictionary"
+    )
 {}
 
 bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
@@ -91,7 +94,7 @@ T Dictionary::value(std::string_view key) const {
 
     auto it = _storage.find(key);
     if (it == _storage.end()) {
-        throw KeyError(fmt::format("Could not find key '{}'", key));
+        throw KeyError(std::format("Could not find key '{}'", key));
     }
 
     if constexpr (isDirectType<T>::value) {
@@ -101,7 +104,7 @@ T Dictionary::value(std::string_view key) const {
         else {
             throw ValueError(
                 std::string(key),
-                fmt::format(
+                std::format(
                     "Error accessing value, wanted type '{}' has '{}'",
                     typeid(T).name(), it->second.index()
                 )
@@ -115,7 +118,7 @@ T Dictionary::value(std::string_view key) const {
             vec = std::get<VT>(it->second);
         }
         else if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
             vec.resize(d._storage.size());
             for (const auto& kv : d._storage) {
                 // Lua is 1-based index, the rest of the world is 0-based
@@ -123,8 +126,8 @@ T Dictionary::value(std::string_view key) const {
                 if (k < 0 || k >= static_cast<int>(d._storage.size())) {
                     throw ValueError(
                         std::string(key),
-                        fmt::format(
-                            "Invalid key {} outside range [0,{}]", k, d._storage.size()
+                        std::format(
+                            "Invalid key '{}' outside range [0,{}]", k, d._storage.size()
                         )
                     );
                 }
@@ -134,8 +137,8 @@ T Dictionary::value(std::string_view key) const {
         else {
             throw ValueError(
                 std::string(key),
-                fmt::format(
-                    "Requested {} but did not contain {} or {}",
+                std::format(
+                    "Requested '{}' but did not contain '{}' or '{}'",
                     typeid(T).name(), typeid(T).name(),
                     typeid(std::vector<typename T::value_type>).name()
                 )
@@ -145,7 +148,7 @@ T Dictionary::value(std::string_view key) const {
         if (vec.size() != ghoul::glm_components<T>::value) {
             throw ValueError(
                 std::string(key),
-                fmt::format(
+                std::format(
                     "Contained wrong number of values. Expected {} got {}",
                     ghoul::glm_components<T>::value, vec.size()
                 )
@@ -178,14 +181,14 @@ bool Dictionary::hasValue(std::string_view key) const {
     }
     else if constexpr (isGLMType<T>::value) {
         if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
 
             if (d.size() != ghoul::glm_components<T>::value) {
                 return false;
             }
 
             // Check whether we have all keys and they are of the correct type
-            for (int i = 1; i <= ghoul::glm_components<T>::value; ++i) {
+            for (int i = 1; i <= ghoul::glm_components<T>::value; i++) {
                 if (!d.hasValue<typename T::value_type>(std::to_string(i))) {
                     return false;
                 }

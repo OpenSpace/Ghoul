@@ -25,7 +25,7 @@
 
 #include <ghoul/logging/log.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <chrono>
 
 #ifdef WIN32
@@ -84,12 +84,12 @@ LogLevel Log::logLevel() const {
     return _logLevel;
 }
 
-std::string Log::timeString() const {
+std::string Log::timeString() {
 #ifdef WIN32
     SYSTEMTIME t = {};
     GetLocalTime(&t);
 
-    return fmt::format(
+    return std::format(
         "{:0>2}:{:0>2}:{:0>2}.{:0<3}", t.wHour, t.wMinute, t.wSecond, t.wMilliseconds
     );
 #else
@@ -97,21 +97,21 @@ std::string Log::timeString() const {
     gettimeofday(&t, nullptr);
     tm* m = gmtime(&t.tv_sec);
 
-    return fmt::format(
+    return std::format(
         "{:0>2}:{:0>2}:{:0>2}.{:0<3}", m->tm_hour, m->tm_min, m->tm_sec, t.tv_usec / 1000
     );
 #endif
 }
 
-std::string Log::dateString() const {
+std::string Log::dateString() {
 #ifdef WIN32
     SYSTEMTIME t = {};
     GetLocalTime(&t);
 
-    return fmt::format("{}-{:0>2}-{:0>2}", t.wYear, t.wMonth, t.wDay);
+    return std::format("{}-{:0>2}-{:0>2}", t.wYear, t.wMonth, t.wDay);
 #else
     auto now = std::chrono::system_clock::now();
-    time_t time = std::chrono::system_clock::to_time_t(now);
+    const time_t time = std::chrono::system_clock::to_time_t(now);
 
     std::stringstream ss;
 
@@ -125,13 +125,13 @@ std::string Log::createFullMessageString(LogLevel level, std::string_view catego
 {
     std::string output;
     if (_dateStamping && !_timeStamping) {
-        output += fmt::format("[{}] ", dateString());
+        output += std::format("[{}] ", dateString());
     }
     else if (!_dateStamping && _timeStamping) {
-        output += fmt::format("[{}] ", timeString());
+        output += std::format("[{}] ", timeString());
     }
     else if (_dateStamping && _timeStamping) {
-        output += fmt::format("[{} | {}] ", dateString(), timeString());
+        output += std::format("[{} | {}] ", dateString(), timeString());
     }
 
     if (isCategoryStamping() && (!category.empty())) {
@@ -139,7 +139,7 @@ std::string Log::createFullMessageString(LogLevel level, std::string_view catego
         output += ' ';
     }
     if (isLogLevelStamping()) {
-        output += fmt::format("({})", to_string(level));
+        output += std::format("({})", to_string(level));
     }
     if (!output.empty()) {
         output += '\t';

@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/assert.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/stacktrace.h>
 #include <ghoul/misc/stringhelper.h>
 #include <algorithm>
@@ -59,7 +59,7 @@ namespace ghoul {
 
 AssertionException::AssertionException(std::string exp, std::string msg,
                                        std::string file, std::string func, int line)
-    : std::runtime_error(fmt::format("{}, \"{}\" ({}:{} ({})",
+    : std::runtime_error(std::format("{}, \"{}\" ({}:{} ({})",
         std::move(exp), std::move(msg), std::move(file), line, std::move(func)
     ))
 {}
@@ -78,7 +78,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
             << padding << "File:       " << file << ", line " << line << '\n'
             << padding << "Function:   " << function << '\n'
             << padding << "Assertion:  " << expression
-            << padding << message << std::endl;
+            << padding << message << '\n';
 
         if (AlwaysAssert) {
 #ifdef _MSC_VER
@@ -129,7 +129,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 std::vector<std::string> stackTrace = ghoul::stackTrace();
 
                 std::cerr << '\n';
-                for (size_t i = 0; i < stackTrace.size(); ++i) {
+                for (size_t i = 0; i < stackTrace.size(); i++) {
                     std::cerr << i << ": " << stackTrace[i] << '\n';
                 }
                 std::cerr << '\n';

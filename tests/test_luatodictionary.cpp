@@ -52,7 +52,7 @@ TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
         }
 )";
 
-    ghoul::lua::LuaState state;
+    const ghoul::lua::LuaState state;
     ghoul::lua::runScript(state, TestString);
     //ghoul::lua::runScriptFile(state, "C:/Users/alebo68/Desktop/test.lua");
 
@@ -62,22 +62,22 @@ TEST_CASE("LuaToDictionary: Nested Tables", "[luatodictionary]") {
     ghoul::lua::luaDictionaryFromState(state, dict);
 
     REQUIRE(dict.hasValue<ghoul::Dictionary>("A"));
-    ghoul::Dictionary a = dict.value<ghoul::Dictionary>("A");
+    const ghoul::Dictionary a = dict.value<ghoul::Dictionary>("A");
 
     REQUIRE(a.hasValue<ghoul::Dictionary>("B"));
-    ghoul::Dictionary b = a.value<ghoul::Dictionary>("B");
+    const ghoul::Dictionary b = a.value<ghoul::Dictionary>("B");
 
     REQUIRE(b.hasValue<ghoul::Dictionary>("C"));
-    ghoul::Dictionary c = b.value<ghoul::Dictionary>("C");
+    const ghoul::Dictionary c = b.value<ghoul::Dictionary>("C");
 
     REQUIRE(c.hasValue<ghoul::Dictionary>("D"));
-    ghoul::Dictionary d = c.value<ghoul::Dictionary>("D");
+    const ghoul::Dictionary d = c.value<ghoul::Dictionary>("D");
 
     REQUIRE(d.hasValue<ghoul::Dictionary>("E"));
-    ghoul::Dictionary e = d.value<ghoul::Dictionary>("E");
+    const ghoul::Dictionary e = d.value<ghoul::Dictionary>("E");
 
     REQUIRE(e.hasValue<ghoul::Dictionary>("F"));
-    ghoul::Dictionary f = e.value<ghoul::Dictionary>("F");
+    const ghoul::Dictionary f = e.value<ghoul::Dictionary>("F");
 
     CHECK(f.hasValue<std::string>("1"));
     CHECK(f.hasValue<std::string>("2"));
@@ -99,10 +99,10 @@ TEST_CASE("LuaToDictionary: Nested Tables 2", "[luatodictionary]") {
         }
 )";
 
-    ghoul::lua::LuaState state;
+    const ghoul::lua::LuaState state;
     ghoul::lua::runScript(state, TestString);
 
     lua_getglobal(state, "ModuleConfigurations");
-    ghoul::Dictionary d = ghoul::lua::value<ghoul::Dictionary>(state);
+    const ghoul::Dictionary d = ghoul::lua::value<ghoul::Dictionary>(state);
     CHECK(d.hasValue<ghoul::Dictionary>("Server"));
 }

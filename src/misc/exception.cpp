@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 
 namespace ghoul {
@@ -39,7 +39,7 @@ RuntimeError::RuntimeError(std::string msg, std::string comp)
 }
 
 FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
-    : RuntimeError(fmt::format("Could not find file '{}'", f), std::move(comp))
+    : RuntimeError(std::format("Could not find file '{}'", f), std::move(comp))
     , file(std::move(f))
 {}
 

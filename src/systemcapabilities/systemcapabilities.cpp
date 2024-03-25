@@ -25,7 +25,7 @@
 
 #include <ghoul/systemcapabilities/systemcapabilities.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
@@ -73,22 +73,24 @@ void SystemCapabilities::logCapabilities(
         for (const SCC::CapabilityInformation& cap : caps) {
             if (verbosity >= cap.verbosity) {
                 LINFOC(
-                    fmt::format("SystemCapabilitiesComponent.{}", c->name()),
-                    fmt::format("{}: {}", cap.description, cap.value)
+                    std::format("SystemCapabilitiesComponent.{}", c->name()),
+                    std::format("{}: {}", cap.description, cap.value)
                 );
             }
         }
     }
 }
 
-void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponent> comp) {
-    ghoul_assert(comp != nullptr, "Component must not be nullptr");
+void SystemCapabilities::addComponent(
+                                   std::unique_ptr<SystemCapabilitiesComponent> component)
+{
+    ghoul_assert(component != nullptr, "Component must not be nullptr");
 
     const auto it = std::find_if(
         _components.cbegin(),
         _components.cend(),
-        [&comp](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
-            SystemCapabilitiesComponent* l = comp.get();
+        [&component](const std::unique_ptr<SystemCapabilitiesComponent>& rhs) {
+            SystemCapabilitiesComponent* l = component.get();
             SystemCapabilitiesComponent* r = rhs.get();
 
             return typeid(*l) == typeid(*r);
@@ -96,7 +98,7 @@ void SystemCapabilities::addComponent(std::unique_ptr<SystemCapabilitiesComponen
     );
 
     ghoul_assert(it == _components.cend(), "Component must not have been added before");
-    _components.push_back(std::move(comp));
+    _components.push_back(std::move(component));
 }
 
 } // namespace ghoul::systemcapabilities

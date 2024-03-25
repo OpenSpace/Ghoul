@@ -67,7 +67,7 @@ namespace {
                            const FSEventStreamEventId[])
     {
         char** paths = reinterpret_cast<char**>(eventPaths);
-        for (size_t i = 0; i < numEvents; ++i) {
+        for (size_t i = 0; i < numEvents; i++) {
             using Events::kFSEventStreamEventFlagItemModified;
             using Events::kFSEventStreamEventFlagItemInodeMetaMod;
             using Events::kFSEventStreamEventFlagItemIsFile;
@@ -184,7 +184,7 @@ void FileSystem::removeFileListener(int callbackIdentifier) {
         }
     }
 
-    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
+    LWARNING(std::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void callbackHandler(const std::string& path) {

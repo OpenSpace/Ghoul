@@ -25,11 +25,11 @@
 
 #include <ghoul/opengl/textureatlas.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/texture.h>
-#include <ghoul/fmt.h>
 
 namespace ghoul::opengl {
 
@@ -109,8 +109,8 @@ void TextureAtlas::initialize() {
             default: throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
         }
     }(_size.z);
-    GLenum internalFormat = GLenum(format);
-    GLenum dataType = GL_UNSIGNED_BYTE;
+    const GLenum internalFormat = GLenum(format);
+    const GLenum dataType = GL_UNSIGNED_BYTE;
 
     _texture = std::make_unique<Texture>(
         glm::uvec3(glm::ivec2(_size), 1),
@@ -166,7 +166,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     int bestWidth = std::numeric_limits<int>::max();
     int bestIndex = -1;
 
-    for (size_t i = 0; i < _nodes.size(); ++i) {
+    for (size_t i = 0; i < _nodes.size(); i++) {
         const int y = atlasFit(i, width, height);
         if (y >= 0) {
             const glm::ivec3& node = _nodes[i];
@@ -183,14 +183,14 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     }
 
     if (bestIndex == -1) {
-        throw InvalidRegionException(fmt::format(
+        throw InvalidRegionException(std::format(
             "Could not fit new region of size ({},{})", width, height
         ));
     }
 
     _nodes.insert(_nodes.begin() + bestIndex, {region.x, region.y + height, width});
 
-    for (size_t i = bestIndex + 1; i < _nodes.size(); ++i) {
+    for (size_t i = bestIndex + 1; i < _nodes.size(); i++) {
         glm::ivec3& node = _nodes[i];
         const glm::ivec3& prev = _nodes[i-1];
 
@@ -229,11 +229,10 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
         "Invalid region"
     );
 
-    _handleInformation.push_back(glm::u16vec4(region));
+    _handleInformation.emplace_back(region);
 
     // Since we push_back the region, the current handle is the last valid array index
-    RegionHandle handle = static_cast<RegionHandle>(_handleInformation.size() - 1);
-    return handle;
+    return static_cast<RegionHandle>(_handleInformation.size() - 1);
 }
 
 void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
@@ -258,10 +257,10 @@ void TextureAtlas::setRegionData(RegionHandle handle, void* data) {
     // As the incoming data is a single stream of bytes, we need to chop it up into chunks
     // of length 'width'. We have 'height' of these chunks that need to be copied into our
     // atlas
-    for (int i = 0; i < height; ++i) {
+    for (int i = 0; i < height; i++) {
         void* dst = _data.data() + ((y + i) * _size.x + x) * sizeof(char) * _size.z;
         void* src = reinterpret_cast<unsigned char*>(data) + (i * width) * sizeof(char);
-        size_t nBytes = width * sizeof(char) * _size.z;
+        const size_t nBytes = width * sizeof(char) * _size.z;
 
         if (src && dst) {
             memcpy(dst, src, nBytes);
@@ -312,13 +311,13 @@ int TextureAtlas::atlasFit(size_t index, int width, int height) const {
             return -1;
         }
         remainingWidth -= node.z;
-        ++index;
+        index++;
     }
     return y;
 }
 
 void TextureAtlas::atlasMerge() {
-    for (size_t i = 0; i < _nodes.size() - 1; ++i) {
+    for (size_t i = 0; i < _nodes.size() - 1; i++) {
         glm::ivec3& node = _nodes[i];
         const glm::ivec3& next = _nodes[i+1];
         if (node.y == next.y) {

@@ -35,13 +35,13 @@ namespace ghoul {
 
 namespace {
     std::string formatNumber(double d) {
-        // fmt::format will represent infinite values with 'inf' and NaNs with 'nan'.
+        // std::format will represent infinite values with 'inf' and NaNs with 'nan'.
         // These are not valid in JSON, so use 'null' instead
         if (!std::isfinite(d)) {
             return "null";
         }
 
-        return fmt::format("{}", d);
+        return std::format("{}", d);
     }
 
     std::string formatString(const std::string& value) {
@@ -91,7 +91,7 @@ namespace {
 
         for (size_t i = 0; i < vec.size() - 1; i++) {
             if constexpr (std::is_arithmetic_v<T>) {
-                double v = static_cast<double>(vec[i]);
+                const double v = static_cast<double>(vec[i]);
                 values << formatNumber(v) << ",";
             }
             else {
@@ -100,7 +100,7 @@ namespace {
         }
         values << vec.back();
 
-        return fmt::format("[{}]", values.str());
+        return std::format("[{}]", values.str());
     }
 
     /**
@@ -114,47 +114,47 @@ namespace {
     */
     std::string formatValue(const Dictionary& dictionary, const std::string& key) {
         if (dictionary.hasValue<Dictionary>(key)) {
-            Dictionary subDictionary = dictionary.value<Dictionary>(key);
+            const Dictionary subDictionary = dictionary.value<Dictionary>(key);
             return formatJson(subDictionary);
         }
 
         if (dictionary.hasValue<double>(key)) {
-            double value = dictionary.value<double>(key);
+            const double value = dictionary.value<double>(key);
             return formatNumber(value);
         }
 
         if (dictionary.hasValue<int>(key)) {
-            int value = dictionary.value<int>(key);
+            const int value = dictionary.value<int>(key);
             return formatNumber(static_cast<double>(value));
         }
 
         if (dictionary.hasValue<bool>(key)) {
-            bool value = dictionary.value<bool>(key);
+            const bool value = dictionary.value<bool>(key);
             return value ? "true" : "false";
         }
 
         if (dictionary.hasValue<std::vector<int>>(key)) {
-            std::vector<int> vec = dictionary.value<std::vector<int>>(key);
+            const std::vector<int> vec = dictionary.value<std::vector<int>>(key);
             return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::vector<double>>(key)) {
-            std::vector<double> vec = dictionary.value<std::vector<double>>(key);
+            const std::vector<double> vec = dictionary.value<std::vector<double>>(key);
             return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::vector<std::string>>(key)) {
-            std::vector<std::string> vec =
+            const std::vector<std::string> vec =
                 dictionary.value<std::vector<std::string>>(key);
             return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::string>(key)) {
-            std::string value = dictionary.value<std::string>(key);
+            const std::string value = dictionary.value<std::string>(key);
             return formatString(value);
         }
 
-        throw JsonFormattingError(fmt::format(
+        throw JsonFormattingError(std::format(
             "Key '{}' has invalid type for formatting dictionary as JSON", key
         ));
     }
@@ -175,16 +175,16 @@ std::string formatJson(const Dictionary& dictionary) {
     };
 
     std::vector<std::string> keys;
-    for (std::string_view k : dictionary.keys()) {
-        keys.push_back(std::string(k));
+    for (const std::string_view k : dictionary.keys()) {
+        keys.emplace_back(k);
     }
 
-    std::string json = std::accumulate(
+    const std::string json = std::accumulate(
         std::next(keys.begin()),
         keys.end(),
         convert(*keys.begin(), dictionary),
-        [convert, dictionary](std::string a, std::string key) {
-            return std::move(a) + "," + convert(std::move(key), dictionary);
+        [convert, dictionary](const std::string& a, const std::string& key) {
+            return std::format("{},{}", a, convert(key, dictionary));
         }
     );
 

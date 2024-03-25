@@ -65,7 +65,7 @@ FramebufferObject::~FramebufferObject() {
     glDeleteFramebuffers(1, &_id);
 }
 
-void FramebufferObject::activate() {
+void FramebufferObject::activate() const {
     glBindFramebuffer(GL_FRAMEBUFFER, _id);
 }
 
@@ -74,8 +74,8 @@ void FramebufferObject::deactivate() {
 }
 
 bool FramebufferObject::isComplete() const {
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    std::string_view error = errorChecking(status);
+    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    const std::string_view error = errorChecking(status);
 
     if (!error.empty()) {
         LERROR(error);
@@ -83,7 +83,7 @@ bool FramebufferObject::isComplete() const {
     return error.empty();
 }
 
-bool FramebufferObject::isActive() {
+bool FramebufferObject::isActive() const {
     return ((getActiveObject() == _id) && (_id != 0));
 }
 
@@ -160,7 +160,7 @@ Texture* FramebufferObject::texture(GLenum attachment) {
 }
 
 GLuint FramebufferObject::getActiveObject() {
-    GLint fbo;
+    GLint fbo = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
     return static_cast<GLuint>(fbo);
 }

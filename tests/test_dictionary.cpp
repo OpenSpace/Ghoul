@@ -132,7 +132,7 @@ TEST_CASE("Dictionary: Dictionary", "[dictionary]") {
     {
         REQUIRE(d.hasKey("a"));
         REQUIRE(d.hasValue<ghoul::Dictionary>("a"));
-        ghoul::Dictionary e = d.value<ghoul::Dictionary>("a");
+        const ghoul::Dictionary e = d.value<ghoul::Dictionary>("a");
         REQUIRE(e.hasKey("foo"));
         REQUIRE(e.hasValue<int>("foo"));
         CHECK(e.value<int>("foo") == 1);
@@ -146,7 +146,7 @@ TEST_CASE("Dictionary: Dictionary", "[dictionary]") {
     {
         REQUIRE(d.hasKey("b"));
         REQUIRE(d.hasValue<ghoul::Dictionary>("b"));
-        ghoul::Dictionary e = d.value<ghoul::Dictionary>("b");
+        const ghoul::Dictionary e = d.value<ghoul::Dictionary>("b");
         REQUIRE(e.hasKey("foo"));
         REQUIRE(e.hasValue<int>("foo"));
         CHECK(e.value<int>("foo") == 3);
@@ -160,7 +160,7 @@ TEST_CASE("Dictionary: Dictionary", "[dictionary]") {
     {
         REQUIRE(d.hasKey("c"));
         REQUIRE(d.hasValue<ghoul::Dictionary>("c"));
-        ghoul::Dictionary e = d.value<ghoul::Dictionary>("c");
+        const ghoul::Dictionary e = d.value<ghoul::Dictionary>("c");
         REQUIRE(e.hasKey("foo"));
         REQUIRE(e.hasValue<int>("foo"));
         CHECK(e.value<int>("foo") == 5);

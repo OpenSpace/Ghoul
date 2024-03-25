@@ -140,6 +140,8 @@ if (GHOUL_MODULE_ASSIMP)
     set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "Set to have assimp build minizip" FORCE)
   endif ()
 
+  set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
+
   add_subdirectory(assimp)
   target_link_libraries(Ghoul PRIVATE assimp)
   set_target_properties(assimp PROPERTIES FOLDER "External")
@@ -168,25 +170,19 @@ if (GHOUL_MODULE_ASSIMP)
       "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
       <string.h>
     )
-  else ()
-    set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
   endif ()
+
+  if (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # Clang started throwing these warnings in assimp
+    target_compile_options(assimp PRIVATE "-Wdeprecated-non-prototype")
+  endif ()
+
   set_target_properties(uninstall PROPERTIES FOLDER "External")
   if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
     set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "External")
   endif ()
   end_module("AssImp")
 endif ()
-
-# fmt
-begin_dependency("fmt")
-set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
-set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
-set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-add_subdirectory(cppformat)
-target_link_libraries(Ghoul PUBLIC fmt)
-set_target_properties(fmt PROPERTIES FOLDER "External")
-end_dependency("fmt")
 
 # scnlib
 begin_dependency("scnlib")

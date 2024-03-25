@@ -27,7 +27,7 @@
 
 namespace ghoul::cmdparser {
 
-SingleCommandZeroArguments::SingleCommandZeroArguments(std::optional<bool>& nExecutions,
+SingleCommandZeroArguments::SingleCommandZeroArguments(std::optional<bool>& ptr,
                                                        std::string name,
                                                        std::string shortName,
                                                        std::string infoText)
@@ -39,7 +39,7 @@ SingleCommandZeroArguments::SingleCommandZeroArguments(std::optional<bool>& nExe
         0,
         CommandlineCommand::MultipleCalls::No
     )
-    , _ptr(nExecutions)
+    , _ptr(ptr)
 {}
 
 void SingleCommandZeroArguments::execute(const std::vector<std::string>&) {
