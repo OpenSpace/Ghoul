@@ -26,6 +26,7 @@
 #include <ghoul/opengl/texture.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <cstring>
 
 using glm::tvec2;
@@ -112,6 +113,8 @@ Texture::~Texture() {
 }
 
 void Texture::initialize(bool allocateData) {
+    ZoneScoped;
+
     calculateBytesPerPixel();
     generateId();
     if (allocateData) {
@@ -122,12 +125,16 @@ void Texture::initialize(bool allocateData) {
 }
 
 void Texture::allocateMemory() {
+    ZoneScoped;
+
     const unsigned int arraySize = compMul(_dimensions) * _bpp;
     _pixels = new GLubyte[arraySize];
     std::memset(_pixels, 0, arraySize);
 }
 
 void Texture::generateId() {
+    ZoneScoped;
+
     _id = 0;
     glGenTextures(1, &_id);
 }
@@ -222,6 +229,8 @@ std::array<GLenum, 4> Texture::swizzleMask() const {
 }
 
 void Texture::applyFilter() {
+    ZoneScoped;
+
     bind();
 
     switch (_filter) {
@@ -354,6 +363,8 @@ void Texture::setMipMapLevel(int mipMapLevel) {
 }
 
 void Texture::applyWrapping() {
+    ZoneScoped;
+
     bind();
 
     switch (_type) {
@@ -477,6 +488,7 @@ void Texture::reUploadDataToTexture(void* pixelData) {
 }
 
 void Texture::uploadTexture() {
+    ZoneScoped;
     uploadDataToTexture(_pixels);
 }
 
