@@ -159,7 +159,6 @@ void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(size_t b
         std::memset(ptr + bytes, AlignmentByte, align);
     }
 
-    TracyAllocN(ptr, bytes, "Memory Pool");
     return ptr;
 }
 
@@ -177,8 +176,6 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p
                                                                      size_t /*alignment*/)
 {
     ZoneScoped;
-
-    TracyFreeN(ptr, "Memory Pool");
 
     if (NoDealloc) {
         return;
