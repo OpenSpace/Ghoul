@@ -27,6 +27,7 @@
 
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -87,14 +88,14 @@ void LogManager::flushLogs() {
 void LogManager::logMessage(LogLevel level, std::string_view category,
                             std::string_view message)
 {
+    ZoneScoped;
+
     if (!ghoul::logging::LogManager::isInitialized()) {
         _consoleLog.log(level, category, message);
         return;
     }
 
     if (level >= _level) {
-        const std::lock_guard lock(_mutex);
-
         _consoleLog.log(level, category, message);
         if (_immediateFlush) {
             _consoleLog.flush();

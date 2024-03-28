@@ -33,6 +33,7 @@
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <ghoul/misc/stringhelper.h>
 #include <algorithm>
 #include <filesystem>
@@ -62,6 +63,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
                                                 ForceRenderInvisible forceRenderInvisible,
                                             NotifyInvisibleDropped notifyInvisibleDropped)
 {
+    ZoneScoped;
+
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 

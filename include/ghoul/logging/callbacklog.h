@@ -28,6 +28,7 @@
 
 #include <ghoul/logging/log.h>
 
+#include <ghoul/misc/profiling.h>
 #include <functional>
 
 namespace ghoul::logging {
@@ -47,7 +48,7 @@ namespace ghoul::logging {
 class CallbackLog : public Log {
 public:
     /// The type of function that is used as a callback in this log
-    using CallbackFunction = std::function<void (std::string)>;
+    using CallbackFunction = std::function<void(std::string)>;
 
     /**
      * Constructor that calls the Log constructor and initializes this CallbackLog.
@@ -97,6 +98,7 @@ public:
 
 protected:
     CallbackFunction _callbackFunction;
+    TracyLockable(std::mutex, _mutex);
 };
 
 } // namespace ghoul::logging

@@ -188,7 +188,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                                                                 bool forceRenderInvisible,
                                                               bool notifyInvisibleDropped)
 {
-    std::ifstream fileStream(cachedFile, std::ifstream::binary);
+    ZoneScoped;
+
+    std::ifstream fileStream = std::ifstream(cachedFile, std::ifstream::binary);
     if (!fileStream.good()) {
         throw ModelCacheException(cachedFile, "Could not open file");
     }
@@ -322,14 +324,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             if (nIndices == 0) {
                 throw ModelCacheException(cachedFile, "No indices were loaded");
             }
-            std::vector<unsigned int> indexArray;
-            indexArray.reserve(nIndices);
-
-            for (int32_t i = 0; i < nIndices; i++) {
-                uint32_t index = 0;
-                fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
-                indexArray.push_back(index);
-            }
+            std::vector<uint32_t> indexArray;
+            indexArray.resize(nIndices);
+            fileStream.read(
+                reinterpret_cast<char*>(indexArray.data()),
+                nIndices * sizeof(uint32_t)
+            );
 
             // IsInvisible
             uint8_t inv = 0;
@@ -357,10 +357,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 texture.hasTexture = (h == 1);
 
                 // color
-                fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
+                fileStream.read(
+                    reinterpret_cast<char*>(&texture.color.r),
+                    4 * sizeof(float)
+                );
 
                 // isTransparent
                 uint8_t isT = 0;
@@ -428,13 +428,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         fileStream.read(reinterpret_cast<char*>(&nChildren), sizeof(int32_t));
 
         // Children
-        std::vector<int> childrenArray;
-        nodeArray.reserve(nChildren);
-        for (int32_t c = 0; c < nChildren; ++c) {
-            int32_t child = 0;
-            fileStream.read(reinterpret_cast<char*>(&child), sizeof(int32_t));
-            childrenArray.push_back(child);
-        }
+        std::vector<int32_t> childrenArray;
+        childrenArray.resize(nChildren);
+        fileStream.read(
+            reinterpret_cast<char*>(childrenArray.data()),
+            nChildren * sizeof(int32_t)
+        );
 
         // HasAnimation
         uint8_t a = 0;
@@ -462,6 +461,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         uint8_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(uint8_t));
         std::string name;
+        name.resize(nameSize);
         fileStream.read(name.data(), nameSize);
 
         // Duration
@@ -494,10 +494,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                glm::vec3 pos = glm::vec3(1.0);
-                fileStream.read(reinterpret_cast<char*>(&pos.x), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&pos.y), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&pos.z), sizeof(float));
+                glm::vec3 pos = glm::vec3(1.f);
+                fileStream.read(reinterpret_cast<char*>(&pos.x), 3 * sizeof(float));
                 posKeyframe.position = pos;
 
                 // Time
@@ -516,15 +514,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                float rotW = 0.f;
-                float rotX = 0.f;
-                float rotY = 0.f;
-                float rotZ = 0.f;
-                fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotY), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotZ), sizeof(float));
-                rotKeyframe.rotation = glm::quat(rotW, rotX, rotY, rotZ);
+                struct {
+                    float w = 0.f;
+                    float x = 0.f;
+                    float y = 0.f;
+                    float z = 0.f;
+                } rot;
+                fileStream.read(reinterpret_cast<char*>(&rot), 4 * sizeof(float));
+                rotKeyframe.rotation = glm::quat(rot.w, rot.x, rot.y, rot.z);
 
                 // Time
                 double time = 0.0;
@@ -543,9 +540,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 
                 // Scale
                 glm::vec3 scale = glm::vec3(1.f);
-                fileStream.read(reinterpret_cast<char*>(&scale.x), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scale.y), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scale.z), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&scale.x), 3 * sizeof(float));
                 scaleKeyframe.scale = scale;
 
                 // Time
@@ -975,6 +970,8 @@ double ModelGeometry::boundingRadius() const {
 }
 
 void ModelGeometry::calculateBoundingRadius() {
+    ZoneScoped;
+
     if (_nodes.empty()) {
         LERROR("Cannot calculate bounding radius for empty geometry");
         return;
@@ -1006,6 +1003,8 @@ double ModelGeometry::animationDuration() const {
 }
 
 void ModelGeometry::calculateTransparency() {
+    ZoneScoped;
+
     if (_hasCalcTransparency) {
         return;
     }

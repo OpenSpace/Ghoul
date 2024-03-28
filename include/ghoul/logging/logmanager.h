@@ -160,9 +160,6 @@ public:
 private:
     static LogManager* _instance;
 
-    /// The mutex that is protecting the #logMessage calls
-    std::mutex _mutex;
-
     /// The LogLevel
     LogLevel _level;
 

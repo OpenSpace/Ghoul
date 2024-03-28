@@ -26,6 +26,7 @@
 #include <ghoul/logging/log.h>
 
 #include <ghoul/format.h>
+#include <ghoul/misc/profiling.h>
 #include <chrono>
 
 #ifdef WIN32
@@ -123,6 +124,8 @@ std::string Log::dateString() {
 std::string Log::createFullMessageString(LogLevel level, std::string_view category,
                                          std::string_view message) const
 {
+    ZoneScoped;
+
     std::string output;
     if (_dateStamping && !_timeStamping) {
         output += std::format("[{}] ", dateString());

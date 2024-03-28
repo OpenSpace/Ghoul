@@ -25,6 +25,8 @@
 
 #include <ghoul/logging/visualstudiooutputlog.h>
 
+#include <ghoul/misc/profiling.h>
+
 #ifdef WIN32
 #include <Windows.h>
 #endif // WIN32
@@ -44,6 +46,8 @@ void VisualStudioOutputLog::log([[ maybe_unused ]] LogLevel level,
                                 [[ maybe_unused ]] std::string_view message)
 {
 #ifdef WIN32
+    ZoneScoped;
+
     std::string fullMessage = createFullMessageString(level, category, message) + '\n';
     OutputDebugString(fullMessage.c_str());
 #endif

@@ -26,7 +26,9 @@
 #include <ghoul/logging/textlog.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <filesystem>
+#include <syncstream>
 
 namespace ghoul::logging {
 
@@ -88,20 +90,23 @@ TextLog::~TextLog() {
 }
 
 void TextLog::log(LogLevel level, std::string_view category, std::string_view message) {
+    ZoneScoped;
+
     if (category.empty() && message.empty()) {
         writeLine("\n");
     }
     else {
-        writeLine(createFullMessageString(level, category, message) + '\n');
+        std::string msg = createFullMessageString(level, category, message) + '\n';
+        writeLine(msg);
     }
 }
 
 void TextLog::flush() {
-    _file.flush();
+    std::osyncstream(_file).flush();
 }
 
 void TextLog::writeLine(const std::string& line) {
-    _file << line;
+    std::osyncstream(_file) << line;
 }
 
 } // namespace ghoul::logging

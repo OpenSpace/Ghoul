@@ -29,6 +29,7 @@
 #include <ghoul/format.h>
 #include <ghoul/io/texture/texturereader.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/textureunit.h>
 
@@ -240,6 +241,8 @@ const std::vector<ModelMesh::Texture>& ModelMesh::textures() const {
 }
 
 void ModelMesh::initialize() {
+    ZoneScoped;
+
     if (_vertices.empty()) {
         LERRORC("ModelMesh", "Cannot initialize empty mesh");
         return;

@@ -27,8 +27,10 @@
 
 #include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <iostream>
 #include <string_view>
+#include <syncstream>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -81,6 +83,8 @@ ConsoleLog::ConsoleLog(ColorOutput colorOutput, LogLevel minimumLogLevel)
 
 void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view message)
 {
+    ZoneScoped;
+
     constexpr int CategoryLength = 20;
     constexpr char FillerCharacter = ' ';
 
@@ -137,7 +141,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
     }
 
     res += message;
-    std::cout << res << '\n';
+    std::osyncstream(std::cout) << res << '\n';
 
 
     if (_colorOutput) {
@@ -146,7 +150,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
 }
 
 void ConsoleLog::flush() {
-    std::cout.flush();
+    std::osyncstream(std::cout).flush();
 }
 
 void ConsoleLog::setColorForLevel(LogLevel level) {
