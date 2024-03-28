@@ -31,6 +31,7 @@
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <filesystem>
@@ -364,7 +365,7 @@ bool ShaderPreprocessor::isInsideEmptyForStatement(ShaderPreprocessor::Env& env)
 
 bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
     Input& input = env.inputs.back();
-    if (!std::getline(input.stream, env.line)) {
+    if (!ghoul::getline(input.stream, env.line)) {
         return false;
     }
     input.lineNumber++;

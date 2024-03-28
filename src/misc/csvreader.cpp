@@ -54,7 +54,7 @@ namespace {
 
         bool hasFoundFirstValidLine = false;
         std::string line;
-        while (std::getline(file, line)) {
+        while (ghoul::getline(file, line)) {
             ghoul::trimWhitespace(line);
 
             // Skip comments and empty lines

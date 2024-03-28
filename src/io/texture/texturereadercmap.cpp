@@ -28,6 +28,7 @@
 #include <ghoul/format.h>
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <fstream>
 #include <sstream>
@@ -58,7 +59,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 
     std::string line;
     int i = 0;
-    while (std::getline(file, line)) {
+    while (ghoul::getline(file, line)) {
         // Skip empty lines
         if (line.empty() || line == "\r") {
             continue;

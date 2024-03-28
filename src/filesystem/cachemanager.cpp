@@ -27,6 +27,7 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/crc32.h>
+#include <ghoul/misc/stringhelper.h>
 #include <fstream>
 
 #ifdef WIN32
@@ -178,7 +179,7 @@ CacheManager::CacheManager(std::filesystem::path directory)
     std::ifstream file(cacheFile);
     if (file.good()) {
         std::string line;
-        std::getline(file, line);
+        ghoul::getline(file, line);
         if (line != std::to_string(CacheVersion)) {
             LINFO(std::format(
                 "Cache version has changed. Current: {}; New: {}", line, CacheVersion
