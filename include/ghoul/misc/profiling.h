@@ -55,6 +55,10 @@
 #define ZoneName(dummy, dummy2)
 #define ZoneScoped
 #define ZoneScopedN(dummy)
+#define ZoneText(text, length)
+#define TracyLockable(type, var) type var
+#define TracyAlloc(ptr, bytes)
+#define TracyAllocN(ptr, bytes, name)
 
 #endif // TRACY_ENABLE
 

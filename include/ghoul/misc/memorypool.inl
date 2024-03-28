@@ -159,6 +159,7 @@ void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(size_t b
         std::memset(ptr + bytes, AlignmentByte, align);
     }
 
+    TracyAllocN(ptr, bytes, "Memory Pool");
     return ptr;
 }
 
@@ -171,11 +172,13 @@ T* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::alloc(Types&&... args) 
 }
 
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
-void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p,
+void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* ptr,
                                                                         size_t bytes,
                                                                      size_t /*alignment*/)
 {
     ZoneScoped;
+
+    TracyFreeN(ptr, "Memory Pool");
 
     if (NoDealloc) {
         return;
@@ -183,12 +186,12 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p
 
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         const std::array<std::byte, BucketSize>& bp = b->payload;
-        if (p >= bp.data() && p < (bp.data() + BucketSize)) {
+        if (ptr >= bp.data() && ptr < (bp.data() + BucketSize)) {
             // We found our bucket to which this pointer belongs
             if (InjectDebugMemory) {
-                std::memset(p, ClearByte, bytes);
+                std::memset(ptr, ClearByte, bytes);
             }
-            _emptyList.push_back({ p, bytes });
+            _emptyList.push_back({ ptr, bytes });
             return;
         }
     }
