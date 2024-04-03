@@ -190,7 +190,7 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
     }
     lua_pop(state, 1);
 
-    if (!values.empty()) {
+    if (values.empty()) {
         return "{}";
     }
 
