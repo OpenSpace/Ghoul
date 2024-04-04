@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2023                                                                #
+# Copyright (c) 2012-2024                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -189,6 +189,7 @@ begin_dependency("scnlib")
 add_subdirectory(scnlib SYSTEM)
 target_link_libraries(Ghoul PUBLIC scn)
 set_target_properties(scn PROPERTIES FOLDER "External")
+set_target_properties(simdutf PROPERTIES FOLDER "External")
 end_dependency("scnlib")
 
 # stb_image
