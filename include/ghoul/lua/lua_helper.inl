@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <charconv>
 #include <filesystem>
+#include <format>
 #include <optional>
 #include <type_traits>
 #include <variant>
@@ -509,7 +510,7 @@ std::string VariantName() {
     using T = std::variant_alternative_t<I, Variant>;
 
     if constexpr (I + 1 != std::variant_size_v<Variant>) {
-        return Name<T>() + " or " + VariantName<I + 1, Variant>();
+        return std::format("{} or {}", Name<T>(), VariantName<I + 1, Variant>());
     }
     else {
         return Name<T>();
