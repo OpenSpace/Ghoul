@@ -27,6 +27,7 @@
 #define __GHOUL___TEXTUREREADERBASE___H__
 
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -44,11 +45,11 @@ class TextureReaderBase {
 public:
     /// The exception that gets thrown if there was an error loading the Texture
     struct TextureLoadException : public RuntimeError {
-        explicit TextureLoadException(std::string name, std::string msg,
+        explicit TextureLoadException(std::filesystem::path name, std::string msg,
             const TextureReaderBase* r);
 
         /// The filename that caused the exception to be thrown
-        const std::string filename;
+        const std::filesystem::path filename;
 
         /// The error message that occurred
         const std::string errorMessage;
@@ -76,7 +77,7 @@ public:
      * \pre \p nDimensions must be 1, 2, or 3
      */
     virtual std::unique_ptr<opengl::Texture> loadTexture(
-        const std::string& filename, int nDimensions) const = 0;
+        const std::filesystem::path& filename, int nDimensions) const = 0;
 
     /**
      * Loads a Texture from the memory pointed at by \p memory. The memory block must

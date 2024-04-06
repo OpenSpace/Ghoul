@@ -45,15 +45,11 @@ namespace {
 
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;
 
-    unsigned int generateHash(const std::filesystem::path& file,
-                              std::string_view information)
-    {
+    unsigned int generateHash(const std::filesystem::path& file, std::string_view info) {
         // something that cannot occur in the filesystem
         constexpr char HashDelimiter = '|';
 
-        const std::string s = std::format(
-            "{}{}{}", file.string(), HashDelimiter, information
-        );
+        const std::string s = std::format("{}{}{}", file, HashDelimiter, info);
         const unsigned int hash = ghoul::hashCRC32(s);
         return hash;
     }
@@ -70,8 +66,9 @@ namespace {
         }
 #ifdef WIN32
         WIN32_FILE_ATTRIBUTE_DATA infoData;
+        const std::string p = path.string();
         const BOOL success = GetFileAttributesEx(
-            path.string().c_str(),
+            p.c_str(),
             GetFileExInfoStandard,
             &infoData
         );
@@ -125,7 +122,8 @@ namespace {
         }
 #else // ^^^^ WIN32 // !WIN32 vvvv
         struct stat attrib;
-        stat(path.string().c_str(), &attrib);
+        const std::string p = path.string();
+        stat(p.c_str(), &attrib);
         struct tm* time = gmtime(&attrib.st_ctime);
         std::array<char, 128> buffer;
         strftime(buffer.data(), 128, "%Y-%m-%dT%H:%M:%S", time);
@@ -221,10 +219,11 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
                                               std::optional<std::string_view> information)
 {
     const std::filesystem::path baseName = file.filename();
-    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
+    const std::string n = baseName.string();
+    const size_t pos = n.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            std::format("Argument '{}' contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", baseName),
             "Cache"
         );
     }
@@ -249,7 +248,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
         std::filesystem::create_directory(destinationBase);
     }
 
-    const std::string destination = std::format("{}/{}", destinationBase.string(), hash);
+    const std::string destination = std::format("{}/{}", destinationBase, hash);
 
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
@@ -266,7 +265,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
     }
 
     // Generate and output the newly generated cache name
-    const std::string cachedName = std::format("{}/{}", destination, baseName.string());
+    const std::string cachedName = std::format("{}/{}", destination, baseName);
 
     // Store the cache information in the map
     _files[hash] = cachedName;
@@ -277,10 +276,11 @@ bool CacheManager::hasCachedFile(const std::filesystem::path& file,
                                  std::optional<std::string_view> information) const
 {
     const std::filesystem::path baseName = file.filename();
-    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
+    const std::string n = baseName.string();
+    const size_t pos = n.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            std::format("Argument '{}' contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", baseName),
             "Cache"
         );
     }
@@ -301,10 +301,11 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
                                    std::optional<std::string_view> information)
 {
     const std::filesystem::path baseName = file.filename();
-    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
+    const std::string n = baseName.string();
+    const size_t pos = n.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            std::format("Argument '{}' contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", baseName),
             "Cache"
         );
     }

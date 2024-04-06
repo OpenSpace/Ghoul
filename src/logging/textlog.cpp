@@ -32,10 +32,10 @@
 
 namespace ghoul::logging {
 
-TextLog::TextLog(const std::string& filename, int nLogRotation, Append writeToAppend,
-                 TimeStamping timeStamping, DateStamping dateStamping,
-                 CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
-                 LogLevel minimumLogLevel)
+TextLog::TextLog(const std::filesystem::path& filename, int nLogRotation,
+                 Append writeToAppend, TimeStamping timeStamping,
+                 DateStamping dateStamping, CategoryStamping categoryStamping,
+                 LogLevelStamping logLevelStamping, LogLevel minimumLogLevel)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
     , _printFooter(writeToAppend)
 {
@@ -50,14 +50,13 @@ TextLog::TextLog(const std::string& filename, int nLogRotation, Append writeToAp
     while (nLogRotation > 0) {
         // Move all of the existing logs one position up
 
-        const std::filesystem::path file = filename;
-        std::string fname = file.stem().string();
-        std::string ext = file.extension().string();
+        const std::filesystem::path fname = filename.stem();
+        const std::filesystem::path ext = filename.extension();
 
-        std::filesystem::path newCandidate = file;
+        std::filesystem::path newCandidate = filename;
         newCandidate.replace_filename(std::format("{}-{}{}", fname, nLogRotation, ext));
 
-        std::filesystem::path oldCandidate = file;
+        std::filesystem::path oldCandidate = filename;
         if (nLogRotation > 1) {
             // We don't actually have a -0 version, it is just the base name
             oldCandidate.replace_filename(

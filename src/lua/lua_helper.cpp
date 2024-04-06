@@ -119,18 +119,19 @@ LuaRuntimeException::LuaRuntimeException(std::string msg)
     : RuntimeError(std::move(msg), "Lua")
 {}
 
-LuaFormatException::LuaFormatException(std::string msg, std::string file)
+LuaFormatException::LuaFormatException(std::string msg, std::filesystem::path file)
     : LuaRuntimeException(std::move(msg))
     , filename(std::move(file))
 {}
 
-LuaLoadingException::LuaLoadingException(std::string error, std::string file)
+LuaLoadingException::LuaLoadingException(std::string error, std::filesystem::path file)
     : LuaRuntimeException(std::format("Error loading script '{}': {}", file, error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}
 
-LuaExecutionException::LuaExecutionException(std::string error, std::string file)
+LuaExecutionException::LuaExecutionException(std::string error,
+                                             std::filesystem::path file)
     : LuaRuntimeException(std::format("Error executing script '{}': {}", file, error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
@@ -237,8 +238,8 @@ std::string stackInformation(lua_State* state) {
     return result;
 }
 
-void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary,
-                                                                         lua_State* state)
+void loadDictionaryFromFile(const std::filesystem::path& filename,
+                            ghoul::Dictionary& dictionary, lua_State* state)
 {
     ghoul_assert(!filename.empty(), "filename must not be empty");
     ghoul_assert(
@@ -250,7 +251,8 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
         state = staticLuaState();
     }
 
-    const int loadStatus = luaL_loadfile(state, filename.c_str());
+    const std::string f = filename.string();
+    const int loadStatus = luaL_loadfile(state, f.c_str());
     if (loadStatus != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1), filename);
     }
@@ -274,7 +276,9 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
     lua_settop(state, 0);
 }
 
-ghoul::Dictionary loadDictionaryFromFile(const std::string& filename, lua_State* state) {
+ghoul::Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
+                                         lua_State* state)
+{
     ghoul::Dictionary result;
     loadDictionaryFromFile(filename, result, state);
     return result;

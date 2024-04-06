@@ -38,7 +38,7 @@ RuntimeError::RuntimeError(std::string msg, std::string comp)
     ghoul_assert(!message.empty(), "Message must not be empty");
 }
 
-FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
+FileNotFoundError::FileNotFoundError(std::filesystem::path f, std::string comp)
     : RuntimeError(std::format("Could not find file '{}'", f), std::move(comp))
     , file(std::move(f))
 {}

@@ -170,11 +170,11 @@ namespace {
                 try {
                     const std::string pathString(path.C_Str());
                     const std::string absolutePath = std::format(
-                        "{}/{}", modelDirectory.string(), pathString
+                        "{}/{}", modelDirectory, pathString
                     );
 
                     textureEntry.texture = TextureReader::ref().loadTexture(
-                        absPath(absolutePath).string(),
+                        absPath(absolutePath),
                         2
                     );
                     meshTexture.texture = textureEntry.texture.get();

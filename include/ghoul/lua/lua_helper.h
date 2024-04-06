@@ -46,20 +46,20 @@ struct LuaRuntimeException : public RuntimeError {
 };
 
 struct LuaFormatException : public LuaRuntimeException {
-    explicit LuaFormatException(std::string msg, std::string file = "");
-    const std::string filename;
+    explicit LuaFormatException(std::string msg, std::filesystem::path file = "");
+    const std::filesystem::path filename;
 };
 
 struct LuaLoadingException : public LuaRuntimeException {
-    explicit LuaLoadingException(std::string error, std::string file = "");
+    explicit LuaLoadingException(std::string error, std::filesystem::path file = "");
     const std::string errorMessage;
-    const std::string filename;
+    const std::filesystem::path filename;
 };
 
 struct LuaExecutionException : public LuaRuntimeException {
-    explicit LuaExecutionException(std::string error, std::string file = "");
+    explicit LuaExecutionException(std::string error, std::filesystem::path file = "");
     const std::string errorMessage;
-    const std::string filename;
+    const std::filesystem::path filename;
 };
 
 /// If an instance of this struct is passed to the #push method, it will cause a nil value
@@ -165,8 +165,8 @@ int luaError(lua_State* state, const std::string& message);
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
  */
-void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary,
-    lua_State* state = nullptr);
+void loadDictionaryFromFile(const std::filesystem::path& filename,
+    ghoul::Dictionary& dictionary, lua_State* state = nullptr);
 
 /**
  * Loads a Lua script and returns it as a #ghoul::Dictionary. The script contained in the
@@ -191,7 +191,7 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
  */
-ghoul::Dictionary loadDictionaryFromFile(const std::string& filename,
+ghoul::Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
     lua_State* state = nullptr);
 
 /**

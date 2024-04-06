@@ -36,7 +36,7 @@
 namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
-                                                              const std::string& filename,
+                                                    const std::filesystem::path& filename,
                                                                     int nDimensions) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");

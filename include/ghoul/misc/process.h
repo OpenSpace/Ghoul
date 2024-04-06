@@ -26,6 +26,7 @@
 #ifndef __GHOUL___PROCESS___H__
 #define __GHOUL___PROCESS___H__
 
+#include <filesystem>
 #include <functional>
 #include <string>
 #include <memory>
@@ -36,7 +37,7 @@ namespace ghoul {
 
 class Process {
 public:
-    Process(const std::string& command, const std::string& path,
+    Process(const std::string& command, const std::filesystem::path& path,
         std::function<void(const char* bytes, size_t n)> readStdout = nullptr,
         std::function<void(const char* bytes, size_t n)> readStderr = nullptr,
         bool openStdin = false);

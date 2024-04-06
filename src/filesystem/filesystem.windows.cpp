@@ -69,8 +69,9 @@ int FileSystem::addFileListener(std::filesystem::path path,
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;
 
+        std::string d = dir.string();
         handle->_handle = CreateFile(
-            dir.string().c_str(),
+            d.c_str(),
             FILE_LIST_DIRECTORY,
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
             nullptr,

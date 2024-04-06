@@ -147,7 +147,7 @@ namespace {
 
 namespace ghoul {
 
-std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
+std::vector<std::vector<std::string>> loadCSVFile(const std::filesystem::path& fileName,
                                                   bool includeFirstLine)
 {
     ghoul_assert(!fileName.empty(), "fileName must not be empty");
@@ -159,7 +159,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     return internalLoadCSV(file, includeFirstLine, std::vector<int>());
 }
 
-std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
+std::vector<std::vector<std::string>> loadCSVFile(const std::filesystem::path& fileName,
                                                   const std::vector<std::string>& columns,
                                                   bool includeFirstLine)
 {
@@ -206,7 +206,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
     return internalLoadCSV(file, includeFirstLine, indices);
 }
 
-std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
+std::vector<std::vector<std::string>> loadCSVFile(const std::filesystem::path& fileName,
                                                   const std::vector<int>& columns,
                                                   bool includeFirstLine)
 {

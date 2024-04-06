@@ -29,6 +29,7 @@
 #include <ghoul/logging/log.h>
 
 #include <ghoul/misc/boolean.h>
+#include <filesystem>
 #include <fstream>
 
 namespace ghoul::logging {
@@ -81,7 +82,7 @@ public:
      * \pre \p nLogRotation must be >= 0
      * \pre If \p nLogRotation is > 0 \p writeToAppend must be Append::No
      */
-    TextLog(const std::string& filename, int nLogRotation = 0,
+    TextLog(const std::filesystem::path& filename, int nLogRotation = 0,
         Append writeToAppend = Append::Yes, TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,

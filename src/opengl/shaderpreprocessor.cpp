@@ -150,7 +150,8 @@ namespace {
 
 namespace ghoul::opengl {
 
-std::vector<std::string> ShaderPreprocessor::_includePaths = std::vector<std::string>();
+std::vector<std::filesystem::path> ShaderPreprocessor::_includePaths =
+    std::vector<std::filesystem::path>();
 
 ShaderPreprocessor::ShaderPreprocessorError::ShaderPreprocessorError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderPreprocessor")
@@ -217,7 +218,7 @@ void ShaderPreprocessor::process(std::string& output) {
     std::stringstream stream;
     ShaderPreprocessor::Env env{stream};
 
-    includeFile(absPath(_shaderPath.string()), TrackChanges::Yes, env);
+    includeFile(absPath(_shaderPath), TrackChanges::Yes, env);
 
     if (!env.forStatements.empty()) {
         throw ParserError(
@@ -235,7 +236,7 @@ void ShaderPreprocessor::process(std::string& output) {
 
 void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = std::move(changeCallback);
-    for (std::pair<const std::string, FileStruct>& files : _includedFiles) {
+    for (std::pair<const std::filesystem::path, FileStruct>& files : _includedFiles) {
         if (files.second.isTracked) {
             files.second.file.setCallback([this]() { _onChangeCallback(); });
         }
@@ -244,7 +245,7 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
 
 std::string ShaderPreprocessor::getFileIdentifiersString() const {
     std::stringstream identifiers;
-    for (const std::pair<const std::string, FileStruct>& f : _includedFiles) {
+    for (const std::pair<const std::filesystem::path, FileStruct>& f : _includedFiles) {
         identifiers << f.second.fileIdentifier << ": " << f.first << '\n';
     }
     return identifiers.str();
@@ -257,13 +258,9 @@ void ShaderPreprocessor::addIncludePath(const std::filesystem::path& folderPath)
         "Folder path must be an existing directory"
     );
 
-    const auto it = std::find(
-        _includePaths.begin(), _includePaths.end(),
-        folderPath.string()
-    );
-
+    const auto it = std::find(_includePaths.begin(), _includePaths.end(), folderPath);
     if (it == _includePaths.cend()) {
-        _includePaths.push_back(folderPath.string());
+        _includePaths.push_back(folderPath);
     }
 }
 
@@ -274,9 +271,9 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
     ghoul_assert(!path.empty(), "Path must not be empty");
     ghoul_assert(std::filesystem::is_regular_file(path), "Path must be an existing file");
 
-    if (_includedFiles.find(path.string()) == _includedFiles.end()) {
+    if (_includedFiles.find(path) == _includedFiles.end()) {
         const auto it = _includedFiles.emplace(
-            path.string(),
+            path,
             FileStruct {
                 filesystem::File(path),
                 _includedFiles.size(),
@@ -337,7 +334,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
 }
 
 void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
-    const std::string filename = env.inputs.back().file.path().string();
+    const std::filesystem::path filename = env.inputs.back().file.path();
     ghoul_assert(
         _includedFiles.find(filename) != _includedFiles.end(),
         "File not in included files"
@@ -403,7 +400,7 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
 std::string ShaderPreprocessor::debugString(const ShaderPreprocessor::Env& env) {
     if (!env.inputs.empty()) {
         const ShaderPreprocessor::Input& input = env.inputs.back();
-        return input.file.path().string() + ": " + std::to_string(input.lineNumber);
+        return std::format("{}: {}", input.file.path(), input.lineNumber);
     }
     else {
         return "";
@@ -580,8 +577,8 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
         // Resolve the include paths if this default includeFilename does not exist
         if (!includeFileWasFound) {
-            for (const std::string& path : _includePaths) {
-                includeFilepath = std::filesystem::path(path) / includeFilename;
+            for (const std::filesystem::path& path : _includePaths) {
+                includeFilepath = path / includeFilename;
                 if (std::filesystem::is_regular_file(includeFilepath)) {
                     includeFileWasFound = true;
                     break;
@@ -598,16 +595,11 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
             }
         }
 
-        if (includeFileWasFound) {
-            includeFile(
-                absPath(includeFilepath.string()),
-                TrackChanges(tracksInclude),
-                env
-            );
-        }
-        else {
+        if (!includeFileWasFound) {
             throw IncludeError(includeFilename);
         }
+
+        includeFile(absPath(includeFilepath), TrackChanges(tracksInclude), env);
     }
     else if (line.at(p1) == '<') {
         const size_t p2 = line.find_first_of('>', p1 + 1);
@@ -617,7 +609,7 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
         const size_t includeLen = p2 - p1 - 1;
         const std::filesystem::path include = absPath(line.substr(p1 + 1, includeLen));
-        includeFile(include.string(), TrackChanges(tracksInclude), env);
+        includeFile(include, TrackChanges(tracksInclude), env);
     }
     return true;
 }
@@ -839,7 +831,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
         env.success = false;
         const int inputIndex = forStmnt.inputIndex;
         const ShaderPreprocessor::Input& forInput = env.inputs[inputIndex];
-        std::string path = forInput.file.path().string();
+        std::filesystem::path path = forInput.file.path();
         int lineNumber = forStmnt.lineNumber;
 
         throw ParserError(std::format(

@@ -392,7 +392,8 @@ void push(lua_State* L, T value) {
         lua_pushlstring(L, value.data(), value.size());
     }
     else if constexpr (std::is_same_v<T, std::filesystem::path>) {
-        lua_pushlstring(L, value.string().c_str(), value.string().size());
+        const std::string s = value.string();
+        lua_pushlstring(L, s.c_str(), s.size());
     }
     else if constexpr (std::is_same_v<T, std::vector<double>> ||
                        std::is_same_v<T, std::vector<float>>)

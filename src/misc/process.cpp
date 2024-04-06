@@ -29,14 +29,14 @@
 
 namespace ghoul {
 
-Process::Process(const std::string& command, const std::string& path,
+Process::Process(const std::string& command, const std::filesystem::path& path,
                  std::function<void(const char* bytes, size_t n)> readStdout,
                  std::function<void(const char* bytes, size_t n)> readStderr,
                  bool openStdin)
 {
     _process = std::make_unique<TinyProcessLib::Process>(
         command,
-        path,
+        path.string(),
         std::move(readStdout),
         std::move(readStderr),
         openStdin

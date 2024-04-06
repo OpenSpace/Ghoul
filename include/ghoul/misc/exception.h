@@ -26,6 +26,7 @@
 #ifndef __GHOUL___EXCEPTION___H__
 #define __GHOUL___EXCEPTION___H__
 
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 
@@ -69,10 +70,10 @@ struct FileNotFoundError : public RuntimeError {
      *
      * \pre \p f must not be empty
      */
-    explicit FileNotFoundError(std::string f, std::string comp = "");
+    explicit FileNotFoundError(std::filesystem::path f, std::string comp = "");
 
     /// The file that was missing
-    const std::string file;
+    const std::filesystem::path file;
 };
 
 } // namespace ghoul

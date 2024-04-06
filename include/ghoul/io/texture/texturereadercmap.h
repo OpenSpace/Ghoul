@@ -52,7 +52,7 @@ public:
      *      reported by supportedExtensions
      * \pre \p nDimensions must be 1, 2, or 3
      */
-    std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename,
+    std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
         int nDimensions) const override;
 
 

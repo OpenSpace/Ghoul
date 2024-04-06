@@ -28,6 +28,7 @@
 
 #include <ghoul/logging/textlog.h>
 
+#include <filesystem>
 #include <vector>
 
 namespace ghoul::logging {
@@ -74,13 +75,15 @@ public:
      *
      * \pre \p filename must not be empty
      */
-    HTMLLog(const std::string& filename, int nLogRotation,
+    HTMLLog(const std::filesystem::path& filename, int nLogRotation,
         TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
         LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
-        const std::vector<std::string>& cssIncludes = std::vector<std::string>(),
-        const std::vector<std::string>& jsIncludes = std::vector<std::string>(),
+        const std::vector<std::filesystem::path>& cssIncludes
+            = std::vector<std::filesystem::path>(),
+        const std::vector<std::filesystem::path>& jsIncludes
+            = std::vector<std::filesystem::path>(),
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
     /**

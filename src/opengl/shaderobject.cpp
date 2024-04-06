@@ -207,7 +207,7 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
 void ShaderObject::setFilename(const std::filesystem::path& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
     if (!std::filesystem::is_regular_file(filename)) {
-        throw FileNotFoundError(filename.string());
+        throw FileNotFoundError(filename);
     }
 
     _preprocessor.setFilename(filename);

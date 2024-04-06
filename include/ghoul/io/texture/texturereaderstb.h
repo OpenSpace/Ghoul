@@ -48,7 +48,7 @@ public:
      * \pre \p nDimensions must be 1, 2, or 3
      */
     std::unique_ptr<opengl::Texture> loadTexture(
-        const std::string& filename, int nDimensions) const override;
+        const std::filesystem::path& filename, int nDimensions) const override;
 
 
     /**

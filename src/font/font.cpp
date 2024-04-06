@@ -80,7 +80,8 @@ namespace {
         const FT_Error e1 = FT_Init_FreeType(&library);
         handleError(e1, nullptr, nullptr, nullptr, name, size);
 
-        const FT_Error e2 = FT_New_Face(library, name.string().c_str(), 0, &face);
+        const std::string n = name.string();
+        const FT_Error e2 = FT_New_Face(library, n.c_str(), 0, &face);
         handleError(e2, library, nullptr, nullptr, name, size);
 
         const FT_Error e3 = FT_Select_Charmap(face, FT_ENCODING_UNICODE);

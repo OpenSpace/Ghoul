@@ -31,11 +31,12 @@
 
 namespace ghoul::logging {
 
-HTMLLog::HTMLLog(const std::string& filename, int nLogRotation,
+HTMLLog::HTMLLog(const std::filesystem::path& filename, int nLogRotation,
                  TimeStamping timeStamping, DateStamping dateStamping,
                  CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
-                 const std::vector<std::string>& cssIncludes,
-                 const std::vector<std::string>& jsIncludes, LogLevel minimumLogLevel)
+                 const std::vector<std::filesystem::path>& cssIncludes,
+                 const std::vector<std::filesystem::path>& jsIncludes,
+                 LogLevel minimumLogLevel)
     : TextLog(
         filename,
         nLogRotation,
@@ -56,7 +57,7 @@ HTMLLog::HTMLLog(const std::string& filename, int nLogRotation,
 
     const std::back_insert_iterator<std::string> backInserter(output);
 
-    for (const std::string& c : cssIncludes) {
+    for (const std::filesystem::path& c : cssIncludes) {
         std::ifstream cssInput(c);
         std::copy(
             std::istreambuf_iterator<char>{cssInput},
@@ -67,7 +68,7 @@ HTMLLog::HTMLLog(const std::string& filename, int nLogRotation,
 
     output += "\t\t</style>\n\t\t<script>\n";
 
-    for (const std::string& j : jsIncludes) {
+    for (const std::filesystem::path& j : jsIncludes) {
         std::ifstream jsInput(j);
         std::copy(
             std::istreambuf_iterator<char>{jsInput},

@@ -164,8 +164,8 @@ private:
         bool isTracked;
     };
 
-    std::map<std::string, FileStruct> _includedFiles;
-    static std::vector<std::string> _includePaths;
+    std::map<std::filesystem::path, FileStruct> _includedFiles;
+    static std::vector<std::filesystem::path> _includePaths;
     std::filesystem::path _shaderPath;
     Dictionary _dictionary;
     ShaderChangedCallback _onChangeCallback;

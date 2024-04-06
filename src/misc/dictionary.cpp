@@ -83,6 +83,17 @@ void Dictionary::setValue(std::string key, T value) {
     {
         setValue(std::move(key), std::string(value));
     }
+    else if constexpr (std::is_same_v<T, std::filesystem::path>) {
+        setValue(std::move(key), value.string());
+    }
+    else if constexpr (std::is_same_v<T, std::vector<std::filesystem::path>>) {
+        std::vector<std::string> vs;
+        vs.reserve(value.size());
+        for (const std::filesystem::path& p : value) {
+            vs.push_back(p.string());
+        }
+        setValue(std::move(key), std::move(vs));
+    }
     else {
         static_assert(sizeof(T) == 0, "Unsupported type");
     }
@@ -159,9 +170,20 @@ T Dictionary::value(std::string_view key) const {
         std::memcpy(glm::value_ptr(res), vec.data(), sizeof(T));
         return res;
     }
-    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
+    else if constexpr (std::is_same_v<T, const char*> ||
+                       std::is_same_v<T, const char[]> ||
+                       std::is_same_v<T, std::filesystem::path>)
     {
         return value<std::string>(key);
+    }
+    else if constexpr (std::is_same_v<T, std::vector<std::filesystem::path>>) {
+        std::vector<std::string> values = value<std::vector<std::string>>(key);
+        std::vector<std::filesystem::path> vs;
+        vs.reserve(values.size());
+        for (const std::string& v : values) {
+            vs.push_back(v);
+        }
+        return vs;
     }
     else {
         static_assert(sizeof(T) == 0, "Unsupported type");
@@ -203,9 +225,14 @@ bool Dictionary::hasValue(std::string_view key) const {
                 std::get<VT>(it->second).size() == ghoul::glm_components<T>::value;
         }
     }
-    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
+    else if constexpr (std::is_same_v<T, const char*> ||
+                       std::is_same_v<T, const char[]> ||
+                       std::is_same_v<T, std::filesystem::path>)
     {
         return hasValue<std::string>(key);
+    }
+    else if constexpr (std::is_same_v<T, std::vector<std::filesystem::path>>) {
+        return hasValue<std::vector<std::string>>(key);
     }
     else {
         static_assert(sizeof(T) == 0, "Unknown type T");
@@ -259,10 +286,12 @@ template void Dictionary::setValue(std::string, bool value);
 template void Dictionary::setValue(std::string, double);
 template void Dictionary::setValue(std::string, int);
 template void Dictionary::setValue(std::string, std::string);
+template void Dictionary::setValue(std::string, std::filesystem::path);
 template void Dictionary::setValue(std::string, void*);
 template void Dictionary::setValue(std::string, std::vector<int>);
 template void Dictionary::setValue(std::string, std::vector<double>);
 template void Dictionary::setValue(std::string, std::vector<std::string>);
+template void Dictionary::setValue(std::string, std::vector<std::filesystem::path>);
 template void Dictionary::setValue(std::string, glm::ivec2);
 template void Dictionary::setValue(std::string, glm::ivec3);
 template void Dictionary::setValue(std::string, glm::ivec4);
@@ -285,10 +314,12 @@ template bool Dictionary::value(std::string_view) const;
 template double Dictionary::value(std::string_view) const;
 template int Dictionary::value(std::string_view) const;
 template std::string Dictionary::value(std::string_view) const;
+template std::filesystem::path Dictionary::value(std::string_view) const;
 template void* Dictionary::value(std::string_view) const;
 template std::vector<int> Dictionary::value(std::string_view) const;
 template std::vector<double> Dictionary::value(std::string_view) const;
 template std::vector<std::string> Dictionary::value(std::string_view) const;
+template std::vector<std::filesystem::path> Dictionary::value(std::string_view) const;
 template glm::ivec2 Dictionary::value(std::string_view) const;
 template glm::ivec3 Dictionary::value(std::string_view) const;
 template glm::ivec4 Dictionary::value(std::string_view) const;
@@ -311,10 +342,13 @@ template bool Dictionary::hasValue<bool>(std::string_view) const;
 template bool Dictionary::hasValue<double>(std::string_view) const;
 template bool Dictionary::hasValue<int>(std::string_view) const;
 template bool Dictionary::hasValue<std::string>(std::string_view) const;
+template bool Dictionary::hasValue<std::filesystem::path>(std::string_view) const;
 template bool Dictionary::hasValue<void*>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<int>>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<double>>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<std::string>>(std::string_view) const;
+template bool Dictionary::hasValue<std::vector<std::filesystem::path>>(
+    std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec2>(std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec3>(std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec4>(std::string_view) const;

@@ -27,6 +27,7 @@
 #define __GHOUL___TEXTUREREADER___H__
 
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -49,10 +50,11 @@ class TextureReader {
 public:
     /// Exception that gets thrown when there is no reader for the provided \p extension
     struct MissingReaderException : public RuntimeError {
-        explicit MissingReaderException(std::string extension, std::string file_);
+        explicit MissingReaderException(std::string extension,
+            std::filesystem::path file_);
 
         const std::string fileExtension;
-        const std::string file;
+        const std::filesystem::path file;
     };
 
     /// Exception that gets thrown when an invalid load result occurs
@@ -89,7 +91,7 @@ public:
      * \pre At least one TextureReaderBase must have been added to the TextureReader
      *      before (addReader)
      */
-    std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename,
+    std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
         int nDimensions);
 
     /**

@@ -116,15 +116,16 @@ namespace {
 namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(
-                                                              const std::string& filename,
+                                                    const std::filesystem::path& filename,
                                                                     int nDimensions) const
 {
+    const std::string f = filename.string();
     int x = 0;
     int y = 0;
     int n = 0;
-    unsigned char* data = stbi_load(filename.c_str(), &x, &y, &n, 0);
+    unsigned char* data = stbi_load(f.c_str(), &x, &y, &n, 0);
 
-    return load(data, x, y, n, filename, this, nDimensions);
+    return load(data, x, y, n, f, this, nDimensions);
 }
 
 std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory, size_t size,
