@@ -159,11 +159,11 @@ TEST_CASE("CSVReader: Column Name w/ comments", "[csvreader]") {
 
     const std::filesystem::path test0 =
         absPath("${UNIT_TEST}/csvreader/test0_with_comments.csv");
-    const std::string test0s = test0;
+
     //   4, 7, 2
     const std::vector<std::string> col = { "slope_g", "obs_num", "designation" };
-    const DataSet noHeader = ghoul::loadCSVFile(test0s, col);
-    const DataSet header = ghoul::loadCSVFile(test0s, col, true);
+    const DataSet noHeader = ghoul::loadCSVFile(test0, col);
+    const DataSet header = ghoul::loadCSVFile(test0, col, true);
 
     REQUIRE(noHeader.size() == 351);
     REQUIRE(header.size() == 352);
