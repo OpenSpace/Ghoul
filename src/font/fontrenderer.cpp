@@ -44,15 +44,6 @@
 namespace {
     constexpr std::string_view _loggerCat = "FontRenderer";
 
-    constexpr std::array<const char*, 5> UniformNames = {
-        "baseColor", "outlineColor", "tex", "hasOutline", "projection"
-    };
-
-    constexpr std::array<const char*, 7> UniformNamesProjection = {
-        "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform",
-        "enableFalseDepth", "disableTransmittance"
-    };
-
     constexpr std::string_view DefaultVertexShaderPath =
         "${TEMPORARY}/defaultfontrenderer_vs.glsl";
     constexpr std::string_view DefaultFragmentShaderPath =
@@ -351,7 +342,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     program->linkProgramObject();
 
     auto fr = std::make_unique<FontRenderer>(std::move(program), glm::vec2(0.f));
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache, UniformNames);
+    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache);
     return fr;
 }
 
@@ -392,11 +383,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
 
     // Can't create a unique_ptr directly here as the FontRenderer is not private
     auto fr = std::make_unique<FontRenderer>(std::move(pg), glm::vec2(0.f));
-    ghoul::opengl::updateUniformLocations(
-        *fr->_program,
-        fr->_uniformCacheProjection,
-        UniformNamesProjection
-    );
+    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection);
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
     return fr;
 }
@@ -527,7 +514,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     _program->setUniform(_uniformCache.baseColor, color);
     _program->setUniform(_uniformCache.outlineColor, outlineColor);
-    _program->setUniform(_uniformCache.texture, atlasUnit);
+    _program->setUniform(_uniformCache.tex, atlasUnit);
     _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
     _program->setUniform(
         _uniformCache.projection,
@@ -738,7 +725,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     _program->setUniform(_uniformCacheProjection.baseColor, color);
     _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
-    _program->setUniform(_uniformCacheProjection.texture, atlasUnit);
+    _program->setUniform(_uniformCacheProjection.tex, atlasUnit);
     _program->setUniform(_uniformCacheProjection.hasOutline, font.hasOutline());
     _program->setUniform(_uniformMvp, labelInfo.mvpMatrix);
     _program->setUniform(
