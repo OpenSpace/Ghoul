@@ -32,7 +32,7 @@ template <typename Key, typename Value, int Size>
 struct Map {
     std::array<std::pair<Key, Value>, Size> data;
 
-    [[ nodiscard ]] constexpr std::optional<Value> at(const Key& key) const {
+    [[nodiscard]] constexpr std::optional<Value> at(const Key& key) const {
         // @CPP20
         // manual constexpr std::find_if implementation until C++20 is available
         for (const std::pair<const Key, Value>& d : data) {
@@ -44,7 +44,7 @@ struct Map {
         return std::nullopt;
     }
 
-    [[ nodiscard ]] constexpr bool contains(const Key& key) const {
+    [[nodiscard]] constexpr bool contains(const Key& key) const {
         // @CPP20
         // manual implementation of std::contains implementation until C++20 is available
         for (const std::pair<const Key, Value>& d : data) {

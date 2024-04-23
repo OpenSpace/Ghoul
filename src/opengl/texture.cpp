@@ -643,7 +643,7 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     throw MissingCaseException();
             }
         case Format::RGB:
-            [[ fallthrough ]];
+            [[fallthrough]];
         case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
@@ -718,7 +718,7 @@ vec4 Texture::texelAsFloat(unsigned int x) const {
                     throw MissingCaseException();
             }
         case Format::RGBA:
-            [[ fallthrough ]];
+            [[fallthrough]];
         case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
@@ -1000,7 +1000,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y) const {
                     throw MissingCaseException();
             }
         case Format::RGBA:
-            [[ fallthrough ]];
+            [[fallthrough]];
         case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
@@ -1207,7 +1207,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     throw MissingCaseException();
             }
         case Format::RGB:
-            [[ fallthrough ]];
+            [[fallthrough]];
         case Format::BGR:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:
@@ -1282,7 +1282,7 @@ vec4 Texture::texelAsFloat(unsigned int x, unsigned int y, unsigned int z) const
                     throw MissingCaseException();
             }
         case Format::RGBA:
-            [[ fallthrough ]];
+            [[fallthrough]];
         case Format::BGRA:
             switch (_dataType) {
                 case GL_UNSIGNED_BYTE:

@@ -41,9 +41,9 @@ VisualStudioOutputLog::VisualStudioOutputLog(TimeStamping timeStamping,
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
 {}
 
-void VisualStudioOutputLog::log([[ maybe_unused ]] LogLevel level,
-                                [[ maybe_unused ]] std::string_view category,
-                                [[ maybe_unused ]] std::string_view message)
+void VisualStudioOutputLog::log([[maybe_unused]] LogLevel level,
+                                [[maybe_unused]] std::string_view category,
+                                [[maybe_unused]] std::string_view message)
 {
 #ifdef WIN32
     ZoneScoped;
