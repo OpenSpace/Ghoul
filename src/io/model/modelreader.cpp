@@ -82,7 +82,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
 
     if (!useCache || !reader->needsCache()) {
-        LINFO(fmt::format("Loading ModelGeometry file {}", filename));
+        LINFO(std::format("Loading ModelGeometry file {}", filename));
         return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
     }
 

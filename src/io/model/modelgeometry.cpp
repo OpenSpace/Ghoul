@@ -243,7 +243,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         LINFO("No cahced TextureEntries were loaded");
     }
     else if (nTextureEntries < 0) {
-        std::string message = fmt::format(
+        std::string message = std::format(
             "Model cannot have negative number of texture entries while loading "
             "cache: {}", nTextureEntries
         );
@@ -340,7 +340,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         int32_t nMeshes = 0;
         fileStream.read(reinterpret_cast<char*>(&nMeshes), sizeof(int32_t));
         if (nMeshes < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of meshes while loading cache: {}",
                 nMeshes
             );
@@ -494,7 +494,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         int32_t nChildren = 0;
         fileStream.read(reinterpret_cast<char*>(&nChildren), sizeof(int32_t));
         if (nChildren < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of children while loading cache: {}",
                 nChildren
             );
@@ -692,7 +692,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         LINFO("No TextureEntries were loaded while saving cache");
     }
     else if (nTextureEntries < 0) {
-        std::string message = fmt::format(
+        std::string message = std::format(
             "Model cannot have negative number of texture entries while saving cache: {}",
             nTextureEntries
         );
@@ -774,7 +774,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         // Write how many meshes are to be written
         int32_t nMeshes = static_cast<int32_t>(node.meshes().size());
         if (nMeshes < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of meshes while saving cache: {}",
                 nMeshes
             );
@@ -925,7 +925,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         // Write how many children are to be written
         int32_t nChildren = static_cast<int32_t>(node.children().size());
         if (nChildren < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of children while saving "
                 "cache: {}", nChildren
             );
@@ -951,7 +951,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     if (_animation != nullptr) {
         // Name
         if (_animation->name().size() >= std::numeric_limits<uint8_t>::max()) {
-            LWARNING(fmt::format(
+            LWARNING(std::format(
                 "A maximum animaion name length of {} is supported",
                 std::numeric_limits<uint8_t>::max()
             ));
