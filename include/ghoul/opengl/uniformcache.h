@@ -67,77 +67,107 @@ struct UniformCacheBase {};
 #define UniformCache1(v1)                                                                \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1;                                                                     \
+        static constexpr std::array UniformNames = { #v1 };                              \
     }
 
 #define UniformCache2(v1, v2)                                                            \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1;                                                            \
+        static constexpr std::array UniformNames = { #v1, #v2 };                         \
     }
 
 #define UniformCache3(v1, v2, v3)                                                        \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1;                                                   \
+        static constexpr std::array UniformNames = { #v1, #v2, #v3 };                    \
     }
 
 #define UniformCache4(v1, v2, v3, v4)                                                    \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1;                                          \
+        static constexpr std::array UniformNames = { #v1, #v2, #v3, #v4 };               \
     }
 
 #define UniformCache5(v1, v2, v3, v4, v5)                                                \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1;                                 \
+        static constexpr std::array UniformNames = { #v1, #v2, #v3, #v4, #v5 };          \
 }
 
 #define UniformCache6(v1, v2, v3, v4, v5, v6)                                            \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1;                        \
+        static constexpr std::array UniformNames = { #v1, #v2, #v3, #v4, #v5, #v6 };     \
     }
 
 #define UniformCache7(v1, v2, v3, v4, v5, v6, v7)                                        \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1;               \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7                                            \
+        };                                                                               \
     }
 
 #define UniformCache8(v1, v2, v3, v4, v5, v6, v7, v8)                                    \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1;      \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8                                       \
+        };                                                                               \
     }
 
 #define UniformCache9(v1, v2, v3, v4, v5, v6, v7, v8, v9)                                \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1, v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,      \
             v9 = -1;                                                                     \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9                                  \
+        };                                                                               \
     }
 
 #define UniformCache10(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10)                          \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1, v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,     \
             v9 = -1, v10 = -1;                                                           \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10                            \
+        };                                                                               \
     }
 
 #define UniformCache11(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)                     \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1, v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,    \
             v9 = -1, v10 = -1, v11 = -1;                                                 \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11                      \
+        };                                                                               \
     }
 
 #define UniformCache12(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12)                \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1, v5 = -1, v6 = -1, v7 = -1, v8 = -1,   \
             v9 = -1, v10 = -1, v11 = -1, v12 = -1;                                       \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12                \
+        };                                                                               \
     }
 
 #define UniformCache13(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13)           \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1, v6 = -1, v7 = -1, v8 = -1,  \
             v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1;                             \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13          \
+        };                                                                               \
     }
 
 #define UniformCache14(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14)      \
     struct : public UniformCacheBase {                                                   \
         int v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1, v7 = -1, v8 = -1, \
             v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1;                   \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14    \
+        };                                                                               \
     }
 
 #define UniformCache15(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) \
@@ -145,6 +175,10 @@ struct UniformCacheBase {};
         int  v1 = -1, v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,         \
              v8 = -1, v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,         \
             v15 = -1;                                                                    \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15                                                                         \
+        };                                                                               \
     }
 
 #define UniformCache16(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -153,6 +187,10 @@ struct UniformCacheBase {};
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1;                                                          \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16                                                                   \
+        };                                                                               \
     }
 
 #define UniformCache17(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -161,6 +199,10 @@ struct UniformCacheBase {};
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1;                                                \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17                                                             \
+        };                                                                               \
     }
 
 #define UniformCache18(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -169,6 +211,10 @@ struct UniformCacheBase {};
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1;                                      \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18                                                       \
+        };                                                                               \
     }
 
 #define UniformCache19(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -177,6 +223,10 @@ struct UniformCacheBase {};
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1;                            \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19                                                 \
+        };                                                                               \
     }
 
 #define UniformCache20(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -185,6 +235,10 @@ struct UniformCacheBase {};
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1;                  \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20                                           \
+        };                                                                               \
     }
 
 #define UniformCache21(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -193,6 +247,10 @@ struct UniformCacheBase {};
         int  v1 = -1,  v2 = -1,  v3 = -1,  v4 = -1,  v5 = -1,  v6 = -1,  v7 = -1,        \
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1;        \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21                                     \
+        };                                                                               \
     }
 
 #define UniformCache22(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -202,6 +260,10 @@ struct UniformCacheBase {};
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1;                                                                    \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22                               \
+        };                                                                               \
     }
 
 #define UniformCache23(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -211,6 +273,10 @@ struct UniformCacheBase {};
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1;                                                          \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23                         \
+        };                                                                               \
     }
 
 #define UniformCache24(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -220,6 +286,10 @@ struct UniformCacheBase {};
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1;                                                \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24                   \
+        };                                                                               \
     }
 
 #define UniformCache25(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -229,6 +299,10 @@ struct UniformCacheBase {};
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1;                                      \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25             \
+        };                                                                               \
     }
 
 #define UniformCache26(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -238,6 +312,10 @@ struct UniformCacheBase {};
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1;                            \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26       \
+        };                                                                               \
     }
 
 #define UniformCache27(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -247,6 +325,11 @@ struct UniformCacheBase {};
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1;                  \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27                                                                         \
+        };                                                                               \
     }
 
 #define UniformCache28(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
@@ -256,6 +339,11 @@ struct UniformCacheBase {};
              v8 = -1,  v9 = -1, v10 = -1, v11 = -1, v12 = -1, v13 = -1, v14 = -1,        \
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1;        \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28                                                                   \
+        };                                                                               \
     }
 #define UniformCache29(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -266,6 +354,11 @@ struct UniformCacheBase {};
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1;                                                                    \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29                                                             \
+        };                                                                               \
     }
 #define UniformCache30(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -276,6 +369,11 @@ struct UniformCacheBase {};
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1;                                                          \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30                                                       \
+        };                                                                               \
     }
 #define UniformCache31(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -286,6 +384,11 @@ struct UniformCacheBase {};
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1;                                                \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31                                                 \
+        };                                                                               \
     }
 #define UniformCache32(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -296,6 +399,11 @@ struct UniformCacheBase {};
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1;                                      \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32                                           \
+        };                                                                               \
     }
 #define UniformCache33(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -306,6 +414,11 @@ struct UniformCacheBase {};
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1;                            \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33                                     \
+        };                                                                               \
     }
 #define UniformCache34(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -316,6 +429,11 @@ struct UniformCacheBase {};
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1;                  \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33, #v34                               \
+        };                                                                               \
     }
 #define UniformCache35(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -326,6 +444,11 @@ struct UniformCacheBase {};
             v15 = -1, v16 = -1, v17 = -1, v18 = -1, v19 = -1, v20 = -1, v21 = -1,        \
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1;        \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33, #v34, #v35                         \
+        };                                                                               \
     }
 #define UniformCache36(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -337,6 +460,11 @@ struct UniformCacheBase {};
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
             v36 = -1;                                                                    \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33, #v34, #v35, #v36                   \
+        };                                                                               \
     }
 #define UniformCache37(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -348,6 +476,11 @@ struct UniformCacheBase {};
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
             v36 = -1, v37 = -1;                                                          \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33, #v34, #v35, #v36, #v37             \
+        };                                                                               \
     }
 #define UniformCache38(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -359,6 +492,11 @@ struct UniformCacheBase {};
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
             v36 = -1, v37 = -1, v38 = -1;                                                \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33, #v34, #v35, #v36, #v37, #v38       \
+        };                                                                               \
     }
 #define UniformCache39(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -370,6 +508,12 @@ struct UniformCacheBase {};
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
             v36 = -1, v37 = -1, v38 = -1, v39 = -1;                                      \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33, #v34, #v35, #v36, #v37, #v38       \
+            #v39                                                                         \
+        };                                                                               \
     }
 #define UniformCache40(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, \
                        v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28,  \
@@ -381,6 +525,12 @@ struct UniformCacheBase {};
             v22 = -1, v23 = -1, v24 = -1, v25 = -1, v26 = -1, v27 = -1, v28 = -1,        \
             v29 = -1, v30 = -1, v31 = -1, v32 = -1, v33 = -1, v34 = -1, v35 = -1,        \
             v36 = -1, v37 = -1, v38 = -1, v39 = -1, v40 = -1;                            \
+        static constexpr std::array UniformNames = {                                     \
+            #v1, #v2, #v3, #v4, #v5, #v6, #v7, #v8, #v9, #v10, #v11, #v12, #v13, #v14,   \
+            #v15, #v16, #v17, #v18, #v19, #v20, #v21, #v22, #v23, #v24, #v25, #v26,      \
+            #v27, #v28, #v29, #v30, #v31, #v32, #v33, #v34, #v35, #v36, #v37, #v38       \
+            #v39, #v40                                                                   \
+        };                                                                               \
     }
 
 namespace ghoul::opengl {
@@ -397,11 +547,6 @@ template <typename T> // @CONCEPTS
 void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& uniformCache,
                      const std::array<const char*, sizeof(T) / sizeof(int)>& uniformNames)
 {
-    // The UniformCaches must only contain data for the uniform locations, so they must be
-    // divisible by 4 as each is an integer number
-    static_assert(sizeof(T) % sizeof(int) == 0);
-
-    // Make the error message a bit nicer if the
     static_assert(std::is_base_of_v<UniformCacheBase, T>);
 
     constexpr int nValues = sizeof(T) / sizeof(int);
@@ -411,6 +556,29 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
         // We skip empty uniform names
         if (uniformNames[i]) {
             uniformLocations[i] = program.uniformLocation(uniformNames[i]);
+        }
+    }
+}
+
+/**
+ * Function that will update the uniform locations in the \p program of the
+ * \p uniformCache based on the uniform names defined inside the \p uniformCache. This
+ * method will essentially call ProgramObject::uniformLocation on the passed parameters.
+ * The order of arguments in the \p uniformNames has to be the same as the location
+ * definitions.
+ *
+ * \tparam A type that was created through the UniformCache command
+ */
+template <typename T> // @CONCEPTS
+void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& uniformCache)
+{
+    static_assert(std::is_base_of_v<UniformCacheBase, T>);
+
+    int* uniformLocations = reinterpret_cast<int*>(&uniformCache);
+    for (size_t i = 0; i < uniformCache.UniformNames.size(); i++) {
+        // We skip empty uniform names
+        if (uniformCache.UniformNames[i]) {
+            uniformLocations[i] = program.uniformLocation(uniformCache.UniformNames[i]);
         }
     }
 }
