@@ -234,7 +234,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
     }
 
     const unsigned int hash = generateHash(
-        baseName,
+        file,
         information.has_value() ? *information : lmd
     );
 
@@ -291,7 +291,7 @@ bool CacheManager::hasCachedFile(const std::filesystem::path& file,
     }
 
     const unsigned long hash = generateHash(
-        baseName,
+        file,
         information.has_value() ? *information : lmd
     );
     return _files.find(hash) != _files.end();
@@ -316,7 +316,7 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
     }
 
     const unsigned int hash = generateHash(
-        baseName,
+        file,
         information.has_value() ? *information : lmd
     );
     const auto it = _files.find(hash);
