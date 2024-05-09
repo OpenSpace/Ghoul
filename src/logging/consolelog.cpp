@@ -141,7 +141,12 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
     }
 
     res += message;
-    std::osyncstream(std::cout) << res << '\n';
+    if (level >= LogLevel::Error) {
+        std::osyncstream(std::cerr) << res << '\n';
+    }
+    else {
+        std::osyncstream(std::cout) << res << '\n';
+    }
 
 
     if (_colorOutput) {
