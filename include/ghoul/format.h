@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___FMT___H__
-#define __GHOUL___FMT___H__
+#ifndef __GHOUL___FORMAT___H__
+#define __GHOUL___FORMAT___H__
 
 #include <filesystem>
 #include <format>
@@ -57,4 +57,4 @@ struct std::formatter<std::optional<T>> {
     }
 };
 
-#endif // __GHOUL___FMT___H__
+#endif // __GHOUL___FORMAT___H__

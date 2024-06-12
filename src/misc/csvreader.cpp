@@ -35,7 +35,7 @@
 namespace {
     std::string readFirstValidLine(std::ifstream& file) {
         std::string line;
-        while (std::getline(file, line)) {
+        while (ghoul::getline(file, line)) {
             ghoul::trimWhitespace(line);
             if (!line.empty() && !line.starts_with("#")) {
                 break;
