@@ -103,7 +103,7 @@ namespace {
             &enumerator
         );
         if (FAILED(hRes)) {
-            throw WMIError("WMI query failed", hRes);
+            throw WMIError(std::format("WMI query '{}' failed", query), hRes);
         }
 
         IWbemClassObject* pclsObject = nullptr;
@@ -127,7 +127,7 @@ namespace {
             if (result) {
                 VariantClear(result);
             }
-            throw WMIError("No WMI query result", hr);
+            throw WMIError(std::format("No WMI query result for query '{}'", query), hr);
         }
 
         if (enumerator) {
