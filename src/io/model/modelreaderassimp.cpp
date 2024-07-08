@@ -326,8 +326,8 @@ namespace {
         // Process materials and textures
         aiMaterial* material = scene.mMaterials[mesh.mMaterialIndex];
 
-        // If there is not material or color then do not add the mesh
-        if (!material || !hasVertexColors) {
+        // If there is no material and no color then do not add the mesh
+        if (!material && !hasVertexColors) {
             return ModelMesh(
                 std::move(vertexArray),
                 std::move(indexArray),
