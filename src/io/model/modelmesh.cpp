@@ -50,11 +50,13 @@ namespace {
 namespace ghoul::io {
 
 ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-                     std::vector<Texture> textures, bool isInvisible)
+                     std::vector<Texture> textures, bool isInvisible,
+                     bool hasVertexColors)
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
     , _isInvisible(isInvisible)
+    , _hasVertexColors(hasVertexColors)
 {}
 
 void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
@@ -85,10 +87,16 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTr
             program.setUniform("has_texture_normal", false);
             program.setUniform("has_texture_specular", false);
             program.setUniform("has_color_specular", false);
+            program.setUniform("use_vertex_colors", false);
 
             // If mesh is invisible and it has not been forced to render then don't render
             if (_isInvisible && _textures.empty()) {
                 return;
+            }
+
+            // Use embeded vertex colors if specified
+            if (_hasVertexColors) {
+                program.setUniform("use_vertex_colors", true);
             }
 
             // Bind appropriate textures
@@ -138,6 +146,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTr
         else {
             // Reset shader
             program.setUniform("has_texture_diffuse", false);
+            program.setUniform("use_vertex_colors", false);
 
             // Bind appropriate textures
             for (const Texture& texture : _textures) {
@@ -305,6 +314,17 @@ void ModelMesh::initialize() {
         GL_FALSE,
         sizeof(Vertex),
         reinterpret_cast<const GLvoid*>(offsetof(Vertex, tangent))
+    );
+
+    // Vertex color
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(
+        4,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(Vertex),
+        reinterpret_cast<const GLvoid*>(offsetof(Vertex, color))
     );
 
     glBindVertexArray(0);

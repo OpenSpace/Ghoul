@@ -246,6 +246,7 @@ namespace {
         std::vector<ModelMesh::Vertex> vertexArray;
         std::vector<unsigned int> indexArray;
         std::vector<ModelMesh::Texture> textureArray;
+        bool hasVertexColors = false;
 
         // Vertices
         vertexArray.reserve(mesh.mNumVertices);
@@ -294,6 +295,19 @@ namespace {
                 vertex.tangent[2] = 0.f;
             }
 
+            // Color, only check the first color set
+            // @TODO: (malej 2024-07-08) Handle the other colors in the set up to
+            // AI_MAX_NUMBER_OF_COLOR_SETS.
+            //
+            // @TODO: (malej 2024-07-08) Handle alpha channel as well
+            if (mesh.HasVertexColors(0)) {
+                aiColor4D* color = &mesh.mColors[0][i];
+                vertex.color[0] = color->r;
+                vertex.color[1] = color->g;
+                vertex.color[2] = color->b;
+                hasVertexColors = true;
+            }
+
             vertexArray.push_back(std::move(vertex));
         }
 
@@ -312,8 +326,8 @@ namespace {
         // Process materials and textures
         aiMaterial* material = scene.mMaterials[mesh.mMaterialIndex];
 
-        // If there is not material then do not add the mesh
-        if (!material) {
+        // If there is not material or color then do not add the mesh
+        if (!material || !hasVertexColors) {
             return ModelMesh(
                 std::move(vertexArray),
                 std::move(indexArray),
@@ -497,7 +511,9 @@ namespace {
         return ModelMesh(
             std::move(vertexArray),
             std::move(indexArray),
-            std::move(textureArray)
+            std::move(textureArray),
+            false,
+            hasVertexColors
         );
     }
 
