@@ -226,6 +226,10 @@ bool ModelMesh::isInvisible() const {
     return _isInvisible;
 }
 
+bool ModelMesh::hasVertexColors() const {
+    return _hasVertexColors;
+}
+
 bool ModelMesh::isTransparent() const {
     for (const Texture& t : _textures) {
         if ((t.type == TextureType::TextureDiffuse ||

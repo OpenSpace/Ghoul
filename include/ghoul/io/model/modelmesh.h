@@ -50,7 +50,7 @@ public:
         GLfloat tex[2];
         GLfloat normal[3];
         GLfloat tangent[3];
-        GLfloat color[3] = {0.f, 0.f, 0.f};
+        GLfloat color[3] = { 0.f, 0.f, 0.f };
     };
 
     struct Texture {
@@ -79,6 +79,7 @@ public:
 
     void setInvisible(bool isInvisible);
     bool isInvisible() const;
+    bool hasVertexColors() const;
     bool isTransparent() const;
 
     const std::vector<Vertex>& vertices() const;
