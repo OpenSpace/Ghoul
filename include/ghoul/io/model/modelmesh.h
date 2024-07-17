@@ -50,6 +50,7 @@ public:
         GLfloat tex[2];
         GLfloat normal[3];
         GLfloat tangent[3];
+        GLfloat color[3] = { 0.f, 0.f, 0.f };
     };
 
     struct Texture {
@@ -64,7 +65,8 @@ public:
     static void generateDebugTexture(ModelMesh::Texture& texture);
 
     ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-        std::vector<Texture> textures, bool isInvisible = false);
+        std::vector<Texture> textures, bool isInvisible = false,
+        bool hasVertexColors = false);
 
     ModelMesh(ModelMesh&&) noexcept = default;
     ~ModelMesh() noexcept = default;
@@ -77,6 +79,7 @@ public:
 
     void setInvisible(bool isInvisible);
     bool isInvisible() const;
+    bool hasVertexColors() const;
     bool isTransparent() const;
 
     const std::vector<Vertex>& vertices() const;
@@ -89,6 +92,7 @@ private:
     std::vector<Texture> _textures;
 
     bool _isInvisible = false;
+    bool _hasVertexColors = false;
 
     GLuint _vaoID = 0;
     GLuint _vbo = 0;

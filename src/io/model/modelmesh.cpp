@@ -50,11 +50,13 @@ namespace {
 namespace ghoul::io {
 
 ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-                     std::vector<Texture> textures, bool isInvisible)
+                     std::vector<Texture> textures, bool isInvisible,
+                     bool hasVertexColors)
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
     , _isInvisible(isInvisible)
+    , _hasVertexColors(hasVertexColors)
 {}
 
 void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
@@ -79,6 +81,9 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTr
     int textureUnitIndex = 0;
 
     if (!isProjection) {
+        // Use embeded vertex colors if specified
+        program.setUniform("use_vertex_colors", _hasVertexColors);
+
         if (isFullyTexturedModel) {
             // Reset shader
             program.setUniform("has_texture_diffuse", false);
@@ -217,6 +222,10 @@ bool ModelMesh::isInvisible() const {
     return _isInvisible;
 }
 
+bool ModelMesh::hasVertexColors() const {
+    return _hasVertexColors;
+}
+
 bool ModelMesh::isTransparent() const {
     for (const Texture& t : _textures) {
         if ((t.type == TextureType::TextureDiffuse ||
@@ -305,6 +314,17 @@ void ModelMesh::initialize() {
         GL_FALSE,
         sizeof(Vertex),
         reinterpret_cast<const GLvoid*>(offsetof(Vertex, tangent))
+    );
+
+    // Vertex color
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(
+        4,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(Vertex),
+        reinterpret_cast<const GLvoid*>(offsetof(Vertex, color))
     );
 
     glBindVertexArray(0);

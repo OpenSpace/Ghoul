@@ -38,7 +38,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 8;
+    constexpr int8_t CurrentCacheVersion = 9;
     constexpr int FormatStringSize = 4;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
@@ -300,6 +300,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::vector<io::ModelMesh> meshArray;
         meshArray.reserve(nMeshes);
         for (int32_t m = 0; m < nMeshes; ++m) {
+            // HasVertexColors
+            uint8_t col = 0;
+            fileStream.read(reinterpret_cast<char*>(&col), sizeof(uint8_t));
+            const bool hasVertexColors = (col == 1);
+
             // Vertices
             int32_t nVertices = 0;
             fileStream.read(reinterpret_cast<char*>(&nVertices), sizeof(int32_t));
@@ -405,7 +410,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 std::move(vertexArray),
                 std::move(indexArray),
                 std::move(textureArray),
-                isInvisible
+                isInvisible,
+                hasVertexColors
             );
         }
 
@@ -682,6 +688,10 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
         // Meshes
         for (const io::ModelMesh& mesh : node.meshes()) {
+            // HasVertexColors
+            uint8_t col = mesh.hasVertexColors() ? 1 : 0;
+            fileStream.write(reinterpret_cast<const char*>(&col), sizeof(uint8_t));
+
             // Vertices
             int32_t nVertices = static_cast<int32_t>(mesh.vertices().size());
             if (nVertices == 0) {
