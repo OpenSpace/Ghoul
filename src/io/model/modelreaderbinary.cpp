@@ -192,7 +192,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 io::ModelMesh::Vertex vertex;
                 fileStream.read(
                     reinterpret_cast<char*>(&vertex),
-                    sizeof(io::ModelMesh::Vertex)
+                    sizeof(io::ModelMesh::Vertex) - sizeof(GLfloat[3]) // @TODO: malej 2024-07-18 Temporary hack, need to update osmodel format + all models
                 );
                 vertexArray.push_back(std::move(vertex));
             }
