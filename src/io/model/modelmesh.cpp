@@ -81,10 +81,10 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTr
     int textureUnitIndex = 0;
 
     if (!isProjection) {
-        // Use embeded vertex colors if specified
-        program.setUniform("use_vertex_colors", _hasVertexColors);
-
         if (isFullyTexturedModel) {
+            // Use embeded vertex colors if specified
+            program.setUniform("use_vertex_colors", _hasVertexColors);
+
             // Reset shader
             program.setUniform("has_texture_diffuse", false);
             program.setUniform("has_texture_normal", false);
