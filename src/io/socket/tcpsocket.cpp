@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,8 @@
 
 #include <ghoul/io/socket/tcpsocket.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
 #include <algorithm>
 #include <cstring>
 
@@ -53,7 +53,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <errno.h>
+#include <cerrno>
 
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
@@ -142,8 +142,8 @@ void TcpSocket::connect() {
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    std::string p = std::to_string(_port);
-    int result = getaddrinfo(_address.c_str(), p.c_str(), &hints, &addresult);
+    const std::string p = std::to_string(_port);
+    const int result = getaddrinfo(_address.c_str(), p.c_str(), &hints, &addresult);
     if (result != 0) {
         return;
     }
@@ -208,7 +208,7 @@ bool TcpSocket::getMessage(std::string& message) {
     if (delimiterIndex == 0) {
         return false;
     }
-    std::lock_guard inputLock(_inputQueueMutex);
+    const std::lock_guard inputLock(_inputQueueMutex);
     message.assign(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
     if (static_cast<int>(_inputQueue.size()) >= delimiterIndex + 1) {
         _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
@@ -219,7 +219,7 @@ bool TcpSocket::getMessage(std::string& message) {
 bool TcpSocket::putMessage(const std::string& message) {
     std::string messageWithDelim = message;
     messageWithDelim.push_back(_delimiter);
-    bool success = putBytes(messageWithDelim.data(), messageWithDelim.size());
+    const bool success = putBytes(messageWithDelim.data(), messageWithDelim.size());
     return success;
 }
 
@@ -242,18 +242,18 @@ void TcpSocket::establishConnection(addrinfo* info) {
 
     const char trueFlag = 1;
     const char falseFlag = 0;
-    int result;
+    int result = 0;
 
     // Disable Nagle's algorithm.
     result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
-        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+        LWARNING(std::format("Socket error: {}", _ERRNO));
     }
 
     // Disable address reuse
     result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &falseFlag, sizeof(falseFlag));
     if (result == SOCKET_ERROR) {
-        LWARNING(fmt::format("Socket error: {}", _ERRNO));
+        LWARNING(std::format("Socket error: {}", _ERRNO));
         freeaddrinfo(info);
         _isConnecting = false;
         _isConnected = false;
@@ -305,13 +305,13 @@ void TcpSocket::streamInput() {
             return;
         }
 
-        std::lock_guard lock(_inputInterceptionMutex);
+        const std::lock_guard lock(_inputInterceptionMutex);
 
         if (_inputInterceptor) {
             _inputInterceptor(_inputBuffer.data(), nReadBytes);
         }
         else {
-            std::lock_guard inputGuard(_inputQueueMutex);
+            const std::lock_guard inputGuard(_inputQueueMutex);
             _inputQueue.insert(
                 _inputQueue.end(),
                 _inputBuffer.begin(),
@@ -327,7 +327,7 @@ void TcpSocket::streamOutput() {
         waitForOutput(1);
 
         size_t nBytesToSend = 0;
-        std::lock_guard outputGuard(_outputQueueMutex);
+        const std::lock_guard outputGuard(_outputQueueMutex);
         while ((nBytesToSend = std::min(_outputQueue.size(), _outputBuffer.size())) > 0) {
             std::copy_n(_outputQueue.begin(), nBytesToSend, _outputBuffer.begin());
 
@@ -337,7 +337,12 @@ void TcpSocket::streamOutput() {
 
             auto failed = [](int nBytes) { return nBytes <= 0; };
 #else // ^^^^ WIN32 // !WIN32 vvvv
-            ssize_t nSentBytes = send(_socket, _outputBuffer.data(), nBytesToSend, 0);
+            const ssize_t nSentBytes = send(
+                _socket,
+                _outputBuffer.data(),
+                nBytesToSend,
+                0
+            );
             auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
 #endif // WIN32
 
@@ -362,7 +367,7 @@ void TcpSocket::waitForInput(size_t nBytes) {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        std::lock_guard queueMutex(_inputQueueMutex);
+        const std::lock_guard queueMutex(_inputQueueMutex);
         return _inputQueue.size() >= nBytes;
     };
 
@@ -381,7 +386,7 @@ int TcpSocket::waitForDelimiter() {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        std::lock_guard queueMutex(_inputQueueMutex);
+        const std::lock_guard queueMutex(_inputQueueMutex);
         auto it = std::find(_inputQueue.begin() + currentIndex, _inputQueue.end(), d);
         currentIndex = it - _inputQueue.begin();
         return it != _inputQueue.end();
@@ -404,7 +409,7 @@ void TcpSocket::waitForOutput(size_t nBytes) {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        std::lock_guard queueMutex(_outputQueueMutex);
+        const std::lock_guard queueMutex(_outputQueueMutex);
         return _outputQueue.size() >= nBytes;
     };
 
@@ -436,12 +441,12 @@ bool TcpSocket::initializedNetworkApi() {
 }
 
 void TcpSocket::interceptInput(InputInterceptor interceptor) {
-    std::lock_guard lock(_inputInterceptionMutex);
+    const std::lock_guard lock(_inputInterceptionMutex);
     _inputInterceptor = std::move(interceptor);
 }
 
 void TcpSocket::uninterceptInput() {
-    std::lock_guard lock(_inputInterceptionMutex);
+    const std::lock_guard lock(_inputInterceptionMutex);
     _inputInterceptor = nullptr;
 }
 
@@ -450,7 +455,7 @@ bool TcpSocket::getBytes(char* buffer, size_t nItems) {
     if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
-    std::lock_guard inputLock(_inputQueueMutex);
+    const std::lock_guard inputLock(_inputQueueMutex);
     std::copy_n(_inputQueue.begin(), nItems, buffer);
     _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nItems);
     return true;
@@ -461,7 +466,7 @@ bool TcpSocket::peekBytes(char* buffer, size_t nItems) {
     if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
-    std::lock_guard inputLock(_inputQueueMutex);
+    const std::lock_guard inputLock(_inputQueueMutex);
     std::copy_n(_inputQueue.begin(), nItems, buffer);
     return true;
 }
@@ -471,7 +476,7 @@ bool TcpSocket::skipBytes(size_t nItems) {
     if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
-    std::lock_guard inputLock(_inputQueueMutex);
+    const std::lock_guard inputLock(_inputQueueMutex);
     _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nItems);
     return true;
 }
@@ -480,7 +485,7 @@ bool TcpSocket::putBytes(const char* buffer, size_t size) {
     if (_shouldStopThreads) {
         return false;
     }
-    std::lock_guard outputLock(_outputQueueMutex);
+    const std::lock_guard outputLock(_outputQueueMutex);
     _outputQueue.insert(_outputQueue.end(), buffer, buffer + size);
     _outputNotifier.notify_one();
     return _isConnected || _isConnecting;

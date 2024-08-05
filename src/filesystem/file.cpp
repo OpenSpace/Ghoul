@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,8 @@
 
 #include <ghoul/filesystem/file.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <filesystem>
 
@@ -84,7 +84,7 @@ void File::installFileChangeListener() {
     _indx = FileSys.addFileListener(path(), _fileChangedCallback);
 }
 
-void File::removeFileChangeListener() {
+void File::removeFileChangeListener() const {
     FileSys.removeFileListener(_indx);
 }
 

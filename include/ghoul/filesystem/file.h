@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,13 +37,15 @@ class FileSystem;
 /**
  * This class is a handle for a generic file in the file system. The main functionality is
  * a platform-independent way of being notified of changes of the file. The constructor
- * or the #setCallback methods expect an `std::function` object (possibly
- * initialized using a lambda-expression) that will be called whenever the file changes on
- * the hard disk. The callback function has this object passed as a parameter. If many
- * changes of the file happen in quick succession, each change will trigger a separate
- * call of the callback. The file system is not polled, but the changes are pushed to the
- * application, so the changes are registered efficiently and are solely impacted by the
- * overhead of `std::function`.
+ * or the #setCallback methods expect an `std::function` object (possibly initialized
+ * using a lambda-expression) that will be called whenever the file changes on the hard
+ * disk. The callback function has this object passed as a parameter. If many changes of
+ * the file happen in quick succession, each change will trigger a separate call of the
+ * callback. The file system is not polled, but the changes are pushed to the application,
+ * so the changes are registered efficiently and are solely impacted by the overhead of
+ * `std::function`.
+ *
+ * \see FileSystem The system to register and use tokens
  */
 class File {
 public:
@@ -57,7 +59,6 @@ public:
      *
      * \pre \p filename must not be empty
      *
-     * \see FileSystem The system to register and use tokens
      */
     File(std::filesystem::path filename);
 
@@ -89,16 +90,16 @@ public:
     void setCallback(FileChangedCallback callback);
 
     /**
-     * Returns the full path to the file as an `std::string`.
+     * Returns the full path to the file.
      *
-     * \return The full path to the file as an `std::string`
+     * \return The full path to the file
      */
     const std::filesystem::path& path() const;
 
 private:
     /**
      * Registers and starts the platform-dependent listener to file changes on disk. Will
-     * remove and unregister the old listener in the process
+     * remove and unregister the old listener in the process.
      */
     void installFileChangeListener();
 
@@ -106,14 +107,14 @@ private:
      * Removes the platform-dependent listener. If there is no listener present, this
      * operation is a no-op.
      */
-    void removeFileChangeListener();
+    void removeFileChangeListener() const;
 
     /// The filename of this File
     std::filesystem::path _filename;
 
     /**
      * The callback that is called when the file changes on disk. Has no performance
-     * impact when it is not used
+     * impact when it is not used.
      */
     FileChangedCallback _fileChangedCallback;
 

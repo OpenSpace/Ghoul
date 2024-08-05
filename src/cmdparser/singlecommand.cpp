@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,7 +27,7 @@
 
 namespace ghoul::cmdparser {
 
-SingleCommandZeroArguments::SingleCommandZeroArguments(std::optional<bool>& nExecutions,
+SingleCommandZeroArguments::SingleCommandZeroArguments(std::optional<bool>& ptr,
                                                        std::string name,
                                                        std::string shortName,
                                                        std::string infoText)
@@ -39,7 +39,7 @@ SingleCommandZeroArguments::SingleCommandZeroArguments(std::optional<bool>& nExe
         0,
         CommandlineCommand::MultipleCalls::No
     )
-    , _ptr(nExecutions)
+    , _ptr(ptr)
 {}
 
 void SingleCommandZeroArguments::execute(const std::vector<std::string>&) {

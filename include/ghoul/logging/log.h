@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,8 +36,8 @@ namespace ghoul::logging {
 /**
  * Abstract base class for all Log%s that can be added to a LogManager. Base classes must
  * implement the #log and #flush methods. The log message will only be called with
- * LogLevel levels which were filtered by the LogManager the Log belongs to.
- * After finishing the #flush method, all previously written log messages should be
+ * LogLevel levels which were filtered by the LogManager the Log belongs to. After
+ * finishing the #flush method, all previously written log messages should be
  * stored/printed/transmitted even if the program crashes immediately after the logging.
  * All subclasses are usable without a LogManager as well by directly instantiating them.
  *
@@ -57,8 +57,8 @@ public:
     virtual ~Log() = default;
 
     /**
-     * Method that logs a message with a given `level` and
-     * `category`. The method of logging is dependent on the explicit subclass.
+     * Method that logs a message with a given \p level and \p category. The method of
+     * logging is dependent on the explicit subclass.
      *
      * \param level The log level with which the message shall be logged
      * \param category The category of this message. Can be used by each subclass
@@ -100,28 +100,44 @@ protected:
         LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
-    /// Is the log printing the logging time?
+    /**
+     * Is the log printing the logging time?
+     */
     bool isTimeStamping() const;
 
-    /// Set the log printing of the time
+    /**
+     * Set the log printing of the time.
+     */
     void setTimeStamping(TimeStamping timeStamping);
 
-    /// Is the log printing the logging date?
+    /**
+     * Is the log printing the logging date?
+     */
     bool isDateStamping() const;
 
-    /// Set the log printing of the date
+    /**
+     * Set the log printing of the date.
+     */
     void setDateStamping(DateStamping dateStamping);
 
-    /// Is the log printing the category?
+    /**
+     * Is the log printing the category?
+     */
     bool isCategoryStamping() const;
 
-    /// Set the log printing of the category
+    /**
+     * Set the log printing of the category.
+     */
     void setCategoryStamping(CategoryStamping categoryStamping);
 
-    /// Is the log printing the log level?
+    /**
+     * Is the log printing the log level?
+     */
     bool isLogLevelStamping() const;
 
-    /// Set the log printing of the log level
+    /**
+     * Set the log printing of the log level.
+     */
     void setLogLevelStamping(LogLevelStamping logLevelStamping);
 
     /**
@@ -130,25 +146,33 @@ protected:
      *
      * \return The current time as a string
      */
-    std::string timeString() const;
+    static std::string timeString();
 
     /**
      * Returns the current date as a string. The date format is "YYYY-MM-DD".
      *
      * \return The current date as a string
      */
-    std::string dateString() const;
+    static std::string dateString();
 
     std::string createFullMessageString(LogLevel level,
         std::string_view category, std::string_view message) const;
 
 private:
-    TimeStamping _timeStamping; ///< Is the log printing the time?
-    DateStamping _dateStamping; ///< Is the log printing the date?
-    CategoryStamping _categoryStamping; ///< Is the log printing the category?
-    LogLevelStamping _logLevelStamping; ///< Is the log printing the log level?
+    /// Is the log printing the time?
+    TimeStamping _timeStamping;
 
-    const LogLevel _logLevel; ///< The minimum allowed log level for this Log
+    /// Is the log printing the date?
+    DateStamping _dateStamping;
+
+    /// Is the log printing the category?
+    CategoryStamping _categoryStamping;
+
+    /// Is the log printing the log level?
+    LogLevelStamping _logLevelStamping;
+
+    /// The minimum allowed log level for this Log
+    const LogLevel _logLevel;
 };
 
 } // namespace ghoul::logging

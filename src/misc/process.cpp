@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,16 +29,16 @@
 
 namespace ghoul {
 
-Process::Process(const std::string& command, const std::string& path,
+Process::Process(const std::string& command, const std::filesystem::path& path,
                  std::function<void(const char* bytes, size_t n)> readStdout,
                  std::function<void(const char* bytes, size_t n)> readStderr,
                  bool openStdin)
 {
     _process = std::make_unique<TinyProcessLib::Process>(
         command,
-        path,
-        readStdout,
-        readStderr,
+        path.string(),
+        std::move(readStdout),
+        std::move(readStderr),
         openStdin
     );
 }

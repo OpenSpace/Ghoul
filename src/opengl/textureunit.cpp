@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -98,7 +98,7 @@ void TextureUnit::assignUnit() {
 
     _assigned = true;
 
-    for (size_t i = 0; i < _maxTexUnits; ++i) {
+    for (size_t i = 0; i < _maxTexUnits; i++) {
         if (!_busyUnits[i]) {
             _number = static_cast<GLint>(i);
             _glEnum = GL_TEXTURE0 + _number;

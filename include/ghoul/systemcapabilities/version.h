@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,7 +31,9 @@
 
 namespace ghoul::systemcapabilities {
 
-/// This struct stores the detected version of the GLSL driver
+/**
+ * This struct stores the detected version of the GLSL driver.
+ */
 struct Version {
     std::strong_ordering operator<=>(const Version& rhs) const noexcept;
 

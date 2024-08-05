@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -116,7 +116,7 @@ public:
      * \return The SystemCapabilitiesComponent that should be retrieved or
      *         `nullptr` if no such type exists
      *
-     * \throws CapabilitiesComponentNotFoundError If no component of type T could be found
+     * \throw CapabilitiesComponentNotFoundError If no component of type T could be found
      */
     template <typename T>
     T& component();

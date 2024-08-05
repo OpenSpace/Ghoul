@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -40,10 +40,11 @@ class Font;
  * The FontRenderer is a class that can take a Font object and renderer it at a given
  * position. It has two separate usage modes; 1. it works as a singleton that has a
  * predefined vertex and fragment shader that perform rendering in a predetermined way.
- * 2. Instances of the FontRenderer can be instatiatd that need a custom ProgramObject
+ * 2. Instances of the FontRenderer can be instantiated that need a custom ProgramObject
  * that handles the rendering. As the rendering is performed in screen space, the
  * size of the rendering window in pixels has to be provided to the FontRenderer
  * (#setFramebufferSize) for a correct rendering.
+ *
  * The main methods for rendering are the #render methods and their varieties.
  */
 class FontRenderer {
@@ -77,21 +78,19 @@ public:
      * passed text. In addition the initial size of the rendering window has to be passed.
      * The inputs for the ProgramObject are as follows:
      *
-     * The <b>vertex shader</b> recieves three `vec2` for each vertex: The
-     * <i>Position</i> (location 0) in pixel screen space coordinates, the
-     * <i>Base Texture Coordinates</i> (location 1) which provides the texture coordinates
-     * for the base font layer, and the <i>Outline Texture Coordinates</i> (location 2)
-     * which provides the texture coordinates for the outline font layer. Furhermore, the
-     * following uniforms are provided: The `projection` (`mat4`)
-     * contains the projection matrix that is derived using the provided window size and
-     * maps the pixel coordinates to normalized device coordinates, the `tex`
-     * (`sampler2D`) is the TextureAtlas that contains all glyphs and into
-     * which the <i>Base Texture Coordinates</i> and <i>Outline Texture Coordinates</i>
-     * index into. The `baseColor` (`vec4`) contains the
-     * user-specified color for the base layer, whereas the `outlineColor`
-     * (`vec4`) is the color for the outline layer. Finally, the
-     * `hasOutline` (`bool`) is `true` whether the passed
-     * font has an outline or not.
+     * The <b>vertex shader</b> recieves three `vec2` for each vertex: The `Position`
+     * (location 0) in pixel screen space coordinates, the `Base Texture Coordinates`
+     * (location 1) which provides the texture coordinates for the base font layer, and
+     * the `Outline Texture Coordinates` (location 2) which provides the texture
+     * coordinates for the outline font layer. Furhermore, the following uniforms are
+     * provided: The `projection` (`mat4`) contains the projection matrix that is derived
+     * using the provided window size and maps the pixel coordinates to normalized device
+     * coordinates, the `tex` (`sampler2D`) is the TextureAtlas that contains all glyphs
+     * and into which the `Base Texture Coordinates` and `Outline Texture Coordinates`
+     * index into. The `baseColor` (`vec4`) contains the user-specified color for the base
+     * layer, whereas the `outlineColor` (`vec4`) is the color for the outline layer.
+     * Finally, the `hasOutline` (`bool`) is `true` whether the passed font has an outline
+     * or not.
      *
      * \param program The custom ProgramObject that is used to render any passed text.
      * \param framebufferSize The size of the framebuffer into which this FontRenderer
@@ -100,7 +99,9 @@ public:
     FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         glm::vec2 framebufferSize);
 
-    /// Default destructor that cleans used OpenGL names and the ProgramObject
+    /**
+     * Default destructor that cleans used OpenGL names and the ProgramObject.
+     */
     ~FontRenderer();
 
     /**
@@ -109,7 +110,7 @@ public:
      * source code of the ShaderObjects will be created. This method requires a valid
      * OpenGL state.
      *
-     * \return a raw pointer to the new default instance
+     * \return A raw pointer to the new default instance
      */
     static std::unique_ptr<FontRenderer> createDefault();
 
@@ -119,7 +120,7 @@ public:
      * containing the source code of the ShaderObjects will be created. This method
      * requires a valid OpenGL state.
      *
-     * \return a raw pointer to the new default instance
+     * \return A raw pointer to the new default instance
      */
     static std::unique_ptr<FontRenderer> createProjectionSubjectText();
 
@@ -143,8 +144,8 @@ public:
      * Check whether the singleton variant of the FontRenderer has already been
      * initialized.
      *
-     * \return `true` if the singleton FontRenderer has already been
-     *         initialized; `false` otherwise
+     * \return `true` if the singleton FontRenderer has already been initialized;
+     *         `false` otherwise
      */
     static bool isInitialized();
 
@@ -183,8 +184,8 @@ public:
      *        or world-space coordinate for projection subject rendering, that is used to
      *        render the text
      * \param text The text that is rendered to the screen. The \p text can also contain
-     *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font.
+     *        `\n` to have a linebreak, which is of the correct length with regard to the
+     *        selected font
      * \param color The base color that is used to render the text
      * \return The bounding box of the text and the number of lines that were printed
      */
@@ -201,8 +202,8 @@ public:
      *        or world-space coordinate for projection subject rendering, that is used to
      *        render the text
      * \param text The text that is rendered to the screen. The \p text can also contain
-     *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font.
+     *        `\n` to have a linebreak, which is of the correct length with regard to the
+     *        selected font
      * \param color The base color that is used to render the text
      * \param outlineColor The outline color that is used to render the text if the Font
      *        has an outline
@@ -217,15 +218,15 @@ public:
      * \p outlineColor is ignored.
      *
      * \param font The Font that is used to render the provided text
-     * \param pos The world-space coordinate for projection subject rendering that
-     *        is used to render the text
+     * \param pos The world-space coordinate for projection subject rendering that is used
+     *        to render the text
      * \param text The text that is rendered to the screen.The \p text can also contain
-     *        '\\n' to have a linebreak, which is of the correct length with regard to the
-     *        selected font.
+     *        `\n` to have a linebreak, which is of the correct length with regard to the
+     *        selected font
      * \param color The base color that is used to render the text
      * \param outlineColor The outline color that is used to render the text if the Font
      *        has an outline
-     * \param labelInfo Label information for the rendered text.
+     * \param labelInfo Label information for the rendered text
      * \param offset Moves the label in xy position of the text's plane
      * \return The bounding box of the text and the number of lines that were printed
      */
@@ -243,10 +244,10 @@ public:
     * \param pos The world-space coordinate for projection subject rendering that
     *        is used to render the text
     * \param text The text that is rendered to the screen.The \p text can also contain
-    *        '\\n' to have a linebreak, which is of the correct length with regard to the
-    *        selected font.
+    *        `\n` to have a linebreak, which is of the correct length with regard to the
+    *        selected font
     * \param color The base color that is used to render the text
-    * \param labelInfo Label information for the rendered text.
+    * \param labelInfo Label information for the rendered text
     * \param offset Moves the label in xy position of the text's plane
     * \return The bounding box of the text and the number of lines that were printed
     */
@@ -260,12 +261,12 @@ public:
     * and a black outline, if the \p font has one.
     *
     * \param font The Font that is used to render the provided text
-    * \param pos The world-space coordinate for projection subject rendering that
-    *        is used to render the text
+    * \param pos The world-space coordinate for projection subject rendering that is used
+    *        to render the text
     * \param text The text that is rendered to the screen.The \p text can also contain
     *        '\\n' to have a linebreak, which is of the correct length with regard to the
     *        selected font.
-    * \param labelInfo Label information for the rendered text.
+    * \param labelInfo Label information for the rendered text
     * \return The bounding box of the text and the number of lines that were printed
     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
@@ -300,8 +301,8 @@ private:
     mutable std::vector<float> _vertexBuffer;
     mutable std::vector<GLushort> _indexBuffer;
 
-    UniformCache(baseColor, outlineColor, texture, hasOutline, projection) _uniformCache;
-    UniformCache(baseColor, outlineColor, texture, hasOutline, modelViewTransform,
+    UniformCache(baseColor, outlineColor, tex, hasOutline, projection) _uniformCache;
+    UniformCache(baseColor, outlineColor, tex, hasOutline, modelViewTransform,
         enableFalseDepth, disableTransmittance) _uniformCacheProjection;
     int _uniformMvp = -1;
 };
@@ -318,7 +319,7 @@ enum class CrDirection {
  * arguments and discarding the second return value. This value moves the \p pos down by
  * the computed distance.
  *
- * \param font The Font that is used to render the provided text.
+ * \param font The Font that is used to render the provided text
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \param direction Determines whether the \p pos should be modified based on how many
@@ -338,7 +339,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * default font. It is equivalent to calling defaultRenderer::render with the same
  * arguments and discarding the second return value.
  *
- * \param font The Font that is used to render the provided text.
+ * \param font The Font that is used to render the provided text
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \param color The color that is used to the render the text
@@ -355,7 +356,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  * arguments and discarding the second return value. This value moves the \p pos down by
  * the computed distance.
  *
- * \param font The Font that is used to render the provided text.
+ * \param font The Font that is used to render the provided text
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \param color The color that is used to the render the text
@@ -373,7 +374,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * default font. It is equivalent to calling defaultRenderer::render with the same
  * arguments and discarding the second return value.
  *
- * \param font The Font that is used to render the provided text.
+ * \param font The Font that is used to render the provided text
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \param color The color that is used to the render the text
@@ -388,7 +389,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  * arguments and discarding the second return value. This value moves the \p pos down by
  * the computed distance.
  *
- * \param font The Font that is used to render the provided text.
+ * \param font The Font that is used to render the provided text
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \param direction Determines whether the \p pos should be modified based on how many
@@ -404,7 +405,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * default font. It is equivalent to calling defaultRenderer::render with the same
  * arguments and discarding the second return value.
  *
- * \param font The Font that is used to render the provided text.
+ * \param font The Font that is used to render the provided text
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
  * \return The bounding box of the text that was printed

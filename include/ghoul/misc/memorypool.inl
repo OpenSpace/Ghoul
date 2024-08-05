@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -48,7 +48,7 @@ MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::MemoryPool(int nBuckets)
     : _originalBucketSize(nBuckets)
 {
     _buckets.reserve(nBuckets);
-    for (int i = 0; i < nBuckets; ++i) {
+    for (int i = 0; i < nBuckets; i++) {
         auto b = std::make_unique<Bucket>();
         if (InjectDebugMemory) {
             std::memset(b->payload.data(), DebugByte, BucketSize);
@@ -94,7 +94,7 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::housekeeping() {
         _emptyList.begin(), _emptyList.end(),
         [](const EmptyPair& lhs, const EmptyPair& rhs) { return lhs.size < rhs.size; }
     );
-    for (size_t i = 0; i < _emptyList.size() - 1; ++i) {
+    for (size_t i = 0; i < _emptyList.size() - 1; i++) {
         EmptyPair& current = _emptyList[i];
         EmptyPair& next = _emptyList[i + 1];
 
@@ -107,8 +107,8 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::housekeeping() {
 }
 
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
-void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(std::size_t bytes,
-                                                                    std::size_t alignment)
+void* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_allocate(size_t bytes,
+                                                                        size_t alignment)
 {
     ZoneScoped;
 
@@ -171,9 +171,9 @@ T* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::alloc(Types&&... args) 
 }
 
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
-void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p,
-                                                                        std::size_t bytes,
-                                                                std::size_t /*alignment*/)
+void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* ptr,
+                                                                        size_t bytes,
+                                                                     size_t /*alignment*/)
 {
     ZoneScoped;
 
@@ -183,12 +183,12 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* p
 
     for (const std::unique_ptr<Bucket>& b : _buckets) {
         const std::array<std::byte, BucketSize>& bp = b->payload;
-        if (p >= bp.data() && p < (bp.data() + BucketSize)) {
+        if (ptr >= bp.data() && ptr < (bp.data() + BucketSize)) {
             // We found our bucket to which this pointer belongs
             if (InjectDebugMemory) {
-                std::memset(p, ClearByte, bytes);
+                std::memset(ptr, ClearByte, bytes);
             }
-            _emptyList.push_back({ p, bytes });
+            _emptyList.push_back({ ptr, bytes });
             return;
         }
     }
@@ -235,7 +235,7 @@ ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::ReusableTypedMem
     : _originalNBuckets(nBuckets)
 {
     _buckets.reserve(nBuckets);
-    for (int i = 0; i < nBuckets; ++i) {
+    for (int i = 0; i < nBuckets; i++) {
         _buckets.push_back(std::make_unique<Bucket>());
     }
 }
@@ -272,7 +272,7 @@ ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
     if (_freeList.size() >= static_cast<size_t>(n)) {
         std::vector<void*> res(n);
         size_t startIndex = _freeList.size() - n;
-        for (int i = 0; i < n; ++i) {
+        for (int i = 0; i < n; i++) {
             res[i] = _freeList[startIndex + i];
         }
         _freeList.erase(_freeList.begin() + startIndex, _freeList.end());
@@ -300,11 +300,11 @@ ReusableTypedMemoryPool<T, BucketSizeItems, InjectDebugMemory>::allocate(int n)
     b->usage += n * sizeof(T);
 
     std::vector<void*> res(n);
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i++) {
         res[i] = reinterpret_cast<std::byte*>(ptr) + (i * sizeof(T));
 
         if (InjectDebugMemory) {
-            for (int ii = 0; ii < sizeof(T) / sizeof(std::byte); ++ii) {
+            for (int ii = 0; ii < sizeof(T) / sizeof(std::byte); ii++) {
                 std::byte* bptr = reinterpret_cast<std::byte*>(res[i]);
                 std::memset(bptr + ii, DebugByte, 1);
             }

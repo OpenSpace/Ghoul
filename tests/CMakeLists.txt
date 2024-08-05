@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2023                                                                #
+# Copyright (c) 2012-2024                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -58,6 +58,10 @@ else ()
 endif ()
 
 target_link_libraries(GhoulTest PRIVATE Catch2 Ghoul)
+
+target_precompile_headers(GhoulTest PRIVATE
+  <catch2/catch_test_macros.hpp>
+)
 
 if (APPLE)
   target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})

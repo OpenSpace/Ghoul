@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -91,7 +91,7 @@ constexpr unsigned int hashCRC32(const char* s) {
 
 constexpr unsigned int hashCRC32(const char* buffer, unsigned int size) {
     unsigned int res = 0xFFFFFFFF;
-    for (unsigned int i = 0; i < size; ++i) {
+    for (unsigned int i = 0; i < size; i++) {
         res = CRC32Table[
             static_cast<unsigned char>(res) ^ static_cast<unsigned char>(buffer[i])
         ] ^ (res >> 8);
@@ -102,7 +102,7 @@ constexpr unsigned int hashCRC32(const char* buffer, unsigned int size) {
 
 constexpr unsigned int hashCRC32(std::string_view s) {
     unsigned int res = 0xFFFFFFFF;
-    for (unsigned int i = 0; i < s.size(); ++i) {
+    for (unsigned int i = 0; i < s.size(); i++) {
         res = CRC32Table[
             static_cast<unsigned char>(res) ^ static_cast<unsigned char>(s[i])
         ] ^ (res >> 8);

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -57,12 +57,16 @@ public:
     bool isListening() const override;
     bool hasPendingSockets() const override;
 
-    // Get next pending connection. Non-blocking. Can return nullptr.
+    /**
+     * Get next pending connection. Non-blocking. Can return nullptr.
+     */
     std::unique_ptr<WebSocket> nextPendingWebSocket();
     std::unique_ptr<Socket> nextPendingSocket() override;
 
-    // Get next pending connection. Blocking.
-    // Only returns nullptr if the socket server closes.
+    /**
+     * Get next pending connection. Blocking. Only returns nullptr if the socket server
+     * closes.
+     */
     std::unique_ptr<WebSocket> awaitPendingWebSocket();
     std::unique_ptr<Socket> awaitPendingSocket() override;
 

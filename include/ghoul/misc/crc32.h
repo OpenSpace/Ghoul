@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -50,7 +50,7 @@ constexpr unsigned int hashCRC32(const char* s);
  *
  * \param buffer The buffer whose contents are to be hashed
  * \param size The size of the buffer
- * \return tThe hash value for the passed buffer
+ * \return The hash value for the passed buffer
  */
 constexpr unsigned int hashCRC32(const char* buffer, unsigned int size);
 

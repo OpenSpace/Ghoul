@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,22 +33,23 @@
 namespace ghoul::logging {
 
 /**
- * A concrete subclass of Log that logs the messages to the console to the
- * `std::cout` stream. The formatting of the log messages depends on the
- * stamping settings. The different possibilities are:
+ * A concrete subclass of Log that logs the messages to the console to the `std::cout`
+ * stream. The formatting of the log messages depends on the stamping settings. The
+ * different possibilities are:
  * ```
  * "[DATE | TIME] CATEGORY (LEVEL) MESSAGE"
  * "[DATE] CATEGORY (LEVEL) MESSAGE"
  * "[TIME] CATEGORY (LEVEL) MESSAGE"
  * ```
- * And the remaining possibilities with `CATEGORY` and `LEVEL`
- * missing. A parameter in the constructor determines if the output text will be colored
- * according to the LogLevel:<br>
- * LogLevel::Debug -> Green<br>
- * LogLevel::Info -> Default color scheme of the console<br>
- * LogLevel::Warning -> Yellow<br>
- * LogLevel::Error -> Red<br>
- * LogLevel::Fatal -> Cyan<br>
+ *
+ * And the remaining possibilities with `CATEGORY` and `LEVEL` missing. A parameter in
+ * the constructor determines if the output text will be colored according to the
+ * LogLevel:
+ *   - LogLevel::Debug -> Green
+ *   - LogLevel::Info -> Default color scheme of the console
+ *   - LogLevel::Warning -> Yellow
+ *   - LogLevel::Error -> Red
+ *   - LogLevel::Fatal -> Cyan
  */
 
 class ConsoleLog : public Log {
@@ -75,22 +76,24 @@ public:
     void log(LogLevel level, std::string_view category,
         std::string_view message) override;
 
-    /// Flushes the stream and, thereby, all messages that are in the associated buffer
+    /**
+     * Flushes the stream and, thereby, all messages that are in the associated buffer
+     */
     void flush() override;
 
 protected:
     /**
      * Prepares the console to print the next messages in the color according to the
-     * LogLevel:<br>
-     * LogLevel::Debug -> Green<br>
-     * LogLevel::Info -> Default color scheme of the console<br>
-     * LogLevel::Warning -> Yellow<br>
-     * LogLevel::Error -> Red<br>
-     * LogLevel::Fatal -> Cyan<br>
+     * LogLevel:
+     *   - LogLevel::Debug -> Green
+     *   - LogLevel::Info -> Default color scheme of the console
+     *   - LogLevel::Warning -> Yellow
+     *   - LogLevel::Error -> Red
+     *   - LogLevel::Fatal -> Cyan
      *
      * \param level The level that determines the color scheme for the console
      */
-    void setColorForLevel(LogLevel level);
+    static void setColorForLevel(LogLevel level);
 
     /**
      * Resets the console to the default color scheme (*nix) or the color scheme it had

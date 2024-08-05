@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -55,6 +55,10 @@
 #define ZoneName(dummy, dummy2)
 #define ZoneScoped
 #define ZoneScopedN(dummy)
+#define ZoneText(text, length)
+#define TracyLockable(type, var) type var
+#define TracyAlloc(ptr, bytes)
+#define TracyAllocN(ptr, bytes, name)
 
 #endif // TRACY_ENABLE
 

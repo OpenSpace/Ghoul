@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -46,11 +46,10 @@ public:
      *
      * \param programName The name of the program. Used in the #usageInformation and
      *        #helpText methods
-     * \param allowUnknownCommands If this is set to `true` the
-     *        CommandlineParser will ignore commands it did not recognize and extract only
-     *        the used commands from the passed command-line, leaving the unknown commands
-     *        untouched. This allows other parts of the program to deal with command-line
-     *        arguments as well.
+     * \param allowUnknownCommands If this is set to `true` the CommandlineParser will
+     *        ignore commands it did not recognize and extract only the used commands from
+     *        the passed command-line, leaving the unknown commands untouched. This allows
+     *        other parts of the program to deal with command-line arguments as well
      * \param shortHelpCommand The short version of the command used to request help
      *        information
      * \param longHelpCommand The long version of the command used to request help
@@ -64,22 +63,23 @@ public:
     /**
      * Sets if this CommandlineParser allows command-line arguments that do not belong to
      * any registered CommandlineCommand. If this is set to `true`, a receiving
-     * `std::vector` has to be provided in the setCommandline method which
-     * will contain all command-line arguments that were not consumed by this parser.
+     * `std::vector` has to be provided in the setCommandline method which will contain
+     * all command-line arguments that were not consumed by this parser.
+     *
      * Warning: This method is only valid to be called before setCommmandLine. Calling it
      * after the command-line has been set results in undefined behavior.
      *
-     * \param allowUnknownCommands If set to `true` this parser allows unknown
-     *        arguments without a corresponding CommandlineCommand. If `false`
-     *        this will lead to logging of errors and #execute will return
-     *        `false` if any unknown commands are encountered during execution
+     * \param allowUnknownCommands If set to `true` this parser allows unknown arguments
+     *        without a corresponding CommandlineCommand. If `false` this will lead to
+     *        logging of errors and #execute will return `false` if any unknown commands
+     *        are encountered during execution
      */
     void setAllowUnknownCommands(AllowUnknownCommands allowUnknownCommands);
 
     /**
      * Returns if this CommandlineParser allows unknown commands, which do not have a
      * CommandlineCommand associated with them, in the command-line set by
-     * setCommandline.
+     * #setCommandLine.
      *
      * \return `true` if unknown command-line arguments are allowed by this
      *         CommandlineParser; `false` otherwise
@@ -92,8 +92,8 @@ public:
      * \param arguments The commandline arguments, beginning with the name of the
      *        application
      * \return The storage for the commands that have not been consumed by the
-     *         CommandlineParser. The `vector` will be cleared by this function
-     *         and will be filled by the #execute method
+     *         CommandlineParser. The `vector` will be cleared by this function and will
+     *         be filled by the #execute method
      *
      * \pre \p arguments must not be empty
      */
@@ -112,11 +112,11 @@ public:
      * \return `true` if the help message should be displayed by the caller
      *         using the displayHelp method.
      *
-     * \throws CommandlineException If there are malformed commandline parameters that
-     *         were passed in the setCommandLine method. Malformed parameters may be due
-     *         to invalid commands, multiple commands for commands that do not allow for
-     *         multiple executions, wrong parameter types, error with unnamed arguments
-     * \throws CommandExecutionException If the execution of a CommandlineCommand failed
+     * \throw CommandlineException If there are malformed commandline parameters that
+     *        were passed in the setCommandLine method. Malformed parameters may be due
+     *        to invalid commands, multiple commands for commands that do not allow for
+     *        multiple executions, wrong parameter types, error with unnamed arguments
+     * \throw CommandExecutionException If the execution of a CommandlineCommand failed
      */
     DisplayHelpText execute();
 
@@ -219,7 +219,8 @@ public:
     std::string helpText() const;
 
 protected:
-    /** Returns the CommandlineCommand with a specific CommandlineCommand::shortName or
+    /**
+     * Returns the CommandlineCommand with a specific CommandlineCommand::shortName or
      * CommandlineCommand::name from the list of stored commands. If no such command
      * exists `nullptr` will be returned.
      *
@@ -231,10 +232,9 @@ protected:
     CommandlineCommand* getCommand(const std::string& shortOrLongName);
 
     /**
-     * Returns `true` if the \em _arguments contains only a single help
-     * argument.
+     * Returns `true` if the #_arguments contains only a single help argument.
      *
-     * \return Whether the \em _arguments only contain a single help argument
+     * \return Whether the #_arguments only contain a single help argument
      */
     bool hasOnlyHelpCommand() const;
 
@@ -254,7 +254,7 @@ protected:
     /// The path to the program + filename
     std::string _programPath;
 
-    /// The name of the program used in the \sa usage method
+    /// The name of the program used in the #helpText method
     std::string _programName;
 
     /// Should the CommandlineParser allow unknown commands or throw an error in that case

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -63,8 +63,8 @@ glm::dvec3 interpolateCatmullRom(double t, const glm::dvec3& p0, const glm::dvec
 
     const glm::dvec3 a = 2.0 * (p1 - p2) + m1 + m2;
     const glm::dvec3 b = -3.0 * (p1 - p2) - m1 - m1 - m2;
-    const glm::dvec3 c = m1;
-    const glm::dvec3 d = p1;
+    const glm::dvec3& c = m1;
+    const glm::dvec3& d = p1;
 
     return a * t * t * t
         + b * t * t

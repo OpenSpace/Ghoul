@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -46,7 +46,7 @@ struct MissingCaseException : public std::logic_error {
 };
 
 /**
- * Ghoul internal assert command. Is called by the ghoul_assert macro.
+ * Ghoul internal assert command. Is called by the #ghoul_assert macro.
  *
  * \param expression The expression that caused the assertion
  * \param message The message that was provided for the assertion
@@ -73,10 +73,10 @@ void internal_assert(std::string expression, std::string message, std::string fi
 #endif
 
 /**
- * This macro asserts on the `__condition__` and prints the optional
- * `__message__`. In addition, it gives the option of aborting, exiting, or
- * ignoring the assertion. The macro is optimized away in Release mode. Due to this fact,
- * the `__condition__` must not have any sideeffects.
+ * This macro asserts on the `__condition__` and prints the optional `__message__`. In
+ * addition, it gives the option of aborting, exiting, or ignoring the assertion. The
+ * macro is optimized away in Release mode. Due to this fact, the `__condition__` must not
+ * have any sideeffects.
  */
 
 #ifdef GHL_THROW_ON_ASSERT

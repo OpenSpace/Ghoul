@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -174,7 +174,7 @@ protected:
     /// Detect the maximum supported GLSL Version
     void detectGLSLVersion();
     /// Detect the vendor of the main GPU
-    /// \throws GPUVendorError if there was an error detecting the GPU vendor
+    /// \throw GPUVendorError if there was an error detecting the GPU vendor
     void detectGPUVendor();
     /// Get the vendor string from OpenGL
     void detectGLRenderer();
@@ -184,8 +184,8 @@ protected:
     /**
      * Use WMI (on Windows) to retrieve information about the installed driver.
      *
-     * \throws WMIError If there was an error accessing the Windows Management
-     *         Instrumentation
+     * \throw WMIError If there was an error accessing the Windows Management
+     *        Instrumentation
      */
     void detectDriverInformation();
 

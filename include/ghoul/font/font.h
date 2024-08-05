@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -64,7 +64,7 @@ public:
      * single glyph for a specific font. Each glyph supplies two pairs of coordinates:
      *
      * 1. The top left and bottom right corners of the base glyph (i.e., the regular
-     *    glyph if it is rendered without an outline.<br>
+     *    glyph if it is rendered without an outline.
      * 2. The top left and bottom right corners of the outline glyph (i.e., a filled glyph
      *    that can be rendered behind the base glyph in a different color to provide an
      *    outline to the base.
@@ -74,12 +74,12 @@ public:
         friend class Font;
 
         /// The default constructor for a Glyph
-        Glyph(wchar_t character, int width = 0, int height = 0, float leftBearing = 0.f,
-            float topBearing = 0.f, float advanceX = 0.f, float advanceY = 0.f,
-            glm::vec2 texCoordTopLeft = glm::vec2(0.f),
-            glm::vec2 texCoordBottomRight = glm::vec2(0.f),
-            glm::vec2 outlineTexCoordTopLeft = glm::vec2(0.f),
-            glm::vec2 outlineTexCoordBottomRight = glm::vec2(0.f)
+        Glyph(wchar_t character_, int width_ = 0, int height_ = 0,
+            float leftBearing_ = 0.f, float topBearing_ = 0.f, float advanceX_ = 0.f,
+            float advanceY_ = 0.f, glm::vec2 texCoordTopLeft_ = glm::vec2(0.f),
+            glm::vec2 texCoordBottomRight_ = glm::vec2(0.f),
+            glm::vec2 outlineTexCoordTopLeft_ = glm::vec2(0.f),
+            glm::vec2 outlineTexCoordBottomRight_ = glm::vec2(0.f)
         );
 
         bool operator==(const Glyph& rhs) const;
@@ -101,12 +101,10 @@ public:
         /// Glyphs's top bearing expressed in pixels
         const float topBearing;
 
-        /// This is the distance used when the glyph is drawn as part
-        /// of horizontal text
+        /// This is the distance used when the glyph is drawn as part of horizontal text
         const float horizontalAdvance;
 
-        /// This is the distance used when the glyph is drawn as part
-        /// of vertical text
+        /// This is the distance used when the glyph is drawn as part of vertical text
         const float verticalAdvance;
 
         /// Normalized texture coordinate of top-left corner
@@ -115,12 +113,10 @@ public:
         /// Normalized texture coordinate of bottom-right corner
         glm::vec2 bottomRight = glm::vec2(0.f);
 
-        /// Normalized texture coordinates for the top left of the
-        /// outline
+        /// Normalized texture coordinates for the top left of the outline
         glm::vec2 outlineTopLeft = glm::vec2(0.f);
 
-        /// Normalized texture coordinates for the bottom right of the
-        /// outline
+        /// Normalized texture coordinates for the bottom right of the outline
         glm::vec2 outlineBottomRight = glm::vec2(0.f);
 
     private:
@@ -131,9 +127,9 @@ public:
     /**
      * Constructor creating a new Font with the specified \p filename at the provided
      * \p pointSize. The Glyphs of this Font will be stored in the \p atlas TextureAtlas
-     * if there is enough free space. If \p outline is `true` two sets of
-     * Glyphs are created which are combined to provide an outline of thickness
-     * \p outlineThickness to the glyphs.
+     * if there is enough free space. If \p outline is `true` two sets of Glyphs are
+     * created which are combined to provide an outline of thickness \p outlineThickness
+     * to the glyphs.
      *
      * \param filename The full path to the font file
      * \param pointSize The font size in pt
@@ -185,7 +181,7 @@ public:
      * height of the text if it were to be rendered.
      *
      * \param text The text that is rendered to the screen. The `text` can also
-     *        contain '\\n' to have a linebreak, which is of the correct length for the
+     *        contain `\n` to have a linebreak, which is of the correct length for the
      *        selected font.
      * \return The pixel coordinates of the bounding box of the passed text
      */
@@ -216,7 +212,7 @@ public:
     void loadGlyphs(std::vector<wchar_t> characters);
 
     /**
-     * Returns the texture behind the TextureAtlas that stores all of the Glyphs
+     * Returns the texture behind the TextureAtlas that stores all of the Glyphs.
      *
      * \return The TextureAtlas's texture that stores all of the Glyphs for this Font
      */
@@ -225,8 +221,6 @@ public:
 private:
     /// Generates the Kerning values for all Glyph pairs that have sofar been loaded
     void generateKerning();
-
-    //float computeLeftBearing(wchar_t charcode) const;
 
     /// A list of all loaded Glyphs
     std::vector<Glyph> _glyphs;

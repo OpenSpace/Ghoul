@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,19 +26,53 @@
 #include <ghoul/logging/textlog.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
+#include <filesystem>
+#include <syncstream>
 
 namespace ghoul::logging {
 
-TextLog::TextLog(const std::string& filename, Append writeToAppend,
-                 TimeStamping timeStamping, DateStamping dateStamping,
-                 CategoryStamping categoryStamping, LogLevelStamping logLevelStamping,
-                 LogLevel minimumLogLevel)
+TextLog::TextLog(const std::filesystem::path& filename, int nLogRotation,
+                 Append writeToAppend, TimeStamping timeStamping,
+                 DateStamping dateStamping, CategoryStamping categoryStamping,
+                 LogLevelStamping logLevelStamping, LogLevel minimumLogLevel)
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
     , _printFooter(writeToAppend)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
+    ghoul_assert(nLogRotation > 0, "Log rotation must be positive");
+    if (nLogRotation > 0) {
+        ghoul_assert(writeToAppend == Append::No, "We can't log rotate when appending");
+    }
 
     _file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+
+    while (nLogRotation > 0) {
+        // Move all of the existing logs one position up
+
+        const std::filesystem::path fname = filename.stem();
+        const std::filesystem::path ext = filename.extension();
+
+        std::filesystem::path newCandidate = filename;
+        newCandidate.replace_filename(std::format("{}-{}{}", fname, nLogRotation, ext));
+
+        std::filesystem::path oldCandidate = filename;
+        if (nLogRotation > 1) {
+            // We don't actually have a -0 version, it is just the base name
+            oldCandidate.replace_filename(
+                std::format("{}-{}{}", fname, nLogRotation - 1, ext)
+            );
+        }
+
+        if (std::filesystem::exists(newCandidate)) {
+            std::filesystem::remove(newCandidate);
+        }
+        if (std::filesystem::exists(oldCandidate)) {
+            std::filesystem::rename(oldCandidate, newCandidate);
+        }
+
+        nLogRotation--;
+    }
 
     if (writeToAppend) {
         _file.open(filename, std::ofstream::out | std::ofstream::app);
@@ -50,25 +84,28 @@ TextLog::TextLog(const std::string& filename, Append writeToAppend,
 
 TextLog::~TextLog() {
     if (_printFooter) {
-        _file << "--------" << std::endl;
+        _file << "--------\n";
     }
 }
 
 void TextLog::log(LogLevel level, std::string_view category, std::string_view message) {
+    ZoneScoped;
+
     if (category.empty() && message.empty()) {
         writeLine("\n");
     }
     else {
-        writeLine(createFullMessageString(level, category, message) + '\n');
+        std::string msg = createFullMessageString(level, category, message) + '\n';
+        writeLine(msg);
     }
 }
 
 void TextLog::flush() {
-    _file.flush();
+    std::osyncstream(_file).flush();
 }
 
-void TextLog::writeLine(std::string line) {
-    _file << std::move(line);
+void TextLog::writeLine(const std::string& line) {
+    std::osyncstream(_file) << line;
 }
 
 } // namespace ghoul::logging

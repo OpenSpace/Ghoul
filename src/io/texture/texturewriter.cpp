@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,9 +25,9 @@
 
 #include <ghoul/io/texture/texturewriter.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/format.h>
 #include <ghoul/io/texture/texturewriterbase.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
@@ -38,7 +38,7 @@ using std::string;
 namespace ghoul::io {
 
 TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
-    : RuntimeError(fmt::format("No writer was found for extension '{}'", extension), "IO")
+    : RuntimeError(std::format("No writer was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
 {}
 

@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2023                                                                #
+# Copyright (c) 2012-2024                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -84,6 +84,14 @@ if (GHOUL_MODULE_OPENGL)
     add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
     target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
 
+    if (MSVC)
+      target_compile_options(glbinding PRIVATE "/W0")
+      target_compile_options(glbinding-aux PRIVATE "/W0")
+    else ()
+      target_compile_options(glbinding PRIVATE "-w")
+      target_compile_options(glbinding-aux PRIVATE "-w")
+    endif ()
+
     set_target_properties(glbinding PROPERTIES FOLDER "External")
     set_target_properties(glbinding-aux PROPERTIES FOLDER "External/glbinding-ext")
     set_target_properties(pack PROPERTIES FOLDER "External/glbinding-ext")
@@ -109,6 +117,14 @@ if (GHOUL_MODULE_LUA)
   add_subdirectory(lua)
   target_link_libraries(Ghoul PUBLIC Lua)
   set_target_properties(Lua PROPERTIES FOLDER "External")
+
+  if (MSVC)
+    target_compile_options(Lua PRIVATE "/W0")
+    target_compile_definitions(Lua PRIVATE "_SCL_SECURE_NO_WARNINGS")
+  else ()
+    target_compile_options(Lua PRIVATE "-w")
+  endif ()
+
   end_module("Lua")
 endif ()
 
@@ -123,6 +139,8 @@ if (GHOUL_MODULE_ASSIMP)
   if (UNIX)
     set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "Set to have assimp build minizip" FORCE)
   endif ()
+
+  set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 
   add_subdirectory(assimp)
   target_link_libraries(Ghoul PRIVATE assimp)
@@ -152,9 +170,13 @@ if (GHOUL_MODULE_ASSIMP)
       "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
       <string.h>
     )
-  else ()
-    set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
   endif ()
+
+  if (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # Clang started throwing these warnings in assimp
+    target_compile_options(assimp PRIVATE "-Wdeprecated-non-prototype")
+  endif ()
+
   set_target_properties(uninstall PROPERTIES FOLDER "External")
   if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
     set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "External")
@@ -162,21 +184,12 @@ if (GHOUL_MODULE_ASSIMP)
   end_module("AssImp")
 endif ()
 
-# fmt
-begin_dependency("fmt")
-set(FMT_DOC OFF CACHE BOOL "Generate the doc target.")
-set(FMT_INSTALL OFF CACHE BOOL "Generate the install target.")
-set(FMT_TEST OFF CACHE BOOL "Generate the test target.")
-add_subdirectory(cppformat)
-target_link_libraries(Ghoul PUBLIC fmt)
-set_target_properties(fmt PROPERTIES FOLDER "External")
-end_dependency("fmt")
-
 # scnlib
 begin_dependency("scnlib")
 add_subdirectory(scnlib SYSTEM)
 target_link_libraries(Ghoul PUBLIC scn)
 set_target_properties(scn PROPERTIES FOLDER "External")
+set_target_properties(simdutf PROPERTIES FOLDER "External")
 end_dependency("scnlib")
 
 # stb_image

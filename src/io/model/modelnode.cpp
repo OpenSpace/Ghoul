@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,8 @@
 
 #include <ghoul/io/model/modelnode.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace ghoul::io {
@@ -113,11 +113,11 @@ const std::vector<int>& ModelNode::children() const {
     return _children;
 }
 
-const glm::mat4x4 ModelNode::transform() const {
+glm::mat4x4 ModelNode::transform() const {
     return glm::make_mat4(_transform);
 }
 
-const glm::mat4x4 ModelNode::animationTransform() const {
+glm::mat4x4 ModelNode::animationTransform() const {
     return glm::make_mat4(_animationTransform);
 }
 

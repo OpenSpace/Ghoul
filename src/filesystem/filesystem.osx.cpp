@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -67,7 +67,7 @@ namespace {
                            const FSEventStreamEventId[])
     {
         char** paths = reinterpret_cast<char**>(eventPaths);
-        for (size_t i = 0; i < numEvents; ++i) {
+        for (size_t i = 0; i < numEvents; i++) {
             using Events::kFSEventStreamEventFlagItemModified;
             using Events::kFSEventStreamEventFlagItemInodeMetaMod;
             using Events::kFSEventStreamEventFlagItemIsFile;
@@ -184,7 +184,7 @@ void FileSystem::removeFileListener(int callbackIdentifier) {
         }
     }
 
-    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
+    LWARNING(std::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void callbackHandler(const std::string& path) {

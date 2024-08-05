@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -151,8 +151,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * quadratic:
- * `y = (1/2)((2x)^2)             ; [0, 0.5)`
- * `y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]`
+ * ```
+ * y = (1/2)((2x)^2)             ; [0, 0.5)
+ * y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -193,8 +195,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * cubic:
- * `y = (1/2)((2x)^3)       ; [0, 0.5)`
- * `y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]`
+ * ```
+ * y = (1/2)((2x)^3)       ; [0, 0.5)
+ * y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -234,8 +238,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * quartic:
- * `y = (1/2)((2x)^4)        ; [0, 0.5)`
- * `y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]`
+ * ```
+ * y = (1/2)((2x)^4)        ; [0, 0.5)
+ * y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -275,8 +281,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * quintic:
- * `y = (1/2)((2x)^5)       ; [0, 0.5)`
- * `y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]`
+ * ```
+ * y = (1/2)((2x)^5)       ; [0, 0.5)
+ * y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -355,8 +363,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * circular function:
- * `y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)`
- * `y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]`
+ * ```
+ * y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)
+ * y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -397,8 +407,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the
  * piecewise exponential function:
- * `y = (1/2)2^(10(2x - 1))         ; [0,0.5)`
- * `y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]`
+ * ```
+ * y = (1/2)2^(10(2x - 1))         ; [0,0.5)
+ * y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -439,8 +451,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * exponentially-damped sine wave:
- * `y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)`
- * `y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]`
+ * ```
+ * y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
+ * y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]
@@ -480,8 +494,10 @@ template <typename T>
 /**
  * Interpolates the parameter \p p, which has to be in [0,1]. Modeled after the piecewise
  * overshooting cubic function:
- * `y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)`
- * `y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]`
+ * ```
+ * y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
+ * y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
+ * ```
  *
  * \tparam T The type of the value to be interpreted. Must be an arithmetic type
  * \param p The parameter to be interpolated in [0,1]

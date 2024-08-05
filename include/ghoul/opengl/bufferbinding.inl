@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -75,7 +75,7 @@ BufferBinding<T>::operator GLint() {
 
 template <bufferbinding::Buffer T>
 void BufferBinding<T>::deinitialize() {
-    for (size_t i = 0; i < _busyBindings.size(); ++i) {
+    for (size_t i = 0; i < _busyBindings.size(); i++) {
         _busyBindings[i] = false;
     }
     _totalActive = 0;
@@ -95,7 +95,7 @@ void BufferBinding<T>::assignBinding() {
 
     _assigned = true;
 
-    for (size_t i = 0; i < _maxBufferBindings; ++i) {
+    for (size_t i = 0; i < _maxBufferBindings; i++) {
         if (!_busyBindings[i]) {
             _number = static_cast<GLint>(i);
             _busyBindings[i] = true;

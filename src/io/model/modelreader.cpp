@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,11 +28,13 @@
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/format.h>
 #include <ghoul/io/model/modelreaderbase.h>
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/fmt.h>
+#include <ghoul/misc/profiling.h>
+#include <ghoul/misc/stringhelper.h>
 #include <algorithm>
 #include <filesystem>
 
@@ -43,12 +45,12 @@ namespace {
 namespace ghoul::io {
 
 ModelReader::MissingReaderException::MissingReaderException(std::string extension,
-                                                            std::filesystem::path f)
-    : RuntimeError(fmt::format(
-        "No reader was found for extension '{}' with file {}", extension, f
+                                                            std::filesystem::path file_)
+    : RuntimeError(std::format(
+        "No reader was found for extension '{}' with file '{}'", extension, file_
     ))
     , fileExtension(std::move(extension))
-    , file(std::move(f))
+    , file(std::move(file_))
 {}
 
 ModelReader& ModelReader::ref() {
@@ -61,6 +63,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
                                                 ForceRenderInvisible forceRenderInvisible,
                                             NotifyInvisibleDropped notifyInvisibleDropped)
 {
+    ZoneScoped;
+
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
@@ -77,15 +81,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
     }
 
     if (!reader->needsCache()) {
-        LINFO(fmt::format("Loading ModelGeometry file {}", filename));
+        LINFO(std::format("Loading ModelGeometry file '{}'", filename));
         return reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
     }
 
     std::filesystem::path cachedFile = FileSys.cacheManager()->cachedFilename(filename);
-    bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
+    const bool hasCachedFile = std::filesystem::is_regular_file(cachedFile);
     if (hasCachedFile) {
-        LINFO(fmt::format(
-            "Cached file {} used for ModelGeometry file {}", cachedFile, filename
+        LINFO(std::format(
+            "Cached file '{}' used for ModelGeometry file '{}'", cachedFile, filename
         ));
 
         try {
@@ -98,8 +102,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
             return model;
         }
         catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
-            LINFO(fmt::format(
-                "Encountered problem: '{}' while loading model from cache file: {}. "
+            LINFO(std::format(
+                "Encountered problem '{}' while loading model from cache file '{}'. "
                 "Deleting cache", e.errorMessage, cachedFile
             ));
             FileSys.cacheManager()->removeCacheFile(filename);
@@ -109,10 +113,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
 
     }
     else {
-        LINFO(fmt::format("Cache for ModelGeometry file {} not found", filename));
+        LINFO(std::format("Cache for ModelGeometry file '{}' not found", filename));
     }
 
-    LINFO(fmt::format("Loading ModelGeometry file {}", filename));
+    LINFO(std::format("Loading ModelGeometry file '{}'", filename));
 
     std::unique_ptr<modelgeometry::ModelGeometry> model =
         reader->loadModel(filename, forceRenderInvisible, notifyInvisibleDropped);
@@ -122,8 +126,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
         model->saveToCacheFile(cachedFile);
     }
     catch (const modelgeometry::ModelGeometry::ModelCacheException& e) {
-        LINFO(fmt::format(
-            "Encountered problem: '{}' while saving model to cache file: {}. "
+        LINFO(std::format(
+            "Encountered problem '{}' while saving model to cache file '{}'. "
             "Deleting cache", e.errorMessage, e.filename
         ));
 
@@ -146,13 +150,8 @@ void ModelReader::addReader(std::unique_ptr<ModelReaderBase> reader) {
 }
 
 ModelReaderBase* ModelReader::readerForExtension(const std::string& extension) {
-    std::string lowerExtension = extension;
-    std::transform(
-        extension.cbegin(),
-        extension.cend(),
-        lowerExtension.begin(),
-        [](char v) { return static_cast<char>(tolower(v)); }
-    );
+    const std::string lowerExtension = toLowerCase(extension);
+
     for (const std::unique_ptr<ModelReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();
         auto it = std::find(extensions.cbegin(), extensions.cend(), lowerExtension);

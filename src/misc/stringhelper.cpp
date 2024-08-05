@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,12 +23,36 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 
 #include <algorithm>
 #include <cctype>
 
 namespace ghoul {
+
+std::string toUpperCase(const std::string& s) {
+    std::string t;
+    t.resize(s.size());
+    std::transform(
+        s.begin(),
+        s.end(),
+        t.begin(),
+        [](unsigned char c) { return std::toupper(c); }
+    );
+    return t;
+}
+
+std::string toLowerCase(const std::string& s) {
+    std::string t;
+    t.resize(s.size());
+    std::transform(
+        s.begin(),
+        s.end(),
+        t.begin(),
+        [](unsigned char c) { return std::tolower(c); }
+    );
+    return t;
+}
 
 std::vector<std::string> tokenizeString(const std::string& input, char separator) {
     size_t separatorPos = input.find(separator);
@@ -94,7 +118,7 @@ std::string replaceAll(std::string string, const std::string& from,
         string.replace(pos, from.length(), to);
 
         // In case 'to' contains 'from', ex replacing 'x' with 'yx'
-        size_t offset = pos + to.length();
+        const size_t offset = pos + to.length();
         pos = string.find(from, offset);
     }
     return string;
@@ -117,6 +141,26 @@ std::string encodeUrl(const std::string& string) {
     result = replaceAll(result, "[", "%5B");
     result = replaceAll(result, "]", "%5D");
     return result;
+}
+
+std::istream& getline(std::istream& inputStream, std::string& str) {
+    std::getline(inputStream, str);
+#ifndef WIN32
+    if (!str.empty() && (str.back() == '\r')) {
+        str.pop_back();
+    }
+#endif //WIN32
+    return inputStream;
+}
+
+std::istream& getline(std::istream& inputStream, std::string& str, char delim) {
+    std::getline(inputStream, str, delim);
+#ifndef WIN32
+    if (!str.empty() && (str.back() == '\r')) {
+        str.pop_back();
+    }
+#endif //WIN32
+    return inputStream;
 }
 
 } // namespace ghoul

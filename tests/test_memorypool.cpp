@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -159,7 +159,7 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Bucket Pre-Alloc", "[memorypool]") {
 TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
     ghoul::MemoryPool<2048> pool;
 
-    unsigned long long alignment = alignof(max_align_t);
+    const unsigned long long alignment = alignof(max_align_t);
     // For the rest:  X used memory; O memory allocated due to alignment; F free memory
 
     CHECK(pool.totalOccupancy() == 0);
@@ -200,14 +200,14 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
 }
 
 TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memorypool]") {
-    unsigned long long alignment = alignof(max_align_t);
+    const unsigned long long alignment = alignof(max_align_t);
     if (alignment == 8) {
         ghoul::MemoryPool<32> pool;
         REQUIRE(pool.occupancies().size() == 1);
         CHECK(pool.occupancies()[0] == 0);
         void* p1 = pool.allocate(8);
         void* p2 = pool.allocate(8);
-        [[ maybe_unused ]] void* p3 = pool.allocate(16);
+        [[maybe_unused]] void* p3 = pool.allocate(16);
         REQUIRE(pool.occupancies().size() == 1);
         CHECK(pool.occupancies()[0] == 32);
 
@@ -231,7 +231,7 @@ TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memoryp
         CHECK(pool.occupancies()[0] == 0);
         void* p1 = pool.allocate(16);
         void* p2 = pool.allocate(16);
-        [[ maybe_unused ]] void* p3 = pool.allocate(32);
+        [[maybe_unused]] void* p3 = pool.allocate(32);
         REQUIRE(pool.occupancies().size() == 1);
         CHECK(pool.occupancies()[0] == 64);
 

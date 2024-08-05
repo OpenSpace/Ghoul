@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -50,6 +50,7 @@ public:
         GLfloat tex[2];
         GLfloat normal[3];
         GLfloat tangent[3];
+        GLfloat color[3] = { 0.f, 0.f, 0.f };
     };
 
     struct Texture {
@@ -64,19 +65,21 @@ public:
     static void generateDebugTexture(ModelMesh::Texture& texture);
 
     ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-        std::vector<Texture> textures, bool isInvisible = false);
+        std::vector<Texture> textures, bool isInvisible = false,
+        bool hasVertexColors = false);
 
     ModelMesh(ModelMesh&&) noexcept = default;
     ~ModelMesh() noexcept = default;
 
     void initialize();
     void deinitialize();
-    void render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
+    void render(opengl::ProgramObject& program, const glm::mat4x4& meshTransform,
         bool isFullyTexturedModel = true, bool isProjection = false) const;
     float calculateBoundingRadius(glm::mat4x4& transform) const;
 
     void setInvisible(bool isInvisible);
     bool isInvisible() const;
+    bool hasVertexColors() const;
     bool isTransparent() const;
 
     const std::vector<Vertex>& vertices() const;
@@ -89,6 +92,7 @@ private:
     std::vector<Texture> _textures;
 
     bool _isInvisible = false;
+    bool _hasVertexColors = false;
 
     GLuint _vaoID = 0;
     GLuint _vbo = 0;

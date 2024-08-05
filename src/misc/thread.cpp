@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -106,7 +106,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
     SetPriorityClass(h, convertThreadPriorityClass(priorityClass));
     SetThreadPriority(h, convertThreadPriorityLevel(priorityClass, priorityLevel));
 #else // ^^^^ WIN32 // !WIN32 vvvv
-    int policy;
+    int policy = 0;
     struct sched_param param;
     int res = pthread_getschedparam(t.native_handle(), &policy, &param);
     if (res != 0) {

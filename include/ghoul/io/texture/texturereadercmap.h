@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,8 +33,8 @@ namespace ghoul::io {
 /**
  * Reads a one dimensional texture from a cmap (color map) file. The format of the cmap
  * files have the width of the Texture in the first non-comment, non-empty line and is
- * followed by `width` number of lines that contain four values for red, green,
- * blue, and alpha each. If the file is malformed, an TextureLoadException is thrown
+ * followed by `width` number of lines that contain four values for red, green, blue, and
+ * alpha each. If the file is malformed, an TextureLoadException is thrown.
  */
 class TextureReaderCMAP : public TextureReaderBase {
 public:
@@ -52,7 +52,7 @@ public:
      *      reported by supportedExtensions
      * \pre \p nDimensions must be 1, 2, or 3
      */
-    std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename,
+    std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
         int nDimensions) const override;
 
 

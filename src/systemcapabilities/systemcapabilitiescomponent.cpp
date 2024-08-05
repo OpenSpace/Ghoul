@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,7 @@
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stringconversion.h>
@@ -42,7 +42,7 @@ namespace {
     /// Management Instrumentation
     struct WMIError : public ghoul::RuntimeError {
         explicit WMIError(std::string msg, HRESULT code)
-            : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
+            : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
             , message(std::move(msg))
             , errorCode(std::move(code))
         {}
@@ -94,7 +94,7 @@ namespace {
 
         VARIANT* result = nullptr;
         IEnumWbemClassObject* enumerator = nullptr;
-        std::string query = fmt::format("SELECT {} FROM {}", attribute, wmiClass);
+        std::string query = std::format("SELECT {} FROM {}", attribute, wmiClass);
         HRESULT hRes = services->ExecQuery(
             bstr_t("WQL"),
             bstr_t(query.c_str()),
@@ -103,7 +103,7 @@ namespace {
             &enumerator
         );
         if (FAILED(hRes)) {
-            throw WMIError("WMI query failed", hRes);
+            throw WMIError(std::format("WMI query '{}' failed", query), hRes);
         }
 
         IWbemClassObject* pclsObject = nullptr;
@@ -127,7 +127,7 @@ namespace {
             if (result) {
                 VariantClear(result);
             }
-            throw WMIError("No WMI query result", hr);
+            throw WMIError(std::format("No WMI query result for query '{}'", query), hr);
         }
 
         if (enumerator) {
@@ -153,7 +153,7 @@ IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 static_assert(std::is_same_v<HRESULT, long>);
 
 SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, long code)
-    : RuntimeError(fmt::format("{}. Error Code: {}", msg, code), "WMI")
+    : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
     , message(std::move(msg))
     , errorCode(std::move(code))
 {}

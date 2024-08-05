@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,14 +25,14 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 
 namespace ghoul::io {
 
-TextureReaderBase::TextureLoadException::TextureLoadException(std::string name,
+TextureReaderBase::TextureLoadException::TextureLoadException(std::filesystem::path name,
                                                               std::string msg,
                                                               const TextureReaderBase* r)
-    : RuntimeError(fmt::format("Error loading texture '{}'", name), "TextureLoader")
+    : RuntimeError(std::format("Error loading texture '{}'", name), "TextureLoader")
     , filename(std::move(name))
     , errorMessage(std::move(msg))
     , reader(r)

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,9 +26,10 @@
 #include <ghoul/io/model/modelmesh.h>
 
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/io/texture/texturereader.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/textureunit.h>
 
@@ -49,11 +50,13 @@ namespace {
 namespace ghoul::io {
 
 ModelMesh::ModelMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-                     std::vector<Texture> textures, bool isInvisible)
+                     std::vector<Texture> textures, bool isInvisible,
+                     bool hasVertexColors)
     : _vertices(std::move(vertices))
     , _indices(std::move(indices))
     , _textures(std::move(textures))
-    , _isInvisible(std::move(isInvisible))
+    , _isInvisible(isInvisible)
+    , _hasVertexColors(hasVertexColors)
 {}
 
 void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
@@ -63,7 +66,7 @@ void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
     texture.type = ModelMesh::TextureType::ColorDiffuse;
 }
 
-void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform,
+void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTransform,
                        bool isFullyTexturedModel, bool isProjection) const
 {
     // Count how many textures have image textures
@@ -79,6 +82,9 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
 
     if (!isProjection) {
         if (isFullyTexturedModel) {
+            // Use embeded vertex colors if specified
+            program.setUniform("use_vertex_colors", _hasVertexColors);
+
             // Reset shader
             program.setUniform("has_texture_diffuse", false);
             program.setUniform("has_texture_normal", false);
@@ -98,7 +104,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
                     break;
                 }
 
-                std::string name = textureTypeToString(texture.type);
+                const std::string name = textureTypeToString(texture.type);
                 // Use texture or color
                 if (texture.hasTexture) {
                     // Activate proper texture unit before binding
@@ -174,7 +180,7 @@ void ModelMesh::render(opengl::ProgramObject& program, glm::mat4x4 meshTransform
 
     // Transform mesh
     program.setUniform("meshTransform", meshTransform);
-    glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
+    const glm::dmat4 normalTransform = glm::transpose(glm::inverse(meshTransform));
     program.setUniform("meshNormalTransform", glm::mat4(normalTransform));
 
     // Render the mesh object
@@ -216,6 +222,10 @@ bool ModelMesh::isInvisible() const {
     return _isInvisible;
 }
 
+bool ModelMesh::hasVertexColors() const {
+    return _hasVertexColors;
+}
+
 bool ModelMesh::isTransparent() const {
     for (const Texture& t : _textures) {
         if ((t.type == TextureType::TextureDiffuse ||
@@ -240,6 +250,8 @@ const std::vector<ModelMesh::Texture>& ModelMesh::textures() const {
 }
 
 void ModelMesh::initialize() {
+    ZoneScoped;
+
     if (_vertices.empty()) {
         LERRORC("ModelMesh", "Cannot initialize empty mesh");
         return;
@@ -302,6 +314,17 @@ void ModelMesh::initialize() {
         GL_FALSE,
         sizeof(Vertex),
         reinterpret_cast<const GLvoid*>(offsetof(Vertex, tangent))
+    );
+
+    // Vertex color
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(
+        4,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(Vertex),
+        reinterpret_cast<const GLvoid*>(offsetof(Vertex, color))
     );
 
     glBindVertexArray(0);

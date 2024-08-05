@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,19 +27,18 @@
 
 #include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 
-static lua_State* _state = nullptr;
-
 namespace {
 
+lua_State* _state = nullptr;
 constexpr int KeyTableIndex = -2;
 constexpr int ValueTableIndex = -1;
 
@@ -120,19 +119,20 @@ LuaRuntimeException::LuaRuntimeException(std::string msg)
     : RuntimeError(std::move(msg), "Lua")
 {}
 
-LuaFormatException::LuaFormatException(std::string msg, std::string file)
+LuaFormatException::LuaFormatException(std::string msg, std::filesystem::path file)
     : LuaRuntimeException(std::move(msg))
     , filename(std::move(file))
 {}
 
-LuaLoadingException::LuaLoadingException(std::string error, std::string file)
-    : LuaRuntimeException(fmt::format("Error loading script '{}': {}", file, error))
+LuaLoadingException::LuaLoadingException(std::string error, std::filesystem::path file)
+    : LuaRuntimeException(std::format("Error loading script '{}': {}", file, error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}
 
-LuaExecutionException::LuaExecutionException(std::string error, std::string file)
-    : LuaRuntimeException(fmt::format("Error executing script '{}': {}", file, error))
+LuaExecutionException::LuaExecutionException(std::string error,
+                                             std::filesystem::path file)
+    : LuaRuntimeException(std::format("Error executing script '{}': {}", file, error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}
@@ -157,8 +157,8 @@ std::string luaValueToString(lua_State* state, int location) {
     const int type = lua_type(state, location);
     switch (type) {
         case LUA_TBOOLEAN: return lua_toboolean(state, location) == 1 ? "true" : "false";
-        case LUA_TNUMBER:  return fmt::format("{}", lua_tonumber(state, location));
-        case LUA_TSTRING:  return fmt::format("\"{}\"", lua_tostring(state, location));
+        case LUA_TNUMBER:  return std::format("{}", lua_tonumber(state, location));
+        case LUA_TSTRING:  return std::format("\"{}\"", lua_tostring(state, location));
         case LUA_TTABLE:   return luaTableToString(state, location);
         default:           return std::string(ghoul::lua::luaTypeToString(type));
     }
@@ -174,7 +174,7 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
     auto getKey = [](lua_State* L) {
         const int keyType = lua_type(L, KeyTableIndex);
         switch (keyType) {
-            case LUA_TNUMBER: return fmt::format("[{}]", lua_tonumber(L, KeyTableIndex));
+            case LUA_TNUMBER: return std::format("[{}]", lua_tonumber(L, KeyTableIndex));
             case LUA_TSTRING: return std::string(lua_tostring(L, KeyTableIndex));
             default:          return std::string(ghoul::lua::luaTypeToString(keyType));
         }
@@ -182,7 +182,7 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
 
     std::vector<std::string> values;
     while (lua_next(state, -2) != 0) {
-        values.push_back(fmt::format(
+        values.push_back(std::format(
             "{} = {}",
             getKey(state),
             luaValueToString(state, ValueTableIndex)
@@ -191,11 +191,11 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
     }
     lua_pop(state, 1);
 
-    if (values.size() == 0) {
+    if (values.empty()) {
         return "{}";
     }
 
-    return fmt::format("{{ {} }}", join(values, ", "));
+    return std::format("{{ {} }}", join(values, ", "));
 }
 
 std::string stackInformation(lua_State* state) {
@@ -207,8 +207,8 @@ std::string stackInformation(lua_State* state) {
     }
 
     std::string result = "Lua Stack\n";
-    for (int i = 1; i <= top; ++i) {
-        result += fmt::format("{}: ", i);
+    for (int i = 1; i <= top; i++) {
+        result += std::format("{}: ", i);
         const int t = lua_type(state, i);
         switch (t) {
             case LUA_TSTRING:
@@ -238,8 +238,8 @@ std::string stackInformation(lua_State* state) {
     return result;
 }
 
-void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dictionary,
-                                                                         lua_State* state)
+void loadDictionaryFromFile(const std::filesystem::path& filename,
+                            ghoul::Dictionary& dictionary, lua_State* state)
 {
     ghoul_assert(!filename.empty(), "filename must not be empty");
     ghoul_assert(
@@ -251,7 +251,8 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
         state = staticLuaState();
     }
 
-    const int loadStatus = luaL_loadfile(state, filename.c_str());
+    const std::string f = filename.string();
+    const int loadStatus = luaL_loadfile(state, f.c_str());
     if (loadStatus != LUA_OK) {
         throw LuaLoadingException(lua_tostring(state, -1), filename);
     }
@@ -275,7 +276,9 @@ void loadDictionaryFromFile(const std::string& filename, ghoul::Dictionary& dict
     lua_settop(state, 0);
 }
 
-ghoul::Dictionary loadDictionaryFromFile(const std::string& filename, lua_State* state) {
+ghoul::Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
+                                         lua_State* state)
+{
     ghoul::Dictionary result;
     loadDictionaryFromFile(filename, result, state);
     return result;
@@ -368,7 +371,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
 
     TableType type = TableType::Undefined;
 
-    int location = luaAbsoluteLocation(state, relativeLocation);
+    const int location = luaAbsoluteLocation(state, relativeLocation);
 
     const int size = lua_gettop(state);
     if (size == 0) {
@@ -418,23 +421,23 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
         const int valueType = lua_type(state, ValueTableIndex);
         switch (valueType) {
             case LUA_TNUMBER: {
-                double value = lua_tonumber(state, ValueTableIndex);
+                const double value = lua_tonumber(state, ValueTableIndex);
                 dictionary.setValue(key, value);
                 break;
             }
             case LUA_TBOOLEAN: {
-                bool value = (lua_toboolean(state, ValueTableIndex) == 1);
+                const bool value = (lua_toboolean(state, ValueTableIndex) == 1);
                 dictionary.setValue(key, value);
                 break;
             }
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, ValueTableIndex);
-                dictionary.setValue(key, value);
+                dictionary.setValue(key, std::move(value));
                 break;
             }
             case LUA_TTABLE: {
                 Dictionary d = luaDictionaryFromState(state);
-                dictionary.setValue(key, d);
+                dictionary.setValue(key, std::move(d));
                 break;
             }
             case LUA_TLIGHTUSERDATA:
@@ -466,21 +469,21 @@ ghoul::Dictionary luaDictionaryFromState(lua_State* state, int location) {
 void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
     const int nValues = lua_gettop(state);
 
-    for (int i = 1; i <= nValues; ++i) {
+    for (int i = 1; i <= nValues; i++) {
         switch (lua_type(state, i)) {
             case LUA_TNUMBER: {
-                double value = lua_tonumber(state, i);
+                const double value = lua_tonumber(state, i);
                 dictionary.setValue(std::to_string(i), value);
                 break;
             }
             case LUA_TBOOLEAN: {
-                bool value = (lua_toboolean(state, i) == 1);
+                const bool value = (lua_toboolean(state, i) == 1);
                 dictionary.setValue(std::to_string(i), value);
                 break;
             }
             case LUA_TSTRING: {
                 std::string value = lua_tostring(state, i);
-                dictionary.setValue(std::to_string(i), value);
+                dictionary.setValue(std::to_string(i), std::move(value));
                 break;
             }
             case LUA_TTABLE: {
@@ -491,7 +494,7 @@ void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
             }
             default:
                 throw LuaFormatException(
-                    fmt::format("Unknown type: {}", lua_type(state, i))
+                    std::format("Unknown type: {}", lua_type(state, i))
                 );
         }
     }
@@ -553,17 +556,17 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename) {
         "Filename must be a file that exists"
     );
 
-    std::string fn = filename.string();
+    const std::string fn = filename.string();
     int status = luaL_loadfile(state, fn.c_str());
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaLoadingException(error);
+        throw LuaLoadingException(std::move(error));
     }
 
     status = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (status != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(error);
+        throw LuaExecutionException(std::move(error));
     }
 }
 
@@ -574,25 +577,25 @@ void runScript(lua_State* state, const std::string& script) {
     const int loadStatus = luaL_loadstring(state, script.c_str());
     if (loadStatus != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaLoadingException(error);
+        throw LuaLoadingException(std::move(error));
     }
 
     const int callStatus = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (callStatus != LUA_OK) {
         std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(error);
+        throw LuaExecutionException(std::move(error));
     }
 }
 
 void runScript(lua_State* state, std::string_view script) {
-    std::string s = std::string(script);
+    const std::string s = std::string(script);
     runScript(state, s);
 }
 
 int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
     const int nArguments = lua_gettop(L);
     if (nArguments != expected) {
-        std::string s = fmt::format(
+        const std::string s = std::format(
             "Expected {} arguments, got {}", expected, nArguments
         );
         LERRORC(component ? component : "Lua", s);
@@ -606,11 +609,11 @@ int checkArgumentsAndThrow(lua_State* L, int expected1, int expected2,
 {
     const int nArguments = lua_gettop(L);
     if ((nArguments != expected1) && (nArguments != expected2)) {
-        std::string s = fmt::format(
+        const std::string s = std::format(
             "Expected {} or {} arguments, got {}", expected1, expected2, nArguments
         );
         LERRORC(component ? component : "Lua", s);
-        return luaError(L, std::move(s));
+        return luaError(L, s);
     }
     return nArguments;
 }
@@ -619,11 +622,11 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range, const char* 
 {
     const int nArguments = lua_gettop(L);
     if ((nArguments < range.first) || (nArguments > range.second)) {
-        std::string s = fmt::format(
+        const std::string s = std::format(
             "Expected {}-{} arguments, got {}", range.first, range.second, nArguments
         );
         LERRORC(component ? component : "Lua", s);
-        return luaError(L, std::move(s));
+        return luaError(L, s);
     }
     return nArguments;
 }
@@ -636,13 +639,13 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
     if (nArguments != expected &&
        (nArguments < range.first) && (nArguments > range.second))
     {
-        std::string s = fmt::format(
+        const std::string s = std::format(
             "Expected {} or {}-{} arguments, got {}",
             expected, range.first, range.second, nArguments
         );
 
         LERRORC(component ? component : "Lua", s);
-        return luaError(L, std::move(s));
+        return luaError(L, s);
     }
     return nArguments;
 }
@@ -656,8 +659,8 @@ void verifyStackSize(lua_State* L, int expected) {
 
     ghoul_assert(
         size == expected,
-        fmt::format("Incorrect number of items left on stack. Expected {} got {}",
-            expected, size
+        std::format(
+            "Incorrect number of items left on stack. Expected {} got {}", expected, size
         )
     );
 }

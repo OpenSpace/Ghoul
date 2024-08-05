@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,7 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 
 namespace ghoul::cmdparser {
 
@@ -81,14 +81,14 @@ CommandlineCommand::MultipleCalls CommandlineCommand::allowsMultipleCalls() cons
 std::string CommandlineCommand::usage() const {
     std::string result = "[";
     if (!shortName().empty()) {
-        result += fmt::format("<{}|{}>", shortName(), name());
+        result += std::format("<{}|{}>", shortName(), name());
     }
     else {
         result += name();
     }
 
     if (!parameterList().empty()) {
-        result += fmt::format(" {}", parameterList());
+        result += std::format(" {}", parameterList());
     }
 
     result += "]";
@@ -98,16 +98,16 @@ std::string CommandlineCommand::usage() const {
 
 std::string CommandlineCommand::help() const {
     if (!shortName().empty()) {
-        return fmt::format("{}|{}:\t{}", shortName(), name(), infoText());
+        return std::format("{}|{}:\t{}", shortName(), name(), infoText());
     }
     else {
-        return fmt::format("{}:\t{}", name(), infoText());
+        return std::format("{}:\t{}", name(), infoText());
     }
 }
 
 void CommandlineCommand::checkParameters(const std::vector<std::string>& param) const {
     if (param.size() != static_cast<size_t>(_nArguments) && _nArguments != -3) {
-        throw CommandParameterException(fmt::format(
+        throw CommandParameterException(std::format(
             "Wrong number of arguments. Expected {} got {}",
             argumentNumber(), param.size()
         ));

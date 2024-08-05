@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,8 +28,10 @@
 
 namespace ghoul::internal {
 
-// This internal struct is used to host the lambda expression that gets executed when the
-// destructor is called
+/**
+ * This internal struct is used to host the lambda expression that gets executed when the
+ * destructor is called.
+ */
 template <typename T>
 struct ScopeExit {
     ScopeExit(T lambda) : _lambda(std::move(lambda)) {}
@@ -40,9 +42,11 @@ struct ScopeExit {
     T _lambda;
 };
 
-// A second helper struct that makes it possible to pass a lambda expression to the
-// ScopeExit without the trailing ) that a constructor call would require. The choice of
-// operator is arbitrary
+/**
+ * A second helper struct that makes it possible to pass a lambda expression to the
+ * ScopeExit without the trailing ) that a constructor call would require. The choice of
+ * operator is arbitrary.
+ */
 class ScopeExitHelper {
 public:
     template <typename T>
@@ -57,12 +61,16 @@ public:
 #define __LABEL_Defer(a) __MERGE_Defer(scopeExit_, a)
 
 
-// The 'defer' macro can be used to execute a piece of code at the end of a scope, for
-// example to guarantee that a `delete` function is called.
-// Example:
-// int* i = new int;
-// defer { delete i; };
-// *i = 0;
+/**
+ * The 'defer' macro can be used to execute a piece of code at the end of a scope, for
+ * example to guarantee that a `delete` function is called.
+ * Example:
+ * ```
+ * int* i = new int;
+ * defer { delete i; };
+ * *i = 0;
+ * ```
+ */
 #define defer auto __LABEL_Defer(__LINE__) = ghoul::internal::ScopeExitHelper() << [&]()
 
 #endif // __GHOUL___DEFER___H__

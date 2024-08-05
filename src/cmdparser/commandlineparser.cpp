@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,8 @@
 
 #include <ghoul/cmdparser/commandlineparser.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/cmdparser/commandlinecommand.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
@@ -49,26 +49,26 @@ int extractArguments(const std::vector<std::string>& in, std::vector<std::string
                      const size_t begin, const int count)
 {
     if (count == -1) {
-        for (size_t i = 0; (i < in.size()) && ((begin + 1 + i) < in.size()); ++i) {
+        for (size_t i = 0; (i < in.size()) && ((begin + 1 + i) < in.size()); i++) {
             out.push_back(in[begin + 1 + i]);
         }
     }
     else if (count == -2) {
         // Extract arguments until a new command is found
         // The '-' restriction is enforced in the #addCommand method
-        for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); ++i) {
+        for (size_t i = begin; (i < in.size()) && (in[i][0] != '-'); i++) {
             out.push_back(in[i]);
         }
     }
     else if (count == -3) {
         // Extract arguments until a new command is found
         // The '-' restriction is enforced in the #addCommand method
-        for (size_t i = begin + 1; (i < in.size()) && (in[i][0] != '-'); ++i) {
+        for (size_t i = begin + 1; (i < in.size()) && (in[i][0] != '-'); i++) {
             out.push_back(in[i]);
         }
     }
     else {
-        for (int i = 0; (i < count) && ((begin + 1 + i) < in.size()); ++i) {
+        for (int i = 0; (i < count) && ((begin + 1 + i) < in.size()); i++) {
             out.push_back(in[begin + 1 + i]);
         }
     }
@@ -148,7 +148,12 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             // The rest of the commands until the next '-' are for the nameless command
             // if we have one
             if (_commandForNamelessArguments) {
-                int number = extractArguments(_arguments, argumentsForNameless, i, -2);
+                const int number = extractArguments(
+                    _arguments,
+                    argumentsForNameless,
+                    i,
+                    -2
+                );
                 i += (number - 1);
             }
             else {
@@ -157,7 +162,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 // available as this is done later
                 if (_allowUnknownCommands) {
                     std::vector<std::string> arguments;
-                    int number = extractArguments(_arguments, arguments, i, -2);
+                    const int number = extractArguments(_arguments, arguments, i, -2);
                     for (const std::string& arg : arguments) {
                         _remainingArguments.push_back(arg);
                     }
@@ -167,7 +172,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     // We have found an unknown command but we don't allow them, so we
                     // have to bail out here
                     throw ghoul::RuntimeError(
-                        fmt::format(
+                        std::format(
                             "Found unknown command '{}' but none are allowed",
                             _arguments[i]
                         ),
@@ -186,7 +191,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 if (_allowUnknownCommands) {
                     // Extract the rest of the arguments
                     std::vector<std::string> arguments;
-                    int number = extractArguments(_arguments, arguments, i + 1, -2);
+                    const int number = extractArguments(_arguments, arguments, i + 1, -2);
                     _remainingArguments.push_back(_arguments[i]);
                     for (const std::string& arg : arguments) {
                         _remainingArguments.push_back(arg);
@@ -196,14 +201,19 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 }
                 else {
                     throw ghoul::RuntimeError(
-                        fmt::format("{} is not a valid command", _arguments[i]),
+                        std::format("{} is not a valid command", _arguments[i]),
                         "CommandlineParser"
                     );
                 }
             }
 
             std::vector<std::string> params;
-            int n = extractArguments(_arguments, params, i, currentCmd->argumentNumber());
+            const int n = extractArguments(
+                _arguments,
+                params,
+                i,
+                currentCmd->argumentNumber()
+            );
             i += (n + 1);
 
             // don't insert if the command doesn't allow multiple calls and already is in
@@ -212,8 +222,8 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 parameterMap.find(currentCmd) != parameterMap.end())
             {
                 throw ghoul::RuntimeError(
-                    fmt::format(
-                        "{} does not allow multiple calls in a single line",
+                    std::format(
+                        "'{}' does not allow multiple calls in a single line",
                         currentCmd->name()
                     ),
                     "CommandlineParser"
@@ -256,14 +266,14 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
     for (const std::string& arg : argumentsForNameless) {
         s << " " << arg;
     }
-    LDEBUG(fmt::format("(Nameless argument: {})", s.str()));
+    LDEBUG(std::format("(Nameless argument: {})", s.str()));
 
     for (const std::pair<const K, V>& it : parameterMap) {
         s.clear();
         for (const std::string& arg : it.second) {
             s << " " << arg;
         }
-        LDEBUG(fmt::format("({}: {})", it.first->name(), s.str()));
+        LDEBUG(std::format("({}: {})", it.first->name(), s.str()));
     }
 
     // Third step: Execute the nameless command if there are any arguments available
@@ -343,19 +353,21 @@ std::string CommandlineParser::usageInformation() const {
     return result;
 }
 
-std::string CommandlineParser::usageInformationForCommand(const std::string& cmd) const {
-    ghoul_assert(!cmd.empty(), "Command must not be empty");
+std::string CommandlineParser::usageInformationForCommand(
+                                                         const std::string& command) const
+{
+    ghoul_assert(!command.empty(), "Command must not be empty");
 
     const auto it = std::find_if(
         _commands.cbegin(),
         _commands.cend(),
-        [cmd](const std::unique_ptr<CommandlineCommand>& i) {
-            return i->name() == cmd || i->shortName() == cmd;
+        [command](const std::unique_ptr<CommandlineCommand>& i) {
+            return i->name() == command || i->shortName() == command;
         }
     );
     ghoul_assert(it != _commands.cend(), "Command must name a valid name or shortname");
 
-    return fmt::format("Usage: \n{}", (*it)->usage());
+    return std::format("Usage: \n{}", (*it)->usage());
 }
 
 std::string CommandlineParser::usageInformationForNamelessCommand() const {
@@ -367,7 +379,7 @@ std::string CommandlineParser::usageInformationForNamelessCommand() const {
 }
 
 std::string CommandlineParser::helpText() const {
-    std::string result = fmt::format("{}\n\nHelp:\n-----\n", usageInformation());
+    std::string result = std::format("{}\n\nHelp:\n-----\n", usageInformation());
     for (const std::unique_ptr<CommandlineCommand>& it : _commands) {
         result += it->help() + '\n';
     }

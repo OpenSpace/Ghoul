@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -68,7 +68,7 @@ public:
      * initialized here, it requires a valid OpenGL context. The size is defined as
      * `width`, `height`, and `depth`.
      *
-     * \param size The size (`width`, `height`, `depth`) of the TextureAtlas.
+     * \param size The size (`width`, `height`, `depth`) of the TextureAtlas
      *
      * \pre \p size's width and height has to be bigger than `4` and smaller than the GPU
      *      limit for 2D textures. The \p size's depth has to be `1`, `2`, `3`, or `4`
@@ -175,11 +175,10 @@ public:
 
     /**
      * Returns the texture coordinates that define the provided region. If the returned
-     * `topLeft` and `bottomRight` coordinates are used as texture
-     * coordinates, the result will be the same as if the data would have been bound to a
-     * separate texture. The \p windowing parameter provides possiblity to offset the
-     * starting points (with the first two arguments and restrict the width (with the
-     * third and fourth arguments).
+     * `topLeft` and `bottomRight` coordinates are used as texture coordinates, the result
+     * will be the same as if the data would have been bound to a separate texture. The
+     * \p windowing parameter provides possiblity to offset the starting points (with the
+     * first two arguments and restrict the width (with the third and fourth arguments).
      * ```
      *  -------------------
      * |         b         |
@@ -197,14 +196,14 @@ public:
      *
      *
      * \param handle The handle of the region for which the texture coordinates shall be
-     * retrieved
+     *        retrieved
      * \param windowing Determines whether a subset of the region should be retrieved. If
      *        this parameter is equal to `glm::ivec4(0)`, the full region is returned. The
      *        first two parameters `x` and `y` determine an offset for the top left
      *        corner, while the third and fourth parameters are subtracted from the bottom
      *        right corner. That means that if `windowing` is equal to
      *        `glm::ivec4(width / 4, height / 4, width / 4, height / 4`, a
-     *        subset in the center of the region is returned.
+     *        subset in the center of the region is returned
      * \return A TextureCoordinatesResult structure containing the `topLeft` corner of the
      *         region in texture coordinates and that `bottomRight` corner of the region
      *         in texture coordinates
@@ -215,7 +214,7 @@ public:
     /**
      * Returns the size of the TextureAtlas in `width`, `height`, and `depth`.
      *
-     * \return The size of the TextureAtlas in `width`, `height`, and `depth`.
+     * \return The size of the TextureAtlas in `width`, `height`, and `depth`
      */
     glm::ivec3 size() const;
 
@@ -224,7 +223,7 @@ public:
      * currently in use. Please note that this is *not* equal to the amount of pixels that
      * can possiblity be used due to fragmentation in the atlas.
      *
-     * \return The amount of pixels that are currently in use in the atlas.
+     * \return The amount of pixels that are currently in use in the atlas
      */
     int spaceUsed() const;
 
@@ -233,7 +232,7 @@ public:
      * Texture can bound to a ProgramObject and subsequently sampled to retrieve the
      * stored textures.
      *
-     * \return The Texture that is the underlying storage for this TextureAtlas.
+     * \return The Texture that is the underlying storage for this TextureAtlas
      */
     const Texture& texture() const;
 

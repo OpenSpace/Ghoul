@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,11 +27,12 @@
 
 namespace ghoul::opengl {
 
-VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) noexcept {
-    _vaoID = other._vaoID;
-    _vBufferID = other._vBufferID;
-    _iBufferID = other._iBufferID;
-    _iSize = other._iSize;
+VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) noexcept
+    : _vaoID(other._vaoID)
+    , _vBufferID(other._vBufferID)
+    , _iBufferID(other._iBufferID)
+    , _iSize(other._iSize)
+{
 
     other._vaoID = 0;
     other._vBufferID = 0;
@@ -102,9 +103,8 @@ void VertexBufferObject::setRenderMode(GLenum mode) {
 
 void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum type,
                                              GLsizei stride, GLuint offset,
-                                             GLboolean normalized)
+                                             GLboolean normalized) const
 {
-    uint64_t o = offset;
     glBindVertexArray(_vaoID);
     glEnableVertexAttribArray(index);
     glVertexAttribPointer(
@@ -113,16 +113,16 @@ void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum ty
         type,
         normalized,
         stride,
-        reinterpret_cast<const GLvoid*>(o)
+        reinterpret_cast<const GLvoid*>(offset)
     );
     glBindVertexArray(0);
 }
 
-void VertexBufferObject::bind() {
+void VertexBufferObject::bind() const {
     glBindVertexArray(_vaoID);
 }
 
-void VertexBufferObject::unbind() {
+void VertexBufferObject::unbind() const {
     glBindVertexArray(0);
 }
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -140,14 +140,14 @@ bool ThreadPool::isRunning() const {
 void ThreadPool::resize(int nThreads) {
     ghoul_assert(nThreads > 0, "nThreads must be bigger than 0");
 
-    int oldNThreads = size();
+    const int oldNThreads = size();
     if (oldNThreads <= nThreads) {
         // if the number of threads has increased
         _workers.resize(nThreads);
 
         // We only want to activate the new workers if we are not currently running
         if (*_isRunning) {
-            for (int i = oldNThreads; i < nThreads; ++i) {
+            for (int i = oldNThreads; i < nThreads; i++) {
                 activateWorker(_workers[i]);
             }
         }
@@ -199,13 +199,13 @@ void ThreadPool::activateWorker(Worker& worker) {
     // they continue to exist when we pass them to the 'workerLoop' lamdba. Otherwise,
     // the ThreadPool might be destructed before the workers have finished (for example
     // when they are detached) and would then access already freed memory
-    std::shared_ptr<std::atomic_bool> threadPoolIsRunning = _isRunning;
-    std::shared_ptr<std::atomic_int> nWaiting = _nWaiting;
-    std::shared_ptr<TaskQueue> taskQueue = _taskQueue;
-    std::shared_ptr<std::mutex> mutex = _mutex;
-    std::shared_ptr<std::condition_variable> cv = _cv;
+    const std::shared_ptr<std::atomic_bool>& threadPoolIsRunning = _isRunning;
+    const std::shared_ptr<std::atomic_int>& nWaiting = _nWaiting;
+    const std::shared_ptr<TaskQueue>& taskQueue = _taskQueue;
+    const std::shared_ptr<std::mutex>& mutex = _mutex;
+    const std::shared_ptr<std::condition_variable>& cv = _cv;
 
-    std::function<void()> workerInitialization = _workerInitialization;
+    const std::function<void()>& workerInitialization = _workerInitialization;
     std::function<void()> workerDeinitialization = _workerDeinitialization;
 
 
@@ -222,7 +222,7 @@ void ThreadPool::activateWorker(Worker& worker) {
         defer { workerDeinitialization(); };
 
         std::function<void()> task;
-        bool hasTask;
+        bool hasTask = false;
         std::tie(task, hasTask) = taskQueue->pop();
 
         // Infinite look that only gets broken if this thread should terminate or if it
@@ -313,7 +313,7 @@ void ThreadPool::activateWorker(Worker& worker) {
 }
 
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
-    std::lock_guard lock(_queueMutex);
+    const std::lock_guard lock(_queueMutex);
     if (_queue.empty()) {
         // No work to be done, the default constructed Task is never read
         return std::make_tuple(Task(), false);
@@ -328,19 +328,19 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
     }
 }
 
-void ThreadPool::TaskQueue::push(ThreadPool::Task&& task) {
-    std::lock_guard lock(_queueMutex);
+void ThreadPool::TaskQueue::push(const ThreadPool::Task& task) {
+    const std::lock_guard lock(_queueMutex);
     _queue.push(task);
 }
 
 bool ThreadPool::TaskQueue::isEmpty() const {
-    std::lock_guard lock(_queueMutex);
+    const std::lock_guard lock(_queueMutex);
     return _queue.empty();
 }
 
 int ThreadPool::TaskQueue::size() const {
-    std::lock_guard lock(_queueMutex);
+    const std::lock_guard lock(_queueMutex);
     return static_cast<int>(_queue.size());
 }
 
-} // namespace openspace
+} // namespace ghoul

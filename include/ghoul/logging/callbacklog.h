@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,15 +28,16 @@
 
 #include <ghoul/logging/log.h>
 
+#include <ghoul/misc/profiling.h>
 #include <functional>
 
 namespace ghoul::logging {
 
 /**
  * A concrete subclass of Log that passes logs to the provided callback function. The
- * callback is specified using `std::function`. Trying to log messages when the
- * callback object has been deleted results in undefined behavior. The formatting of the
- * log messages depends on the stamping settings. The different possibilities are:
+ * callback is specified using `std::function`. Trying to log messages when the callback
+ * object has been deleted results in undefined behavior. The formatting of the log
+ * messages depends on the stamping settings. The different possibilities are:
  * ```
  * [DATE | TIME] CATEGORY (LEVEL) MESSAGE
  * [DATE] CATEGORY (LEVEL) MESSAGE
@@ -47,17 +48,16 @@ namespace ghoul::logging {
 class CallbackLog : public Log {
 public:
     /// The type of function that is used as a callback in this log
-    using CallbackFunction = std::function<void (std::string)>;
+    using CallbackFunction = std::function<void(std::string)>;
 
     /**
      * Constructor that calls the Log constructor and initializes this CallbackLog.
      *
-     * \param callbackFunction The callback function that is called for each log
-     *        message.
-     * \param timeStamping Determines if the log should print the time when a message
-     *        is logged
-     * \param dateStamping Determines if the log should print the time when a message
-     *        is logged
+     * \param callbackFunction The callback function that is called for each log message
+     * \param timeStamping Determines if the log should print the time when a message is
+     *        logged
+     * \param dateStamping Determines if the log should print the time when a message is
+     *        logged
      * \param categoryStamping Determines if the log should print the categories
      * \param logLevelStamping Determines if the log should print the log level
      * \param minimumLogLevel The minimum log level that this logger will accept
@@ -98,6 +98,7 @@ public:
 
 protected:
     CallbackFunction _callbackFunction;
+    TracyLockable(std::mutex, _mutex);
 };
 
 } // namespace ghoul::logging

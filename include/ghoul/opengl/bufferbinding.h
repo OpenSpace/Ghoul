@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -40,14 +40,13 @@ namespace bufferbinding {
 } // bufferbinding
 
 /**
- * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER,
- * GL_SHADER_STORAGE_BUFFER, GL_TRANSFORM_FEEDBACK_BUFFER and GL_UNIFORM_BUFFER.
- * It manages which bindings are currently active and which bindings are free to use.
- * To use a BufferBinding, it has to be ProgramObject::activate%d, and then the
- * #bindingNumber can be retrieved so that it can be used in a block binding.
- * A block binding number is assigned as soon as the first call to
- * ProgramObject::activate, ProgramObject::glEnum, or #bindingNumber is made. If there
- * are no free binding numbers left, an `std::runtime_error` will be thrown.
+ * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER, GL_SHADER_STORAGE_BUFFER,
+ * GL_TRANSFORM_FEEDBACK_BUFFER and GL_UNIFORM_BUFFER. It manages which bindings are
+ * currently active and which bindings are free to use. To use a BufferBinding, it has to
+ * be ProgramObject::activate%d, and then the #bindingNumber can be retrieved so that it
+ * can be used in a block binding. A block binding number is assigned as soon as the first
+ * call to ProgramObject::activate, ProgramObject::glEnum, or #bindingNumber is made. If
+ * there are no free binding numbers left, an `std::runtime_error` will be thrown.
 */
 template <bufferbinding::Buffer T>
 class BufferBinding {
@@ -73,9 +72,9 @@ public:
     GLint bindingNumber();
 
     /**
-     * This operator returns the binding number that was assigned to this
-     * If this is the first call to #bindingNumber, a free binding number
-     * will be assigned to this object.
+     * This operator returns the binding number that was assigned to this. If this is the
+     * first call to #bindingNumber, a free binding number will be assigned to this
+     * object.
      *
      * \return The buffer binding number that was assigned to this BufferBinding
      */
@@ -95,7 +94,7 @@ public:
     static int numberActiveBindings();
 
     /**
-    * This method returns the maximum number of buffer bindings that is avalable.
+    * This method returns the maximum number of buffer bindings that is available.
     *
     * \return The number of buffer bindings in use
     */
@@ -103,14 +102,14 @@ public:
 
 private:
     /**
-     * This method is called the first time #bindingNumber is
-     * called. It will assign a new OpenGL buffer binding to this BufferBinding and mark
-     * this new binding as used until this BufferBinding is destroyed.
+     * This method is called the first time #bindingNumber is called. It will assign a new
+     * OpenGL buffer binding to this BufferBinding and mark this new binding as used until
+     * this BufferBinding is destroyed.
      */
     void assignBinding();
 
     /**
-     * This method returns true if the buffer binding is assigned
+     * This method returns true if the buffer binding is assigned.
      */
     bool assigned();
 
@@ -137,10 +136,8 @@ private:
     /// The maximum number of buffer bindings
     static unsigned int _maxBufferBindings;
 
-    /**
-     * This vector stores a bool at position `i` if the buffer binding number
-     * `i` is currently in use
-     */
+    /// This vector stores a bool at position `i` if the buffer binding number `i` is
+    /// currently in use
     static std::vector<bool> _busyBindings;
 };
 

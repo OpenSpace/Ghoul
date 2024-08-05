@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,6 +27,7 @@
 
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -87,14 +88,14 @@ void LogManager::flushLogs() {
 void LogManager::logMessage(LogLevel level, std::string_view category,
                             std::string_view message)
 {
+    ZoneScoped;
+
     if (!ghoul::logging::LogManager::isInitialized()) {
         _consoleLog.log(level, category, message);
         return;
     }
 
     if (level >= _level) {
-        std::lock_guard lock(_mutex);
-
         _consoleLog.log(level, category, message);
         if (_immediateFlush) {
             _consoleLog.flush();
@@ -108,7 +109,7 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
             }
         }
 
-        const int l = std::underlying_type<LogLevel>::type(level);
+        const int l = std::underlying_type_t<LogLevel>(level);
         ++(_logCounters[l]);
     }
 }
@@ -122,7 +123,7 @@ LogLevel LogManager::logLevel() const {
 }
 
 int LogManager::messageCounter(LogLevel level) {
-    return _logCounters[std::underlying_type<LogLevel>::type(level)];
+    return _logCounters[std::underlying_type_t<LogLevel>(level)];
 }
 
 void LogManager::resetMessageCounters() {

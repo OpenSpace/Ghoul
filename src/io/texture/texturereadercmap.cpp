@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,9 +25,10 @@
 
 #include <ghoul/io/texture/texturereadercmap.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <fstream>
 #include <sstream>
@@ -35,14 +36,15 @@
 namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
-                                                              const std::string& filename,
+                                                    const std::filesystem::path& filename,
                                                                     int nDimensions) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     if (nDimensions != 1) {
-        throw ghoul::RuntimeError(fmt::format(
-            "The number of dimensions for {} must be 1, but was {}", filename, nDimensions
+        throw ghoul::RuntimeError(std::format(
+            "The number of dimensions for '{}' must be 1, but was {}",
+            filename, nDimensions
         ));
     }
 
@@ -57,7 +59,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 
     std::string line;
     int i = 0;
-    while (std::getline(file, line)) {
+    while (ghoul::getline(file, line)) {
         // Skip empty lines
         if (line.empty() || line == "\r") {
             continue;
@@ -92,7 +94,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             delete[] values;
             throw TextureLoadException(
                 filename,
-                fmt::format("Header assured '{}' values but more were found", width),
+                std::format("Header assured '{}' values but more were found", width),
                 this
             );
         }
@@ -107,19 +109,19 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         delete[] values;
         throw TextureLoadException(
             filename,
-            fmt::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
+            std::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
             this
         );
     }
 
-    GLenum type = [](int d) {
+    const GLenum type = [](int d) {
         switch (d) {
             case 1: return GL_TEXTURE_1D;
             case 2: return GL_TEXTURE_2D;
             case 3: return GL_TEXTURE_3D;
             default:
-                throw ghoul::RuntimeError(fmt::format(
-                    "Unsupported dimensionality {}", d
+                throw ghoul::RuntimeError(std::format(
+                    "Unsupported dimensionality '{}'", d
                 ));
         }
     }(nDimensions);

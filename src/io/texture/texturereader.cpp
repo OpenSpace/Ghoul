@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,10 +25,11 @@
 
 #include <ghoul/io/texture/texturereader.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/file.h>
+#include <ghoul/format.h>
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
 #include <filesystem>
@@ -36,18 +37,20 @@
 namespace ghoul::io {
 
 TextureReader::MissingReaderException::MissingReaderException(std::string extension,
-                                                              std::string f)
+                                                              std::filesystem::path file_)
     : RuntimeError(
-        fmt::format("No reader found for extension '{}' with file '{}'", extension, f),
+        std::format(
+            "No reader found for extension '{}' with file '{}'", extension, file_
+        ),
         "IO"
     )
     , fileExtension(std::move(extension))
-    , file(std::move(f))
+    , file(std::move(file_))
 {}
 
 TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
     : RuntimeError(
-        fmt::format("Error loading texture at location {} with size {}", memory, size),
+        std::format("Error loading texture at location {} with size {}", memory, size),
         "IO"
     )
     , _memory(memory)
@@ -59,8 +62,9 @@ TextureReader& TextureReader::ref() {
     return textureReader;
 }
 
-std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& filename,
-                                                            int nDimensions)
+std::unique_ptr<opengl::Texture> TextureReader::loadTexture(
+                                                    const std::filesystem::path& filename,
+                                                                          int nDimensions)
 {
     ghoul_assert(!_readers.empty(), "No readers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
@@ -81,7 +85,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(const std::string& f
 }
 
 std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t size,
-                                                            int nDimension,
+                                                            int nDimensions,
                                                             const std::string& format)
 {
     ghoul_assert(memory, "Memory must not be nullptr");
@@ -93,7 +97,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
         throw InvalidLoadException(memory, size);
     }
 
-    return reader->loadTexture(memory, size, nDimension);
+    return reader->loadTexture(memory, size, nDimensions);
 }
 
 std::vector<std::string> TextureReader::supportedExtensions() {
@@ -110,13 +114,8 @@ void TextureReader::addReader(std::unique_ptr<TextureReaderBase> reader) {
 }
 
 TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
-    std::string lowerExtension = extension;
-    std::transform(
-        extension.cbegin(),
-        extension.cend(),
-        lowerExtension.begin(),
-        [](char v) { return static_cast<char>(::tolower(v)); }
-    );
+    const std::string lowerExtension = toLowerCase(extension);
+
     for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {
         std::vector<std::string> extensions = reader->supportedExtensions();
         auto it = std::find(extensions.cbegin(), extensions.cend(), lowerExtension);

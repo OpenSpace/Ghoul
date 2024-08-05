@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,6 +27,7 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/crc32.h>
+#include <ghoul/misc/stringhelper.h>
 #include <fstream>
 
 #ifdef WIN32
@@ -44,28 +45,30 @@ namespace {
 
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;
 
-    unsigned int generateHash(std::filesystem::path file, std::string_view information) {
+    unsigned int generateHash(const std::filesystem::path& file, std::string_view info) {
         // something that cannot occur in the filesystem
         constexpr char HashDelimiter = '|';
 
-        std::string s = fmt::format("{}{}{}", file.string(), HashDelimiter, information);
-        unsigned int hash = ghoul::hashCRC32(s);
+        const std::string s = std::format("{}{}{}", file, HashDelimiter, info);
+        const unsigned int hash = ghoul::hashCRC32(s);
         return hash;
     }
 
     std::string lastModifiedDate(std::filesystem::path path) {
         if (!std::filesystem::is_regular_file(path)) {
             throw ghoul::RuntimeError(
-                fmt::format(
-                    "Error retrieving last-modified date for {}. File did not exist", path
+                std::format(
+                    "Error retrieving last-modified date for '{}'. File did not exist",
+                    path
                 ),
                 "Cache"
             );
         }
 #ifdef WIN32
         WIN32_FILE_ATTRIBUTE_DATA infoData;
+        const std::string p = path.string();
         const BOOL success = GetFileAttributesEx(
-            path.string().c_str(),
+            p.c_str(),
             GetFileExInfoStandard,
             &infoData
         );
@@ -83,8 +86,8 @@ namespace {
             );
             std::string msg(buffer.data());
             throw ghoul::RuntimeError(
-                fmt::format(
-                    "Could not retrieve last-modified date for {}: {}", path, msg
+                std::format(
+                    "Could not retrieve last-modified date for '{}': {}", path, msg
                 ),
                 "Cache"
             );
@@ -106,12 +109,12 @@ namespace {
                 );
                 std::string msg(buffer.data());
                 throw ghoul::RuntimeError(
-                    fmt::format("'FileTimeToSystemTime' failed for {}: {}", path, msg),
+                    std::format("'FileTimeToSystemTime' failed for '{}': {}", path, msg),
                     "Cache"
                 );
             }
             else {
-                return fmt::format(
+                return std::format(
                     "{}-{}-{}T{}:{}:{}.{}", time.wYear, time.wMonth, time.wDay,
                     time.wHour, time.wMinute, time.wSecond, time.wMilliseconds
                 );
@@ -119,11 +122,12 @@ namespace {
         }
 #else // ^^^^ WIN32 // !WIN32 vvvv
         struct stat attrib;
-        stat(path.string().c_str(), &attrib);
+        const std::string p = path.string();
+        stat(p.c_str(), &attrib);
         struct tm* time = gmtime(&attrib.st_ctime);
-        char buffer[128];
-        strftime(buffer, 128, "%Y-%m-%dT%H:%M:%S", time);
-        return buffer;
+        std::array<char, 128> buffer;
+        strftime(buffer.data(), 128, "%Y-%m-%dT%H:%M:%S", time);
+        return buffer.data();
 #endif // WIN32
     }
 
@@ -139,22 +143,22 @@ namespace {
                 continue;
             }
 
-            fs::path thisFilename = e.path().filename();
-            fs::path hashName = e.path().parent_path().filename();
-            fs::path parentFilename = e.path().parent_path().parent_path().filename();
+            const fs::path thisFilename = e.path().filename();
+            const fs::path hashName = e.path().parent_path().filename();
+            const fs::path parent = e.path().parent_path().parent_path().filename();
 
-            if (thisFilename != parentFilename) {
+            if (thisFilename != parent) {
                 throw ghoul::RuntimeError(
-                    fmt::format(
-                        "File contained in cache directory {} contains a file "
-                        "with name {} instead of expected {}",
-                        path, thisFilename, parentFilename
+                    std::format(
+                        "File contained in cache directory '{}' contains a file "
+                        "with name '{}' instead of expected '{}'",
+                        path, thisFilename, parent
                     ),
                     "Cache"
                 );
             }
 
-            unsigned long hash = std::stoul(hashName.string());
+            const unsigned long hash = std::stoul(hashName.string());
             result[hash] = e.path();
         }
 
@@ -173,9 +177,9 @@ CacheManager::CacheManager(std::filesystem::path directory)
     std::ifstream file(cacheFile);
     if (file.good()) {
         std::string line;
-        std::getline(file, line);
+        ghoul::getline(file, line);
         if (line != std::to_string(CacheVersion)) {
-            LINFO(fmt::format(
+            LINFO(std::format(
                 "Cache version has changed. Current: {}; New: {}", line, CacheVersion
             ));
             file.close();
@@ -205,7 +209,7 @@ CacheManager::~CacheManager() {
     const std::filesystem::path path = _directory / CacheFile;
     std::ofstream file(path, std::ofstream::out);
     if (!file.good()) {
-        LERROR(fmt::format("Could not open {} for writing cache version file", path));
+        LERROR(std::format("Could not open '{}' for writing cache version file", path));
     }
 
     file << CacheVersion;
@@ -215,10 +219,11 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
                                               std::optional<std::string_view> information)
 {
     const std::filesystem::path baseName = file.filename();
-    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
+    const std::string n = baseName.string();
+    const size_t pos = n.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument {} contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", baseName),
             "Cache"
         );
     }
@@ -229,7 +234,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
     }
 
     const unsigned int hash = generateHash(
-        baseName,
+        file,
         information.has_value() ? *information : lmd
     );
 
@@ -243,7 +248,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
         std::filesystem::create_directory(destinationBase);
     }
 
-    const std::string destination = fmt::format("{}/{}", destinationBase.string(), hash);
+    const std::string destination = std::format("{}/{}", destinationBase, hash);
 
     // The new destination should always not exist, since we checked before if we have the
     // value in the map and only get here if it isn't; persistent cache entries are always
@@ -260,7 +265,7 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
     }
 
     // Generate and output the newly generated cache name
-    const std::string cachedName = fmt::format("{}/{}", destination, baseName.string());
+    const std::string cachedName = std::format("{}/{}", destination, baseName);
 
     // Store the cache information in the map
     _files[hash] = cachedName;
@@ -271,10 +276,11 @@ bool CacheManager::hasCachedFile(const std::filesystem::path& file,
                                  std::optional<std::string_view> information) const
 {
     const std::filesystem::path baseName = file.filename();
-    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
+    const std::string n = baseName.string();
+    const size_t pos = n.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument {} contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", baseName),
             "Cache"
         );
     }
@@ -285,7 +291,7 @@ bool CacheManager::hasCachedFile(const std::filesystem::path& file,
     }
 
     const unsigned long hash = generateHash(
-        baseName,
+        file,
         information.has_value() ? *information : lmd
     );
     return _files.find(hash) != _files.end();
@@ -295,10 +301,11 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
                                    std::optional<std::string_view> information)
 {
     const std::filesystem::path baseName = file.filename();
-    const size_t pos = baseName.string().find_first_of("/\\?%*:|\"<>");
+    const std::string n = baseName.string();
+    const size_t pos = n.find_first_of("/\\?%*:|\"<>");
     if (pos != std::string::npos) {
         throw ghoul::RuntimeError(
-            fmt::format("Argument {} contains an illegal character", file.filename()),
+            std::format("Argument '{}' contains an illegal character", baseName),
             "Cache"
         );
     }
@@ -309,7 +316,7 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
     }
 
     const unsigned int hash = generateHash(
-        baseName,
+        file,
         information.has_value() ? *information : lmd
     );
     const auto it = _files.find(hash);

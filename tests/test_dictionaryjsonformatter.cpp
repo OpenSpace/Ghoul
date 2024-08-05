@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,7 +30,7 @@
 #include <string>
 
 TEST_CASE("DictionaryJsonFormatter: Empty Dictionary", "[dictionaryjsonformatter]") {
-    ghoul::Dictionary d;
+    const ghoul::Dictionary d;
     std::string res = ghoul::formatJson(d);
     CHECK(res == "{}");
 }

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,7 +26,7 @@
 #include <ghoul/misc/clipboard.h>
 
 #include <ghoul/misc/exception.h>
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <algorithm>
 #include <sstream>
 
@@ -44,11 +44,11 @@ namespace {
         }
 
         constexpr int BufferSize = 1024;
-        char buffer[BufferSize];
+        std::array<char, BufferSize> buffer = {};
         value.clear();
         while (!feof(pipe)) {
-            if (fgets(buffer, BufferSize, pipe) != nullptr) {
-                value += buffer;
+            if (fgets(buffer.data(), BufferSize, pipe) != nullptr) {
+                value += buffer.data();
             }
         }
         pclose(pipe);
@@ -132,13 +132,13 @@ void setClipboardText(const std::string& text) {
     CloseClipboard();
 #elif defined(__APPLE__)
     std::string buf;
-    bool success = exec(fmt::format("echo \"{}\" | pbcopy", text), buf);
+    bool success = exec(std::format("echo \"{}\" | pbcopy", text), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }
 #else
     std::string buf;
-    bool success = exec(fmt::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
+    const bool success = exec(std::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }

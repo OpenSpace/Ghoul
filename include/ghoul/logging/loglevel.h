@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #ifndef __GHOUL___LOGLEVEL___H__
 #define __GHOUL___LOGLEVEL___H__
 
+#include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringconversion.h>
@@ -38,27 +39,23 @@ namespace ghoul::logging {
  * to be strictly ordered from least important to important.
  */
 enum class LogLevel {
-    /// All log messages are accepted.
+    /// All log messages are accepted
     AllLogging = 0,
-    /// Used for high-throughput messages, for example to trace function calls.
+    /// Used for high-throughput messages, for example to trace function calls
     Trace = 1,
-    /// Used for Debug output.
+    /// Used for Debug output
     Debug = 2,
-    /// Used for informational messages which can be ignored, but might be informative.
+    /// Used for informational messages which can be ignored, but might be informative
     Info = 3,
-    /**
-     * Warnings which do not represent a problem in itself, but may hint to a wrong
-     * configuration.
-     */
+    /// Warnings which do not represent a problem in itself, but may hint to a wrong
+    /// configuration
     Warning = 4,
-    /**
-     * Errors which will pose problems, but do not necessarily require the immediate
-     * end of the application.
-     */
+    /// Errors which will pose problems, but do not necessarily require the immediate
+    /// end of the application
     Error = 5,
-    /// Error which will be so severe that the application cannot recover from them.
+    /// Error which will be so severe that the application cannot recover from them
     Fatal = 6,
-    /// Used as a placeholder to inhibit all LogMessages.
+    /// Used as a placeholder to inhibit all LogMessages
     NoLogging = 7
 };
 
@@ -67,11 +64,11 @@ enum class LogLevel {
 namespace ghoul {
 
 /**
-* Returns the string representation of the passed LogLevel. The name of
-* each level is equal to its enum value.
-*
-* \return The string representation of the passed LogLevel
-*/
+ * Returns the string representation of the passed LogLevel. The name of each level is
+ * equal to its enum value.
+ *
+ * \return The string representation of the passed LogLevel
+ */
 constexpr std::string_view to_string(logging::LogLevel string) {
     switch (string) {
         case logging::LogLevel::AllLogging: return "All";
@@ -87,11 +84,11 @@ constexpr std::string_view to_string(logging::LogLevel string) {
 }
 
 /**
-* Returns the LogLevel for the passed string representation. The name of
-* each level is equal to its enum value.
-*
-* \return The the LogLevel for the passed string representation
-*/
+ * Returns the LogLevel for the passed string representation. The name of each level is
+ * equal to its enum value.
+ *
+ * \return The LogLevel for the passed string representation
+ */
 template <>
 constexpr logging::LogLevel from_string(std::string_view string) {
     if (string == "All") { return logging::LogLevel::AllLogging; }
@@ -104,6 +101,21 @@ constexpr logging::LogLevel from_string(std::string_view string) {
     if (string == "None") { return logging::LogLevel::NoLogging; }
 
     throw ghoul::RuntimeError("Unknown log level '" + std::string(string) + "'");
+}
+
+/**
+ * Returns the color representation of the passed LogLevel
+ */
+constexpr glm::vec4 toColor(logging::LogLevel level) {
+    constexpr glm::vec4 White(0.9f, 0.9f, 0.9f, 1.f);
+
+    switch (level) {
+        case logging::LogLevel::Debug:   return glm::vec4(0.f, 1.f, 0.f, 1.f);
+        case logging::LogLevel::Warning: return glm::vec4(1.f, 1.f, 0.f, 1.f);
+        case logging::LogLevel::Error:   return glm::vec4(1.f, 0.f, 0.f, 1.f);
+        case logging::LogLevel::Fatal:   return glm::vec4(0.3f, 0.3f, 0.85f, 1.f);
+        default:                         return White;
+    }
 }
 
 } // namespace

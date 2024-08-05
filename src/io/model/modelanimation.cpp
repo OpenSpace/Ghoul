@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -35,7 +35,7 @@ ModelAnimation::ModelAnimation(std::string name, double duration)
 {}
 
 void ModelAnimation::setTimeScale(float timeScale) {
-    double duration = _duration / _timeScale;
+    const double duration = _duration / _timeScale;
     _timeScale = timeScale;
     _duration = duration * _timeScale;
 }
@@ -66,7 +66,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
 
             for (const io::ModelAnimation::PositionKeyframe& kf : nodeAnimation.positions)
             {
-                double diff = (kf.time * _timeScale) - now;
+                const double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
                 if (std::abs(diff) < std::numeric_limits<double>::epsilon()) {
@@ -86,7 +86,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             }
 
             if (interpolate) {
-                double blend = (now - prevPosTime) / (nextPosTime - prevPosTime);
+                const double blend = (now - prevPosTime) / (nextPosTime - prevPosTime);
                 currPos = glm::mix(prevPos, nextPos, static_cast<float>(blend));
             }
         }
@@ -108,7 +108,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
 
             for (const io::ModelAnimation::RotationKeyframe& kf : nodeAnimation.rotations)
             {
-                double diff = (kf.time * _timeScale) - now;
+                const double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
                 if (std::abs(diff) < std::numeric_limits<double>::epsilon()) {
@@ -128,7 +128,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             }
 
             if (interpolate) {
-                double blend = (now - prevRotTime) / (nextRotTime - prevRotTime);
+                const double blend = (now - prevRotTime) / (nextRotTime - prevRotTime);
                 currRot = glm::slerp(prevRot, nextRot, static_cast<float>(blend));
             }
         }
@@ -149,7 +149,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             bool interpolate = true;
 
             for (const io::ModelAnimation::ScaleKeyframe& scale : nodeAnimation.scales) {
-                double diff = (scale.time * _timeScale) - now;
+                const double diff = (scale.time * _timeScale) - now;
 
                 // Exact on a keyframe
                 if (std::abs(diff) < std::numeric_limits<double>::epsilon()) {
@@ -169,7 +169,8 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             }
 
             if (interpolate) {
-                double blend = (now - prevScaleTime) / (nextScaleTime - prevScaleTime);
+                const double blend =
+                    (now - prevScaleTime) / (nextScaleTime - prevScaleTime);
                 currScale = glm::mix(prevScale, nextScale, static_cast<float>(blend));
             }
         }

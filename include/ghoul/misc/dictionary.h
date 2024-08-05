@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,6 +28,7 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <map>
 #include <string>
 #include <string_view>
@@ -45,10 +46,11 @@ class Dictionary;
 template <typename T>
 concept SupportedByDictionary = IsAnyOf<
     T,
-    bool, int, double, std::string, Dictionary, void*, std::vector<int>,
-    std::vector<double>, std::vector<std::string>, glm::ivec2, glm::ivec3, glm::ivec4,
-    glm::dvec2, glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4,
-    glm::dmat3x2, glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
+    bool, int, double, std::string, std::filesystem::path, Dictionary, void*,
+    std::vector<int>, std::vector<double>, std::vector<std::string>,
+    std::vector<std::filesystem::path>, glm::ivec2, glm::ivec3, glm::ivec4, glm::dvec2,
+    glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
+    glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
 >;
 
 /**
@@ -74,8 +76,9 @@ class Dictionary {
 public:
     /// This is a list of all types that can be stored and retrieved from the Dictionary
     using Types = std::variant<
-        bool, int, double, std::string, Dictionary, void*, std::vector<int>,
-        std::vector<double>, std::vector<std::string>, glm::ivec2, glm::ivec3, glm::ivec4,
+        bool, int, double, std::string, std::filesystem::path, Dictionary, void*,
+        std::vector<int>, std::vector<double>, std::vector<std::string>,
+        std::vector<std::filesystem::path>, glm::ivec2, glm::ivec3, glm::ivec4,
         glm::dvec2, glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4,
         glm::dmat3x2, glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
     >;
@@ -99,8 +102,8 @@ public:
      * Store the value \p value at the specified \p key, overwriting any existing value.
      * The type for T has to be a type that can be represented in the Types variant type.
      *
-     * \param key The key under which the \p value is stored. If \p key already
-     *        existed, it will be silently overwritten
+     * \param key The key under which the \p value is stored. If \p key already existed,
+     *        it will be silently overwritten
      * \param value The value to store. It has to be one of the types that is present in
      *        the Types variant
      *
@@ -109,9 +112,7 @@ public:
     template <SupportedByDictionary T>
     void setValue(std::string key, T value);
 
-    /**
-     * \overload void setValue(std::string key, T value)
-     */
+    /// \overload void setValue(std::string key, T value)
     //void setValue(std::string key, const char value[]);
 
     /**
@@ -124,8 +125,8 @@ public:
      * \param key The key for which to retrieve the value
      * \return The value in the Dictionary stored at the \p key
      *
-     * \throws KeyError If the provided \p key does not exist
-     * \throws ValueError If the value stored at \p key is not of type T
+     * \throw KeyError If the provided \p key does not exist
+     * \throw ValueError If the value stored at \p key is not of type T
      * \pre \p key must not be the empty string
      */
     template <SupportedByDictionary T>
@@ -159,6 +160,7 @@ public:
 
     /**
      * Returns a list of all keys stored in the Dictionary.
+     *
      * \return A list of all keys stored in the Dictionary
      */
     std::vector<std::string_view> keys() const;
@@ -173,12 +175,14 @@ public:
 
     /**
      * Returns whether the Dictionary is empty or contains values.
+     *
      * \return Whether the Dictionary is empty or contains values
      */
     bool isEmpty() const;
 
     /**
-     * Returns the number of values stored in the Dictionary
+     * Returns the number of values stored in the Dictionary.
+     *
      * \return The number of values stored in the Dictionary
      */
     size_t size() const;
