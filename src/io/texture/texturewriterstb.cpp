@@ -64,7 +64,7 @@ void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
     const void* data = texture.pixelData();
 
     if (texture.dimensions().z > 1) {
-        LERROR(fmt::format(
+        LERROR(std::format(
             "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
             filename
         ));
@@ -100,7 +100,7 @@ void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
     else {
         throw TextureWriteException(
             filename,
-            fmt::format("Could not write to image with file extension {}", extension),
+            std::format("Could not write to image with file extension {}", extension),
             *this
         );
     }
