@@ -107,6 +107,19 @@ is_declared = function(a)
   return mt.__declared[a] and what() ~= "C";
 end)";
 
+// Code snippet that sandboxes the state by removing ways to directly affect the outside
+// world
+constexpr std::string_view SandboxedStateSourceBase = R"(
+-- Remove the function that can be used to load additional modules
+require = nil
+)";
+
+constexpr std::string_view SandboxedStateSourceLibrary = R"(
+io = nil
+os = nil
+package = nil
+)";
+
 } // namespace
 
 namespace ghoul::lua {
@@ -516,7 +529,8 @@ std::string_view luaTypeToString(int type) {
     }
 }
 
-lua_State* createNewLuaState(bool loadStandardLibraries, bool strictState) {
+lua_State* createNewLuaState(bool sandboxed, bool loadStandardLibraries, bool strictState)
+{
     LDEBUGC("Lua", "Creating Lua state");
     lua_State* s = luaL_newstate();
     if (!s) {
@@ -539,6 +553,13 @@ lua_State* createNewLuaState(bool loadStandardLibraries, bool strictState) {
     if (strictState) {
         LDEBUGC("Lua", "Registering strict code");
         runScript(s, StrictStateSource);
+    }
+    if (sandboxed) {
+        LDEBUGC("Lua", "Sandboxing Lua state");
+        runScript(s, SandboxedStateSourceBase);
+        if (loadStandardLibraries || strictState) {
+            runScript(s, SandboxedStateSourceLibrary);
+        }
     }
     return s;
 }

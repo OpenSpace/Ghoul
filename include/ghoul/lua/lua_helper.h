@@ -359,6 +359,9 @@ std::string_view luaTypeToString(int type);
 /**
  * Creates a new Lua state and initializes it with the default Lua libraries.
  *
+ * \param sandboxed If this is `true`, then all of the functions that might pose
+ *        potential security risks are removed from the state. This includes functions to
+ *        load third-party modules or access the file system
  * \param loadStandardLibraries If `true`, the Lua standard libraries will be loaded into
  *        the newly created state by means of a `luaL_openlibs` call
  * \param strictState If this is `true`, the created Lua state will panic if an unused
@@ -367,7 +370,8 @@ std::string_view luaTypeToString(int type);
  *
  * \throw LuaRuntimeException If there was an error creating the new Lua state
  */
-lua_State* createNewLuaState(bool loadStandardLibraries = true, bool strictState = false);
+lua_State* createNewLuaState(bool sandboxed = true, bool loadStandardLibraries = true,
+    bool strictState = false);
 
 /**
  * Destroys the passed lua state and frees all memory that is associated with it.
