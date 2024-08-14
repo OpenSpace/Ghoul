@@ -408,18 +408,6 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename);
  * \pre \p state must not be nullptr
  * \pre \p script must not be empty
  */
-void runScript(lua_State* state, const std::string& script);
-
-/**
- * This function executes the Lua script provided as plain text in \p script using the
- * passed `lua_State` \p state.
- *
- * \throw LuaLoadingException If there was an error loading the script
- * \throw LuaExecutionError If there was an error executing the script
- *
- * \pre \p state must not be nullptr
- * \pre \p script must not be empty
- */
 void runScript(lua_State* state, std::string_view script);
 
 /**

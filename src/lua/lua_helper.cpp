@@ -591,26 +591,21 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename) {
     }
 }
 
-void runScript(lua_State* state, const std::string& script) {
+void runScript(lua_State* state, std::string_view script) {
     ghoul_assert(state, "State must not be nullptr");
     ghoul_assert(!script.empty(), "Script must not be empty");
 
-    const int loadStatus = luaL_loadstring(state, script.c_str());
-    if (loadStatus != LUA_OK) {
+    const int load = luaL_loadbuffer(state, script.data(), script.size(), script.data());
+    if (load != LUA_OK) {
         std::string error = lua_tostring(state, -1);
         throw LuaLoadingException(std::move(error));
     }
 
-    const int callStatus = lua_pcall(state, 0, LUA_MULTRET, 0);
-    if (callStatus != LUA_OK) {
+    const int call = lua_pcall(state, 0, LUA_MULTRET, 0);
+    if (call != LUA_OK) {
         std::string error = lua_tostring(state, -1);
         throw LuaExecutionException(std::move(error));
     }
-}
-
-void runScript(lua_State* state, std::string_view script) {
-    const std::string s = std::string(script);
-    runScript(state, s);
 }
 
 int checkArgumentsAndThrow(lua_State* L, int expected, const char* component) {
