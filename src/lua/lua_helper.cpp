@@ -459,6 +459,21 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
                 dictionary.setValue(key, data);
                 break;
             }
+            case LUA_TFUNCTION: {
+                auto writer = [](lua_State*, const void* p, size_t sz, void* user) {
+                    std::string* buffer = reinterpret_cast<std::string*>(user);
+                    const size_t tail = buffer->size();
+                    buffer->resize(buffer->size() + sz);
+                    std::memcpy(buffer->data() + tail, p, sz);
+                    return 0;
+                };
+
+                std::string buffer;
+                const int StripCode = 1;
+                lua_dump(state, writer, &buffer, StripCode);
+                dictionary.setValue(key, buffer);
+                break;
+            }
             default:
                 throw LuaFormatException("Unknown type: " + std::to_string(valueType));
         }
