@@ -69,7 +69,7 @@ endif ()
 
 if (WIN32)
   add_custom_command(TARGET GhoulTest POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:GhoulTest> $<TARGET_FILE_DIR:GhoulTest>
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:GhoulTest> $<TARGET_RUNTIME_DLLS:GhoulTest>
     COMMAND_EXPAND_LISTS
   )
 endif ()
