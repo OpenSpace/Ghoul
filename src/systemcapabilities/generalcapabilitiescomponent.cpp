@@ -26,6 +26,7 @@
 #include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
 #include <ghoul/format.h>
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
 #include <array>
@@ -342,20 +343,23 @@ void GeneralCapabilitiesComponent::detectOS() {
 
 void GeneralCapabilitiesComponent::detectMemory() {
 #ifdef WIN32
-    std::string memory;
     try {
+        std::string memory;
         queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
+        std::stringstream convert;
+        convert << memory;
+        unsigned long long value;
+        convert >> value;
+        _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
     catch (const WMIError& e) {
-        throw MainMemoryError(std::format(
-            "Error reading physical memory from WMI. {} ({})", e.message, e.errorCode
-        ));
+        LERRORC(
+            "GeneralCapabilitiesComponent",
+            std::format(
+                "Error reading physical memory from WMI. {} ({})", e.message, e.errorCode
+            )
+        );
     }
-    std::stringstream convert;
-    convert << memory;
-    unsigned long long value;
-    convert >> value;
-    _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
 #elif defined(__APPLE__)
     int mib[2] = { CTL_HW, HW_MEMSIZE };
     size_t len;
