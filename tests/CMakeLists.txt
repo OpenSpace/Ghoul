@@ -66,10 +66,3 @@ target_precompile_headers(GhoulTest PRIVATE
 if (APPLE)
   target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
 endif ()
-
-if (WIN32)
-  add_custom_command(TARGET GhoulTest POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:GhoulTest> $<TARGET_FILE_DIR:GhoulTest>
-    COMMAND_EXPAND_LISTS
-  )
-endif ()
