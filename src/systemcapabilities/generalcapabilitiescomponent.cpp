@@ -353,7 +353,7 @@ void GeneralCapabilitiesComponent::detectMemory() {
         _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
     catch (const WMIError& e) {
-        LERRORC(
+        LWARNINGC(
             "GeneralCapabilitiesComponent",
             std::format(
                 "Error reading physical memory from WMI. {} ({})", e.message, e.errorCode
