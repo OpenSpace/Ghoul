@@ -482,6 +482,18 @@ int checkArgumentsAndThrow(lua_State* L, int expected, std::pair<int, int> range
 void verifyStackSize(lua_State* L, int expected = 0);
 
 /**
+ * Returns whether the provided \p script is a binary blob or not. If the \p script is not
+ * a binary blob, it is a potentially null-terminated string. If it is a binary blob, the
+ * string might contain null-terminated characters within and shouldn't be used as an
+ * `std::string`. Passing binary or non-binary scripts to the #runScript function will
+ * both work as expected.
+ *
+ * \param script The script that should be tested whether it is a binary blob or not
+ * \return `true` if the \p script is binary, `false` otherwise
+ */
+bool isScriptBinary(std::string_view script);
+
+/**
  * Checks whether a value of the requested type exists at the provided location of the
  * stack.
  *

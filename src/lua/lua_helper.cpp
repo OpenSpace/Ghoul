@@ -696,6 +696,11 @@ void verifyStackSize(lua_State* L, int expected) {
     );
 }
 
+bool isScriptBinary(std::string_view script) {
+    // A script is a binary if it's not empty and it doesn't start with `\x1b`
+    return !script.empty() && script[0] == '\x1b';
+}
+
 namespace internal {
 
 void deinitializeGlobalState() {
