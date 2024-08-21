@@ -345,6 +345,8 @@ void GeneralCapabilitiesComponent::detectMemory() {
 #ifdef WIN32
     try {
         std::string memory;
+        // This function might fail if the process has insufficient priviledges to access
+        // the WMI on Windows
         queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
         std::stringstream convert;
         convert << memory;
@@ -352,13 +354,8 @@ void GeneralCapabilitiesComponent::detectMemory() {
         convert >> value;
         _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
-    catch (const WMIError& e) {
-        LWARNINGC(
-            "GeneralCapabilitiesComponent",
-            std::format(
-                "Error reading physical memory from WMI. {} ({})", e.message, e.errorCode
-            )
-        );
+    catch (const std::runtime_error& e) {
+        LWARNINGC("GeneralCapabilitiesComponent", e.what());
     }
 #elif defined(__APPLE__)
     int mib[2] = { CTL_HW, HW_MEMSIZE };
