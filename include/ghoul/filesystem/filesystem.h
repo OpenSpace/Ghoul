@@ -180,6 +180,10 @@ public:
      */
     void triggerFilesystemEvents();
 
+#ifdef WIN32
+    std::filesystem::path resolveShellLink(std::filesystem::path path);
+#endif // WIN32
+
 private:
     /**
      * Constructs a FileSystem object.
