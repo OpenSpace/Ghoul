@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -38,13 +38,12 @@ namespace ghoul::logging {
  * automatically reserves a part of the block for use as a header in which the version,
  * possible attributes and the amount of stored data is located. The version is always
  * located in the first byte of the buffer and determines the size and the structure of
- * the rest of the header. Each log entry stores an 8 byte timestamp followed by a
- * `\0` terminated ASCII char array containing the message. Each logging will
- * test if there is enough memory left in the buffer. For memory exhaustion management, a
- * custom callback can be specified (#setCallback) that will have to reset the buffer
- * (#resetBuffer) or a warning will be logged. The buffer can be written to disk
- * (#writeToDisk), or access directly (#buffer). Most of the methods are thread-safe and
- * are marked as such.
+ * the rest of the header. Each log entry stores an 8 byte timestamp followed by a `\0`
+ * terminated ASCII char array containing the message. Each logging will test if there is
+ * enough memory left in the buffer. For memory exhaustion management, a custom callback
+ * can be specified (#setCallback) that will have to reset the buffer (#resetBuffer) or a
+ * warning will be logged. The buffer can be written to disk (#writeToDisk), or access
+ * directly (#buffer). Most of the methods are thread-safe and are marked as such.
  */
 class BufferLog {
 public:
@@ -96,7 +95,7 @@ public:
      * buffer, an exception will be thrown.
      *
      * \param address The address to the buffer that will be used by this log. The
-     *        ownership of the memory is <b>not</b> passed to the BufferLog by this
+     *        ownership of the memory is **not** passed to the BufferLog by this
      * \param bufferSize The total size of the buffer. It is the callers responsibility to
      *        assure that the provided buffer is at least as big as \p bufferSize
      *
@@ -202,25 +201,20 @@ protected:
      */
     void initializeBuffer();
 
-    /**
-     * This block of memory will store all log messages that are added to this BufferLog
-     * it has to be as big as the value provided in `_totalSize`
-     */
+    /// This block of memory will store all log messages that are added to this BufferLog
+    /// it has to be as big as the value provided in `_totalSize`.
     void* _buffer;
     size_t _totalSize; ///< The total size of the buffer used by this BufferLog
 
-    /**
-     * This callback will be called when an incoming log message would exhaust the
-     * available memory of the buffer. The callback has to either provide a new buffer
-     * which will be used henceforth (#setBuffer) or mark the current buffer as
-     * reusable (#resetBuffer).
-     */
+    /// This callback will be called when an incoming log message would exhaust the
+    /// available memory of the buffer. The callback has to either provide a new buffer
+    /// which will be used henceforth (#setBuffer) or mark the current buffer as
+    /// reusable (#resetBuffer).
     MemoryExhaustedCallback _callback;
 
-    /** This variable is `true` if this BufferLog has had its callback trigged
-     * in the current callstack. It forces some methods to ignore the
-     * `atomic_lock` to ensure that no deadlock can happen.
-     */
+    /// This variable is `true` if this BufferLog has had its callback trigged in the
+    /// current callstack. It forces some methods to ignore the `atomic_lock` to ensure
+    /// that no deadlock can happen.
     bool _inCallbackStack = false;
 };
 

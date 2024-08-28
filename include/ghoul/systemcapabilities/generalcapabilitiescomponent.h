@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -43,13 +43,17 @@ namespace ghoul::systemcapabilities {
  */
 class GeneralCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
-    /// Main exception that is thrown if an error occured in the detection of general
-    /// capabilities
+    /**
+     * Main exception that is thrown if an error occured in the detection of general
+     * capabilities.
+     */
     struct GeneralCapabilitiesComponentError : public RuntimeError {
         explicit GeneralCapabilitiesComponentError(std::string msg);
     };
 
-    /// Exception that is thrown if there was an error detecting the operating system
+    /**
+     * Exception that is thrown if there was an error detecting the operating system.
+     */
     struct OperatingSystemError : public GeneralCapabilitiesComponentError {
         explicit OperatingSystemError(std::string desc, std::string errorMsg);
 
@@ -60,12 +64,16 @@ public:
         const std::string errorMessage;
     };
 
-    /// Exception that is thrown if there was an error detecting the main memory
+    /**
+     * Exception that is thrown if there was an error detecting the main memory.
+     */
     struct MainMemoryError : public GeneralCapabilitiesComponentError {
         explicit MainMemoryError(std::string msg);
     };
 
-    /// This enum stores the possible operating systems that can be detected
+    /**
+     * This enum stores the possible operating systems that can be detected.
+     */
     enum class OperatingSystem {
         Windows10or11,
         WindowsServer2016,

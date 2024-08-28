@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -32,7 +32,9 @@ namespace ghoul {
 
 class Dictionary;
 
-/// This exception is thrown if an unknown type is being converted.
+/**
+ * This exception is thrown if an unknown type is being converted.
+ */
 struct JsonFormattingError : public RuntimeError {
     explicit JsonFormattingError(std::string msg);
 };

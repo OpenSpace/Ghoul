@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,7 @@
 
 #include <ghoul/logging/callbacklog.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 
 namespace ghoul::logging {
 
@@ -39,7 +39,13 @@ CallbackLog::CallbackLog(CallbackFunction callbackFunction, TimeStamping timeSta
 
 void CallbackLog::log(LogLevel level, std::string_view category, std::string_view message)
 {
-    _callbackFunction(createFullMessageString(level, category, message));
+    ZoneScoped;
+
+    std::string msg = createFullMessageString(level, category, message);
+    {
+        const std::lock_guard lock(_mutex);
+        _callbackFunction(std::move(msg));
+    }
 }
 
 void CallbackLog::setCallback(CallbackFunction callbackFunction) {

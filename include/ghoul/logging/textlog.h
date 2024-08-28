@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,6 +29,7 @@
 #include <ghoul/logging/log.h>
 
 #include <ghoul/misc/boolean.h>
+#include <filesystem>
 #include <fstream>
 
 namespace ghoul::logging {
@@ -42,11 +43,11 @@ namespace ghoul::logging {
  * "[DATE] CATEGORY (LEVEL) MESSAGE"
  * "[TIME] CATEGORY (LEVEL) MESSAGE"
  * ```
- * And the remaining possibilities with `CATEGORY` and `LEVEL`
- * missing. Only the #log method needs to be overwritten in a subclass, if a
- * different output format is required. The file will be opened in the constructor and
- * closed in the destructor of this class. A parameter in the constructor controls of the
- * file will be reset before writing the first time.
+ * And the remaining possibilities with `CATEGORY` and `LEVEL` missing. Only the #log
+ * method needs to be overwritten in a subclass, if a different output format is required.
+ * The file will be opened in the constructor and closed in the destructor of this class.
+ * A parameter in the constructor controls of the file will be reset before writing the
+ * first time.
  */
 class TextLog : public Log {
 public:
@@ -59,9 +60,13 @@ public:
      *
      * \param filename The path and filename of the file that will receive the log
      *        messages
+     * \param nLogRotation The number of log files that should be kept. If this is 0, only
+     *        a single file will be used. If this is 3, there will be files
+     *        `filename.ext`, `filename-1.ext`, and `filename-2.ext` with the numbered
+     *        files being the previous versions of the log file.
      * \param writeToAppend If this is `true`, the log messages will be appended
      *        to the file. If it is `false` the file will be overwritten without
-     *        a warning.
+     *        a warning
      * \param timeStamping Determines if the log should print the time when a message is
      *        logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is
@@ -74,15 +79,19 @@ public:
      *
      * \throw std::ios_base::failure If the opening of the file failed
      * \pre \p filename must not be empty
+     * \pre \p nLogRotation must be >= 0
+     * \pre If \p nLogRotation is > 0 \p writeToAppend must be Append::No
      */
-    TextLog(const std::string& filename, Append writeToAppend = Append::Yes,
-        TimeStamping timeStamping = TimeStamping::Yes,
+    TextLog(const std::filesystem::path& filename, int nLogRotation = 0,
+        Append writeToAppend = Append::Yes, TimeStamping timeStamping = TimeStamping::Yes,
         DateStamping dateStamping = DateStamping::Yes,
         CategoryStamping categoryStamping = CategoryStamping::Yes,
         LogLevelStamping logLevelStamping = LogLevelStamping::Yes,
         LogLevel minimumLogLevel = LogLevel::AllLogging);
 
-    /// Destructor closing and releasing the file handle
+    /**
+     * Destructor closing and releasing the file handle.
+     */
     virtual ~TextLog() override;
 
     /**
@@ -96,7 +105,9 @@ public:
     void log(LogLevel level, std::string_view category,
         std::string_view message) override;
 
-    /// Flushes the text file and, thereby, all messages that are in the associated buffer
+    /**
+     * Flushes the text file and, thereby, all messages that are in the associated buffer.
+     */
     void flush() override;
 
 protected:
@@ -106,7 +117,7 @@ protected:
      *
      * \param line The line of text that should be printed to the file
      */
-    void writeLine(std::string line);
+    void writeLine(const std::string& line);
 
     /// Should a line be printed at the end after the file is closed?
     const bool _printFooter;

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -50,12 +50,16 @@ namespace ghoul::opengl {
  */
 class ShaderObject {
 public:
-    /// Main exception that is thrown by methods of the ShaderObject class
+    /**
+     * Main exception that is thrown by methods of the ShaderObject class.
+     */
     struct ShaderObjectError : public RuntimeError {
         explicit ShaderObjectError(std::string msg);
     };
 
-    /// The exception that is thrown if the compilation of a ShaderObject failed
+    /**
+     * The exception that is thrown if the compilation of a ShaderObject failed.
+     */
     struct ShaderCompileError : public ShaderObjectError {
         /**
          * The constructor constructing a ShaderCompileError containing the cause for the
@@ -94,9 +98,9 @@ public:
 
 
     /**
-    * A type definition for a callback function that is called if any of
-    * the tracked files is changed.
-    */
+     * A type definition for a callback function that is called if any of
+     * the tracked files is changed.
+     */
     using ShaderObjectCallback = std::function<void()>;
 
     /**
@@ -116,7 +120,7 @@ public:
      * \pre \p filename must not be empty
      * \pre \p filename must be a file that exists
      */
-    ShaderObject(ShaderType shaderType, std::filesystem::path filename = "",
+    ShaderObject(ShaderType shaderType, const std::filesystem::path& filename = "",
         std::string name = "", Dictionary dictionary = Dictionary());
 
     /**
@@ -228,12 +232,12 @@ public:
      * \throw ShaderObjectError If the file pointed to by \p filename was empty
      * \pre \p filename must not be empty
      */
-    void setFilename(std::filesystem::path filename);
+    void setFilename(const std::filesystem::path& filename);
 
     /**
-    * Rebuild the shader object from file using the file set by setFilename and the
-    * dictionary set by setDictionary.
-    */
+     * Rebuild the shader object from file using the file set by setFilename and the
+     * dictionary set by setDictionary.
+     */
     void rebuildFromFile();
 
     /**

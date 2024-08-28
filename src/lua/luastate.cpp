@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,11 +29,11 @@
 
 namespace {
     int luaPanicFunction(lua_State* L) {
-        int n = lua_gettop(L);
+        const int n = lua_gettop(L);
         if (n > 0) {
             // The top value is the error message
             std::string msg = lua_tostring(L, -1);
-            throw ghoul::lua::LuaRuntimeException(msg);
+            throw ghoul::lua::LuaRuntimeException(std::move(msg));
         }
         throw ghoul::lua::LuaRuntimeException("empty stack");
     }
@@ -41,8 +41,9 @@ namespace {
 
 namespace ghoul::lua {
 
-LuaState::LuaState(IncludeStandardLibrary include, StrictState strict)
-    : _state(ghoul::lua::createNewLuaState(include, strict))
+LuaState::LuaState(Sandboxed sandboxed, IncludeStandardLibrary include,
+                   StrictState strict)
+    : _state(ghoul::lua::createNewLuaState(sandboxed, include, strict))
 {
     // Set a panic function to make sure that we always throw with a useful error message
     // if an exception occurs due to a luaError. This should never happen under normal

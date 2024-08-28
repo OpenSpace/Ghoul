@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -53,8 +53,11 @@ Dictionary::KeyError::KeyError(std::string msg)
     : RuntimeError(std::move(msg), "Dictionary")
 {}
 
-Dictionary::ValueError::ValueError(std::string k, std::string m)
-    : RuntimeError(fmt::format("Key '{}': {}", std::move(k), std::move(m)), "Dictionary")
+Dictionary::ValueError::ValueError(std::string key, std::string msg)
+    : RuntimeError(
+        std::format("Key '{}': {}", std::move(key), std::move(msg)),
+        "Dictionary"
+    )
 {}
 
 bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
@@ -80,6 +83,17 @@ void Dictionary::setValue(std::string key, T value) {
     {
         setValue(std::move(key), std::string(value));
     }
+    else if constexpr (std::is_same_v<T, std::filesystem::path>) {
+        setValue(std::move(key), value.string());
+    }
+    else if constexpr (std::is_same_v<T, std::vector<std::filesystem::path>>) {
+        std::vector<std::string> vs;
+        vs.reserve(value.size());
+        for (const std::filesystem::path& p : value) {
+            vs.push_back(p.string());
+        }
+        setValue(std::move(key), std::move(vs));
+    }
     else {
         static_assert(sizeof(T) == 0, "Unsupported type");
     }
@@ -91,7 +105,7 @@ T Dictionary::value(std::string_view key) const {
 
     auto it = _storage.find(key);
     if (it == _storage.end()) {
-        throw KeyError(fmt::format("Could not find key '{}'", key));
+        throw KeyError(std::format("Could not find key '{}'", key));
     }
 
     if constexpr (isDirectType<T>::value) {
@@ -101,7 +115,7 @@ T Dictionary::value(std::string_view key) const {
         else {
             throw ValueError(
                 std::string(key),
-                fmt::format(
+                std::format(
                     "Error accessing value, wanted type '{}' has '{}'",
                     typeid(T).name(), it->second.index()
                 )
@@ -115,7 +129,7 @@ T Dictionary::value(std::string_view key) const {
             vec = std::get<VT>(it->second);
         }
         else if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
             vec.resize(d._storage.size());
             for (const auto& kv : d._storage) {
                 // Lua is 1-based index, the rest of the world is 0-based
@@ -123,8 +137,8 @@ T Dictionary::value(std::string_view key) const {
                 if (k < 0 || k >= static_cast<int>(d._storage.size())) {
                     throw ValueError(
                         std::string(key),
-                        fmt::format(
-                            "Invalid key {} outside range [0,{}]", k, d._storage.size()
+                        std::format(
+                            "Invalid key '{}' outside range [0,{}]", k, d._storage.size()
                         )
                     );
                 }
@@ -134,8 +148,8 @@ T Dictionary::value(std::string_view key) const {
         else {
             throw ValueError(
                 std::string(key),
-                fmt::format(
-                    "Requested {} but did not contain {} or {}",
+                std::format(
+                    "Requested '{}' but did not contain '{}' or '{}'",
                     typeid(T).name(), typeid(T).name(),
                     typeid(std::vector<typename T::value_type>).name()
                 )
@@ -145,7 +159,7 @@ T Dictionary::value(std::string_view key) const {
         if (vec.size() != ghoul::glm_components<T>::value) {
             throw ValueError(
                 std::string(key),
-                fmt::format(
+                std::format(
                     "Contained wrong number of values. Expected {} got {}",
                     ghoul::glm_components<T>::value, vec.size()
                 )
@@ -156,9 +170,20 @@ T Dictionary::value(std::string_view key) const {
         std::memcpy(glm::value_ptr(res), vec.data(), sizeof(T));
         return res;
     }
-    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
+    else if constexpr (std::is_same_v<T, const char*> ||
+                       std::is_same_v<T, const char[]> ||
+                       std::is_same_v<T, std::filesystem::path>)
     {
         return value<std::string>(key);
+    }
+    else if constexpr (std::is_same_v<T, std::vector<std::filesystem::path>>) {
+        std::vector<std::string> values = value<std::vector<std::string>>(key);
+        std::vector<std::filesystem::path> vs;
+        vs.reserve(values.size());
+        for (const std::string& v : values) {
+            vs.push_back(v);
+        }
+        return vs;
     }
     else {
         static_assert(sizeof(T) == 0, "Unsupported type");
@@ -178,14 +203,14 @@ bool Dictionary::hasValue(std::string_view key) const {
     }
     else if constexpr (isGLMType<T>::value) {
         if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
 
             if (d.size() != ghoul::glm_components<T>::value) {
                 return false;
             }
 
             // Check whether we have all keys and they are of the correct type
-            for (int i = 1; i <= ghoul::glm_components<T>::value; ++i) {
+            for (int i = 1; i <= ghoul::glm_components<T>::value; i++) {
                 if (!d.hasValue<typename T::value_type>(std::to_string(i))) {
                     return false;
                 }
@@ -200,9 +225,14 @@ bool Dictionary::hasValue(std::string_view key) const {
                 std::get<VT>(it->second).size() == ghoul::glm_components<T>::value;
         }
     }
-    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
+    else if constexpr (std::is_same_v<T, const char*> ||
+                       std::is_same_v<T, const char[]> ||
+                       std::is_same_v<T, std::filesystem::path>)
     {
         return hasValue<std::string>(key);
+    }
+    else if constexpr (std::is_same_v<T, std::vector<std::filesystem::path>>) {
+        return hasValue<std::vector<std::string>>(key);
     }
     else {
         static_assert(sizeof(T) == 0, "Unknown type T");
@@ -256,10 +286,12 @@ template void Dictionary::setValue(std::string, bool value);
 template void Dictionary::setValue(std::string, double);
 template void Dictionary::setValue(std::string, int);
 template void Dictionary::setValue(std::string, std::string);
+template void Dictionary::setValue(std::string, std::filesystem::path);
 template void Dictionary::setValue(std::string, void*);
 template void Dictionary::setValue(std::string, std::vector<int>);
 template void Dictionary::setValue(std::string, std::vector<double>);
 template void Dictionary::setValue(std::string, std::vector<std::string>);
+template void Dictionary::setValue(std::string, std::vector<std::filesystem::path>);
 template void Dictionary::setValue(std::string, glm::ivec2);
 template void Dictionary::setValue(std::string, glm::ivec3);
 template void Dictionary::setValue(std::string, glm::ivec4);
@@ -282,10 +314,12 @@ template bool Dictionary::value(std::string_view) const;
 template double Dictionary::value(std::string_view) const;
 template int Dictionary::value(std::string_view) const;
 template std::string Dictionary::value(std::string_view) const;
+template std::filesystem::path Dictionary::value(std::string_view) const;
 template void* Dictionary::value(std::string_view) const;
 template std::vector<int> Dictionary::value(std::string_view) const;
 template std::vector<double> Dictionary::value(std::string_view) const;
 template std::vector<std::string> Dictionary::value(std::string_view) const;
+template std::vector<std::filesystem::path> Dictionary::value(std::string_view) const;
 template glm::ivec2 Dictionary::value(std::string_view) const;
 template glm::ivec3 Dictionary::value(std::string_view) const;
 template glm::ivec4 Dictionary::value(std::string_view) const;
@@ -308,10 +342,13 @@ template bool Dictionary::hasValue<bool>(std::string_view) const;
 template bool Dictionary::hasValue<double>(std::string_view) const;
 template bool Dictionary::hasValue<int>(std::string_view) const;
 template bool Dictionary::hasValue<std::string>(std::string_view) const;
+template bool Dictionary::hasValue<std::filesystem::path>(std::string_view) const;
 template bool Dictionary::hasValue<void*>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<int>>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<double>>(std::string_view) const;
 template bool Dictionary::hasValue<std::vector<std::string>>(std::string_view) const;
+template bool Dictionary::hasValue<std::vector<std::filesystem::path>>(
+    std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec2>(std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec3>(std::string_view) const;
 template bool Dictionary::hasValue<glm::ivec4>(std::string_view) const;

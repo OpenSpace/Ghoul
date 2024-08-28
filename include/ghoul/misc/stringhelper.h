@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,8 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MISC___H__
-#define __GHOUL___MISC___H__
+#ifndef __GHOUL___STRINGHELPER___H__
+#define __GHOUL___STRINGHELPER___H__
 
 #include <string>
 #include <vector>
@@ -32,10 +32,25 @@
 namespace ghoul {
 
 /**
+ * Convert a string to contain only upper case letters.
+ *
+ * \param s The string to convert to only upper case letters
+ * \return The resulting string, after conversion
+ */
+std::string toUpperCase(const std::string& s);
+
+/**
+ * Convert a string to contain only lower case letters.
+ *
+ * \param s The string to convert to only lower case letters
+ * \return The resulting string, after conversion
+ */
+std::string toLowerCase(const std::string& s);
+
+/**
  * Separates the provided \p input URI into separate parts. If \p input is
  * `a.b.c.d 1.e`, the returned vector will contain one entry for
- * `a`, `b`, `c`, `d 1`, and `e`.
- * If an error occurred, an exception will be thrown.
+ * `a`, `b`, `c`, `d 1`, and `e`. If an error occurred, an exception will be thrown.
  *
  * \param input The input URI that is to be tokenized using the \p separator
  * \param separator The separator that is used for tokenize the string
@@ -94,6 +109,29 @@ std::string replaceAll(std::string string, const std::string& from,
  */
 std::string encodeUrl(const std::string& string);
 
+/**
+ * Provides a platform-independent version of std::getline by ensuring that no newline
+ * character ('\\n' or '\\r') will remain at the end of the line that is read from a
+ * std::isstream which may or may not have windows-style line endings.
+ *
+ * \param inputStream The isstream object from to read the next line at current location
+ * \param str The line that is read from the stream is stored in this string
+ * \return The same as parameter inputStream
+ */
+std::istream& getline(std::istream& inputStream, std::string& str);
+
+/**
+ * Provides a platform-independent version of std::getline by ensuring that no newline
+ * character ('\\n' or '\\r') will remain at the end of the line that is read from a
+ * std::isstream which may or may not have windows-style line endings.
+ *
+ * \param inputStream The isstream object from to read the next line at current location
+ * \param str The line that is read from the stream is stored in this string
+ * \param delim The delimiter to be used to stop a line read
+ * \return The same as parameter inputStream
+ */
+std::istream& getline(std::istream& inputStream, std::string& str, char delim);
+
 } // namespace ghoul
 
-#endif // __GHOUL___MISC___H__
+#endif // __GHOUL___STRINGHELPER___H__

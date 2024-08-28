@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -69,7 +69,7 @@ public:
     const std::filesystem::path& filename() const;
     const Dictionary& dictionary() const;
     void setDictionary(Dictionary dictionary);
-    void setFilename(std::filesystem::path shaderPath);
+    void setFilename(const std::filesystem::path& shaderPath);
     void setCallback(ShaderChangedCallback changeCallback);
     void process(std::string& output);
     std::string getFileIdentifiersString() const;
@@ -86,7 +86,7 @@ public:
      * \pre \p folderPath must be an existing directory
      * \pre \p folderPath must be a path without FileSystem tokens
      */
-    static void addIncludePath(std::filesystem::path folderPath);
+    static void addIncludePath(const std::filesystem::path& folderPath);
 
 private:
     struct Input {
@@ -135,7 +135,7 @@ private:
     bool parseFor(ShaderPreprocessor::Env& env);
     bool parseEndFor(ShaderPreprocessor::Env& env);
     bool parseInclude(ShaderPreprocessor::Env& env);
-    bool parseVersion(ShaderPreprocessor::Env& env);
+    bool parseVersion(const ShaderPreprocessor::Env& env);
     bool parseOs(ShaderPreprocessor::Env& env);
 
     bool substituteLine(ShaderPreprocessor::Env& env);
@@ -143,7 +143,8 @@ private:
     bool resolveAlias(const std::string& in, std::string& out,
         ShaderPreprocessor::Env& env);
 
-    void pushScope(std::map<std::string, std::string> map, ShaderPreprocessor::Env& env);
+    void pushScope(const std::map<std::string, std::string>& map,
+        ShaderPreprocessor::Env& env);
 
     void popScope(ShaderPreprocessor::Env& env);
 
@@ -155,7 +156,7 @@ private:
     void addLineNumber(ShaderPreprocessor::Env& env);
     bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
 
-    std::string debugString(ShaderPreprocessor::Env& env);
+    std::string debugString(const ShaderPreprocessor::Env& env);
 
     struct FileStruct {
         ghoul::filesystem::File file;
@@ -163,8 +164,8 @@ private:
         bool isTracked;
     };
 
-    std::map<std::string, FileStruct> _includedFiles;
-    static std::vector<std::string> _includePaths;
+    std::map<std::filesystem::path, FileStruct> _includedFiles;
+    static std::vector<std::filesystem::path> _includePaths;
     std::filesystem::path _shaderPath;
     Dictionary _dictionary;
     ShaderChangedCallback _onChangeCallback;

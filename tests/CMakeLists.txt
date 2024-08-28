@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2023                                                                #
+# Copyright (c) 2012-2024                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -41,6 +41,7 @@ target_sources(
     ${GHOUL_ROOT_DIR}/tests/test_luaconversions.cpp
     ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
     ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
+    ${GHOUL_ROOT_DIR}/tests/test_templatefactory.cpp
 )
 
 target_compile_definitions(GhoulTest PRIVATE
@@ -58,13 +59,10 @@ endif ()
 
 target_link_libraries(GhoulTest PRIVATE Catch2 Ghoul)
 
+target_precompile_headers(GhoulTest PRIVATE
+  <catch2/catch_test_macros.hpp>
+)
+
 if (APPLE)
   target_link_libraries(GhoulTest PRIVATE ${CARBON_LIBRARY} ${COREFOUNDATION_LIBRARY} ${COCOA_LIBRARY} ${APP_SERVICES_LIBRARY})
-endif ()
-
-if (WIN32)
-  add_custom_command(TARGET GhoulTest POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:GhoulTest> $<TARGET_FILE_DIR:GhoulTest>
-    COMMAND_EXPAND_LISTS
-  )
 endif ()

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,10 +31,10 @@
 #include <ghoul/misc/stacktrace.h>
 
 #if defined __unix__ || defined __APPLE__
-#include <execinfo.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cxxabi.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <execinfo.h>
 #elif defined _MSC_VER
 #include <StackWalker.h>
 #endif
@@ -75,13 +75,13 @@ std::vector<std::string> stackTrace() {
     int callstack[MaxCallStackDepth] = {};
 
     // Get the full stacktrace
-    int nFrames = backtrace(reinterpret_cast<void**>(callstack), MaxCallStackDepth);
+    const int nFrames = backtrace(reinterpret_cast<void**>(callstack), MaxCallStackDepth);
 
     // Unmangle the stacktrace to get it in a human-readable format
     char** strs = backtrace_symbols(reinterpret_cast<void**>(callstack), nFrames);
 
     stackFrames.reserve(nFrames);
-    for (int i = 0; i < nFrames; ++i) {
+    for (int i = 0; i < nFrames; i++) {
         const int MaxFunctionSymbolLength = 1024;
         const int MaxModuleNameLength = 1024;
         const int MaxAddressLength = 48;
@@ -129,11 +129,11 @@ std::vector<std::string> stackTrace() {
         );
 
         constexpr int MaxStackFrameSize = 4096;
-        char stackFrame[MaxStackFrameSize] = {};
+        std::array<char, MaxStackFrameSize> stackFrame = {};
 
         if (functionName) {
             sprintf(
-                stackFrame,
+                stackFrame.data(),
                 "(%s)\t0x%s — %s + %d",
                 moduleName.data(),
                 addr.data(),
@@ -143,7 +143,7 @@ std::vector<std::string> stackTrace() {
             free(functionName);
         }
 
-        stackFrames.push_back(std::string(stackFrame));
+        stackFrames.emplace_back(stackFrame.data());
     }
     free(strs);
 #elif WIN32

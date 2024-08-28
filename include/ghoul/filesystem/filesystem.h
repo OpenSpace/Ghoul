@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -49,12 +49,12 @@ void callbackHandler(const std::string& path);
 class CacheManager;
 
 /**
- * The methods are for dealing with path tokens. These are tokens of the form
- * `${...}` which are like variables, pointing to a specific location. These
- * tokens can only be bound once, as some of the tokens might already have been resolved
- * and changing the tokens later might lead to inconsistencies. For the same reason, it is
- * not possible to unregister tokens. Every FileSystem contains one token
- * `${TEMPORARY}` that points to the location of the system's temporary files.
+ * The methods are for dealing with path tokens. These are tokens of the form `${...}`
+ * which are like variables, pointing to a specific location. These tokens can only be
+ * bound once, as some of the tokens might already have been resolved and changing the
+ * tokens later might lead to inconsistencies. For the same reason, it is not possible to
+ * unregister tokens. Every FileSystem contains one token `${TEMPORARY}` that points to
+ * the location of the system's temporary files.
  */
 class FileSystem {
 public:
@@ -67,18 +67,17 @@ public:
 
     /**
      * Registers the path token \p token with this FileSystem. Henceforth, every call to,
-     * for example, #absPath, the constructors of File, or Directory, will replace
-     * the \p token with \p path. The tokens cannot be removed or replaced afterwards, as
-     * this might lead to inconsistencies since some files might have replaced the tokens
-     * while others have not.
+     * for example, #absPath, the constructors of File, or Directory, will replace the
+     * \p token with \p path. The tokens cannot be removed or replaced afterwards, as this
+     * might lead to inconsistencies since some files might have replaced the tokens while
+     * others have not.
      *
      * \param token The token in the form `${...}`
      * \param path The path the token should point to
      * \param override If `true` an existing token will be silently overriden
      *
      * \pre \p token must not be empty
-     * \pre \p token must start with FileSystem::TokenOpeningBrace and end with
-     *      FileSystem::TokenClosingBraces
+     * \pre \p token must start with `{` and end with `}`
      * \pre \p token must not have been registered before if \p override is false
      */
     void registerPathToken(std::string token, std::filesystem::path path,
@@ -86,9 +85,8 @@ public:
 
     /**
      * Replaces the path tokens present in the \p path if any exist. If all tokens could
-     * be replaced, the method returns `true`; if `false` is
-     * returned, one or more tokens could not be replaced. In this case, only part of the
-     * path is modified.
+     * be replaced, the method returns `true`; if `false` is returned, one or more tokens
+     * could not be replaced. In this case, only part of the path is modified.
      *
      * \param path The path whose tokens should be replaced
      * \param ignoredTokens All tokens contained in this list are ignored during the
@@ -107,10 +105,10 @@ public:
 
     /**
      * Checks whether the \p token has been registered to a path before.
+     *
      * \param token The token to be checked.
      *
-     * \return `true` if the \p token has been registered to a path before,
-     *         `false` otherwise
+     * \return `true` if the \p token has been registered before, `false` otherwise
      */
     bool hasRegisteredToken(const std::string& token) const;
 
@@ -133,7 +131,7 @@ public:
      *        to be an existing directory with proper read/write access.
      *
      * \pre \p directory must point to an existing directory
-     * \pre \p The CacheManager must not have been created before without destroying it
+     * \pre The CacheManager must not have been created before without destroying it
      */
     void createCacheManager(const std::filesystem::path& directory);
 
@@ -141,14 +139,14 @@ public:
      * Destroys the previously created CacheManager. The destruction of the CacheManager
      * will trigger a cleanup of the cache directory via the CacheManager destructor.
      * After this method returns, a new CacheManager can be reinitialized with a new
-     * cache directory
+     * cache directory.
      *
      * \pre CacheManager must have been created before
      */
     void destroyCacheManager();
 
     /**
-     * Returns the CacheManager associated with this FileSystem
+     * Returns the CacheManager associated with this FileSystem.
      *
      * \return The CacheManager or `nullptr` if it has not been initialized
      *
@@ -178,9 +176,13 @@ public:
     void removeFileListener(int callbackIdentifier);
 
     /**
-     * Triggers callbacks on filesystem. May not be needed depending on environment.
+     * Triggers callbacks on filesystem. May not be needed depending on the environment.
      */
     void triggerFilesystemEvents();
+
+#ifdef WIN32
+    std::filesystem::path resolveShellLink(std::filesystem::path path);
+#endif // WIN32
 
 private:
     /**
@@ -202,7 +204,7 @@ private:
     FileSystem& operator=(const FileSystem& rhs) = delete;
     FileSystem& operator=(FileSystem&& rhs) = delete;
 
-    /// This map stores all the tokens that are used in the FileSystem.
+    /// This map stores all the tokens that are used in the FileSystem
     std::map<std::string, std::filesystem::path> _tokenMap;
 
     /// The cache manager object, only allocated if createCacheManager is called
@@ -293,10 +295,9 @@ private:
 } // namespace ghoul::filesystem
 
 /**
- * Returns the absolute path to the passed \p path, resolving any tokens (if present)
- * in the process. The current working directory is used as a base
- * path for this. All tokens contained in the \p ignoredTokens are ignored from the
- * token resolving
+ * Returns the absolute path to the passed \p path, resolving any tokens (if present) in
+ * the process. The current working directory is used as a base path for this. All tokens
+ * contained in the \p ignoredTokens are ignored from the token resolving.
  *
  * \param path The path that should be converted into an absolute path
  * \return The absolute path to the passed \p path
@@ -308,7 +309,7 @@ std::filesystem::path absPath(std::string path);
 /**
  * \overload std::filesystem::path absPath(std::string path)
  */
-std::filesystem::path absPath(std::filesystem::path path);
+std::filesystem::path absPath(const std::filesystem::path& path);
 
 /**
  * \overload std::filesystem::path absPath(std::string path)

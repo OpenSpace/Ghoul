@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -40,11 +40,10 @@ namespace ghoul::filesystem {
  * cached result. This class only generates and manages the file paths and does not do any
  * caching itself. The use case for this is for expensive operations that has have result,
  * which gets written to a file and the developer wants to retain the results without
- * recomputing it at every application start. Using the same `file` and
- * `information` values, the same path will be retrieved in subsequent
- * application runs. The persistent files are stored in a `cache` file so that
- * they can be retained between application runs. If two CacheManagers are pointing at the
- * same directory, the result is undefined.
+ * recomputing it at every application start. Using the same `file` and `information`
+ * values, the same path will be retrieved in subsequent application runs. The persistent
+ * files are stored in a `cache` file so that they can be retained between application
+ * runs. If two CacheManagers are pointing at the same directory, the result is undefined.
  */
 class CacheManager {
 public:
@@ -91,8 +90,8 @@ public:
      * This method checks if a cached \p file has been registered before in this or in a
      * previous application run with the provided \p information. If no information is
      * provided, the method will use the date of last modification as a unique identifier
-     * for the file.Note that this only checks if a file has been requested before, not if
-     * the cached file has actually been used.
+     * for the file. Note that this only checks if a file has been requested before, not
+     * if the cached file has actually been used.
      *
      * \param file The file for which the cached file should be searched
      * \param information The identifying information for the file

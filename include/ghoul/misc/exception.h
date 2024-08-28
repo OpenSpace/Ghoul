@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #ifndef __GHOUL___EXCEPTION___H__
 #define __GHOUL___EXCEPTION___H__
 
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 
@@ -33,8 +34,8 @@ namespace ghoul {
 
 /**
  * Superclass for all exceptions that are thrown in Ghoul. The total message of the
- * exception consists of the `message` prefixed with the `component`
- * that threw the exception if it was set.
+ * exception consists of the `message` prefixed with the `component` that threw the
+ * exception if it was set.
  */
 struct RuntimeError : public std::runtime_error {
     /**
@@ -56,7 +57,9 @@ struct RuntimeError : public std::runtime_error {
     const std::string component;
 };
 
-/// Exception that is thrown if an IO access failed because a file could was not found
+/**
+ * Exception that is thrown if an IO access failed because a file could was not found.
+ */
 struct FileNotFoundError : public RuntimeError {
     /**
      * Main constructor constructing the exception with the provided missing file \p f and
@@ -67,10 +70,10 @@ struct FileNotFoundError : public RuntimeError {
      *
      * \pre \p f must not be empty
      */
-    explicit FileNotFoundError(std::string f, std::string comp = "");
+    explicit FileNotFoundError(std::filesystem::path f, std::string comp = "");
 
     /// The file that was missing
-    const std::string file;
+    const std::filesystem::path file;
 };
 
 } // namespace ghoul

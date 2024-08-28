@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,6 +28,8 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
+#include <optional>
+
 namespace ghoul::cmdparser {
 
 template <typename... T>
@@ -35,12 +37,11 @@ class SingleCommand : public CommandlineCommand {};
 
 /**
  * This class represents a command that can occur only once in a given commandline and has
- * a single argument of type \p T, which must be convertable using an
- * `std::stringstream`.
+ * a single argument of type \p T, which must be convertable using a `std::stringstream`.
  *
  * \tparam T The typename of the first argument type
  *
- * \sa SingleCommandZeroArguments
+ * \see SingleCommandZeroArguments
  */
 template<typename T>
 class SingleCommand<T> : public CommandlineCommand {
@@ -59,7 +60,7 @@ public:
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
      */
-    SingleCommand(T& ptr1, std::string name, std::string shortName = "",
+    SingleCommand(std::optional<T>& ptr1, std::string name, std::string shortName = "",
         std::string infoText = "", std::string parameterList = "");
 
     /**
@@ -83,7 +84,7 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    T& _ptr1;
+    std::optional<T>& _ptr1;
 };
 
 /**
@@ -94,7 +95,7 @@ protected:
  * \tparam T The typename of the first argument type
  * \tparam U The typename of the second argument type
  *
- * \sa SingleCommandZeroArguments
+ * \see SingleCommandZeroArguments
  */
 template<typename T, typename U>
 class SingleCommand<T, U> : public CommandlineCommand {
@@ -115,131 +116,7 @@ public:
      * \param parameterList The explanation of the parameters that this command expects.
      *        Is presented to the user upon request by the CommandlineParser
      */
-    SingleCommand(T& ptr1, U& ptr2, std::string name, std::string shortName = "",
-        std::string infoText = "", std::string parameterList = "");
-
-    /**
-     * Executes this SingleCommand and stores the values passed as \p parameters into the
-     * pointers passed through the constructor.
-     *
-     * \param parameters The parameters for this SingleCommand
-     *
-     * \throw CommandExecutionException If one parameter has the wrong type that was not
-     *        detected in the checkParameters method
-     */
-    void execute(const std::vector<std::string>& parameters) override;
-
-    /**
-     * Checks whether all of the \p parameters have the correct types.
-     *
-     * \param parameters The list of parameters that are to be checked
-     *
-     * \throw CommandParameterException If any of the parameters have the wrong type
-     */
-    void checkParameters(const std::vector<std::string>& parameters) const override;
-
-protected:
-    T& _ptr1;
-    U& _ptr2;
-};
-
-/**
- * This class represents a command that can occur only once in a given commandline and has
- * 3 arguments of respective types \p T, \p U, and \p V. The template classes \p T, \p U,
- * and \p V must be convertable using an `std::stringstream`.
- *
- * \tparam T The typename of the first argument type
- * \tparam U The typename of the second argument type
- * \tparam V The typename of the third argument type
- *
- * \sa SingleCommandZeroArguments
- */
-template<typename T, typename U, typename V>
-class SingleCommand<T, U, V> : public CommandlineCommand {
-public:
-    /**
-     * This constructor uses three parameters.
-     *
-     * \param ptr1 The reference to the parameter that will be set when this command is
-     *        executed
-     * \param ptr2 The reference to the second parameter that will be set when this
-     *        command is executed
-     * \param ptr3 The reference to the third parameter that will be set when this command
-     *        is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
-     * \param shortName The (optional) short name for this command. If it is provided, it
-     *        has to start with a `-` in order to be valid
-     * \param infoText The info text that will be presented to the user if it is requested
-     *        by the CommandlineParser
-     * \param parameterList The explanation of the parameters that this command expects.
-     *        Is presented to the user upon request by the CommandlineParser
-     */
-    SingleCommand(T& ptr1, U& ptr2, V& ptr3, std::string name, std::string shortName = "",
-        std::string infoText = "", std::string parameterList = "");
-
-    /**
-     * Executes this SingleCommand and stores the values passed as \p parameters into the
-     * pointers passed through the constructor.
-     *
-     * \param parameters The parameters for this SingleCommand
-     *
-     * \throw CommandExecutionException If one parameter has the wrong type that was not
-     *        detected in the checkParameters method
-     */
-    void execute(const std::vector<std::string>& parameters) override;
-
-    /**
-     * Checks whether all of the \p parameters have the correct types.
-     *
-     * \param parameters The list of parameters that are to be checked
-     *
-     * \throw CommandParameterException If any of the parameters have the wrong type
-     */
-    void checkParameters(const std::vector<std::string>& parameters) const override;
-
-protected:
-    T& _ptr1;
-    U& _ptr2;
-    V& _ptr3;
-};
-
-/**
- * This class represents a command that can occur only once in a given commandline and
- * has 4 arguments of respective types \p T, \p U, \p V, and \p U. The command tries to
- * convert the parameters to the appropriate types and stores them. The template classes
- * \p T, \p U, \p V, and \p U must be convertable using an `std::stringstream`.
- *
- * \tparam T The typename of the first argument type
- * \tparam U The typename of the second argument type
- * \tparam V The typename of the third argument type
- * \tparam W The typename of the fourth argument type
- * \sa SingleCommandZeroArguments
- */
-template<typename T, typename U, typename V, typename W>
-class SingleCommand<T, U, V, W> : public CommandlineCommand {
-public:
-    /**
-     * This constructor takes four parameters.
-     *
-     * \param ptr1 The reference to the parameter that will be set when this command is
-     *        executed
-     * \param ptr2 The reference to the second parameter that will be set when this
-     *        command is executed
-     * \param ptr3 The reference to the third parameter that will be set when this command
-     *        is executed
-     * \param ptr4 The reference to the fourth parameter that will be set when this
-     *        command is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
-     * \param shortName The (optional) short name for this command. If it is provided, it
-     *        has to start with a `-` in order to be valid
-     * \param infoText The info text that will be presented to the user if it is requested
-     *        by the CommandlineParser
-     * \param parameterList The explanation of the parameters that this command expects.
-     *        Is presented to the user upon request by the CommandlineParser
-     */
-    SingleCommand(T& ptr1, U& ptr2, V& ptr3, W& ptr4, std::string name,
+    SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2, std::string name,
         std::string shortName = "", std::string infoText = "",
         std::string parameterList = "");
 
@@ -264,10 +141,137 @@ public:
     void checkParameters(const std::vector<std::string>& parameters) const override;
 
 protected:
-    T& _ptr1 = nullptr;
-    U& _ptr2 = nullptr;
-    V& _ptr3 = nullptr;
-    W& _ptr4 = nullptr;
+    std::optional<T>& _ptr1;
+    std::optional<U>& _ptr2;
+};
+
+/**
+ * This class represents a command that can occur only once in a given commandline and has
+ * 3 arguments of respective types \p T, \p U, and \p V. The template classes \p T, \p U,
+ * and \p V must be convertable using an `std::stringstream`.
+ *
+ * \tparam T The typename of the first argument type
+ * \tparam U The typename of the second argument type
+ * \tparam V The typename of the third argument type
+ *
+ * \see SingleCommandZeroArguments
+ */
+template<typename T, typename U, typename V>
+class SingleCommand<T, U, V> : public CommandlineCommand {
+public:
+    /**
+     * This constructor uses three parameters.
+     *
+     * \param ptr1 The reference to the parameter that will be set when this command is
+     *        executed
+     * \param ptr2 The reference to the second parameter that will be set when this
+     *        command is executed
+     * \param ptr3 The reference to the third parameter that will be set when this command
+     *        is executed
+     * \param name The full name for this command. Has to start with a `-` in
+     *        order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     *        has to start with a `-` in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     *        by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     *        Is presented to the user upon request by the CommandlineParser
+     */
+    SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2, std::optional<V>& ptr3,
+        std::string name, std::string shortName = "", std::string infoText = "",
+        std::string parameterList = "");
+
+    /**
+     * Executes this SingleCommand and stores the values passed as \p parameters into the
+     * pointers passed through the constructor.
+     *
+     * \param parameters The parameters for this SingleCommand
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
+     */
+    void execute(const std::vector<std::string>& parameters) override;
+
+    /**
+     * Checks whether all of the \p parameters have the correct types.
+     *
+     * \param parameters The list of parameters that are to be checked
+     *
+     * \throw CommandParameterException If any of the parameters have the wrong type
+     */
+    void checkParameters(const std::vector<std::string>& parameters) const override;
+
+protected:
+    std::optional<T>& _ptr1;
+    std::optional<U>& _ptr2;
+    std::optional<V>& _ptr3;
+};
+
+/**
+ * This class represents a command that can occur only once in a given commandline and
+ * has 4 arguments of respective types \p T, \p U, \p V, and \p U. The command tries to
+ * convert the parameters to the appropriate types and stores them. The template classes
+ * \p T, \p U, \p V, and \p U must be convertable using an `std::stringstream`.
+ *
+ * \tparam T The typename of the first argument type
+ * \tparam U The typename of the second argument type
+ * \tparam V The typename of the third argument type
+ * \tparam W The typename of the fourth argument type
+ *
+ * \see SingleCommandZeroArguments
+ */
+template<typename T, typename U, typename V, typename W>
+class SingleCommand<T, U, V, W> : public CommandlineCommand {
+public:
+    /**
+     * This constructor takes four parameters.
+     *
+     * \param ptr1 The reference to the parameter that will be set when this command is
+     *        executed
+     * \param ptr2 The reference to the second parameter that will be set when this
+     *        command is executed
+     * \param ptr3 The reference to the third parameter that will be set when this command
+     *        is executed
+     * \param ptr4 The reference to the fourth parameter that will be set when this
+     *        command is executed
+     * \param name The full name for this command. Has to start with a `-` in
+     *        order to be valid
+     * \param shortName The (optional) short name for this command. If it is provided, it
+     *        has to start with a `-` in order to be valid
+     * \param infoText The info text that will be presented to the user if it is requested
+     *        by the CommandlineParser
+     * \param parameterList The explanation of the parameters that this command expects.
+     *        Is presented to the user upon request by the CommandlineParser
+     */
+    SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr2, std::optional<V>& ptr3,
+        std::optional<W>& ptr4, std::string name, std::string shortName = "",
+        std::string infoText = "", std::string parameterList = "");
+
+    /**
+     * Executes this SingleCommand and stores the values passed as \p parameters into the
+     * pointers passed through the constructor.
+     *
+     * \param parameters The parameters for this SingleCommand
+     *
+     * \throw CommandExecutionException If one parameter has the wrong type that was not
+     *        detected in the checkParameters method
+     */
+    void execute(const std::vector<std::string>& parameters) override;
+
+    /**
+     * Checks whether all of the \p parameters have the correct types.
+     *
+     * \param parameters The list of parameters that are to be checked
+     *
+     * \throw CommandParameterException If any of the parameters have the wrong type
+     */
+    void checkParameters(const std::vector<std::string>& parameters) const override;
+
+protected:
+    std::optional<T>& _ptr1 = nullptr;
+    std::optional<U>& _ptr2 = nullptr;
+    std::optional<V>& _ptr3 = nullptr;
+    std::optional<W>& _ptr4 = nullptr;
 };
 
 
@@ -292,7 +296,7 @@ public:
      * \param infoText The info text that will be presented to the user if it is requested
      *        by the CommandlineParser
      */
-    SingleCommandZeroArguments(bool& ptr, std::string name,
+    SingleCommandZeroArguments(std::optional<bool>& ptr, std::string name,
         std::string shortName = "", std::string infoText = "");
 
     /**
@@ -301,7 +305,7 @@ public:
     virtual void execute(const std::vector<std::string>& /*parameters*/) override;
 
 protected:
-    bool& _ptr;
+    std::optional<bool>& _ptr;
 };
 
 } // namespace ghoul::cmdparser

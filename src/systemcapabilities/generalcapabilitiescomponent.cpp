@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,8 @@
 
 #include <ghoul/systemcapabilities/generalcapabilitiescomponent.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
+#include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <algorithm>
 #include <array>
@@ -101,7 +102,7 @@ GeneralCapabilitiesComponent::GeneralCapabilitiesComponentError::
 
 GeneralCapabilitiesComponent::OperatingSystemError::OperatingSystemError(std::string desc,
                                                                      std::string errorMsg)
-    : GeneralCapabilitiesComponentError(fmt::format("{}. Error: {}", desc, errorMsg))
+    : GeneralCapabilitiesComponentError(std::format("{}. Error: {}", desc, errorMsg))
     , description(std::move(desc))
     , errorMessage(std::move(errorMsg))
 {}
@@ -325,7 +326,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         ghoul::to_string(_operatingSystem) + ' ' + _operatingSystemExtra;
 #else
     utsname name;
-    int res = uname(&name);
+    const int res = uname(&name);
     if (res != 0) {
         throw OperatingSystemError(
             "OS detection failed. 'uname' returned non-null value", std::to_string(res)
@@ -333,7 +334,7 @@ void GeneralCapabilitiesComponent::detectOS() {
     }
 
     _operatingSystem = OperatingSystem::Unknown;
-    _operatingSystemExtra = fmt::format(
+    _operatingSystemExtra = std::format(
         "{} {} {} {}", name.sysname, name.release, name.version, name.machine
     );
     _fullOperatingSystem = _operatingSystemExtra;
@@ -342,20 +343,20 @@ void GeneralCapabilitiesComponent::detectOS() {
 
 void GeneralCapabilitiesComponent::detectMemory() {
 #ifdef WIN32
-    std::string memory;
     try {
+        std::string memory;
+        // This function might fail if the process has insufficient priviledges to access
+        // the WMI on Windows
         queryWMI("Win32_ComputerSystem", "TotalPhysicalMemory", memory);
+        std::stringstream convert;
+        convert << memory;
+        unsigned long long value;
+        convert >> value;
+        _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
     }
-    catch (const WMIError& e) {
-        throw MainMemoryError(fmt::format(
-            "Error reading physical memory from WMI. {} ({})", e.message, e.errorCode
-        ));
+    catch (const std::runtime_error& e) {
+        LWARNINGC("GeneralCapabilitiesComponent", e.what());
     }
-    std::stringstream convert;
-    convert << memory;
-    unsigned long long value;
-    convert >> value;
-    _installedMainMemory = static_cast<unsigned int>((value / 1024) / 1024);
 #elif defined(__APPLE__)
     int mib[2] = { CTL_HW, HW_MEMSIZE };
     size_t len;
@@ -396,7 +397,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     bool hasMonitorMWait = false;
     bool hasCplQualifiedDebugStore = false;
     bool hasThermalMonitor2 = false;
-    for (unsigned i = 0; i <= nIds; ++i) {
+    for (unsigned i = 0; i <= nIds; i++) {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU feature information.
@@ -418,7 +419,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     std::memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
     // Get the information associated with each extended ID.
-    for (unsigned i = 0x80000000; i <= nExIds; ++i) {
+    for (unsigned i = 0x80000000; i <= nExIds; i++) {
         __cpuid(CPUInfo, i);
 
         // Interpret CPU brand string and cache information.
@@ -454,7 +455,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
         extensions << "tm2 ";
     }
 
-    for (size_t i = 0; i < szFeatures.size(); ++i, nIds <<= 1) {
+    for (size_t i = 0; i < szFeatures.size(); i++, nIds <<= 1) {
         if (nFeatureInfo & nIds) {
             extensions << szFeatures[i] << " ";
         }
@@ -553,7 +554,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     _L2Associativity = static_cast<unsigned int>(intValue);
 //    delete[] p;
 #else
-    FILE* file;
+    FILE* file = nullptr;
     const unsigned int maxSize = 2048;
     char line[maxSize];
 
@@ -561,7 +562,9 @@ void GeneralCapabilitiesComponent::detectCPU() {
     file = fopen("/proc/cpuinfo", "r");
     if (file) {
         while (fgets(line, maxSize, file) != nullptr) {
-            if (strncmp(line, "processor", 9) == 0) ++_cores;
+            if (strncmp(line, "processor", 9) == 0) {
+                ++_cores;
+            }
             if (strncmp(line, "model name", 10) == 0) {
                 _cpu = line;
                 _cpu = _cpu.substr(18, _cpu.length()-19);

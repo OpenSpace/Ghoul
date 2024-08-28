@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,7 @@
 
 #include <ghoul/opengl/openglstatecache.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 
@@ -73,14 +73,14 @@ void OpenGLStateCache::loadCurrentGLState() {
     _blending.enabled = glIsEnabled(GL_BLEND);
 
     if (_blending.enabledArray.empty()) {
-        for (int i = 0; i < _maxAttachBuffers; ++i) {
+        for (int i = 0; i < _maxAttachBuffers; i++) {
             _blending.enabledArray.push_back(glIsEnabledi(GL_BLEND, i));
         }
     }
     else {
         std::vector<GLboolean>::iterator blendBufferIt = _blending.enabledArray.begin();
         std::vector<GLboolean>::iterator endBlendBuffer = _blending.enabledArray.end();
-        for (int i = 0; blendBufferIt < endBlendBuffer; ++ blendBufferIt, ++i) {
+        for (int i = 0; blendBufferIt < endBlendBuffer; blendBufferIt++, i++) {
             *blendBufferIt = glIsEnabledi(GL_BLEND, i);
         }
     }
@@ -119,7 +119,7 @@ void OpenGLStateCache::resetBlendState() const {
     }
 
     auto it  = _blending.enabledArray.cbegin();
-    for (int i = 0; it < _blending.enabledArray.cend(); ++it, ++i) {
+    for (int i = 0; it < _blending.enabledArray.cend(); it++, i++) {
         if (*it) {
             glEnablei(GL_BLEND, i);
         }
@@ -195,18 +195,18 @@ void OpenGLStateCache::resetColorState() const {
     );
 }
 
-void OpenGLStateCache::setColorState(GLfloat color[4], GLboolean clampColor)  {
-    ghoul_assert(color != nullptr, "color must not be nullptr");
+void OpenGLStateCache::setColorState(GLfloat clearColor[4], GLboolean clampColor) {
+    ghoul_assert(clearColor != nullptr, "color must not be nullptr");
 
-    if (!std::equal_to<>()(color[0], _colorClearValue[0]) ||
-        !std::equal_to<>()(color[1], _colorClearValue[1]) ||
-        !std::equal_to<>()(color[2], _colorClearValue[2]) ||
-        !std::equal_to<>()(color[3], _colorClearValue[3]))
+    if (!std::equal_to<>()(clearColor[0], _colorClearValue[0]) ||
+        !std::equal_to<>()(clearColor[1], _colorClearValue[1]) ||
+        !std::equal_to<>()(clearColor[2], _colorClearValue[2]) ||
+        !std::equal_to<>()(clearColor[3], _colorClearValue[3]))
     {
-        _colorClearValue[0] = color[0];
-        _colorClearValue[1] = color[1];
-        _colorClearValue[2] = color[2];
-        _colorClearValue[3] = color[3];
+        _colorClearValue[0] = clearColor[0];
+        _colorClearValue[1] = clearColor[1];
+        _colorClearValue[2] = clearColor[2];
+        _colorClearValue[3] = clearColor[3];
     }
 
     if (clampColor != _clampColorEnabled) {

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,6 +25,8 @@
 
 #include <ghoul/logging/visualstudiooutputlog.h>
 
+#include <ghoul/misc/profiling.h>
+
 #ifdef WIN32
 #include <Windows.h>
 #endif // WIN32
@@ -39,11 +41,13 @@ VisualStudioOutputLog::VisualStudioOutputLog(TimeStamping timeStamping,
     : Log(timeStamping, dateStamping, categoryStamping, logLevelStamping, minimumLogLevel)
 {}
 
-void VisualStudioOutputLog::log([[ maybe_unused ]] LogLevel level,
-                                [[ maybe_unused ]] std::string_view category,
-                                [[ maybe_unused ]] std::string_view message)
+void VisualStudioOutputLog::log([[maybe_unused]] LogLevel level,
+                                [[maybe_unused]] std::string_view category,
+                                [[maybe_unused]] std::string_view message)
 {
 #ifdef WIN32
+    ZoneScoped;
+
     std::string fullMessage = createFullMessageString(level, category, message) + '\n';
     OutputDebugString(fullMessage.c_str());
 #endif

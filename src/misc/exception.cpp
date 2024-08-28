@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/exception.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 
 namespace ghoul {
@@ -38,8 +38,8 @@ RuntimeError::RuntimeError(std::string msg, std::string comp)
     ghoul_assert(!message.empty(), "Message must not be empty");
 }
 
-FileNotFoundError::FileNotFoundError(std::string f, std::string comp)
-    : RuntimeError(fmt::format("Could not find file '{}'", f), std::move(comp))
+FileNotFoundError::FileNotFoundError(std::filesystem::path f, std::string comp)
+    : RuntimeError(std::format("Could not find file '{}'", f), std::move(comp))
     , file(std::move(f))
 {}
 

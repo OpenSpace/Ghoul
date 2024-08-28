@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,8 @@
 
 #include <ghoul/io/socket/websocket.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
 #include <websocketpp/common/functional.hpp>
 #include <chrono>
 #include <functional>
@@ -96,7 +96,7 @@ bool WebSocket::getMessage(std::string& message) {
         _inputNotifier.wait_for(lock, MaxWaitDuration, messageOrDisconnected);
     }
 
-    std::lock_guard guard(_inputMessageQueueMutex);
+    const std::lock_guard guard(_inputMessageQueueMutex);
     if (_inputMessageQueue.empty()) {
         return false;
     }
@@ -133,30 +133,30 @@ void WebSocket::startStreams() {
 void WebSocket::onMessage(const websocketpp::connection_hdl&,
                    const websocketpp::server<websocketpp::config::core>::message_ptr& msg)
 {
-    std::string msgContent = msg->get_payload();
-    std::lock_guard guard(_inputMessageQueueMutex);
+    const std::string msgContent = msg->get_payload();
+    const std::lock_guard guard(_inputMessageQueueMutex);
     _inputMessageQueue.push_back(msgContent);
     _inputNotifier.notify_one();
 }
 
 void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
-    LDEBUG(fmt::format(
+    LDEBUG(std::format(
         "onOpen: WebSocket opened. Client: {}:{}",
         _tcpSocket->address(), _tcpSocket->port()
     ));
-    std::lock_guard guard(_connectionHandlesMutex);
+    const std::lock_guard guard(_connectionHandlesMutex);
     _connectionHandles.insert(hdl);
     _tcpSocket->put<char>(_outputStream.str().c_str(), _outputStream.str().size());
     _outputStream.str("");
 }
 
 void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
-    LDEBUG(fmt::format(
+    LDEBUG(std::format(
         "onClose: WebSocket closing. Client: {}:{}",
         _tcpSocket->address(), _tcpSocket->port()
     ));
 
-    std::lock_guard guard(_connectionHandlesMutex);
+    const std::lock_guard guard(_connectionHandlesMutex);
     _connectionHandles.erase(hdl);
     _inputNotifier.notify_one();
 }

@@ -4,9 +4,6 @@
 [submodule "ext/freetype2"]
 	path = ext/freetype2
 url=https://github.com/OpenSpace/freetype-mirror
-[submodule "ext/cppformat"]
-	path = ext/cppformat
-	url = https://github.com/fmtlib/fmt.git
 [submodule "ext/assimp"]
 	path = ext/assimp
 	url = https://github.com/assimp/assimp.git

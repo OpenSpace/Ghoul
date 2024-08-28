@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -41,22 +41,29 @@ class LuaState {
 public:
     BooleanType(IncludeStandardLibrary);
     BooleanType(StrictState);
+    BooleanType(Sandboxed);
 
     /**
      * The constructor will create a new Lua state and optionally fill it with the Lua
      * standard libraries, if \p includeStandardLibraries is `true`.
      *
-     * \param include If `Yes`, the created Lua state will contain the
-     *        set of Lua standard libraries
-     * \param strict If this is `true`, the created Lua state will panic if an unused
+     * \param sandboxed If this is `Yes` then all of the functions that might pose
+     *        potential security risks are removed from the state. This includes functions
+     *        to load third-party modules or access the file system
+     * \param include If `Yes`, the created Lua state will contain the set of Lua standard
+     *        libraries
+     * \param strict If this is `Yes`, the created Lua state will panic if an unused
      *        variable is read or being written to before being defined before
      *
      * \throw LuaRuntimeException If an error occurs during the state creation
      */
-    explicit LuaState(IncludeStandardLibrary include = IncludeStandardLibrary::Yes,
+    explicit LuaState(Sandboxed sandboxed = Sandboxed::Yes,
+        IncludeStandardLibrary include = IncludeStandardLibrary::Yes,
         StrictState strict = StrictState::Yes);
 
-    /// Destroys the created Lua state and frees all the related memory.
+    /**
+     * Destroys the created Lua state and frees all the related memory.
+     */
     ~LuaState();
 
     LuaState(LuaState&& other) noexcept;
@@ -75,7 +82,7 @@ public:
 
 private:
     /// The stored `lua_State`
-    lua_State* _state;
+    lua_State* _state = nullptr;
 };
 
 }  // namespace ghoul::lua

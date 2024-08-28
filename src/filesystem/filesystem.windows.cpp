@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -64,13 +64,14 @@ int FileSystem::addFileListener(std::filesystem::path path,
     std::filesystem::path dir = path.parent_path();
     auto f = _directories.find(dir);
     if (f == _directories.end()) {
-        LDEBUG(fmt::format("Started watching: {}", dir));
+        LDEBUG(std::format("Started watching '{}'", dir));
         DirectoryHandle* handle = new DirectoryHandle;
         handle->_activeBuffer = 0;
         handle->_handle = nullptr;
 
+        std::string d = dir.string();
         handle->_handle = CreateFile(
-            dir.string().c_str(),
+            d.c_str(),
             FILE_LIST_DIRECTORY,
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
             nullptr,
@@ -82,7 +83,7 @@ int FileSystem::addFileListener(std::filesystem::path path,
         if (handle->_handle == INVALID_HANDLE_VALUE) {
             delete handle;
             throw ghoul::RuntimeError(
-                fmt::format("Directory handle for '{}' could not be obtained", dir)
+                std::format("Directory handle for '{}' could not be obtained", dir)
             );
         }
 
@@ -110,7 +111,7 @@ void FileSystem::removeFileListener(int callbackIdentifier) {
         }
     }
 
-    LWARNING(fmt::format("Could not find callback identifier '{}'", callbackIdentifier));
+    LWARNING(std::format("Could not find callback identifier '{}'", callbackIdentifier));
 }
 
 void FileSystem::callbackHandler(DirectoryHandle* directoryHandle,

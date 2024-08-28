@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -38,7 +38,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 9;
+    constexpr int8_t CurrentCacheVersion = 10;
     constexpr int FormatStringSize = 4;
     constexpr int8_t ShouldSkipMarker = -1;
     constexpr int8_t NoSkipMarker = 1;
@@ -109,11 +109,11 @@ namespace {
         glm::mat4x4 globalTransform = parentTransform * node->transform();
 
         for (const ghoul::io::ModelMesh& mesh : node->meshes()) {
-            float d = mesh.calculateBoundingRadius(globalTransform);
+            const float d = mesh.calculateBoundingRadius(globalTransform);
             maximumDistanceSquared = std::max(d, maximumDistanceSquared);
         }
 
-        for (int child : node->children()) {
+        for (const int child : node->children()) {
             calculateBoundingRadiusRecursive(
                 nodes,
                 &nodes[child],
@@ -148,7 +148,7 @@ namespace {
             mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
         }
 
-        for (int child : node->children()) {
+        for (const int child : node->children()) {
             renderRecursive(
                 nodes,
                 &nodes[child],
@@ -165,7 +165,7 @@ namespace ghoul::modelgeometry {
 
 ModelGeometry::ModelCacheException::ModelCacheException(std::filesystem::path file,
                                                         std::string msg)
-    : RuntimeError(fmt::format("Error: '{}' with cache file: {}", msg, file))
+    : RuntimeError(std::format("Error '{}' with cache file '{}'", msg, file))
     , filename(std::move(file))
     , errorMessage(std::move(msg))
 {}
@@ -177,8 +177,8 @@ ModelGeometry::ModelGeometry(std::vector<io::ModelNode> nodes,
     : _nodes(std::move(nodes))
     , _textureStorage(std::move(textureStorage))
     , _animation(std::move(animation))
-    , _hasCalcTransparency(std::move(hasCalcTransparency))
-    , _isTransparent(std::move(isTransparent))
+    , _hasCalcTransparency(hasCalcTransparency)
+    , _isTransparent(isTransparent)
 {
     if (!_hasCalcTransparency) {
         calculateTransparency();
@@ -190,7 +190,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                                                                 bool forceRenderInvisible,
                                                               bool notifyInvisibleDropped)
 {
-    std::ifstream fileStream(cachedFile, std::ifstream::binary);
+    ZoneScoped;
+
+    std::ifstream fileStream = std::ifstream(cachedFile, std::ifstream::binary);
     if (!fileStream.good()) {
         throw ModelCacheException(cachedFile, "Could not open file to load cache");
     }
@@ -212,7 +214,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         LINFO("No cahced TextureEntries were loaded");
     }
     else if (nTextureEntries < 0) {
-        std::string message = fmt::format(
+        std::string message = std::format(
             "Model cannot have negative number of texture entries while loading "
             "cache: {}", nTextureEntries
         );
@@ -243,7 +245,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             reinterpret_cast<char*>(dimensionStorage.data()),
             3 * sizeof(int32_t)
         );
-        glm::uvec3 dimensions = glm::uvec3(
+        const glm::uvec3 dimensions = glm::uvec3(
             static_cast<unsigned int>(dimensionStorage[0]),
             static_cast<unsigned int>(dimensionStorage[1]),
             static_cast<unsigned int>(dimensionStorage[2])
@@ -253,18 +255,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::string formatString;
         formatString.resize(FormatStringSize);
         fileStream.read(formatString.data(), FormatStringSize * sizeof(char));
-        opengl::Texture::Format format = stringToFormat(formatString);
+        const opengl::Texture::Format format = stringToFormat(formatString);
 
         // internal format
-        uint32_t rawInternalFormat;
+        uint32_t rawInternalFormat = 0;
         fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(uint32_t));
-        GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
+        const GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
         // data type
         std::string dataTypeString;
         dataTypeString.resize(FormatStringSize);
         fileStream.read(dataTypeString.data(), FormatStringSize * sizeof(char));
-        GLenum dataType = stringToDataType(dataTypeString);
+        const GLenum dataType = stringToDataType(dataTypeString);
 
         // data
         int32_t textureSize = 0;
@@ -309,7 +311,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         int32_t nMeshes = 0;
         fileStream.read(reinterpret_cast<char*>(&nMeshes), sizeof(int32_t));
         if (nMeshes < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of meshes while loading cache: {}",
                 nMeshes
             );
@@ -320,6 +322,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         std::vector<io::ModelMesh> meshArray;
         meshArray.reserve(nMeshes);
         for (int32_t m = 0; m < nMeshes; ++m) {
+            // HasVertexColors
+            uint8_t col = 0;
+            fileStream.read(reinterpret_cast<char*>(&col), sizeof(uint8_t));
+            const bool hasVertexColors = (col == 1);
+
             // Vertices
             int32_t nVertices = 0;
             fileStream.read(reinterpret_cast<char*>(&nVertices), sizeof(int32_t));
@@ -350,19 +357,17 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                     "No indices were found while loading cache"
                 );
             }
-            std::vector<unsigned int> indexArray;
-            indexArray.reserve(nIndices);
-
-            for (int32_t i = 0; i < nIndices; ++i) {
-                uint32_t index;
-                fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
-                indexArray.push_back(index);
-            }
+            std::vector<uint32_t> indexArray;
+            indexArray.resize(nIndices);
+            fileStream.read(
+                reinterpret_cast<char*>(indexArray.data()),
+                nIndices * sizeof(uint32_t)
+            );
 
             // IsInvisible
-            uint8_t inv;
+            uint8_t inv = 0;
             fileStream.read(reinterpret_cast<char*>(&inv), sizeof(uint8_t));
-            bool isInvisible = (inv == 1);
+            const bool isInvisible = (inv == 1);
 
             // Textures
             int32_t nTextures = 0;
@@ -390,18 +395,18 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 fileStream.read(reinterpret_cast<char*>(&texture.type), sizeof(uint8_t));
 
                 // hasTexture
-                uint8_t h;
+                uint8_t h = 0;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
                 texture.hasTexture = (h == 1);
 
                 // color
-                fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.a), sizeof(float));
+                fileStream.read(
+                    reinterpret_cast<char*>(&texture.color.r),
+                    4 * sizeof(float)
+                );
 
                 // isTransparent
-                uint8_t isT;
+                uint8_t isT = 0;
                 fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
                 texture.isTransparent = (isT == 1);
 
@@ -409,7 +414,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 if (texture.hasTexture) {
                     // Read which index in the textureStorageArray that this texture
                     // should point to
-                    uint32_t index;
+                    uint32_t index = 0;
                     fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
 
                     if (index >= textureStorageArray.size()) {
@@ -439,12 +444,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Make mesh
-            meshArray.push_back(io::ModelMesh(
+            meshArray.emplace_back(
                 std::move(vertexArray),
                 std::move(indexArray),
                 std::move(textureArray),
-                isInvisible
-            ));
+                isInvisible,
+                hasVertexColors
+            );
         }
 
         // Transform
@@ -455,7 +461,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // AnimationTransform
         GLfloat rawAnimTransform[16];
         fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
-        glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
+        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
         int32_t parent = 0;
@@ -465,7 +471,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         int32_t nChildren = 0;
         fileStream.read(reinterpret_cast<char*>(&nChildren), sizeof(int32_t));
         if (nChildren < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of children while loading cache: {}",
                 nChildren
             );
@@ -473,18 +479,17 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // Children
-        std::vector<int> childrenArray;
-        nodeArray.reserve(nChildren);
-        for (int32_t c = 0; c < nChildren; ++c) {
-            int32_t child;
-            fileStream.read(reinterpret_cast<char*>(&child), sizeof(int32_t));
-            childrenArray.push_back(child);
-        }
+        std::vector<int32_t> childrenArray;
+        childrenArray.resize(nChildren);
+        fileStream.read(
+            reinterpret_cast<char*>(childrenArray.data()),
+            nChildren * sizeof(int32_t)
+        );
 
         // HasAnimation
-        uint8_t a;
+        uint8_t a = 0;
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
-        bool hasAnimation = (a == 1);
+        const bool hasAnimation = (a == 1);
 
         // Create Node
         io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
@@ -498,9 +503,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     }
 
     // Animation
-    uint8_t anim;
+    uint8_t anim = 0;
     fileStream.read(reinterpret_cast<char*>(&anim), sizeof(uint8_t));
-    bool hasAnimation = (anim == 1);
+    const bool hasAnimation = (anim == 1);
 
     if (hasAnimation) {
         // Name
@@ -510,10 +515,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             LINFO("No name was found for animation while loading cache");
         }
         std::string name;
+        name.resize(nameSize);
         fileStream.read(name.data(), nameSize * sizeof(char));
 
         // Duration
-        double duration;
+        double duration = 0.0;
         fileStream.read(reinterpret_cast<char*>(&duration), sizeof(double));
 
         // Read how many NodeAnimations to read
@@ -527,33 +533,30 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // NodeAnimations
-        std::unique_ptr<io::ModelAnimation> animation =
-            std::make_unique<io::ModelAnimation>(io::ModelAnimation(name, duration));
+        auto animation = std::make_unique<io::ModelAnimation>(name, duration);
         animation->nodeAnimations().reserve(nNodeAnimations);
         for (int32_t na = 0; na < nNodeAnimations; ++na) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
             // Node index
-            int32_t nodeIndex;
+            int32_t nodeIndex = 0;
             fileStream.read(reinterpret_cast<char*>(&nodeIndex), sizeof(int32_t));
             nodeAnimation.node = nodeIndex;
 
             // Positions
-            uint32_t nPos;
+            uint32_t nPos = 0;
             fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint32_t));
             nodeAnimation.positions.reserve(nPos);
             for (uint32_t p = 0; p < nPos; ++p) {
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                glm::vec3 pos = glm::vec3(1.0);
-                fileStream.read(reinterpret_cast<char*>(&pos.x), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&pos.y), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&pos.z), sizeof(float));
+                glm::vec3 pos = glm::vec3(1.f);
+                fileStream.read(reinterpret_cast<char*>(&pos.x), 3 * sizeof(float));
                 posKeyframe.position = pos;
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 posKeyframe.time = time;
 
@@ -561,22 +564,24 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Rotations
-            uint32_t nRot;
+            uint32_t nRot = 0;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
             for (uint32_t r = 0; r < nRot; ++r) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                float rotW, rotX, rotY, rotZ;
-                fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotY), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotZ), sizeof(float));
-                rotKeyframe.rotation = glm::quat(rotW, rotX, rotY, rotZ);
+                struct {
+                    float w = 0.f;
+                    float x = 0.f;
+                    float y = 0.f;
+                    float z = 0.f;
+                } rot;
+                fileStream.read(reinterpret_cast<char*>(&rot), 4 * sizeof(float));
+                rotKeyframe.rotation = glm::quat(rot.w, rot.x, rot.y, rot.z);
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 rotKeyframe.time = time;
 
@@ -584,7 +589,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             }
 
             // Scales
-            uint32_t nScale;
+            uint32_t nScale = 0;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
             for (uint32_t s = 0; s < nScale; ++s) {
@@ -592,13 +597,11 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 
                 // Scale
                 glm::vec3 scale = glm::vec3(1.f);
-                fileStream.read(reinterpret_cast<char*>(&scale.x), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scale.y), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scale.z), sizeof(float));
+                fileStream.read(reinterpret_cast<char*>(&scale.x), 3 * sizeof(float));
                 scaleKeyframe.scale = scale;
 
                 // Time
-                double time;
+                double time = 0.0;
                 fileStream.read(reinterpret_cast<char*>(&time), sizeof(double));
                 scaleKeyframe.time = time;
 
@@ -609,14 +612,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // _isTransparent
-        uint8_t isT;
+        uint8_t isT = 0;
         fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
-        bool isTransparent = (isT == 1);
+        const bool isTransparent = (isT == 1);
 
         // _hasCalcTransparency
-        uint8_t hasCalcT;
+        uint8_t hasCalcT = 0;
         fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
-        bool hasCalcTransparency = (hasCalcT == 1);
+        const bool hasCalcTransparency = (hasCalcT == 1);
 
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
@@ -629,14 +632,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     }
     else {
         // _isTransparent
-        uint8_t isT;
+        uint8_t isT = 0;
         fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
-        bool isTransparent = (isT == 1);
+        const bool isTransparent = (isT == 1);
 
         // _hasCalcTransparency
-        uint8_t hasCalcT;
+        uint8_t hasCalcT = 0;
         fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
-        bool hasCalcTransparency = (hasCalcT == 1);
+        const bool hasCalcTransparency = (hasCalcT == 1);
 
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
@@ -667,7 +670,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         LINFO("No TextureEntries were loaded while saving cache");
     }
     else if (nTextureEntries < 0) {
-        std::string message = fmt::format(
+        std::string message = std::format(
             "Model cannot have negative number of texture entries while saving cache: {}",
             nTextureEntries
         );
@@ -749,7 +752,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         // Write how many meshes are to be written
         int32_t nMeshes = static_cast<int32_t>(node.meshes().size());
         if (nMeshes < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of meshes while saving cache: {}",
                 nMeshes
             );
@@ -759,6 +762,10 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
         // Meshes
         for (const io::ModelMesh& mesh : node.meshes()) {
+            // HasVertexColors
+            uint8_t col = mesh.hasVertexColors() ? 1 : 0;
+            fileStream.write(reinterpret_cast<const char*>(&col), sizeof(uint8_t));
+
             // Vertices
             int32_t nVertices = static_cast<int32_t>(mesh.vertices().size());
             if (nVertices <= 0) {
@@ -786,7 +793,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             }
             fileStream.write(reinterpret_cast<const char*>(&nIndices), sizeof(int32_t));
 
-            for (int32_t i = 0; i < nIndices; ++i) {
+            for (int32_t i = 0; i < nIndices; i++) {
                 uint32_t index = static_cast<uint32_t>(mesh.indices()[i]);
                 fileStream.write(reinterpret_cast<const char*>(&index), sizeof(uint32_t));
             }
@@ -900,7 +907,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         // Write how many children are to be written
         int32_t nChildren = static_cast<int32_t>(node.children().size());
         if (nChildren < 0) {
-            std::string message = fmt::format(
+            std::string message = std::format(
                 "Model cannot have negative number of children while saving "
                 "cache: {}", nChildren
             );
@@ -926,7 +933,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     if (_animation != nullptr) {
         // Name
         if (_animation->name().size() >= std::numeric_limits<uint8_t>::max()) {
-            LWARNING(fmt::format(
+            LWARNING(std::format(
                 "A maximum animaion name length of {} is supported",
                 std::numeric_limits<uint8_t>::max()
             ));
@@ -965,7 +972,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
             // Positions
             if (nodeAnimation.positions.size() >= std::numeric_limits<uint32_t>::max()) {
-                LWARNING(fmt::format(
+                LWARNING(std::format(
                     "A maximum number of '{}' position keyframes are supported",
                     std::numeric_limits<uint32_t>::max())
                 );
@@ -999,7 +1006,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             // Rotations
             uint32_t nRot = static_cast<uint32_t>(nodeAnimation.rotations.size());
             if (nodeAnimation.rotations.size() >= std::numeric_limits<uint32_t>::max()) {
-                LWARNING(fmt::format(
+                LWARNING(std::format(
                     "A maximum number of '{}' rotation keyframes are supported",
                     std::numeric_limits<uint32_t>::max())
                 );
@@ -1036,7 +1043,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             // Scales
             uint32_t nScale = static_cast<uint32_t>(nodeAnimation.scales.size());
             if (nodeAnimation.scales.size() >= std::numeric_limits<uint32_t>::max()) {
-                LWARNING(fmt::format(
+                LWARNING(std::format(
                     "A maximum number of '{}' scale keyframes are supported",
                     std::numeric_limits<uint32_t>::max())
                 );
@@ -1084,12 +1091,14 @@ double ModelGeometry::boundingRadius() const {
 }
 
 void ModelGeometry::calculateBoundingRadius() {
+    ZoneScoped;
+
     if (_nodes.empty()) {
         LERROR("Cannot calculate bounding radius for empty geometry");
         return;
     }
 
-    glm::mat4x4 parentTransform = glm::mat4x4(1.f);
+    const glm::mat4x4 parentTransform = glm::mat4x4(1.f);
     float maximumDistanceSquared = 0.f;
     calculateBoundingRadiusRecursive(
         _nodes,
@@ -1115,6 +1124,8 @@ double ModelGeometry::animationDuration() const {
 }
 
 void ModelGeometry::calculateTransparency() {
+    ZoneScoped;
+
     if (_hasCalcTransparency) {
         return;
     }
@@ -1176,7 +1187,7 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedM
         return;
     }
 
-    glm::mat4x4 parentTransform = glm::mat4x4(1.f);
+    const glm::mat4x4 parentTransform = glm::mat4x4(1.f);
     renderRecursive(
         _nodes,
         _nodes.data(),
@@ -1233,4 +1244,4 @@ void ModelGeometry::deinitialize() {
     }
 }
 
-}  // namespace openspace::modelgeometry
+}  // namespace ghoul::modelgeometry

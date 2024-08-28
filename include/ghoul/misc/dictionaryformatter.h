@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,9 +33,9 @@ namespace ghoul {
 class Dictionary;
 
 /**
- * A DictionaryFormatter will take a Dictionary and convert it into an
- * `std::string`. The resulting format of the string will be determined by the
- * concrete implementation of the subclass.
+ * A DictionaryFormatter will take a Dictionary and convert it into an `std::string`.
+ * The resulting format of the string will be determined by the concrete implementation of
+ * the subclass.
  */
 class DictionaryFormatter {
 public:

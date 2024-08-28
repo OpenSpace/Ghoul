@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-// X11 #defines 'None' in its X.h header file. We don't want it here ---abock
+// X11 #defines 'None' in its X.h header file. We don't want it here
 #undef None
 
 #ifdef WIN32
@@ -60,15 +60,23 @@ class SystemCapabilitiesComponent {
 public:
     BooleanType(InitializeWMI);
 
-    /// The verbosity that is used in the #capabilities method
+    /**
+     * The verbosity that is used in the #capabilities method.
+     */
     enum class Verbosity {
-        None = 0, ///< No verbosity at all, discarding all information strings
-        Minimal, ///< The minimal verbosity presenting the absolute minimum information
-        Default, ///< The default verbosity
-        Full ///< Show all the available information
+        /// No verbosity at all, discarding all information strings
+        None = 0,
+        /// The minimal verbosity presenting the absolute minimum information
+        Minimal,
+        /// The default verbosity
+        Default,
+        /// Show all the available information
+        Full
     };
 
-    /// Each piece of capability information is represented by an information and a value
+    /**
+     * Each piece of capability information is represented by an information and a value.
+     */
     struct CapabilityInformation {
         /// The user-readable description of this capability
         std::string description;
@@ -129,8 +137,10 @@ public:
 
 protected:
 #ifdef WIN32
-    /// Exception that will be thrown if there was an error regarding Windows'
-    /// Management Instrumentation
+    /**
+     * Exception that will be thrown if there was an error regarding Windows' Management
+     * Instrumentation.
+     */
     struct WMIError : public ghoul::RuntimeError {
         explicit WMIError(std::string msg, long code);
 

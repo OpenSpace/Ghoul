@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,7 @@
 
 #include <ghoul/misc/easing.h>
 
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <array>
 #include <string_view>
 
@@ -53,12 +53,12 @@ std::string_view nameForEasingFunction(EasingFunction func) {
 }
 
 EasingFunction easingFunctionFromName(std::string_view name) {
-    for (size_t i = 0; i < EaseFuncNames.size(); ++i) {
+    for (size_t i = 0; i < EaseFuncNames.size(); i++) {
         if (EaseFuncNames[i] == name) {
             return EasingFunction(i);
         }
     }
-    throw std::invalid_argument(fmt::format(
+    throw std::invalid_argument(std::format(
         "Could not find easing function with name '{}'", name
     ));
 }

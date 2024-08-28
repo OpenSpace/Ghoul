@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,6 +27,7 @@
 #define __GHOUL___TEXTUREREADER___H__
 
 #include <ghoul/misc/exception.h>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -41,16 +42,19 @@ class TextureReaderBase;
  * This class manages multiple TextureReaderBase and makes them available through one
  * method loadTexture. TextureReaderBases are added through the method addReader. The
  * class provides a static member, but also allows users to create local variants.
- * TextureReaderBases can be reused between multiple TextureReaders
+ * TextureReaderBases can be reused between multiple TextureReaders.
+ *
+ * \see TextureReaderBase
  */
 class TextureReader {
 public:
     /// Exception that gets thrown when there is no reader for the provided \p extension
     struct MissingReaderException : public RuntimeError {
-        explicit MissingReaderException(std::string extension, std::string file);
+        explicit MissingReaderException(std::string extension,
+            std::filesystem::path file_);
 
         const std::string fileExtension;
-        const std::string file;
+        const std::filesystem::path file;
     };
 
     /// Exception that gets thrown when an invalid load result occurs
@@ -77,7 +81,7 @@ public:
      *        using this function. This parameter is necessary as it is not always
      *        possible to automatically detect this based on the image information. For
      *        example, someone might want to load a 128x1 texture but use it as a 2D
-     *        texture instead.
+     *        texture instead
      *
      * \throw TextureLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
@@ -87,7 +91,7 @@ public:
      * \pre At least one TextureReaderBase must have been added to the TextureReader
      *      before (addReader)
      */
-    std::unique_ptr<opengl::Texture> loadTexture(const std::string& filename,
+    std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
         int nDimensions);
 
     /**
@@ -104,11 +108,11 @@ public:
      *        using this function. This parameter is necessary as it is not always
      *        possible to automatically detect this based on the image information. For
      *        example, someone might want to load a 128x1 texture but use it as a 2D
-     *        texture instead.
+     *        texture instead
      * \param format The format of the image pointed to by \p memory. This parameter
      *        should be the same as the usual file extension for the image. However, this
      *        parameter is only used to determine which TextureReader is used for this
-     *        memory, if multiple readers are registered.
+     *        memory, if multiple readers are registered
      *
      * \throw TextureLoadException If there was an error reading the \p memory
      * \throw MissingReaderException If there was no reader for the specified \p filename

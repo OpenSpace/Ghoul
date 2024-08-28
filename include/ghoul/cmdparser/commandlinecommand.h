@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -178,22 +178,20 @@ protected:
     /**
      * Casts the string value \p s into the type `T`. If the conversion fails,
      * an CommandException is thrown. The conversion is done via an
-     * `std::stringstream` so it can only cast those types supported by the
-     * stream.
+     * `std::stringstream` so it can only cast those types supported by the stream.
      *
      * \tparam T The type of the value which should be converted
      * \param s The `std::string` representation of the value
      *
-     * \throws CommandException If the conversion failed
+     * \throw CommandException If the conversion failed
      * \pre \p s must not be empty
      */
     template <class T>
     T cast(const std::string& s) const;
 
     /**
-     * Checks if the string value \p s can be cast into the type `T`. It only
-     * returns `true` for those values that can be converted using an
-     * `std::stringstream`.
+     * Checks if the string value \p s can be cast into the type `T`. It only returns
+     * `true` for those values that can be converted using a `std::stringstream`.
      *
      * \tparam T The type of the value which should be converted
      * \param s The `std::string` representation of the value

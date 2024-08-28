@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -153,7 +153,7 @@ void convertTextureFormat(Texture& texture, Texture::Format newFormat) {
     std::memset(newData, 0, nChannelsNew * bytesPerChannel * nPixels);
 
     // Conversion
-    for (int i = 0; i < nPixels; ++i) {
+    for (int i = 0; i < nPixels; i++) {
         const char* oldPtr = oldData + i * bytesPerChannel * nChannelsOld;
         char* newPtr = newData + i * bytesPerChannel * nChannelsNew;
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -39,8 +39,8 @@ namespace ghoul::io {
 
 /**
  * Concrete instantiations of this abstract base class provide the ability to load
- * geometric models from a file on disk into a ModelGeometry.
- * A valid OpenGL context has to be present for the loadModel function.
+ * geometric models from a file on disk into a ModelGeometry. A valid OpenGL context has
+ * to be present for the loadModel function.
  */
 class ModelReaderBase {
 public:

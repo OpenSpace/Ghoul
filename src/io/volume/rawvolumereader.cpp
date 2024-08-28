@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,7 +26,7 @@
 #include <ghoul/io/volume/rawvolumereader.h>
 
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/fmt.h>
+#include <ghoul/format.h>
 #include <iostream>
 #include <fstream>
 
@@ -54,7 +54,7 @@ void RawVolumeReader::setReadHints(ReadHints hints) {
 
 std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filename) {
     if (_hints._dimensions == glm::ivec3(0)) {
-        LERROR(fmt::format("Volume dimensions not set for file {}", filename));
+        LERROR(std::format("Volume dimensions not set for file '{}'", filename));
         return nullptr;
     }
 
@@ -67,7 +67,7 @@ std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filena
         fin.close();
     }
     else {
-        LERROR(fmt::format("Could not open file {}", filename));
+        LERROR(std::format("Could not open file '{}'", filename));
     }
 
     return std::make_unique<opengl::Texture>(

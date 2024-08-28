@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #ifndef __GHOUL___STRINGCONVERSION___H__
 #define __GHOUL___STRINGCONVERSION___H__
 
+#include <format>
 #include <string>
 #include <string_view>
 
@@ -36,9 +37,10 @@ namespace ghoul {
  * conversion, a template specialization has to be created. This function is meant to be
  * analogous to the `std::to_string` function and should behave as such:
  *
- * `ghoul::to_string(ghoul::from_string(s)) == s`
- *
- * `ghoul::from_string(ghoul::to_string(v)) == v`
+ * ```
+ * ghoul::to_string(ghoul::from_string(s)) == s
+ * ghoul::from_string(ghoul::to_string(v)) == v
+ * ```
  */
 template <typename T>
 constexpr T from_string(std::string_view) {
@@ -49,17 +51,20 @@ constexpr T from_string(std::string_view) {
 
 /**
  * Converts the passed \p value to its string representation. The default implementation
- * calls the `std::to_string` function. User-defined types are supported by
- * creating a specialization of this function.
+ * calls the `std::to_string` function. User-defined types are supported by creating a
+ * specialization of this function.
  */
 template <typename T>
 std::string to_string(const T& value) {
+    // (2024-03-24, abock)  I think we can probably get rid of this function by now and
+    // replace it with std::formatter overloads
+
     // std::string does not define the identity transformation so we have to handle that
     if constexpr (std::is_same_v<T, std::string>) {
         return value;
     }
     else {
-        return std::to_string(value);
+        return std::format("{}", value);
     }
 }
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,13 +25,13 @@
 
 #include <ghoul/font/fontrenderer.h>
 
-#include <ghoul/fmt.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/font/font.h>
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/misc/misc.h>
 #include <ghoul/misc/profiling.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureatlas.h>
@@ -43,15 +43,6 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "FontRenderer";
-
-    constexpr std::array<const char*, 5> UniformNames = {
-        "baseColor", "outlineColor", "tex", "hasOutline", "projection"
-    };
-
-    constexpr std::array<const char*, 7> UniformNamesProjection = {
-        "baseColor", "outlineColor", "tex", "hasOutline", "modelViewTransform",
-        "enableFalseDepth", "disableTransmittance"
-    };
 
     constexpr std::string_view DefaultVertexShaderPath =
         "${TEMPORARY}/defaultfontrenderer_vs.glsl";
@@ -186,15 +177,15 @@ namespace {
     // Extracts the next line from the string view and returns it, the passed string_view
     // is modified to remove the new line *and* the \n character
     std::string_view extractLine(std::string_view& view) {
-        std::string_view::size_type p = view.find('\n');
+        const std::string_view::size_type p = view.find('\n');
         if (p == std::string_view::npos) {
             // No new line found
-            std::string_view res = view;
+            const std::string_view res = view;
             view = std::string_view();
             return res;
         }
 
-        std::string_view res = view.substr(0, p);
+        const std::string_view res = view.substr(0, p);
         view = view.substr(p + 1);
         return res;
     }
@@ -318,20 +309,20 @@ FontRenderer::~FontRenderer() {
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     std::filesystem::path vsPath = absPath(DefaultVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
+        LDEBUG(std::format("Skipping creation of existing vertex shader '{}'", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default vertex shader to {}", vsPath));
+        LDEBUG(std::format("Writing default vertex shader to '{}'", vsPath));
         std::ofstream file(vsPath);
         file << DefaultVertexShaderSource;
     }
 
     std::filesystem::path fsPath = absPath(DefaultFragmentShaderPath);
     if (std::filesystem::is_regular_file(fsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", fsPath));
+        LDEBUG(std::format("Skipping creation of existing fragment shader '{}'", fsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default fragment shader to {}", fsPath));
+        LDEBUG(std::format("Writing default fragment shader to '{}'", fsPath));
         std::ofstream file(fsPath);
         file << DefaultFragmentShaderSource;
     }
@@ -351,27 +342,27 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     program->linkProgramObject();
 
     auto fr = std::make_unique<FontRenderer>(std::move(program), glm::vec2(0.f));
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache, UniformNames);
+    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache);
     return fr;
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
     std::filesystem::path vsPath = absPath(ProjectionVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing vertex shader {}", vsPath));
+        LDEBUG(std::format("Skipping creation of existing vertex shader '{}'", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default vertex shader to {}", vsPath));
+        LDEBUG(std::format("Writing default vertex shader to '{}'", vsPath));
         std::ofstream file(vsPath);
         file << ProjectionVertexShaderSource;
     }
 
     std::filesystem::path fsPath = absPath(ProjectionFragmentShaderPath);
     if (std::filesystem::is_regular_file(fsPath)) {
-        LDEBUG(fmt::format("Skipping creation of existing fragment shader {}", vsPath));
+        LDEBUG(std::format("Skipping creation of existing fragment shader '{}'", vsPath));
     }
     else {
-        LDEBUG(fmt::format("Writing default fragment shader to {}", fsPath));
+        LDEBUG(std::format("Writing default fragment shader to '{}'", fsPath));
         std::ofstream file(fsPath);
         file << ProjectionFragmentShaderSource;
     }
@@ -392,11 +383,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
 
     // Can't create a unique_ptr directly here as the FontRenderer is not private
     auto fr = std::make_unique<FontRenderer>(std::move(pg), glm::vec2(0.f));
-    ghoul::opengl::updateUniformLocations(
-        *fr->_program,
-        fr->_uniformCacheProjection,
-        UniformNamesProjection
-    );
+    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection);
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
     return fr;
 }
@@ -465,11 +452,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glm::vec2 size = glm::vec2(0.f);
     glm::vec2 movingPos = pos;
     do {
-        std::string_view line = extractLine(text);
+        const std::string_view line = extractLine(text);
         movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
-        for (size_t j = 0; j < line.size(); ++j) {
+        for (size_t j = 0; j < line.size(); j++) {
             wchar_t character = line[j];
             if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
@@ -527,7 +514,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     _program->setUniform(_uniformCache.baseColor, color);
     _program->setUniform(_uniformCache.outlineColor, outlineColor);
-    _program->setUniform(_uniformCache.texture, atlasUnit);
+    _program->setUniform(_uniformCache.tex, atlasUnit);
     _program->setUniform(_uniformCache.hasOutline, font.hasOutline());
     _program->setUniform(
         _uniformCache.projection,
@@ -573,7 +560,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                               const ProjectedLabelsInformation& labelInfo,
                                                             const glm::vec2& offset) const
 {
-    float h = font.height();
+    const float h = font.height();
 
     _vertexBuffer.clear();
     _indexBuffer.clear();
@@ -586,12 +573,12 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     glm::vec2 size = glm::vec2(0.f);
     float heightInPixels = 0.f;
     do {
-        std::string_view line = extractLine(text);
+        const std::string_view line = extractLine(text);
         //movingPos.x = 0.f;
         //movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
-        for (size_t j = 0; j < line.size(); ++j) {
+        for (size_t j = 0; j < line.size(); j++) {
             wchar_t character = line[j];
             if (character == wchar_t('\t')) {
                 character = wchar_t(' ');
@@ -602,19 +589,19 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 movingPos.x += glyph->kerning(line[j - 1]);
             }
 
-            float x0 = movingPos.x + glyph->leftBearing;
-            float y0 = movingPos.y + glyph->topBearing;
-            float s0 = glyph->topLeft.x;
-            float t0 = glyph->topLeft.y;
-            float outlineS0 = glyph->outlineTopLeft.x;
-            float outlineT0 = glyph->outlineTopLeft.y;
+            const float x0 = movingPos.x + glyph->leftBearing;
+            const float y0 = movingPos.y + glyph->topBearing;
+            const float s0 = glyph->topLeft.x;
+            const float t0 = glyph->topLeft.y;
+            const float outlineS0 = glyph->outlineTopLeft.x;
+            const float outlineT0 = glyph->outlineTopLeft.y;
 
-            float x1 = x0 + glyph->width;
-            float y1 = y0 - glyph->height;
-            float s1 = glyph->bottomRight.x;
-            float t1 = glyph->bottomRight.y;
-            float outlineS1 = glyph->outlineBottomRight.x;
-            float outlineT1 = glyph->outlineBottomRight.y;
+            const float x1 = x0 + glyph->width;
+            const float y1 = y0 - glyph->height;
+            const float s1 = glyph->bottomRight.x;
+            const float t1 = glyph->bottomRight.y;
+            const float outlineS1 = glyph->outlineBottomRight.x;
+            const float outlineT1 = glyph->outlineBottomRight.y;
 
             glm::vec3 p0;
             glm::vec3 p1;
@@ -632,9 +619,13 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                     labelInfo.scale + pos;
             }
             else {
-                glm::dvec3 normal = glm::normalize(labelInfo.cameraPos - glm::dvec3(pos));
-                glm::vec3 right = glm::vec3(glm::cross(labelInfo.cameraLookUp, normal));
-                glm::vec3 up = glm::vec3(glm::cross(normal, glm::dvec3(right)));
+                const glm::dvec3 normal = glm::normalize(
+                    labelInfo.cameraPos - glm::dvec3(pos)
+                );
+                const glm::vec3 right = glm::vec3(
+                    glm::cross(labelInfo.cameraLookUp, normal)
+                );
+                const glm::vec3 up = glm::vec3(glm::cross(normal, glm::dvec3(right)));
 
                 p0 = (x0 * right + y0 * up) * labelInfo.scale + pos;
                 p1 = (x0 * right + y1 * up) * labelInfo.scale + pos;
@@ -643,7 +634,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             }
 
 
-            glm::vec4 projPos[2] = {
+            std::array<glm::vec4, 2> projPos = {
                 glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p0, 1.0)),
                 glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p1, 1.0))
             };
@@ -669,7 +660,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             }
 
             if (heightInPixels > labelInfo.maxSize) {
-                float scaleFix = static_cast<float>(labelInfo.maxSize) / heightInPixels;
+                const float scaleFix =
+                    static_cast<float>(labelInfo.maxSize) / heightInPixels;
                 if (labelInfo.renderType == 0) {
                     p0 = (x0 * labelInfo.orthoRight + y0 * labelInfo.orthoUp) *
                         labelInfo.scale * scaleFix + pos;
@@ -733,7 +725,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     _program->setUniform(_uniformCacheProjection.baseColor, color);
     _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
-    _program->setUniform(_uniformCacheProjection.texture, atlasUnit);
+    _program->setUniform(_uniformCacheProjection.tex, atlasUnit);
     _program->setUniform(_uniformCacheProjection.hasOutline, font.hasOutline());
     _program->setUniform(_uniformMvp, labelInfo.mvpMatrix);
     _program->setUniform(
@@ -812,7 +804,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
                      const glm::vec4& outlineColor)
 {
     using FR = ghoul::fontrendering::FontRenderer;
-    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+    const FR::BoundingBoxInformation res = FR::defaultRenderer().render(
         font,
         pos,
         text,
@@ -838,7 +830,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
                      const glm::vec4& outlineColor)
 {
     using FR = ghoul::fontrendering::FontRenderer;
-    FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+    const FR::BoundingBoxInformation res = FR::defaultRenderer().render(
         font,
         pos,
         text,

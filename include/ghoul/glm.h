@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #ifndef __GHOUL___GLM___H__
 #define __GHOUL___GLM___H__
 
+#include <ghoul/format.h>
 #include <ghoul/misc/stringconversion.h>
 
 #ifdef __APPLE__
@@ -75,15 +76,6 @@ namespace {
     struct is_any : std::disjunction<std::is_same<T, Ts>...> {};
 } // namespace
 
-namespace glm {
-
-template <typename genType>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR genType tau() {
-    return genType(6.28318530717958647692528676655900576);
-}
-
-} // namespace glm
-
 namespace ghoul {
 
 template <typename T>
@@ -118,8 +110,8 @@ constexpr bool isGlmVector() {
 }
 
 /**
- * Compute a quaternion that represents the rotation looking from \p eye to
- * \p target, with the specified \p up direction
+ * Compute a quaternion that represents the rotation looking from \p eye to \p target,
+ * with the specified \p up direction.
  */
 template <typename valType>
 glm::tquat<valType> lookAtQuaternion(const glm::tvec3<valType> eye,
@@ -131,8 +123,8 @@ glm::tquat<valType> lookAtQuaternion(const glm::tvec3<valType> eye,
 }
 
 /**
- * Check if quaternion \p q1 and \p q2 represent the same spatial orientation.
- * The precision of the check can be controlled using the \p precision parameter
+ * Check if quaternion \p q1 and \p q2 represent the same spatial orientation. The
+ * precision of the check can be controlled using the \p precision parameter.
  */
 template <typename valType>
 bool isSameOrientation(const glm::tquat<valType> q1, const glm::tquat<valType> q2,
@@ -142,7 +134,7 @@ bool isSameOrientation(const glm::tquat<valType> q1, const glm::tquat<valType> q
 }
 
 /**
- * Compute a view direction vector from a quaternion representing a rotation
+ * Compute a view direction vector from a quaternion representing a rotation.
  */
 inline glm::dvec3 viewDirection(const glm::dquat& q) {
     return glm::normalize(q * glm::dvec3(0.0, 0.0, -1.0));
@@ -193,418 +185,893 @@ glm::tmat4x3<valType> createFillMat4x3(valType v) {
     return glm::tmat4x3<valType>(v, v, v, v, v, v, v, v, v, v, v, v);
 }
 
-inline std::string to_string(const glm::bvec2& _Val) {
-    return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
-}
-
-inline std::string to_string(const glm::bvec3& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "}";
-}
-
-inline std::string to_string(const glm::bvec4& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "," +
-        std::to_string(_Val.w) + "}";
-}
-
-inline std::string to_string(const glm::vec2& _Val) {
-    return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
-}
-
-inline std::string to_string(const glm::vec3& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "}";
-}
-
-inline std::string to_string(const glm::vec4& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "," +
-        std::to_string(_Val.w) + "}";
-}
-
-inline std::string to_string(const glm::quat& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "," +
-        std::to_string(_Val.w) + "}";
-}
-
-inline std::string to_string(const glm::dvec2& _Val) {
-    return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
-}
-
-inline std::string to_string(const glm::dvec3& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "}";
-}
-
-inline std::string to_string(const glm::dvec4& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "," +
-        std::to_string(_Val.w) + "}";
-}
-
-inline std::string to_string(const glm::dquat& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "," +
-        std::to_string(_Val.w) + "}";
-}
-
-inline std::string to_string(const glm::ivec2& _Val) {
-    return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
-}
-
-inline std::string to_string(const glm::ivec3& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "}";
-}
-
-inline std::string to_string(const glm::ivec4& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "," +
-        std::to_string(_Val.w) + "}";
-}
-
-inline std::string to_string(const glm::uvec2& _Val) {
-    return "{" + std::to_string(_Val.x) + "," + std::to_string(_Val.y) + "}";
-}
-
-inline std::string to_string(const glm::uvec3& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "}";
-}
-
-inline std::string to_string(const glm::uvec4& _Val) {
-    return "{" +
-        std::to_string(_Val.x) + "," +
-        std::to_string(_Val.y) + "," +
-        std::to_string(_Val.z) + "," +
-        std::to_string(_Val.w) + "}";
-}
-
-inline std::string to_string(const glm::mat2& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "}";
-}
-
-inline std::string to_string(const glm::mat2x3& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "}";
-}
-
-inline std::string to_string(const glm::mat2x4& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[0].w) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[1].w) + "}";
-}
-
-inline std::string to_string(const glm::mat3x2& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "}";
-}
-
-inline std::string to_string(const glm::mat3& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "}";
-}
-
-inline std::string to_string(const glm::mat3x4& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[0].w) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[1].w) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "," +
-        std::to_string(_Val[2].w) + "}";
-}
-
-inline std::string to_string(const glm::mat4x2& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[3].x) + "," +
-        std::to_string(_Val[3].y) + "}";
-}
-
-inline std::string to_string(const glm::mat4x3& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "," +
-        std::to_string(_Val[3].x) + "," +
-        std::to_string(_Val[3].y) + "," +
-        std::to_string(_Val[3].z) + "}";
-}
-
-inline std::string to_string(const glm::mat4& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[0].w) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[1].w) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "," +
-        std::to_string(_Val[2].w) + "," +
-        std::to_string(_Val[3].x) + "," +
-        std::to_string(_Val[3].y) + "," +
-        std::to_string(_Val[3].z) + "," +
-        std::to_string(_Val[3].w) + "}";
-}
-
-inline std::string to_string(const glm::dmat2& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "}";
-}
-
-inline std::string to_string(const glm::dmat2x3& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "}";
-}
-
-inline std::string to_string(const glm::dmat2x4& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[0].w) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[1].w) + "}";
-}
-
-inline std::string to_string(const glm::dmat3x2& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "}";
-}
-
-inline std::string to_string(const glm::dmat3& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "}";
-}
-
-inline std::string to_string(const glm::dmat3x4& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[0].w) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[1].w) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "," +
-        std::to_string(_Val[2].w) + "}";
-}
-
-inline std::string to_string(const glm::dmat4x2& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[3].x) + "," +
-        std::to_string(_Val[3].y) + "}";
-}
-
-inline std::string to_string(const glm::dmat4x3& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "," +
-        std::to_string(_Val[3].x) + "," +
-        std::to_string(_Val[3].y) + "," +
-        std::to_string(_Val[3].z) + "}";
-}
-
-inline std::string to_string(const glm::dmat4& _Val) {
-    return "{" +
-        std::to_string(_Val[0].x) + "," +
-        std::to_string(_Val[0].y) + "," +
-        std::to_string(_Val[0].z) + "," +
-        std::to_string(_Val[0].w) + "," +
-        std::to_string(_Val[1].x) + "," +
-        std::to_string(_Val[1].y) + "," +
-        std::to_string(_Val[1].z) + "," +
-        std::to_string(_Val[1].w) + "," +
-        std::to_string(_Val[2].x) + "," +
-        std::to_string(_Val[2].y) + "," +
-        std::to_string(_Val[2].z) + "," +
-        std::to_string(_Val[2].w) + "," +
-        std::to_string(_Val[3].x) + "," +
-        std::to_string(_Val[3].y) + "," +
-        std::to_string(_Val[3].z) + "," +
-        std::to_string(_Val[3].w) + "}";
-}
-
 } // namespace ghoul
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tvec2<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+template <>
+struct std::formatter<glm::bvec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tvec3<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+    auto format(const glm::bvec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tvec4<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+template <>
+struct std::formatter<glm::bvec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat2x2<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+    auto format(const glm::bvec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat2x3<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+template <>
+struct std::formatter<glm::bvec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat2x4<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+    auto format(const glm::bvec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat3x2<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+template <>
+struct std::formatter<glm::vec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat3x3<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+    auto format(const glm::vec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat3x4<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+template <>
+struct std::formatter<glm::vec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat4x2<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+    auto format(const glm::vec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat4x3<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+template <>
+struct std::formatter<glm::vec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tmat4x4<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+    auto format(const glm::vec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
 
-template <typename T, glm::precision P>
-std::ostream& operator<<(std::ostream& out, const glm::tquat<T, P>& val) {
-    return out << ghoul::to_string(val);
-}
+template <>
+struct std::formatter<glm::quat> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
 
+    auto format(const glm::quat& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dvec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dvec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::dvec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dvec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::dvec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dvec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dquat> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dquat& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::ivec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::ivec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::ivec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::ivec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::ivec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::ivec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::uvec2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::uvec2& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{}}}", _val.x, _val.y);
+    }
+};
+
+template <>
+struct std::formatter<glm::uvec3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::uvec3& _val, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "{{{},{},{}}}", _val.x, _val.y, _val.z);
+    }
+};
+
+template <>
+struct std::formatter<glm::uvec4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::uvec4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val.x, _val.y, _val.z, _val.w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val[0].x, _val[0].y, _val[1].x, _val[1].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat2x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat2x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[1].x, _val[1].y, _val[1].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat2x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat2x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat3x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat3x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[1].x, _val[1].y, _val[2].x, _val[2].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat3x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat3x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat4x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat4x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y,
+            _val[1].x, _val[1].y,
+            _val[2].x, _val[2].y,
+            _val[3].x, _val[3].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat4x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat4x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z,
+            _val[3].x, _val[3].y, _val[3].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::mat4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w,
+            _val[3].x, _val[3].y, _val[3].z, _val[3].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{}}}", _val[0].x, _val[0].y, _val[1].x, _val[1].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat2x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat2x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[1].x, _val[1].y, _val[1].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat2x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat2x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat3x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat3x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[1].x, _val[1].y, _val[2].x, _val[2].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat3x4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat3x4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat4x2> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat4x2& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y,
+            _val[1].x, _val[1].y,
+            _val[2].x, _val[2].y,
+            _val[3].x, _val[3].y
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat4x3> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat4x3& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z,
+            _val[1].x, _val[1].y, _val[1].z,
+            _val[2].x, _val[2].y, _val[2].z,
+            _val[3].x, _val[3].y, _val[3].z
+        );
+    }
+};
+
+template <>
+struct std::formatter<glm::dmat4> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::dmat4& _val, std::format_context& ctx) const {
+        return std::format_to(
+            ctx.out(),
+            "{{{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}}}",
+            _val[0].x, _val[0].y, _val[0].z, _val[0].w,
+            _val[1].x, _val[1].y, _val[1].z, _val[1].w,
+            _val[2].x, _val[2].y, _val[2].z, _val[2].w,
+            _val[3].x, _val[3].y, _val[3].z, _val[3].w
+        );
+    }
+};
+
+
+
+
+
+template <>
+struct std::less<glm::vec2> {
+    bool operator()(const glm::vec2& a, const glm::vec2& b) const {
+        return a.x < b.x && a.x < b.y;
+    }
+};
+
+template <>
+struct std::less<glm::vec3> {
+    bool operator()(const glm::vec3& a, const glm::vec3& b) const {
+        return a.x < b.x && a.x < b.y && a.z < b.z;
+    }
+};
+
+template <>
+struct std::less<glm::vec4> {
+    bool operator()(const glm::vec4& a, const glm::vec4& b) const {
+        return a.x < b.x && a.x < b.y && a.z < b.z && a.w < b.w;
+    }
+};
+
+template <>
+struct std::less<glm::ivec2> {
+    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+        return a.x < b.x && a.x < b.y;
+    }
+};
+
+template <>
+struct std::less<glm::ivec3> {
+    bool operator()(const glm::ivec3& a, const glm::ivec3& b) const {
+        return a.x < b.x && a.x < b.y && a.z < b.z;
+    }
+};
+
+template <>
+struct std::less<glm::ivec4> {
+    bool operator()(const glm::ivec4& a, const glm::ivec4& b) const {
+        return a.x < b.x && a.x < b.y && a.z < b.z && a.w < b.w;
+    }
+};
+
+template <>
+struct std::less<glm::dvec2> {
+    bool operator()(const glm::dvec2& a, const glm::dvec2& b) const {
+        return a.x < b.x && a.x < b.y;
+    }
+};
+
+template <>
+struct std::less<glm::dvec3> {
+    bool operator()(const glm::dvec3& a, const glm::dvec3& b) const {
+        return a.x < b.x && a.x < b.y && a.z < b.z;
+    }
+};
+
+template <>
+struct std::less<glm::dvec4> {
+    bool operator()(const glm::dvec4& a, const glm::dvec4& b) const {
+        return a.x < b.x && a.x < b.y && a.z < b.z && a.w < b.w;
+    }
+};
+
+template <>
+struct std::less_equal<glm::vec2> {
+    bool operator()(const glm::vec2& a, const glm::vec2& b) const {
+        return a.x <= b.x && a.x <= b.y;
+    }
+};
+
+template <>
+struct std::less_equal<glm::vec3> {
+    bool operator()(const glm::vec3& a, const glm::vec3& b) const {
+        return a.x <= b.x && a.x <= b.y && a.z <= b.z;
+    }
+};
+
+template <>
+struct std::less_equal<glm::vec4> {
+    bool operator()(const glm::vec4& a, const glm::vec4& b) const {
+        return a.x <= b.x && a.x <= b.y && a.z <= b.z && a.w <= b.w;
+    }
+};
+
+template <>
+struct std::less_equal<glm::ivec2> {
+    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+        return a.x <= b.x && a.x <= b.y;
+    }
+};
+
+template <>
+struct std::less_equal<glm::ivec3> {
+    bool operator()(const glm::ivec3& a, const glm::ivec3& b) const {
+        return a.x <= b.x && a.x <= b.y && a.z <= b.z;
+    }
+};
+
+template <>
+struct std::less_equal<glm::ivec4> {
+    bool operator()(const glm::ivec4& a, const glm::ivec4& b) const {
+        return a.x <= b.x && a.x <= b.y && a.z <= b.z && a.w <= b.w;
+    }
+};
+
+template <>
+struct std::less_equal<glm::dvec2> {
+    bool operator()(const glm::dvec2& a, const glm::dvec2& b) const {
+        return a.x <= b.x && a.x <= b.y;
+    }
+};
+
+template <>
+struct std::less_equal<glm::dvec3> {
+    bool operator()(const glm::dvec3& a, const glm::dvec3& b) const {
+        return a.x <= b.x && a.x <= b.y && a.z <= b.z;
+    }
+};
+
+template <>
+struct std::less_equal<glm::dvec4> {
+    bool operator()(const glm::dvec4& a, const glm::dvec4& b) const {
+        return a.x <= b.x && a.x <= b.y && a.z <= b.z && a.w <= b.w;
+    }
+};
+
+template <>
+struct std::greater<glm::vec2> {
+    bool operator()(const glm::vec2& a, const glm::vec2& b) const {
+        return a.x > b.x && a.x > b.y;
+    }
+};
+
+template <>
+struct std::greater<glm::vec3> {
+    bool operator()(const glm::vec3& a, const glm::vec3& b) const {
+        return a.x > b.x && a.x > b.y && a.z > b.z;
+    }
+};
+
+template <>
+struct std::greater<glm::vec4> {
+    bool operator()(const glm::vec4& a, const glm::vec4& b) const {
+        return a.x > b.x && a.x > b.y && a.z > b.z && a.w > b.w;
+    }
+};
+
+template <>
+struct std::greater<glm::ivec2> {
+    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+        return a.x > b.x && a.x > b.y;
+    }
+};
+
+template <>
+struct std::greater<glm::ivec3> {
+    bool operator()(const glm::ivec3& a, const glm::ivec3& b) const {
+        return a.x > b.x && a.x > b.y && a.z > b.z;
+    }
+};
+
+template <>
+struct std::greater<glm::ivec4> {
+    bool operator()(const glm::ivec4& a, const glm::ivec4& b) const {
+        return a.x > b.x && a.x > b.y && a.z > b.z && a.w > b.w;
+    }
+};
+
+template <>
+struct std::greater<glm::dvec2> {
+    bool operator()(const glm::dvec2& a, const glm::dvec2& b) const {
+        return a.x > b.x && a.x > b.y;
+    }
+};
+
+template <>
+struct std::greater<glm::dvec3> {
+    bool operator()(const glm::dvec3& a, const glm::dvec3& b) const {
+        return a.x > b.x && a.x > b.y && a.z > b.z;
+    }
+};
+
+template <>
+struct std::greater<glm::dvec4> {
+    bool operator()(const glm::dvec4& a, const glm::dvec4& b) const {
+        return a.x > b.x && a.x > b.y && a.z > b.z && a.w > b.w;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::vec2> {
+    bool operator()(const glm::vec2& a, const glm::vec2& b) const {
+        return a.x >= b.x && a.x >= b.y;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::vec3> {
+    bool operator()(const glm::vec3& a, const glm::vec3& b) const {
+        return a.x >= b.x && a.x >= b.y && a.z >= b.z;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::vec4> {
+    bool operator()(const glm::vec4& a, const glm::vec4& b) const {
+        return a.x >= b.x && a.x >= b.y && a.z >= b.z && a.w >= b.w;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::ivec2> {
+    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+        return a.x >= b.x && a.x >= b.y;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::ivec3> {
+    bool operator()(const glm::ivec3& a, const glm::ivec3& b) const {
+        return a.x >= b.x && a.x >= b.y && a.z >= b.z;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::ivec4> {
+    bool operator()(const glm::ivec4& a, const glm::ivec4& b) const {
+        return a.x >= b.x && a.x >= b.y && a.z >= b.z && a.w >= b.w;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::dvec2> {
+    bool operator()(const glm::dvec2& a, const glm::dvec2& b) const {
+        return a.x >= b.x && a.x >= b.y;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::dvec3> {
+    bool operator()(const glm::dvec3& a, const glm::dvec3& b) const {
+        return a.x >= b.x && a.x >= b.y && a.z >= b.z;
+    }
+};
+
+template <>
+struct std::greater_equal<glm::dvec4> {
+    bool operator()(const glm::dvec4& a, const glm::dvec4& b) const {
+        return a.x >= b.x && a.x >= b.y && a.z >= b.z && a.w >= b.w;
+    }
+};
+
+template <>
+struct std::equal_to<glm::vec2> {
+    bool operator()(const glm::vec2& a, const glm::vec2& b) const {
+        return a.x == b.x && a.x == b.y;
+    }
+};
+
+template <>
+struct std::equal_to<glm::vec3> {
+    bool operator()(const glm::vec3& a, const glm::vec3& b) const {
+        return a.x == b.x && a.x == b.y && a.z == b.z;
+    }
+};
+
+template <>
+struct std::equal_to<glm::vec4> {
+    bool operator()(const glm::vec4& a, const glm::vec4& b) const {
+        return a.x == b.x && a.x == b.y && a.z == b.z && a.w == b.w;
+    }
+};
+
+template <>
+struct std::equal_to<glm::ivec2> {
+    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+        return a.x == b.x && a.x == b.y;
+    }
+};
+
+template <>
+struct std::equal_to<glm::ivec3> {
+    bool operator()(const glm::ivec3& a, const glm::ivec3& b) const {
+        return a.x == b.x && a.x == b.y && a.z == b.z;
+    }
+};
+
+template <>
+struct std::equal_to<glm::ivec4> {
+    bool operator()(const glm::ivec4& a, const glm::ivec4& b) const {
+        return a.x == b.x && a.x == b.y && a.z == b.z && a.w == b.w;
+    }
+};
+
+template <>
+struct std::equal_to<glm::dvec2> {
+    bool operator()(const glm::dvec2& a, const glm::dvec2& b) const {
+        return a.x == b.x && a.x == b.y;
+    }
+};
+
+template <>
+struct std::equal_to<glm::dvec3> {
+    bool operator()(const glm::dvec3& a, const glm::dvec3& b) const {
+        return a.x == b.x && a.x == b.y && a.z == b.z;
+    }
+};
+
+template <>
+struct std::equal_to<glm::dvec4> {
+    bool operator()(const glm::dvec4& a, const glm::dvec4& b) const {
+        return a.x == b.x && a.x == b.y && a.z == b.z && a.w == b.w;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::vec2> {
+    bool operator()(const glm::vec2& a, const glm::vec2& b) const {
+        return a.x != b.x && a.x != b.y;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::vec3> {
+    bool operator()(const glm::vec3& a, const glm::vec3& b) const {
+        return a.x != b.x && a.x != b.y && a.z != b.z;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::vec4> {
+    bool operator()(const glm::vec4& a, const glm::vec4& b) const {
+        return a.x != b.x && a.x != b.y && a.z != b.z && a.w != b.w;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::ivec2> {
+    bool operator()(const glm::ivec2& a, const glm::ivec2& b) const {
+        return a.x != b.x && a.x != b.y;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::ivec3> {
+    bool operator()(const glm::ivec3& a, const glm::ivec3& b) const {
+        return a.x != b.x && a.x != b.y && a.z != b.z;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::ivec4> {
+    bool operator()(const glm::ivec4& a, const glm::ivec4& b) const {
+        return a.x != b.x && a.x != b.y && a.z != b.z && a.w != b.w;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::dvec2> {
+    bool operator()(const glm::dvec2& a, const glm::dvec2& b) const {
+        return a.x != b.x && a.x != b.y;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::dvec3> {
+    bool operator()(const glm::dvec3& a, const glm::dvec3& b) const {
+        return a.x != b.x && a.x != b.y && a.z != b.z;
+    }
+};
+
+template <>
+struct std::not_equal_to<glm::dvec4> {
+    bool operator()(const glm::dvec4& a, const glm::dvec4& b) const {
+        return a.x != b.x && a.x != b.y && a.z != b.z && a.w != b.w;
+    }
+};
 
 #ifdef __APPLE__
 #pragma clang diagnostic pop

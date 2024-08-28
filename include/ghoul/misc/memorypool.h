@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -56,6 +56,7 @@ public:
  * blocks can be requested. The MemoryPool is organized into multiple separate buckets
  * with a specific size. The number of buckets in the MemoryPool will increase until the
  * MemoryPool is destroyed or the reset method is called.
+ *
  * OBS: If the MemoryPool is destroyed, all memory that was returned from the alloc method
  *      is freed, but if the memory was used to create objects, their destructors are not
  *      called.
@@ -69,7 +70,7 @@ public:
 
     /**
      * Creates the MemoryBool with the specified number of buckets already created
-
+     *
      * \param nBuckets the number of buckets that should be created at creation time
      */
     MemoryPool(int nBuckets = 1);
@@ -97,7 +98,7 @@ public:
     template <typename T, class... Types>
     T* alloc(Types&&... args);
 
-    virtual void* do_allocate(std::size_t bytes, std::size_t alignment) final;
+    virtual void* do_allocate(size_t bytes, size_t alignment) final;
     virtual void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
     virtual bool do_is_equal(const pmr::memory_resource& other) const noexcept final;
 
@@ -115,8 +116,10 @@ public:
 
 private:
     struct Bucket {
-        size_t usage = 0; ///< The number of bytes that have been used in this Bucket
-        std::array<std::byte, BucketSize> payload; ///< The bucket's data storage
+        /// The number of bytes that have been used in this Bucket
+        size_t usage = 0;
+        /// The bucket's data storage
+        std::array<std::byte, BucketSize> payload;
     };
 
     struct EmptyPair {
@@ -125,8 +128,10 @@ private:
     };
     std::vector<EmptyPair> _emptyList;
 
-    std::vector<std::unique_ptr<Bucket>> _buckets; ///< The number of allocated buckets
-    const int _originalBucketSize; ///< The original desired number of buckets
+    /// The number of allocated buckets
+    std::vector<std::unique_ptr<Bucket>> _buckets;
+    /// The original desired number of buckets
+    const int _originalBucketSize;
 };
 
 /**
@@ -141,7 +146,7 @@ template <typename T, int BucketSizeItems = 128, bool InjectDebugMemory = false>
 class ReusableTypedMemoryPool {
 public:
     /**
-     * Creates the MemoryBool with the specified number of buckets already created
+     * Creates the MemoryBool with the specified number of buckets already created.
      *
      * \param nBuckets the number of buckets that should be created at creation time
      */
@@ -166,7 +171,6 @@ public:
      * instance of T.
      *
      * \param n The number of Ts that determine the size of the reserved memory block
-     *
      * \return A list of pointers that each are big enough to hold a single T. These are
      *         not guaranteed to be contiguous.
      */
@@ -186,12 +190,16 @@ private:
     struct Bucket {
         /// The data storage of this bucket
         std::array<std::byte, BucketSizeItems * sizeof(T)> payload;
-        int usage = 0;  ///< The number of bytes that have been used in this Bucket
+        /// The number of bytes that have been used in this Bucket
+        int usage = 0;
     };
 
-    std::vector<T*> _freeList; ///< The list of pointers that have been returned
-    std::vector<std::unique_ptr<Bucket>> _buckets;  ///< The number of allocated buckets
-    int _originalNBuckets;  ///< The original desired number of buckets
+    /// The list of pointers that have been returned
+    std::vector<T*> _freeList;
+    /// The number of allocated buckets
+    std::vector<std::unique_ptr<Bucket>> _buckets;
+    /// The original desired number of buckets
+    int _originalNBuckets;
 };
 
 } // namespace ghoul

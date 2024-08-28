@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -61,11 +61,12 @@ namespace {
         };
 
         std::vector<std::string> keys;
-        for (std::string_view k : d.keys()) {
-            keys.push_back(std::string(k));
+        keys.reserve(d.keys().size());
+        for (const std::string_view k : d.keys()) {
+            keys.emplace_back(k);
         }
 
-        std::string lua = std::accumulate(
+        const std::string lua = std::accumulate(
             std::next(keys.begin()),
             keys.end(),
             convert(*keys.begin()),
@@ -91,11 +92,11 @@ namespace {
 
         std::string values;
         for (size_t i = 0; i < vec.size() - 1; i++) {
-            values += fmt::format("{},", vec[i]);
+            values += std::format("{},", vec[i]);
         }
-        values += fmt::format("{}", vec.back());
+        values += std::format("{}", vec.back());
 
-        return fmt::format("{{{}}}", values);
+        return std::format("{{{}}}", values);
     }
 
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
@@ -103,37 +104,37 @@ namespace {
                             int indentationSteps)
     {
         if (dictionary.hasValue<Dictionary>(key)) {
-            Dictionary subDictionary = dictionary.value<Dictionary>(key);
+            const Dictionary subDictionary = dictionary.value<Dictionary>(key);
             return format(subDictionary, prettyPrint, indentation, indentationSteps);
         }
 
         if (dictionary.hasValue<double>(key)) {
             const double value = dictionary.value<double>(key);
-            return fmt::format("{}", value);
+            return std::format("{}", value);
         }
 
         if (dictionary.hasValue<int>(key)) {
-            int value = dictionary.value<int>(key);
+            const int value = dictionary.value<int>(key);
             return std::to_string(value);
         }
 
         if (dictionary.hasValue<bool>(key)) {
-            bool value = dictionary.value<bool>(key);
+            const bool value = dictionary.value<bool>(key);
             return value ? "true" : "false";
         }
 
         if (dictionary.hasValue<std::vector<int>>(key)) {
-            std::vector<int> vec = dictionary.value<std::vector<int>>(key);
+            const std::vector<int> vec = dictionary.value<std::vector<int>>(key);
             return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::vector<double>>(key)) {
-            std::vector<double> vec = dictionary.value<std::vector<double>>(key);
+            const std::vector<double> vec = dictionary.value<std::vector<double>>(key);
             return formatVector(vec);
         }
 
         if (dictionary.hasValue<std::string>(key)) {
-            std::string value = dictionary.value<std::string>(key);
+            const std::string value = dictionary.value<std::string>(key);
 
             std::string luaString;
             for (const char c : value) {
@@ -167,7 +168,7 @@ namespace {
             return "\"" + luaString + "\"";
         }
 
-        throw LuaFormattingError(fmt::format(
+        throw LuaFormattingError(std::format(
             "Key '{}' has invalid type for formatting dictionary as Lua", key
         ));
     }

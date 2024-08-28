@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2023                                                                #
+# Copyright (c) 2012-2024                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -32,7 +32,7 @@ target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_sources(
   Ghoul
   PRIVATE
-    ${PROJECT_SOURCE_DIR}/include/ghoul/fmt.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/format.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/freetype.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/ghoul.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/glm.h
@@ -91,13 +91,13 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.inl
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/misc.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/objectmanager.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/profiling.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/sharedmemory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stacktrace.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stringconversion.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/stringhelper.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/supportmacros.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/templatefactory.inl
@@ -144,9 +144,9 @@ target_sources(
     misc/easing.cpp
     misc/exception.cpp
     misc/interpolator.cpp
-    misc/misc.cpp
     misc/sharedmemory.cpp
     misc/stacktrace.cpp
+    misc/stringhelper.cpp
     misc/templatefactory.cpp
     misc/thread.cpp
     misc/threadpool.cpp
@@ -239,6 +239,7 @@ if (GHOUL_MODULE_OPENGL)
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderstb.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
+      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterstb.h
       opengl/bufferbinding.cpp
       opengl/debugcontext.cpp
       opengl/framebufferobject.cpp
@@ -260,6 +261,7 @@ if (GHOUL_MODULE_OPENGL)
       io/texture/texturereaderstb.cpp
       io/texture/texturewriter.cpp
       io/texture/texturewriterbase.cpp
+      io/texture/texturewriterstb.cpp
   )
 endif ()
 
@@ -283,7 +285,7 @@ endif ()
 
 
 target_precompile_headers(Ghoul PRIVATE
-  [["ghoul/fmt.h"]]
+  [["ghoul/format.h"]]
   [["ghoul/glm.h"]]
   [["ghoul/misc/assert.h"]]
   [["ghoul/misc/boolean.h"]]

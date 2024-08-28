@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -37,15 +37,15 @@ namespace ghoul::io {
  * whereas the `VertexAttribPointers` dictionary must contain tables with the `Position`,
  * `Size`, `Stride`, `Offset`, and `Normalized` arguments found in OpenGL's
  * `VertexAttribPointer` method. The default values for the `VertexAttribPointer` are:
- * `Position = 0`, `Size = 0`, `Stride = 0`, `Offset = 0`, and `Normalized = false`.
- * The value for the `type` is always `GL_FLOAT`.
+ * `Position = 0`, `Size = 0`, `Stride = 0`, `Offset = 0`, and `Normalized = false`. The
+ * value for the `type` is always `GL_FLOAT`.
  *
  * The allowed values for the `Mode` are the strings: `GL_LINES`, `GL_POINTS`,
  * `GL_LINE_STRIP`, `GL_LINE_LOOP`, `GL_LINES`, `GL_LINE_STRIP_ADJACENCY`,
  * `GL_LINES_ADJACENCY`, `GL_TRIANGLE_STRIP`, `GL_TRIANGLE_FAN`, `GL_TRIANGLES`,
  * `GL_TRIANGLE_STRIP_ADJACENCY`, `GL_TRIANGLES_ADJACENCY`, or `GL_PATCHES`.
  *
- * \sa https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
+ * \see https://www.opengl.org/sdk/docs/man/html/glVertexAttribPointer.xhtml
  */
 class ModelReaderLua : public ModelReaderBase {
 public:

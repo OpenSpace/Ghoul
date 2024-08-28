@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -66,8 +66,7 @@ public:
     /**
      * A runtime function that checks if initialize has been called.
      *
-     * \returns `true` if any initialize function has been called and
-     *          `false` otherwise.
+     * \return `true` if any initialize function has been called and `false` otherwise
      */
     bool isInitialized() const;
 
@@ -107,6 +106,7 @@ public:
      * render primitives are `GL_LINES` and `GL_POINTS`. See
      * https://www.opengl.org/sdk/docs/man/html/glDrawElements.xhtml for supported render
      * modes.
+     *
      * \param mode The render mode. Default is `GL_TRIANGLES`
      */
     void setRenderMode(GLenum mode = GL_TRIANGLES);
@@ -114,6 +114,7 @@ public:
     /**
      * A wrapper function for `glEnableVertexAttribArray` and `glVertexAttribPointer` that
      * defines how the values passed in the #initialize method are interpreted.
+     *
      * \param index The index of the attribute to be modified
      * \param size The number of elements in this attribute
      * \param type The data type, for example `GL_FLOAT`
@@ -122,21 +123,27 @@ public:
      * \param normalized flag weather the attribute should be normalized
      */
     void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLsizei stride,
-        GLuint offset, GLboolean normalized = GL_FALSE);
+        GLuint offset, GLboolean normalized = GL_FALSE) const;
 
-    /// Binds the VBO
-    void bind();
+    /**
+     * Binds the VBO.
+     */
+    void bind() const;
 
-    /// Unbinds the VBO
-    void unbind();
+    /**
+     * Unbinds the VBO.
+     */
+    void unbind() const;
 
-    /// Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
+    /**
+     * Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
+     */
     void render();
 
 private:
     /**
      * Constructs the internal GL objects by calling `glGenVertexArrays` and
-     * `glGenBuffers`
+     * `glGenBuffers`.
      */
     void generateGLObjects();
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -46,7 +46,7 @@ namespace ghoul {
  *
  * \pre fileName must not be empty
  */
-std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
+std::vector<std::vector<std::string>> loadCSVFile(const std::filesystem::path& fileName,
     bool includeFirstLine = false);
 
 /**
@@ -70,7 +70,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
  * \pre columns must not be empty
  * \post `return.size() == columns.size()`
  */
-std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
+std::vector<std::vector<std::string>> loadCSVFile(const std::filesystem::path& fileName,
     const std::vector<std::string>& columns, bool includeFirstLine = false);
 
 /**
@@ -92,7 +92,7 @@ std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
  * \pre columns must not be empty
  * \post `return.size() == columns.size()`
  */
-std::vector<std::vector<std::string>> loadCSVFile(const std::string& fileName,
+std::vector<std::vector<std::string>> loadCSVFile(const std::filesystem::path& fileName,
     const std::vector<int>& columns, bool includeFirstLine = false);
 
 } // namespace ghoul

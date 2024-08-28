@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2023                                                               *
+ * Copyright (c) 2012-2024                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -76,7 +76,7 @@ void setDebugMessageControl(Source source, Type type,
     ghoul_assert(type != Type::DontCare, "type must not be Type::Dontcare");
 
     static_assert(
-        std::is_same<unsigned int, GLuint>::value,
+        std::is_same_v<unsigned int, GLuint>,
         "We exploit that 'int' and 'GLsizei' are the same for glDebugMessageControl"
     );
 
@@ -96,7 +96,7 @@ void setDebugCallback(CallbackFunction callback) {
     // In a perfect world, we'd want to capture the function pointer, but the OpenGL
     // callback only allows pure C functions
     static CallbackFunction storage;
-    storage = callback;
+    storage = std::move(callback);
     glDebugMessageCallback(internalCallback, &storage);
 }
 
