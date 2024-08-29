@@ -211,7 +211,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     int32_t nTextureEntries = 0;
     fileStream.read(reinterpret_cast<char*>(&nTextureEntries), sizeof(int32_t));
     if (nTextureEntries == 0) {
-        LINFO("No cahced TextureEntries were loaded");
+        LINFO("No TextureEntries were loaded while loading cache");
     }
     else if (nTextureEntries < 0) {
         std::string message = std::format(
@@ -236,7 +236,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             );
         }
         textureEntry.name.resize(nameSize);
-        fileStream.read(textureEntry.name.data(), nameSize);
+        fileStream.read(textureEntry.name.data(), nameSize * sizeof(char));
 
         // Texture
         // dimensions
@@ -511,9 +511,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Name
         uint8_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(uint8_t));
-        if (nameSize == 0) {
-            LINFO("No name was found for animation while loading cache");
-        }
         std::string name;
         name.resize(nameSize);
         fileStream.read(name.data(), nameSize * sizeof(char));
