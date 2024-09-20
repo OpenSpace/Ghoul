@@ -61,7 +61,7 @@ namespace {
         SubClassDefault() : BaseClass() {
             value1 = 1;
             value2 = 2;
-        };
+        }
     };
 
     struct SubClassDefault2 : public BaseClass {
@@ -81,7 +81,7 @@ namespace {
             if (dict.hasValue<int>("value2")) {
                 value2 = dict.value<int>("value2");
             }
-        };
+        }
     };
 
     struct SubClassDefaultDictionary : public BaseClass {
@@ -97,11 +97,11 @@ namespace {
             if (dict.hasValue<int>("value2")) {
                 value2 = dict.value<int>("value2");
             }
-        };
+        }
     };
 
     struct SubClassMultipleLayers : public SubClassDefault {
-        SubClassMultipleLayers() {};
+        SubClassMultipleLayers() {}
     };
 
     struct FunctionPointerClass : public BaseClass {};
