@@ -77,7 +77,7 @@ void Event<T...>::unsubscribe(const std::string& name) {
             std::remove_if(
                 topic.second.begin(), topic.second.end(),
                 // predicate function, true if subscriber name is equal to given name
-                [name](const Subscriber& subscriber){
+                [name](const Subscriber& subscriber) {
                     return (subscriber.name == name);
                 }
             ),

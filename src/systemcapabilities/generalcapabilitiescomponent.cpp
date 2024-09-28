@@ -586,7 +586,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
     file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "r");
     if (file) {
-        if (fgets(line, maxSize, file) != nullptr){
+        if (fgets(line, maxSize, file) != nullptr) {
             _cacheLineSize = static_cast<unsigned int>(strtol(line, nullptr, 0));
         }
         fclose(file);
@@ -594,7 +594,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
 
     file = fopen("/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity", "r");
     if (file) {
-        if (fgets(line, maxSize, file) != nullptr){
+        if (fgets(line, maxSize, file) != nullptr) {
             _L2Associativity = static_cast<unsigned int>(strtol(line, nullptr, 0));
         }
         fclose(file);

@@ -2164,7 +2164,7 @@ TEST_CASE(
         CHECK(v2[1] == 1);
     }
 
-    SECTION("01 11"){
+    SECTION("01 11") {
         const std::vector<std::string> argv = {
             "tests",
             "-single",
