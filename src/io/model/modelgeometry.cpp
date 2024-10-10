@@ -385,7 +385,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelMesh::Texture texture;
 
                 // Skip marker
-                int8_t skip;
+                int8_t skip = 0;
                 fileStream.read(reinterpret_cast<char*>(&skip), sizeof(int8_t));
                 if (skip == ShouldSkipMarker) {
                     continue;
@@ -456,7 +456,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Transform
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        glm::mat4x4 transform = glm::make_mat4(rawTransform);
+        const glm::mat4x4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         GLfloat rawAnimTransform[16];
@@ -548,9 +548,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                glm::vec3 pos = glm::vec3(1.f);
-                fileStream.read(reinterpret_cast<char*>(&pos.x), 3 * sizeof(float));
-                posKeyframe.position = pos;
+                fileStream.read(
+                    reinterpret_cast<char*>(glm::value_ptr(posKeyframe.position)),
+                    3 * sizeof(float)
+                );
 
                 // Time
                 double time = 0.0;
@@ -568,14 +569,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                struct {
-                    float w = 0.f;
-                    float x = 0.f;
-                    float y = 0.f;
-                    float z = 0.f;
-                } rot;
-                fileStream.read(reinterpret_cast<char*>(&rot), 4 * sizeof(float));
-                rotKeyframe.rotation = glm::quat(rot.w, rot.x, rot.y, rot.z);
+                float rot[4];
+                fileStream.read(reinterpret_cast<char*>(rot), 4 * sizeof(float));
+                rotKeyframe.rotation = glm::quat(rot[0], rot[1], rot[2], rot[3]);
 
                 // Time
                 double time = 0.0;
@@ -593,9 +589,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
-                glm::vec3 scale = glm::vec3(1.f);
-                fileStream.read(reinterpret_cast<char*>(&scale.x), 3 * sizeof(float));
-                scaleKeyframe.scale = scale;
+                fileStream.read(
+                    reinterpret_cast<char*>(glm::value_ptr(scaleKeyframe.scale)),
+                    3 * sizeof(float)
+                );
 
                 // Time
                 double time = 0.0;
@@ -666,13 +663,6 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     if (nTextureEntries == 0) {
         LINFO("No TextureEntries were loaded while saving cache");
     }
-    else if (nTextureEntries < 0) {
-        std::string message = std::format(
-            "Model cannot have negative number of texture entries while saving cache: {}",
-            nTextureEntries
-        );
-        throw ModelCacheException(cachedFile, message);
-    }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
     for (int32_t te = 0; te < nTextureEntries; ++te) {
@@ -680,7 +670,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         int32_t nameSize = static_cast<int32_t>(
             _textureStorage[te].name.size() * sizeof(char)
         );
-        if (nameSize <= 0) {
+        if (nameSize == 0) {
             throw ModelCacheException(
                 cachedFile,
                 "No texture name was found while saving cache"
@@ -736,7 +726,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
     // Write how many nodes are to be written
     int32_t nNodes = static_cast<int32_t>(_nodes.size());
-    if (nNodes <= 0) {
+    if (nNodes == 0) {
         throw ModelCacheException(
             cachedFile,
             "No nodes were found while saving cache"
@@ -748,13 +738,6 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     for (const io::ModelNode& node : _nodes) {
         // Write how many meshes are to be written
         int32_t nMeshes = static_cast<int32_t>(node.meshes().size());
-        if (nMeshes < 0) {
-            std::string message = std::format(
-                "Model cannot have negative number of meshes while saving cache: {}",
-                nMeshes
-            );
-            throw ModelCacheException(cachedFile, message);
-        }
         fileStream.write(reinterpret_cast<const char*>(&nMeshes), sizeof(int32_t));
 
         // Meshes
@@ -765,7 +748,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
             // Vertices
             int32_t nVertices = static_cast<int32_t>(mesh.vertices().size());
-            if (nVertices <= 0) {
+            if (nVertices == 0) {
                 throw ModelCacheException(
                     cachedFile,
                     "No vertices were found while saving cache"
@@ -782,7 +765,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
             // Indices
             int32_t nIndices = static_cast<int32_t>(mesh.indices().size());
-            if (nIndices <= 0) {
+            if (nIndices == 0) {
                 throw ModelCacheException(
                     cachedFile,
                     "No indices were found while saving cache"
@@ -801,7 +784,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
             // Textures
             int32_t nTextures = static_cast<int32_t>(mesh.textures().size());
-            if (nTextures <= 0 && !mesh.isInvisible()) {
+            if (nTextures == 0 && !mesh.isInvisible()) {
                 throw ModelCacheException(
                     cachedFile,
                     "No materials were found while saving cache"
@@ -903,13 +886,6 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
         // Write how many children are to be written
         int32_t nChildren = static_cast<int32_t>(node.children().size());
-        if (nChildren < 0) {
-            std::string message = std::format(
-                "Model cannot have negative number of children while saving "
-                "cache: {}", nChildren
-            );
-            throw ModelCacheException(cachedFile, message);
-        }
 
         fileStream.write(reinterpret_cast<const char*>(&nChildren), sizeof(int32_t));
 
@@ -951,7 +927,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
         // Write how many NodeAnimations are to be written
         int32_t nAnimations = static_cast<int32_t>(_animation->nodeAnimations().size());
-        if (nAnimations <= 0) {
+        if (nAnimations == 0) {
             throw ModelCacheException(
                 cachedFile,
                 "No node animations were found while saving cache"

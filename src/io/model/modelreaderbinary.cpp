@@ -243,10 +243,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             for (int32_t v = 0; v < nVertices; ++v) {
                 io::ModelMesh::Vertex vertex;
 
-                // @TODO: malej 2024-07-18 Temporary hack, need to update all osmodel
-                // models on the data server
+                // Set the vertex size based on version
                 auto vertexSize = sizeof(io::ModelMesh::Vertex);
                 if (version < VertexColorUpdateVersion) {
+                    // Three extra floats (rgb color) were added to the Vertex struct
+                    // since version VertexColorUpdateVersion, previous versions does
+                    // not have them
                     vertexSize -= sizeof(GLfloat[3]);
                 }
 
@@ -294,7 +296,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
 
                 if (version >= SkipMarkerUpdateVersion) {
                     // Skip marker
-                    int8_t skip;
+                    int8_t skip = 0;
                     fileStream.read(reinterpret_cast<char*>(&skip), sizeof(int8_t));
                     if (skip == ShouldSkipMarker) {
                         continue;
@@ -311,7 +313,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
 
                 // color
                 fileStream.read(
-                    reinterpret_cast<char*>(&texture.color.r),
+                    reinterpret_cast<char*>(glm::value_ptr(texture.color)),
                     3 * sizeof(float)
                 );
                 if (version >= OpacityUpdateVersion) {
@@ -372,7 +374,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Transform
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        glm::mat4x4 transform = glm::make_mat4(rawTransform);
+        const glm::mat4x4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         GLfloat rawAnimTransform[16];
@@ -465,9 +467,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                glm::vec3 pos = glm::vec3(1.f);
-                fileStream.read(reinterpret_cast<char*>(&pos.x), 3 * sizeof(float));
-                posKeyframe.position = pos;
+                fileStream.read(
+                    reinterpret_cast<char*>(glm::value_ptr(posKeyframe.position)),
+                    3 * sizeof(float)
+                );
 
                 // Time
                 double time = 0.0;
@@ -485,14 +488,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                struct {
-                    float w = 0.f;
-                    float x = 0.f;
-                    float y = 0.f;
-                    float z = 0.f;
-                } rot;
-                fileStream.read(reinterpret_cast<char*>(&rot), 4 * sizeof(float));
-                rotKeyframe.rotation = glm::quat(rot.w, rot.x, rot.y, rot.z);
+                float rot[4];
+                fileStream.read(reinterpret_cast<char*>(rot), 4 * sizeof(float));
+                rotKeyframe.rotation = glm::quat(rot[0], rot[1], rot[2], rot[3]);
 
                 // Time
                 double time = 0.0;
@@ -510,9 +508,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
-                glm::vec3 scale = glm::vec3(1.f);
-                fileStream.read(reinterpret_cast<char*>(&scale.x), 3 * sizeof(float));
-                scaleKeyframe.scale = scale;
+                fileStream.read(
+                    reinterpret_cast<char*>(glm::value_ptr(scaleKeyframe.scale)),
+                    3 * sizeof(float)
+                );
 
                 // Time
                 double time = 0.0;
