@@ -31,8 +31,15 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelReaderBinary";
-    constexpr int8_t CurrentModelVersion = 8;
+    constexpr int8_t CurrentModelVersion = 10;
     constexpr int FormatStringSize = 4;
+    constexpr int8_t ShouldSkipMarker = -1;
+
+    // Backward compatible versions
+    constexpr int8_t AnimationUpdateVersion = 7;
+    constexpr int8_t OpacityUpdateVersion = 8;
+    constexpr int8_t VertexColorUpdateVersion = 9;
+    constexpr int8_t SkipMarkerUpdateVersion = 10;
 
     ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
         using Format = ghoul::opengl::Texture::Format;
@@ -70,16 +77,23 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
 
     std::ifstream fileStream(filename, std::ifstream::binary);
     if (!fileStream.good()) {
-        throw ModelLoadException(filename, "Could not open file", this);
+        throw ModelLoadException(filename, "Could not open binary model file", this);
     }
 
     // Check the file format version
     int8_t version = 0;
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
-    if ( (version != CurrentModelVersion) && (version != CurrentModelVersion - 1) ) {
+    if (version != CurrentModelVersion &&
+        // Backward compatible versions are ok
+        version != AnimationUpdateVersion &&
+        version != OpacityUpdateVersion &&
+        version != VertexColorUpdateVersion &&
+        version != SkipMarkerUpdateVersion
+       )
+    {
         throw ModelLoadException(
             filename,
-            "The format of the OS-model file has changed",
+            std::format("OS-model format {} is not supported", version),
             this
         );
     }
@@ -88,7 +102,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     int32_t nTextureEntries = 0;
     fileStream.read(reinterpret_cast<char*>(&nTextureEntries), sizeof(int32_t));
     if (nTextureEntries == 0) {
-        LINFO("No TextureEntries were loaded");
+        LINFO("No TextureEntries were found while loading binary model");
+    }
+    else if (nTextureEntries < 0) {
+        std::string message = std::format(
+            "Model cannot have negative number of texture entries while loading "
+            "binary model: {}", nTextureEntries
+        );
+        throw ModelLoadException(filename, message, this);
     }
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
@@ -99,11 +120,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Name
         int32_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(int32_t));
-        if (nameSize == 0) {
-            throw ModelLoadException(filename, "No texture name was loaded", this);
+        if (nameSize <= 0) {
+            throw ModelLoadException(
+                filename,
+                "No texture name was found while loading binary model",
+                this
+            );
         }
         textureEntry.name.resize(nameSize);
-        fileStream.read(textureEntry.name.data(), nameSize);
+        fileStream.read(textureEntry.name.data(), nameSize * sizeof(char));
 
         // Texture
         // dimensions
@@ -138,8 +163,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // data
         int32_t textureSize = 0;
         fileStream.read(reinterpret_cast<char*>(&textureSize), sizeof(int32_t));
-        if (textureSize == 0) {
-            throw ModelLoadException(filename, "No texture size was loaded", this);
+        if (textureSize <= 0) {
+            throw ModelLoadException(
+                filename,
+                "No texture size was found while loading binary model",
+                this
+            );
         }
         std::byte* data = new std::byte[textureSize];
         fileStream.read(reinterpret_cast<char*>(data), textureSize);
@@ -163,8 +192,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     // Read how many nodes to read
     int32_t nNodes = 0;
     fileStream.read(reinterpret_cast<char*>(&nNodes), sizeof(int32_t));
-    if (nNodes == 0) {
-        throw ModelLoadException(filename, "No nodes were loaded", this);
+    if (nNodes <= 0) {
+        throw ModelLoadException(
+            filename,
+            "No nodes were found while loading binary model",
+            this
+        );
     }
 
     // Nodes
@@ -174,43 +207,71 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Read how many meshes to read
         int32_t nMeshes = 0;
         fileStream.read(reinterpret_cast<char*>(&nMeshes), sizeof(int32_t));
+        if (nMeshes < 0) {
+            std::string message = std::format(
+                "Model cannot have negative number of meshes while loading binary "
+                "model: {}", nMeshes
+            );
+            throw ModelLoadException(filename, message, this);
+        }
 
         // Meshes
         std::vector<io::ModelMesh> meshArray;
         meshArray.reserve(nMeshes);
         for (int32_t m = 0; m < nMeshes; ++m) {
+            bool hasVertexColors = false;
+            if (version >= VertexColorUpdateVersion) {
+                // HasVertexColors
+                uint8_t col = 0;
+                fileStream.read(reinterpret_cast<char*>(&col), sizeof(uint8_t));
+                hasVertexColors = (col == 1);
+            }
+
             // Vertices
             int32_t nVertices = 0;
             fileStream.read(reinterpret_cast<char*>(&nVertices), sizeof(int32_t));
-            if (nVertices == 0) {
-                throw ModelLoadException(filename, "No vertices were loaded", this);
+            if (nVertices <= 0) {
+                throw ModelLoadException(
+                    filename,
+                    "No vertices were found while loading binary model",
+                    this
+                );
             }
             std::vector<io::ModelMesh::Vertex> vertexArray;
             vertexArray.reserve(nVertices);
 
             for (int32_t v = 0; v < nVertices; ++v) {
                 io::ModelMesh::Vertex vertex;
-                fileStream.read(
-                    reinterpret_cast<char*>(&vertex),
-                    sizeof(io::ModelMesh::Vertex) - sizeof(GLfloat[3]) // @TODO: malej 2024-07-18 Temporary hack, need to update osmodel format + all models
-                );
+
+                // Set the vertex size based on version
+                auto vertexSize = sizeof(io::ModelMesh::Vertex);
+                if (version < VertexColorUpdateVersion) {
+                    // Three extra floats (rgb color) were added to the Vertex struct
+                    // since version VertexColorUpdateVersion, previous versions does
+                    // not have them
+                    vertexSize -= sizeof(GLfloat[3]);
+                }
+
+                fileStream.read(reinterpret_cast<char*>(&vertex), vertexSize);
                 vertexArray.push_back(std::move(vertex));
             }
 
             // Indices
             int32_t nIndices = 0;
             fileStream.read(reinterpret_cast<char*>(&nIndices), sizeof(int32_t));
-            if (nIndices == 0) {
-                throw ModelLoadException(filename, "No indices were loaded", this);
+            if (nIndices <= 0) {
+                throw ModelLoadException(
+                    filename,
+                    "No indices were found while loading binary model",
+                    this
+                );
             }
-            std::vector<unsigned int> indexArray;
-            indexArray.reserve(nIndices);
-
-            for (int32_t i = 0; i < nIndices; i++) {
-                uint32_t index = 0;
-                fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
-                indexArray.push_back(index);
-            }
+            std::vector<uint32_t> indexArray;
+            indexArray.resize(nIndices);
+            fileStream.read(
+                reinterpret_cast<char*>(indexArray.data()),
+                nIndices * sizeof(uint32_t)
+            );
 
             // IsInvisible
             uint8_t inv = 0;
@@ -221,13 +282,26 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             int32_t nTextures = 0;
             fileStream.read(reinterpret_cast<char*>(&nTextures), sizeof(int32_t));
             if (nTextures == 0 && !isInvisible) {
-                throw ModelLoadException(filename, "No textures were loaded", this);
+                throw ModelLoadException(
+                    filename,
+                    "No textures were found while loading binary model",
+                    this
+                );
             }
             std::vector<io::ModelMesh::Texture> textureArray;
             textureArray.reserve(nTextures);
 
             for (int32_t t = 0; t < nTextures; ++t) {
                 io::ModelMesh::Texture texture;
+
+                if (version >= SkipMarkerUpdateVersion) {
+                    // Skip marker
+                    int8_t skip = 0;
+                    fileStream.read(reinterpret_cast<char*>(&skip), sizeof(int8_t));
+                    if (skip == ShouldSkipMarker) {
+                        continue;
+                    }
+                }
 
                 // type
                 fileStream.read(reinterpret_cast<char*>(&texture.type), sizeof(uint8_t));
@@ -238,20 +312,21 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 texture.hasTexture = (h == 1);
 
                 // color
-                fileStream.read(reinterpret_cast<char*>(&texture.color.r), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.g), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&texture.color.b), sizeof(float));
-                if (version == CurrentModelVersion) {
+                fileStream.read(
+                    reinterpret_cast<char*>(glm::value_ptr(texture.color)),
+                    3 * sizeof(float)
+                );
+                if (version >= OpacityUpdateVersion) {
                     fileStream.read(
                         reinterpret_cast<char*>(&texture.color.a),
                         sizeof(float)
                     );
+
                     // isTransparent
                     uint8_t isT = 0;
                     fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
                     texture.isTransparent = (isT == 1);
                 }
-
 
                 // texture
                 if (texture.hasTexture) {
@@ -261,11 +336,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                     fileStream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
 
                     if (index >= textureStorageArray.size()) {
-                        throw ModelLoadException(
-                            filename,
-                            "Texture index is outside of textureStorage",
-                            this
-                        );
+                        std::string message =
+                            "Texture index is outside of textureStorage during loading "
+                            "of binary model";
+                        throw ModelLoadException(filename, message, this);
                     }
 
                     texture.texture = textureStorageArray[index].texture.get();
@@ -283,7 +357,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                     textureArray.push_back(std::move(texture));
                 }
                 else if (notifyInvisibleDropped) {
-                    LINFO("An invisible mesh has been dropped");
+                    LINFO("An invisible mesh has been dropped while loading binary model");
                 }
             }
 
@@ -292,25 +366,20 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 std::move(vertexArray),
                 std::move(indexArray),
                 std::move(textureArray),
-                isInvisible
+                isInvisible,
+                hasVertexColors
             );
         }
 
         // Transform
-        std::array<GLfloat, 16> rawTransform;
-        fileStream.read(
-            reinterpret_cast<char*>(rawTransform.data()),
-            16 * sizeof(GLfloat)
-        );
-        glm::mat4x4 transform = glm::make_mat4(rawTransform.data());
+        GLfloat rawTransform[16];
+        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
+        const glm::mat4x4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
-        std::array<GLfloat, 16> rawAnimTransform;
-        fileStream.read(
-            reinterpret_cast<char*>(rawAnimTransform.data()),
-            16 * sizeof(GLfloat)
-        );
-        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform.data());
+        GLfloat rawAnimTransform[16];
+        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
+        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
         int32_t parent = 0;
@@ -319,15 +388,21 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Read how many children to read
         int32_t nChildren = 0;
         fileStream.read(reinterpret_cast<char*>(&nChildren), sizeof(int32_t));
+        if (nChildren < 0) {
+            std::string message = std::format(
+                "Binary model cannot have negative number of children: {}",
+                nChildren
+            );
+            throw ModelLoadException(filename, message, this);
+        }
 
         // Children
-        std::vector<int> childrenArray;
-        nodeArray.reserve(nChildren);
-        for (int32_t c = 0; c < nChildren; ++c) {
-            int child = 0;
-            fileStream.read(reinterpret_cast<char*>(&child), sizeof(int32_t));
-            childrenArray.push_back(child);
-        }
+        std::vector<int32_t> childrenArray;
+        childrenArray.resize(nChildren);
+        fileStream.read(
+            reinterpret_cast<char*>(childrenArray.data()),
+            nChildren * sizeof(int32_t)
+        );
 
         // HasAnimation
         uint8_t a = 0;
@@ -355,7 +430,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         uint8_t nameSize = 0;
         fileStream.read(reinterpret_cast<char*>(&nameSize), sizeof(uint8_t));
         std::string name;
-        fileStream.read(name.data(), nameSize);
+        name.resize(nameSize);
+        fileStream.read(name.data(), nameSize * sizeof(char));
 
         // Duration
         double duration = 0.0;
@@ -364,13 +440,16 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Read how many NodeAnimations to read
         int32_t nNodeAnimations = 0;
         fileStream.read(reinterpret_cast<char*>(&nNodeAnimations), sizeof(int32_t));
-        if (nNodeAnimations == 0) {
-            throw ModelLoadException(filename, "No node animations were loaded", this);
+        if (nNodeAnimations <= 0) {
+            throw ModelLoadException(
+                filename,
+                "No node animations were found while loading binary model",
+                this
+            );
         }
 
         // NodeAnimations
-        std::unique_ptr<io::ModelAnimation> animation =
-            std::make_unique<io::ModelAnimation>(io::ModelAnimation(name, duration));
+        auto animation = std::make_unique<io::ModelAnimation>(name, duration);
         animation->nodeAnimations().reserve(nNodeAnimations);
         for (int32_t na = 0; na < nNodeAnimations; ++na) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
@@ -388,11 +467,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
-                glm::vec3 pos;
-                fileStream.read(reinterpret_cast<char*>(&pos.x), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&pos.y), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&pos.z), sizeof(float));
-                posKeyframe.position = pos;
+                fileStream.read(
+                    reinterpret_cast<char*>(glm::value_ptr(posKeyframe.position)),
+                    3 * sizeof(float)
+                );
 
                 // Time
                 double time = 0.0;
@@ -406,19 +484,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             uint32_t nRot = 0;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
-            for (uint32_t p = 0; p < nRot; ++p) {
+            for (uint32_t r = 0; r < nRot; ++r) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                float rotW = 0.f;
-                float rotX = 0.f;
-                float rotY = 0.f;
-                float rotZ = 0.f;
-                fileStream.read(reinterpret_cast<char*>(&rotW), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotX), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotY), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&rotZ), sizeof(float));
-                rotKeyframe.rotation = glm::quat(rotW, rotX, rotY, rotZ);
+                float rot[4];
+                fileStream.read(reinterpret_cast<char*>(rot), 4 * sizeof(float));
+                rotKeyframe.rotation = glm::quat(rot[0], rot[1], rot[2], rot[3]);
 
                 // Time
                 double time = 0.0;
@@ -432,15 +504,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             uint32_t nScale = 0;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
-            for (uint32_t p = 0; p < nScale; ++p) {
+            for (uint32_t s = 0; s < nScale; ++s) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
-                glm::vec3 scale;
-                fileStream.read(reinterpret_cast<char*>(&scale.x), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scale.y), sizeof(float));
-                fileStream.read(reinterpret_cast<char*>(&scale.z), sizeof(float));
-                scaleKeyframe.scale = scale;
+                fileStream.read(
+                    reinterpret_cast<char*>(glm::value_ptr(scaleKeyframe.scale)),
+                    3 * sizeof(float)
+                );
 
                 // Time
                 double time = 0.0;
@@ -453,19 +524,51 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             animation->nodeAnimations().push_back(nodeAnimation);
         }
 
+        bool isTransparent = false;
+        bool hasCalcTransparency = false;
+        if (version >= OpacityUpdateVersion) {
+            // _isTransparent
+            uint8_t isT = 0;
+            fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+            isTransparent = (isT == 1);
+
+            // _hasCalcTransparency
+            uint8_t hasCalcT = 0;
+            fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
+            hasCalcTransparency = (hasCalcT == 1);
+        }
+
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
             std::move(nodeArray),
             std::move(textureStorageArray),
-            std::move(animation)
+            std::move(animation),
+            isTransparent,
+            hasCalcTransparency
         );
     }
     else {
+        bool isTransparent = false;
+        bool hasCalcTransparency = false;
+        if (version >= OpacityUpdateVersion) {
+            // _isTransparent
+            uint8_t isT = 0;
+            fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
+            isTransparent = (isT == 1);
+
+            // _hasCalcTransparency
+            uint8_t hasCalcT = 0;
+            fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
+            hasCalcTransparency = (hasCalcT == 1);
+        }
+
         // Create the ModelGeometry
         return std::make_unique<modelgeometry::ModelGeometry>(
             std::move(nodeArray),
             std::move(textureStorageArray),
-            nullptr
+            nullptr,
+            isTransparent,
+            hasCalcTransparency
         );
     }
 }
