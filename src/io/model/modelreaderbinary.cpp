@@ -357,7 +357,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                     textureArray.push_back(std::move(texture));
                 }
                 else if (notifyInvisibleDropped) {
-                    LINFO("An invisible mesh has been dropped while loading binary model");
+                    LINFO(
+                        "An invisible mesh has been dropped while loading binary model"
+                    );
                 }
             }
 
