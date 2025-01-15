@@ -506,7 +506,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         size.x = std::max(size.x, width);
         movingPos.y -= font.height();
     } while (!text.empty());
-    size.y = (lines - 1) * font.height();
+    size.y = lines * font.height();
 
     opengl::TextureUnit atlasUnit;
     atlasUnit.activate();
@@ -709,7 +709,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         size.x = std::max(size.x, width);
         movingPos.y -= h;
     } while (!text.empty());
-    size.y = (lines - 1) * font.height();
+    size.y = lines * font.height();
 
     if (!labelInfo.enableDepth) {
         glDisable(GL_DEPTH_TEST);
