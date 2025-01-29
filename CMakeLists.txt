@@ -48,6 +48,7 @@ option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_LUA "Enable Lua" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
+option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries" OFF)
 
@@ -85,7 +86,6 @@ add_subdirectory(src)
 add_subdirectory(ext SYSTEM)
 
 # Other applications
-option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 if (GHOUL_HAVE_TESTS)
   begin_header("Generating unit test")
   add_subdirectory(tests)
