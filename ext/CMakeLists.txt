@@ -55,13 +55,15 @@ message(STATUS "Including GLM found at ${GLM_INCLUDE_DIRS}")
 target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
 end_dependency("GLM")
 
-add_subdirectory(catch2)
-# Catch2 by default compiles with C++14, which leads to some linker errors:
-# https://github.com/catchorg/Catch2/issues/2046
-target_compile_features(Catch2 PUBLIC cxx_std_20)
-target_compile_features(Catch2WithMain PUBLIC cxx_std_20)
-set_target_properties(Catch2 PROPERTIES FOLDER External)
-set_target_properties(Catch2WithMain PROPERTIES FOLDER External)
+if (GHOUL_HAVE_TESTS)
+  add_subdirectory(catch2)
+  # Catch2 by default compiles with C++14, which leads to some linker errors:
+  # https://github.com/catchorg/Catch2/issues/2046
+  target_compile_features(Catch2 PUBLIC cxx_std_20)
+  target_compile_features(Catch2WithMain PUBLIC cxx_std_20)
+  set_target_properties(Catch2 PROPERTIES FOLDER External)
+  set_target_properties(Catch2WithMain PROPERTIES FOLDER External)
+endif()
 
 if (GHOUL_MODULE_OPENGL)
   begin_module("OpenGL")
