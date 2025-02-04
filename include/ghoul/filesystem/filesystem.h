@@ -292,7 +292,33 @@ private:
 
 #define FileSys (ghoul::filesystem::FileSystem::ref())
 
+/**
+ * Walks the provided directory in \p path and returns a path of all contained files. If
+ * \p recursive is `true`, any directory encountered will be recursively walked and if
+ * \p sorted is `true`, the returning vector alphabetically sorted. The \p filter
+ * determines for each encountered path whether it should be included or not. If no
+ * \p filter is provided all provided paths wil be accepted.
+ *
+ * \param path The directory that should be walked
+ * \param recursive If this value is set to `true`, then any directory will be recursively
+ *        walked and all files will be provided in a single list
+ * \param sorted If this value is `true`, the resulting list will be alphabetically
+ *        sorted. If it is `false`, the list will be returned in the order as the
+ *        operating system determines
+ * \param filter This filter function will be executed for each encounted path, both files
+ *        and directories (if \p recursive is `true`). If the filter function returns
+ *        `false` for a path, it will not be included in the final list, if it was a file,
+ *        and its contents will not be considered, if it was a directory.
+ *
+ * \pre \p path must be a valid and existing directory
+ */
+std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& path,
+    bool recursive, bool sorted,
+    std::function<bool(const std::filesystem::path&)> filter =
+        [](const std::filesystem::path&) { return true; });
+
 } // namespace ghoul::filesystem
+
 
 /**
  * Returns the absolute path to the passed \p path, resolving any tokens (if present) in

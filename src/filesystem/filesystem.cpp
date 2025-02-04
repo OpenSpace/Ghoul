@@ -312,5 +312,35 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
 }
 #endif // WIN32
 
+std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& path,
+                                                 bool recursive, bool sorted,
+                                 std::function<bool(const std::filesystem::path&)> filter)
+{
+    ghoul_assert(std::filesystem::exists(path), "Path does not exist");
+    ghoul_assert(std::filesystem::is_directory(path), "Path is not a directory");
+
+    namespace fs = std::filesystem;
+    std::vector<std::filesystem::path> result;
+    if (fs::is_directory(path)) {
+        if (recursive) {
+            for (fs::directory_entry e : fs::recursive_directory_iterator(path)) {
+                if (filter(e)) {
+                    result.push_back(e.path());
+                }
+            }
+        }
+        else {
+            for (fs::directory_entry e : fs::directory_iterator(path)) {
+                if (filter(e)) {
+                    result.push_back(e.path());
+                }
+            }
+        }
+    }
+    if (sorted) {
+        std::sort(result.begin(), result.end());
+    }
+    return result;
+}
 
 } // namespace ghoul::filesystem
