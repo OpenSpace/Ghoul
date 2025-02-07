@@ -313,7 +313,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
 #endif // WIN32
 
 std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& path,
-                                                 bool recursive, bool sorted,
+                                                 Recursive recursive, Sorted sorted,
                                  std::function<bool(const std::filesystem::path&)> filter)
 {
     ghoul_assert(std::filesystem::exists(path), "Path does not exist");

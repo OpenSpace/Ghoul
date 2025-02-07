@@ -292,6 +292,9 @@ private:
 
 #define FileSys (ghoul::filesystem::FileSystem::ref())
 
+BooleanType(Recursive);
+BooleanType(Sorted);
+
 /**
  * Walks the provided directory in \p path and returns a path of all contained files. If
  * \p recursive is `true`, any directory encountered will be recursively walked and if
@@ -313,7 +316,7 @@ private:
  * \pre \p path must be a valid and existing directory
  */
 std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& path,
-    bool recursive, bool sorted,
+    Recursive recursive = Recursive::No, Sorted sorted = Sorted::No,
     std::function<bool(const std::filesystem::path&)> filter =
         [](const std::filesystem::path&) { return true; });
 
