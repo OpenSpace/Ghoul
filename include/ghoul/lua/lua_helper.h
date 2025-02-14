@@ -26,6 +26,7 @@
 #ifndef __GHOUL___LUA_HELPER___H__
 #define __GHOUL___LUA_HELPER___H__
 
+#include <ghoul/lua/lua_types.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <filesystem>
@@ -67,7 +68,6 @@ struct LuaExecutionException : public LuaRuntimeException {
 struct nil_t {};
 
 BooleanType(PopValue);
-
 
 /**
  * Returns the location of the calling function using `luaL_where` and returns
@@ -355,6 +355,8 @@ void luaArrayDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary
  * \return The converted string
  */
 std::string_view luaTypeToString(int type);
+
+std::string_view luaTypeToString(LuaTypes type);
 
 /**
  * Creates a new Lua state and initializes it with the default Lua libraries.

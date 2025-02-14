@@ -528,20 +528,24 @@ void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary) {
     }
 }
 
-std::string_view luaTypeToString(int type) {
+std::string_view luaTypeToString(LuaTypes type) {
     switch (type) {
-        case LUA_TNONE:          return "None";
-        case LUA_TNIL:           return "Nil";
-        case LUA_TBOOLEAN:       return "Boolean";
-        case LUA_TLIGHTUSERDATA: return "Light UserData";
-        case LUA_TNUMBER:        return "Number";
-        case LUA_TSTRING:        return "String";
-        case LUA_TTABLE:         return "Table";
-        case LUA_TFUNCTION:      return "Function";
-        case LUA_TUSERDATA:      return "UserData";
-        case LUA_TTHREAD:        return "Thread";
-        default:                 throw MissingCaseException();
+        case LuaTypes::None:          return "None";
+        case LuaTypes::Nil:           return "Nil";
+        case LuaTypes::Boolean:       return "Boolean";
+        case LuaTypes::LightUserData: return "Light UserData";
+        case LuaTypes::Number:        return "Number";
+        case LuaTypes::String:        return "String";
+        case LuaTypes::Table:         return "Table";
+        case LuaTypes::Function:      return "Function";
+        case LuaTypes::UserData:      return "UserData";
+        case LuaTypes::Thread:        return "Thread";
+        default:                      throw std::logic_error("Lua only has 9 types");
     }
+}
+
+std::string_view luaTypeToString(int type) {
+    return luaTypeToString(fromLuaType(type));
 }
 
 lua_State* createNewLuaState(bool sandboxed, bool loadStandardLibraries, bool strictState)
