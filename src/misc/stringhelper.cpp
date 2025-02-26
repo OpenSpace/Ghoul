@@ -73,6 +73,10 @@ std::vector<std::string> tokenizeString(const std::string& input, char separator
 }
 
 std::string join(std::vector<std::string> input, const std::string& separator) {
+    if (input.empty()) {
+        return std::string();
+    }
+
     std::string result;
     for (std::string& s : input) {
         result += std::move(s) + separator;

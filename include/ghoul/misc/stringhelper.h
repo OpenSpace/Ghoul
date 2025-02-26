@@ -62,7 +62,7 @@ std::vector<std::string> tokenizeString(const std::string& input, char separator
 
 /**
  * Joins the strings located in the \p input using the provided \p separator and returns
- * the joined list.
+ * the joined list. If the provided \p input is empty, the empty string is returned.
  *
  * \param input The list of strings that will be joined
  * \param separator The separator that will be used in the joined string
