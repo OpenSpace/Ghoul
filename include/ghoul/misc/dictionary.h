@@ -27,7 +27,6 @@
 #define __GHOUL___DICTIONARY___H__
 
 #include <ghoul/glm.h>
-#include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <map>
 #include <string>
@@ -82,18 +81,6 @@ public:
         glm::dvec2, glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4,
         glm::dmat3x2, glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4
     >;
-
-    /// Exception that is thrown if the Dictionary does not contain a provided key
-    struct KeyError : public ghoul::RuntimeError {
-        explicit KeyError(std::string msg);
-    };
-
-    /// Exception thrown if there was an error with a value, either trying to access the
-    /// wrong type for a known key or if trying to access a vector/matrix based type and
-    /// the underlying std::vector did contain the wrong number of values
-    struct ValueError : public ghoul::RuntimeError {
-        explicit ValueError(std::string key, std::string msg);
-    };
 
     bool operator==(const Dictionary& rhs) const noexcept;
     bool operator!=(const Dictionary& rhs) const noexcept;

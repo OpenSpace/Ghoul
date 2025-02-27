@@ -26,6 +26,7 @@
 #include <ghoul/misc/dictionary.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/exception.h>
 
 namespace {
     // Boolean constant used to check whether a value T is part of a parameter pack Ts
@@ -45,20 +46,30 @@ namespace {
         glm::dvec3, glm::dvec4, glm::dmat2x2, glm::dmat2x3, glm::dmat2x4, glm::dmat3x2,
         glm::dmat3x3, glm::dmat3x4, glm::dmat4x2, glm::dmat4x3, glm::dmat4x4>;
     template <typename T> using isGLMType = is_one_of<T, GLMTypes>;
+
+
+    /// Exception that is thrown if the Dictionary does not contain a provided key
+    struct KeyError : public ghoul::RuntimeError {
+        explicit KeyError(std::string msg)
+            : RuntimeError(std::move(msg), "Dictionary")
+        {}
+    };
+
+    /// Exception thrown if there was an error with a value, either trying to access the
+    /// wrong type for a known key or if trying to access a vector/matrix based type and
+    /// the underlying std::vector did contain the wrong number of values
+    struct ValueError : public ghoul::RuntimeError {
+        explicit ValueError(std::string key, std::string msg)
+            : ghoul::RuntimeError(
+                std::format("Key '{}': {}", std::move(key), std::move(msg)),
+                "Dictionary"
+            )
+        {}
+    };
+
 } // namespace
 
 namespace ghoul {
-
-Dictionary::KeyError::KeyError(std::string msg)
-    : RuntimeError(std::move(msg), "Dictionary")
-{}
-
-Dictionary::ValueError::ValueError(std::string key, std::string msg)
-    : RuntimeError(
-        std::format("Key '{}': {}", std::move(key), std::move(msg)),
-        "Dictionary"
-    )
-{}
 
 bool Dictionary::operator==(const Dictionary& rhs) const noexcept {
     return _storage == rhs._storage;
