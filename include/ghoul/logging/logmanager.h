@@ -28,6 +28,7 @@
 
 #include <ghoul/logging/loglevel.h>
 #include <ghoul/misc/boolean.h>
+#include <array>
 #include <memory>
 #include <string_view>
 #include <vector>
