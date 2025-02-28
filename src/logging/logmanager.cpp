@@ -25,12 +25,19 @@
 
 #include <ghoul/logging/logmanager.h>
 
+#include <ghoul/logging/consolelog.h>
 #include <ghoul/logging/log.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <algorithm>
 #include <map>
 #include <vector>
+
+namespace {
+    // The always-present console log. Definining it here as we'd other need to include
+    // the ConsoleLog in every file that wants to use the LogManager
+    ghoul::logging::ConsoleLog consoleLog;
+} // namespace
 
 namespace ghoul::logging {
 
@@ -91,14 +98,14 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
     ZoneScoped;
 
     if (!ghoul::logging::LogManager::isInitialized()) {
-        _consoleLog.log(level, category, message);
+        consoleLog.log(level, category, message);
         return;
     }
 
     if (level >= _level) {
-        _consoleLog.log(level, category, message);
+        consoleLog.log(level, category, message);
         if (_immediateFlush) {
-            _consoleLog.flush();
+            consoleLog.flush();
         }
         for (const std::unique_ptr<Log>& log : _logs) {
             if (level >= log->logLevel()) {
