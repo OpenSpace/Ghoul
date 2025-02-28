@@ -89,7 +89,7 @@ namespace {
         SubClassDefaultDictionary() : BaseClass() {
             value1 = 31;
             value2 = 32;
-        };
+        }
         explicit SubClassDefaultDictionary(const ghoul::Dictionary& dict) : BaseClass() {
             if (dict.hasValue<int>("value1")) {
                 value1 = dict.value<int>("value1");
