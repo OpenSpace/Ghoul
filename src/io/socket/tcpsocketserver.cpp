@@ -36,9 +36,6 @@
 #ifndef _ERRNO
 #define _ERRNO WSAGetLastError()
 #endif
-
-#pragma warning(push)
-#pragma warning (disable : 4996)
 #else //Use BSD sockets
 #ifdef _XCODE
 #include <unistd.h>
