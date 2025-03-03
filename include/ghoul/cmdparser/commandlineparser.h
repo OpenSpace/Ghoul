@@ -242,7 +242,7 @@ protected:
     std::vector<std::unique_ptr<CommandlineCommand>> _commands;
 
     /// The command we want to use for nameless arguments
-    std::unique_ptr<CommandlineCommand> _commandForNamelessArguments = nullptr;
+    std::unique_ptr<CommandlineCommand> _commandForNamelessArguments;
 
     /// All the arguments passed onto this parser
     std::vector<std::string> _arguments;
