@@ -407,20 +407,26 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
         const int keyType = lua_type(state, KeyTableIndex);
         switch (keyType) {
             case LUA_TNUMBER:
+                key = std::to_string(lua_tointeger(state, KeyTableIndex));
+
                 if (type == TableType::Map) {
-                    throw LuaFormatException(
-                        "Dictionary can only contain a pure map or a pure array"
-                    );
+                    throw LuaFormatException(std::format(
+                        "Dictionary can only contain a pure map or a pure array. Error "
+                        "at key '{}'", key
+                    ));
                 }
 
                 type = TableType::Array;
                 key = std::to_string(lua_tointeger(state, KeyTableIndex));
                 break;
             case LUA_TSTRING:
+                key = lua_tostring(state, KeyTableIndex);
+
                 if (type == TableType::Array) {
-                    throw LuaFormatException(
-                        "Dictionary can only contain a pure map or a pure array"
-                    );
+                    throw LuaFormatException(std::format(
+                        "Dictionary can only contain a pure map or a pure array. Error "
+                        "at key '{}'", key
+                    ));
                 }
 
                 type = TableType::Map;

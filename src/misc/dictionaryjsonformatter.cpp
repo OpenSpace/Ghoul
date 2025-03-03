@@ -170,25 +170,49 @@ std::string formatJson(const Dictionary& dictionary) {
         return "{}";
     }
 
-    auto convert = [](const std::string& key, const ghoul::Dictionary& d) -> std::string {
-        return "\"" + key + "\":" + formatValue(d, key);
-    };
-
     std::vector<std::string> keys;
+    std::vector<int> intKeys;
     for (const std::string_view k : dictionary.keys()) {
         keys.emplace_back(k);
-    }
-
-    const std::string json = std::accumulate(
-        std::next(keys.begin()),
-        keys.end(),
-        convert(*keys.begin(), dictionary),
-        [convert, dictionary](const std::string& a, const std::string& key) {
-            return std::format("{},{}", a, convert(key, dictionary));
+        int result;
+        auto [p, ec] = std::from_chars(k.data(), k.data() + k.size(), result);
+        if (ec == std::errc()) {
+            intKeys.emplace_back(result);
         }
-    );
+    }
+    std::sort(intKeys.begin(), intKeys.end());
 
-    return "{" + json + "}";
+    // Check whether the dictionary contains only numerical and sequential keys
+    std::vector<int> seqRef = std::vector<int>(keys.size());
+    std::iota(seqRef.begin(), seqRef.end(), 1);
+    if (intKeys == seqRef) {
+        auto convert = [](const std::string& key, const ghoul::Dictionary& d) {
+            return formatValue(d, key);
+        };
+        const std::string json = std::accumulate(
+            std::next(keys.begin()),
+            keys.end(),
+            convert(*keys.begin(), dictionary),
+            [convert, dictionary](const std::string& a, const std::string& key) {
+                return std::format("{},{}", a, convert(key, dictionary));
+            }
+        );
+        return "[" + json + "]";
+    }
+    else {
+        auto convert = [](const std::string& key, const ghoul::Dictionary& d) {
+            return "\"" + key + "\":" + formatValue(d, key);
+        };
+        const std::string json = std::accumulate(
+            std::next(keys.begin()),
+            keys.end(),
+            convert(*keys.begin(), dictionary),
+            [convert, dictionary](const std::string& a, const std::string& key) {
+                return std::format("{},{}", a, convert(key, dictionary));
+            }
+        );
+        return "{" + json + "}";
+    }
 }
 
 }  // namespace ghoul
