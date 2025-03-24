@@ -320,6 +320,13 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
     std::function<bool(const std::filesystem::path&)> filter =
         [](const std::filesystem::path&) { return true; });
 
+/**
+ * Checks whether \p root is a direct parent of \p p.
+ *
+ * \return `true` if \p root is a direct parent of \p p. `false` otherwise.
+ */
+bool isSubdirectory(std::filesystem::path p, std::filesystem::path root);
+
 } // namespace ghoul::filesystem
 
 

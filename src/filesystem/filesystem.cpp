@@ -343,4 +343,14 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
     return result;
 }
 
+bool isSubdirectory(std::filesystem::path p, std::filesystem::path root) {
+    while (p != p.parent_path()) {
+        if (p == root) {
+            return true;
+        }
+        p = p.parent_path();
+    }
+    return false;
+}
+
 } // namespace ghoul::filesystem
