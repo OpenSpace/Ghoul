@@ -191,7 +191,6 @@ begin_dependency("scnlib")
 add_subdirectory(scnlib SYSTEM)
 target_link_libraries(Ghoul PUBLIC scn)
 set_target_properties(scn PROPERTIES FOLDER "External")
-set_target_properties(simdutf PROPERTIES FOLDER "External")
 end_dependency("scnlib")
 
 # stb_image
