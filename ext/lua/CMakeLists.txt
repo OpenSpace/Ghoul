@@ -23,7 +23,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 project(Lua)
 
 set(LUA_ROOT_DIR ${PROJECT_SOURCE_DIR})
