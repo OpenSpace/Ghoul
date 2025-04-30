@@ -15,7 +15,7 @@
 	url = https://github.com/cginternals/glbinding.git
 [submodule "ext/websocketpp"]
 	path = ext/websocketpp
-	url = https://github.com/zaphoyd/websocketpp.git
+	url = https://github.com/OpenSpace/websocketpp
 [submodule "ext/tiny-process-library"]
 	path = ext/tiny-process-library
 	url = https://github.com/OpenSpace/tiny-process-library.git
