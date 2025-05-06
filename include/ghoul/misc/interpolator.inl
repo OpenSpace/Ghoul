@@ -26,33 +26,67 @@
 #include <array>
 #include <glm/gtx/quaternion.hpp>
 
+namespace {
+
+template <typename T, typename V>
+T internalLinear(V t, const T& p0, const T& p1) {
+    return t * p1 + (V(1.0) - t) * p0;
+}
+
+template <typename T, typename V>
+T internalCubicBezier(V t, const T& p0, const T& p1, const T& p2, const T& p3) {
+    V a = V(1.0) - t;
+    return p0 * a * a * a
+        + p1 * t * a * a * V(3.0)
+        + p2 * t * t * a * V(3.0)
+        + p3 * t * t * t;
+}
+
+template <typename T, typename V>
+T internalCatmullRom(V t, const T& p0, const T& p1, const T& p2, const T& p3) {
+    const V t2 = t * t;
+    const V t3 = t2 * t;
+
+    return V(0.5) * (
+        V(2.0) * p1 +
+        t * (p2 - p0) +
+        t2 * (V(2.0) * p0 - V(5.0) * p1 + V(4.0) * p2 - p3) +
+        t3 * (V(3.0) * p1 - p0 - V(3.0) * p2 + p3)
+    );
+}
+
+} // namespace
+
 namespace ghoul {
 
 template <typename T>
 T interpolateLinear(double t, const T& p0, const T& p1) {
-    return t * p1 + (1.0 - t) * p0;
+    if constexpr (isGlmMatrix<T> || isGlmVector<T>) {
+        return internalLinear(T::value_type(t), p0, p1);
+    }
+    else {
+        return internalLinear(t, p0, p1);
+    }
 }
 
 template <typename T>
 T interpolateCubicBezier(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    double a = 1.0 - t;
-    return p0 * a * a * a
-        + p1 * t * a * a * 3.0
-        + p2 * t * t * a * 3.0
-        + p3 * t * t * t;
+    if constexpr (isGlmMatrix<T> || isGlmVector<T>) {
+        return internalCubicBezier(T::value_type(t), p0, p1, p2, p3);
+    }
+    else {
+        return internalCubicBezier(t, p0, p1, p2, p3);
+    }
 }
 
 template <typename T>
 T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    const double t2 = t * t;
-    const double t3 = t2 * t;
-
-    return 0.5 * (
-        2.0 * p1 +
-        t * (p2 - p0) +
-        t2 * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) +
-        t3 * (3.0 * p1 - p0  - 3.0 * p2 + p3)
-    );
+    if constexpr (isGlmMatrix<T> || isGlmVector<T>) {
+        return internalCatmullRom(T::value_type(t), p0, p1, p2, p3);
+    }
+    else {
+        return internalCatmullRom(t, p0, p1, p2, p3);
+    }
 }
 
 } // namespace ghoul
