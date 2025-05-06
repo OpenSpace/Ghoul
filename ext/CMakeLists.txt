@@ -256,6 +256,7 @@ endif ()
 
 # Tiny process library
 begin_dependency("tiny-process-library")
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 add_subdirectory(tiny-process-library)
 target_link_libraries(Ghoul PRIVATE tiny-process-library)
 set_target_properties(tiny-process-library PROPERTIES FOLDER "External")
