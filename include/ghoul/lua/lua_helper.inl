@@ -862,7 +862,7 @@ T valueInner(lua_State* L, int location) {
         defer { lua_pop(L, 1); };
 
         ghoul::Dictionary d = ghoul::lua::luaDictionaryFromState(L);
-        T res = dictionaryToVector<typename T::value_type>(d);
+        T res = dictionaryToVector<typename T::value_type, true>(d);
         return res;
     }
     else if constexpr (is_array<T>::value) {
