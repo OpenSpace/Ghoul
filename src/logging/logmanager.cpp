@@ -97,6 +97,10 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
 {
     ZoneScoped;
 
+    if (level == LogLevel::NoLogging) {
+        return;
+    }
+
     if (!ghoul::logging::LogManager::isInitialized()) {
         consoleLog.log(level, category, message);
         return;
