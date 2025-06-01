@@ -148,7 +148,7 @@ namespace {
                     catch (const TextureReaderBase::TextureLoadException& e) {
                         LWARNING(std::format(
                             "Failed to load texture from '{}' with error '{}': "
-                            "Replacing with flashy color", e.filename, e.message
+                            "Replacing with flashy color", e.filename.string(), e.message
                         ));
                         ModelMesh::generateDebugTexture(meshTexture);
                         textureArray.push_back(std::move(meshTexture));
@@ -183,7 +183,7 @@ namespace {
                 catch (const TextureReader::MissingReaderException& e) {
                     LWARNING(std::format(
                         "Could not load unsupported texture from '{}' with extension "
-                        "'{}': Replacing with flashy color", e.file, e.fileExtension
+                        "'{}': Replacing with flashy color", e.file.string(), e.fileExtension
                     ));
                     ModelMesh::generateDebugTexture(meshTexture);
                     textureArray.push_back(std::move(meshTexture));
@@ -192,7 +192,7 @@ namespace {
                 catch (const TextureReaderBase::TextureLoadException& e) {
                     LWARNING(std::format(
                         "Failed to load texture from '{}' with error '{}': Replacing "
-                        "with flashy color", e.filename, e.message
+                        "with flashy color", e.filename.string(), e.message
                     ));
                     ModelMesh::generateDebugTexture(meshTexture);
                     textureArray.push_back(std::move(meshTexture));

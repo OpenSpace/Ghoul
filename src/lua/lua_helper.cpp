@@ -138,14 +138,14 @@ LuaFormatException::LuaFormatException(std::string msg, std::filesystem::path fi
 {}
 
 LuaLoadingException::LuaLoadingException(std::string error, std::filesystem::path file)
-    : LuaRuntimeException(std::format("Error loading script '{}': {}", file, error))
+    : LuaRuntimeException(std::format("Error loading script '{}': {}", file.string(), error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}
 
 LuaExecutionException::LuaExecutionException(std::string error,
                                              std::filesystem::path file)
-    : LuaRuntimeException(std::format("Error executing script '{}': {}", file, error))
+    : LuaRuntimeException(std::format("Error executing script '{}': {}", file.string(), error))
     , errorMessage(std::move(error))
     , filename(std::move(file))
 {}

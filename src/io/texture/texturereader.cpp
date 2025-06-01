@@ -40,7 +40,7 @@ TextureReader::MissingReaderException::MissingReaderException(std::string extens
                                                               std::filesystem::path file_)
     : RuntimeError(
         std::format(
-            "No reader found for extension '{}' with file '{}'", extension, file_
+            "No reader found for extension '{}' with file '{}'", extension, file_.string()
         ),
         "IO"
     )

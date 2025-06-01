@@ -39,7 +39,7 @@ RuntimeError::RuntimeError(std::string msg, std::string comp)
 }
 
 FileNotFoundError::FileNotFoundError(std::filesystem::path f, std::string comp)
-    : RuntimeError(std::format("Could not find file '{}'", f), std::move(comp))
+    : RuntimeError(std::format("Could not find file '{}'", f.string()), std::move(comp))
     , file(std::move(f))
 {}
 

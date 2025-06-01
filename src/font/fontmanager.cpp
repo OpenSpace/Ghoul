@@ -74,7 +74,7 @@ unsigned int FontManager::registerFontPath(std::string_view fontName,
             throw RuntimeError(
                 std::format(
                     "Font '{}' was registered with path '{}' before, trying '{}' now",
-                    fontName, registeredPath, filePath
+                    fontName, registeredPath.string(), filePath.string()
                 ),
                 "FontManager"
             );

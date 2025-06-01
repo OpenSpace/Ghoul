@@ -54,13 +54,13 @@ TextLog::TextLog(const std::filesystem::path& filename, int nLogRotation,
         const std::filesystem::path ext = filename.extension();
 
         std::filesystem::path newCandidate = filename;
-        newCandidate.replace_filename(std::format("{}-{}{}", fname, nLogRotation, ext));
+        newCandidate.replace_filename(std::format("{}-{}{}", fname.string(), nLogRotation, ext));
 
         std::filesystem::path oldCandidate = filename;
         if (nLogRotation > 1) {
             // We don't actually have a -0 version, it is just the base name
             oldCandidate.replace_filename(
-                std::format("{}-{}{}", fname, nLogRotation - 1, ext)
+                std::format("{}-{}{}", fname.string(), nLogRotation - 1, ext)
             );
         }
 
