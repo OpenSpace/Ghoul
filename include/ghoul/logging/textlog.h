@@ -31,6 +31,7 @@
 #include <ghoul/misc/boolean.h>
 #include <filesystem>
 #include <fstream>
+#include <mutex>
 
 namespace ghoul::logging {
 
@@ -124,6 +125,7 @@ protected:
 
 private:
     std::fstream _file;
+    std::mutex _fileMutex;
 };
 
 } // namespace ghoul::logging

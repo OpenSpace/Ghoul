@@ -28,7 +28,6 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <filesystem>
-#include <syncstream>
 
 namespace ghoul::logging {
 
@@ -101,11 +100,13 @@ void TextLog::log(LogLevel level, std::string_view category, std::string_view me
 }
 
 void TextLog::flush() {
-    std::osyncstream(_file).flush();
+    std::lock_guard g(_fileMutex);
+    _file.flush();
 }
 
 void TextLog::writeLine(const std::string& line) {
-    std::osyncstream(_file) << line;
+    std::lock_guard g(_fileMutex);
+    _file << line;
 }
 
 } // namespace ghoul::logging
