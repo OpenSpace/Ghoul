@@ -165,7 +165,7 @@ namespace ghoul::modelgeometry {
 
 ModelGeometry::ModelCacheException::ModelCacheException(std::filesystem::path file,
                                                         std::string msg)
-    : RuntimeError(std::format("Error '{}' with cache file '{}'", msg, file))
+    : RuntimeError(std::format("Error '{}' with cache file '{}'", msg, file.string()))
     , filename(std::move(file))
     , errorMessage(std::move(msg))
 {}
@@ -907,7 +907,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         // Name
         if (_animation->name().size() >= std::numeric_limits<uint8_t>::max()) {
             LWARNING(std::format(
-                "A maximum animaion name length of {} is supported",
+                "A maximum animation name length of {} is supported",
                 std::numeric_limits<uint8_t>::max()
             ));
         }
