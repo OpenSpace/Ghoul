@@ -69,6 +69,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/textlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/logging/visualstudiooutputlog.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/assert.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/base64.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/boolean.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/clipboard.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constexpr.h
@@ -135,6 +136,7 @@ target_sources(
     logging/textlog.cpp
     logging/visualstudiooutputlog.cpp
     misc/assert.cpp
+    misc/base64.cpp
     misc/clipboard.cpp
     misc/crc32.cpp
     misc/csvreader.cpp
