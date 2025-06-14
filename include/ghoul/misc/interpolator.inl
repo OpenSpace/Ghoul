@@ -61,7 +61,7 @@ namespace ghoul {
 
 template <typename T>
 T interpolateLinear(double t, const T& p0, const T& p1) {
-    if constexpr (isGlmMatrix<T> || isGlmVector<T>) {
+    if constexpr (isGlmMatrix<T>() || isGlmVector<T>()) {
         return internalLinear(typename T::value_type(t), p0, p1);
     }
     else {
@@ -71,7 +71,7 @@ T interpolateLinear(double t, const T& p0, const T& p1) {
 
 template <typename T>
 T interpolateCubicBezier(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    if constexpr (isGlmMatrix<T> || isGlmVector<T>) {
+    if constexpr (isGlmMatrix<T>() || isGlmVector<T>()) {
         return internalCubicBezier(typename T::value_type(t), p0, p1, p2, p3);
     }
     else {
@@ -81,7 +81,7 @@ T interpolateCubicBezier(double t, const T& p0, const T& p1, const T& p2, const 
 
 template <typename T>
 T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    if constexpr (isGlmMatrix<T> || isGlmVector<T>) {
+    if constexpr (isGlmMatrix<T>() || isGlmVector<T>()) {
         return internalCatmullRom(typename T::value_type(t), p0, p1, p2, p3);
     }
     else {

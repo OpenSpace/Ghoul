@@ -42,29 +42,29 @@ std::vector<uint8_t> decodeBase64(const std::string_view base64) {
         return (isalnum(c) || (c == '+') || (c == '/'));
     };
 
-    int inLen = base64.size();
+    int inLen = static_cast<int>(base64.size());
     int i = 0;
     int j = 0;
     int in_ = 0;
-    std::array<unsigned char, 4> charArray4;
-    std::array<unsigned char, 3> charArray3;
+    std::array<unsigned char, 4> char4;
+    std::array<unsigned char, 3> char3;
     std::vector<uint8_t> ret;
 
     while (inLen-- && ( base64[in_] != '=') && isBase64(base64[in_])) {
-        charArray4[i++] = base64[in_];
+        char4[i++] = base64[in_];
         in_++;
 
         if (i == 4) {
             for (i = 0; i < 4; i++) {
-                charArray4[i] = base64Chars.find(charArray4[i]);
+                char4[i] = static_cast<unsigned char>(base64Chars.find(char4[i]));
             }
 
-            charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
-            charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
-            charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+            char3[0] = (char4[0] << 2) + ((char4[1] & 0x30) >> 4);
+            char3[1] = ((char4[1] & 0xf) << 4) + ((char4[2] & 0x3c) >> 2);
+            char3[2] = ((char4[2] & 0x3) << 6) + char4[3];
 
             for (i = 0; (i < 3); i++) {
-                ret.push_back(charArray3[i]);
+                ret.push_back(char3[i]);
             }
             i = 0;
         }
@@ -72,19 +72,19 @@ std::vector<uint8_t> decodeBase64(const std::string_view base64) {
 
     if (i != 0) {
         for (j = i; j < 4; j++) {
-            charArray4[j] = 0;
+            char4[j] = 0;
         }
 
         for (j = 0; j < 4; j++) {
-            charArray4[j] = base64Chars.find(charArray4[j]);
+            char4[j] = static_cast<unsigned char>(base64Chars.find(char4[j]));
         }
 
-        charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
-        charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
-        charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+        char3[0] = (char4[0] << 2) + ((char4[1] & 0x30) >> 4);
+        char3[1] = ((char4[1] & 0xf) << 4) + ((char4[2] & 0x3c) >> 2);
+        char3[2] = ((char4[2] & 0x3) << 6) + char4[3];
 
         for (j = 0; (j < i - 1); j++) {
-            ret.push_back(charArray3[j]);
+            ret.push_back(char3[j]);
         }
     }
 
