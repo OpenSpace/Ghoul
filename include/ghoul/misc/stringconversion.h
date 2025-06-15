@@ -30,55 +30,6 @@
 #include <string>
 #include <string_view>
 
-#ifdef __APPLE__
-#include <ghoul/glm.h>
-#include <type_traits>
-
-namespace std {
-template <glm::length_t L, typename T, glm::qualifier Q>
-struct formatter<glm::vec<L, T, Q>> {
-    constexpr auto parse(format_parse_context& ctx) {
-        return ctx.begin();
-    }
-
-    auto format(const glm::vec<L, T, Q>& v, format_context& ctx) const {
-        auto out = ctx.out();
-        *out++ = '{';
-        for (glm::length_t i = 0; i < L; ++i) {
-            // Use std::format to convert each element to string
-            out = std::format_to(out, "{}", v[i]);
-            if (i + 1 < L)
-                *out++ = ',';
-        }
-        *out++ = '}';
-        return out;
-    }
-};
-
-template <glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
-struct formatter<glm::mat<C, R, T, Q>> {
-    constexpr auto parse(format_parse_context& ctx) {
-        return ctx.begin();
-    }
-
-    auto format(const glm::mat<C, R, T, Q>& m, format_context& ctx) const {
-        auto out = ctx.out();
-        *out++ = '{';
-        for (glm::length_t c = 0; c < C; ++c) {
-            for (glm::length_t r = 0; r < R; ++r) {
-                out = std::format_to(out, "{}", m[c][r]);
-                if (r + 1 < R || c + 1 < C)
-                    *out++ = ',';
-            }
-        }
-        *out++ = '}';
-        return out;
-    }
-};
-
-} // namespace std
-#endif // APPLE
-
 namespace ghoul {
 
 /**
