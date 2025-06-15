@@ -27,6 +27,7 @@
 #define __GHOUL___STRINGCONVERSION___H__
 #ifdef __APPLE__
 #include <ghoul/glm.h>
+#include <ghoul/glm_ostream.h>
 #include <sstream>
 #endif // __APPLE__
 #include <format>
