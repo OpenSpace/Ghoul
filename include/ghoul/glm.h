@@ -187,9 +187,6 @@ glm::tmat4x3<valType> createFillMat4x3(valType v) {
 
 } // namespace ghoul
 
-#ifndef __APPLE__
-// these formatters are repeated inside namespace std block for XCode
-
 template <>
 struct std::formatter<glm::bvec2> {
     constexpr auto parse(std::format_parse_context& ctx) {
