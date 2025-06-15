@@ -36,6 +36,12 @@
 #include <cstring>
 #include <sys/shm.h>
 // Common access type bits, used with ipcperm()
+#ifdef __APPLE__
+// constants conflict with macros defined in the system header file sys/ipc.h
+#undef IPC_R
+#undef IPC_W
+#undef IPC_M
+#endif // APPLE
 constexpr int IPC_R = 000400; // read permission
 constexpr int IPC_W = 000200; // write/alter permission
 constexpr int IPC_M = 010000; // permission to change control info
