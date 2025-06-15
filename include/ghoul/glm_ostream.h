@@ -87,6 +87,23 @@ ostream& operator<<(ostream& os, const glm::mat<4, 4, T, Q>& m) {
     }
     return os;
 }
+
+template <typename T, glm::length_t C, glm::length_t R>
+std::ostream& operator<<(std::ostream& os, const glm::mat<C, R, T>& mat) {
+    os << "[";
+    for (glm::length_t i = 0; i < C; ++i) {
+        os << "[";
+        for (glm::length_t j = 0; j < R; ++j) {
+            os << mat[i][j];
+            if (j < R - 1) os << ", ";
+        }
+        os << "]";
+        if (i < C - 1) os << ", ";
+    }
+    os << "]";
+    return os;
 }
+
+} // namespace std
 
 #endif // __GHOUL___GLM_OSTREAM___H__
