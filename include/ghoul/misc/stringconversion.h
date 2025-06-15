@@ -54,8 +54,30 @@ struct formatter<glm::vec<L, T, Q>> {
         return out;
     }
 };
+
+template <glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
+struct formatter<glm::mat<C, R, T, Q>> {
+    constexpr auto parse(format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const glm::mat<C, R, T, Q>& m, format_context& ctx) const {
+        auto out = ctx.out();
+        *out++ = '{';
+        for (glm::length_t c = 0; c < C; ++c) {
+            for (glm::length_t r = 0; r < R; ++r) {
+                out = std::format_to(out, "{}", m[c][r]);
+                if (r + 1 < R || c + 1 < C)
+                    *out++ = ',';
+            }
+        }
+        *out++ = '}';
+        return out;
+    }
+};
+
 } // namespace std
-#endif
+#endif // APPLE
 
 namespace ghoul {
 
