@@ -52,12 +52,11 @@
 
 #include <string>
 
-
-
 namespace std {
 // adding operator overloads for MacOS instead of std::format overloads
 
 // for glm::vec2, glm::vec3, glm::vec4
+/*
 template<typename T, glm::qualifier Q>
 ostream& operator<<(ostream& os, const glm::vec<2, T, Q>& v) {
     return os << '(' << v.x << ", " << v.y << ')';
@@ -72,35 +71,37 @@ template<typename T, glm::qualifier Q>
 ostream& operator<<(ostream& os, const glm::vec<4, T, Q>& v) {
     return os << '(' << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ')';
 }
+*/
 
-// For glm::mat types, implement similarly
-template<typename T, glm::qualifier Q>
-ostream& operator<<(ostream& os, const glm::mat<4, 4, T, Q>& m) {
-    for (int i = 0; i < 4; ++i) {
-        os << '|';
-        for (int j = 0; j < 4; ++j) {
-            os << m[j][i];
-            if (j < 3) os << ", ";
+// Generic operator<< for all glm::vec types to match std::formatter
+template <glm::length_t L, typename T, glm::qualifier Q>
+ostream& operator<<(ostream& os, const glm::vec<L, T, Q>& v) {
+    os << '{';
+    for (glm::length_t i = 0; i < L; ++i) {
+        os << v[i];
+        if (i < L - 1) {
+            os << ',';
         }
-        os << '|';
-        if (i < 3) os << '\n';
     }
+    os << '}';
     return os;
 }
 
-template <typename T, glm::length_t C, glm::length_t R>
-std::ostream& operator<<(std::ostream& os, const glm::mat<C, R, T>& mat) {
-    os << "[";
+// For glm::mat types, implement similarly
+
+template<typename T, glm::length_t C, glm::length_t R, glm::qualifier Q>
+ostream& operator<<(ostream& os, const glm::mat<C, R, T, Q>& mat) {
+    os << "{";
     for (glm::length_t i = 0; i < C; ++i) {
-        os << "[";
         for (glm::length_t j = 0; j < R; ++j) {
             os << mat[i][j];
-            if (j < R - 1) os << ", ";
+            // Print comma except after the last element
+            if (!(i == C - 1 && j == R - 1)) {
+                os << ",";
+            }
         }
-        os << "]";
-        if (i < C - 1) os << ", ";
     }
-    os << "]";
+    os << "}";
     return os;
 }
 
