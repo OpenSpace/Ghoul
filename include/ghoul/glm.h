@@ -1077,38 +1077,6 @@ struct std::not_equal_to<glm::dvec4> {
 };
 
 #ifdef __APPLE__
-// adding operator overloads for MacOS instead of std::format overloads
-
-// for glm::vec2, glm::vec3, glm::vec4
-template<typename T, glm::qualifier Q>
-std::ostream& operator<<(std::ostream& os, const glm::vec<2, T, Q>& v) {
-    return os << '(' << v.x << ", " << v.y << ')';
-}
-
-template<typename T, glm::qualifier Q>
-std::ostream& operator<<(std::ostream& os, const glm::vec<3, T, Q>& v) {
-    return os << '(' << v.x << ", " << v.y << ", " << v.z << ')';
-}
-
-template<typename T, glm::qualifier Q>
-std::ostream& operator<<(std::ostream& os, const glm::vec<4, T, Q>& v) {
-    return os << '(' << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ')';
-}
-
-// For glm::mat types, implement similarly
-template<typename T, glm::qualifier Q>
-std::ostream& operator<<(std::ostream& os, const glm::mat<4, 4, T, Q>& m) {
-    for (int i = 0; i < 4; ++i) {
-        os << '|';
-        for (int j = 0; j < 4; ++j) {
-            os << m[j][i];
-            if (j < 3) os << ", ";
-        }
-        os << '|';
-        if (i < 3) os << '\n';
-    }
-    return os;
-}
 #pragma clang diagnostic pop
 #endif // APPLE
 
