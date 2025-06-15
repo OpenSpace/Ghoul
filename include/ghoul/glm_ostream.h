@@ -29,15 +29,6 @@
 #include <ghoul/misc/stringconversion.h>
 #include <ostream>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/ext/matrix_common.hpp>
-#include <glm/gtx/component_wise.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <string>
-
 #ifndef GLM_META_PROG_HELPERS
 #define GLM_META_PROG_HELPERS
 #endif // GLM_META_PROG_HELPERS
@@ -51,6 +42,17 @@
 #define GLM_FORCE_CTOR_INIT
 #endif // GLM_FORCE_CTOR_INIT
 #endif
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext/matrix_common.hpp>
+#include <glm/gtx/component_wise.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <string>
+
+
 
 namespace std {
 // adding operator overloads for MacOS instead of std::format overloads
