@@ -189,6 +189,9 @@ glm::tmat4x3<valType> createFillMat4x3(valType v) {
 
 } // namespace ghoul
 
+#ifndef __APPLE__
+// these formatters are repeated inside namespace std block for XCode
+
 template <>
 struct std::formatter<glm::bvec2> {
     constexpr auto parse(std::format_parse_context& ctx) {
@@ -1074,6 +1077,8 @@ struct std::not_equal_to<glm::dvec4> {
         return a.x != b.x && a.x != b.y && a.z != b.z && a.w != b.w;
     }
 };
+
+#endif // ifndef APPLE
 
 #ifdef __APPLE__
 // adding formatters inside namespace std since MacOS
