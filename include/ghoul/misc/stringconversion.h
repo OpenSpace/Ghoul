@@ -25,7 +25,9 @@
 
 #ifndef __GHOUL___STRINGCONVERSION___H__
 #define __GHOUL___STRINGCONVERSION___H__
-
+#ifdef __APPLE__
+#include <ghoul/glm.h>
+#endif // __APPLE__
 #include <format>
 #include <string>
 #include <string_view>
