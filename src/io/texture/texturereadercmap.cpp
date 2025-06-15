@@ -44,7 +44,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     if (nDimensions != 1) {
         throw ghoul::RuntimeError(std::format(
             "The number of dimensions for '{}' must be 1, but was {}",
-            filename, nDimensions
+            filename.string(), nDimensions
         ));
     }
 
