@@ -38,6 +38,20 @@
 
 #include <string>
 
+#ifndef GLM_META_PROG_HELPERS
+#define GLM_META_PROG_HELPERS
+#endif // GLM_META_PROG_HELPERS
+
+#ifndef GLM_ENABLE_EXPERIMENTAL
+#define GLM_ENABLE_EXPERIMENTAL
+#endif // GLM_ENABLE_EXPERIMENTAL
+
+#ifndef __APPLE__
+#ifndef GLM_FORCE_CTOR_INIT
+#define GLM_FORCE_CTOR_INIT
+#endif // GLM_FORCE_CTOR_INIT
+#endif
+
 namespace std {
 // adding operator overloads for MacOS instead of std::format overloads
 
