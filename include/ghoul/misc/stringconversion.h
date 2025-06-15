@@ -27,6 +27,7 @@
 #define __GHOUL___STRINGCONVERSION___H__
 #ifdef __APPLE__
 #include <ghoul/glm.h>
+#include <sstream>
 #endif // __APPLE__
 #include <format>
 #include <string>
@@ -66,7 +67,15 @@ std::string to_string(const T& value) {
         return value;
     }
     else {
+#ifndef __APPLE__
+        // XCode 15.4 trips over this, even after namespace changes
         return std::format("{}", value);
+#endif
+#ifdef __APPLE__
+        std::ostringstream oss;
+        oss << value;
+        return oss.str();
+#endif // __APPLE__
     }
 }
 
