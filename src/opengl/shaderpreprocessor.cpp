@@ -172,7 +172,7 @@ ShaderPreprocessor::ShaderPreprocessor(std::string shaderPath, Dictionary dictio
 
 ShaderPreprocessor::IncludeError::IncludeError(std::filesystem::path f)
     : ShaderPreprocessorError(
-        std::format("Could not resolve file path for include file '{}'", f)
+        std::format("Could not resolve file path for include file '{}'", f.string())
     )
     , file(std::move(f))
 {}
@@ -287,7 +287,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
 
     std::ifstream stream = std::ifstream(path, std::ifstream::binary);
     if (!stream.good()) {
-        throw ghoul::RuntimeError(std::format("Error loading include file '{}'", path));
+        throw ghoul::RuntimeError(std::format("Error loading include file '{}'", path.string()));
     }
     ghoul_assert(stream.good() , "Input stream is not good");
 
@@ -305,7 +305,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
         if (!environment.success) {
             throw ParserError(std::format(
                 "Could not parse line. '{}': {}",
-                path, environment.inputs.back().lineNumber
+                path.string(), environment.inputs.back().lineNumber
             ));
         }
     }
@@ -321,7 +321,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
 
             throw ParserError(std::format(
                 "Unexpected end of file. Still processing #for loop from '{}': {}. {}",
-                p, lineNumber, debugString(environment)
+                p.string(), lineNumber, debugString(environment)
             ));
         }
     }
@@ -352,7 +352,7 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
 
     env.output << std::format(
         "{}\n#line {} {} // {}\n",
-        includeSeparator, env.inputs.back().lineNumber, fileIdentifier, filename
+        includeSeparator, env.inputs.back().lineNumber, fileIdentifier, filename.string()
     );
 }
 
@@ -400,7 +400,7 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
 std::string ShaderPreprocessor::debugString(const ShaderPreprocessor::Env& env) {
     if (!env.inputs.empty()) {
         const ShaderPreprocessor::Input& input = env.inputs.back();
-        return std::format("{}: {}", input.file.path(), input.lineNumber);
+        return std::format("{}: {}", input.file.path().string(), input.lineNumber);
     }
     else {
         return "";
@@ -836,7 +836,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
 
         throw ParserError(std::format(
             "Unexpected #endfor. Last #for was in {}: {}. {}",
-            path, lineNumber, debugString(env)
+            path.string(), lineNumber, debugString(env)
         ));
     }
 
