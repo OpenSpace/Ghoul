@@ -64,7 +64,7 @@ namespace {
         throw RuntimeError(
             std::format(
                 "Error loading font '{}' for size '{}': {} {}",
-                name, size, e.code, e.message
+                name.string(), size, e.code, e.message
             ),
             "Font"
         );
