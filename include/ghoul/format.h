@@ -30,31 +30,35 @@
 #include <format>
 #include <optional>
 
+// XCode insists on having namespace std{} block around templates
+namespace std {
 template <>
-struct std::formatter<std::filesystem::path> {
-    constexpr auto parse(std::format_parse_context& ctx) {
+struct formatter<filesystem::path> {
+    constexpr auto parse(format_parse_context& ctx) {
         return ctx.begin();
     }
 
-    auto format(const std::filesystem::path& path, std::format_context& ctx) const {
-        return std::format_to(ctx.out(), "{}", path.string());
+    auto format(const filesystem::path& path, format_context& ctx) const {
+        return format_to(ctx.out(), "{}", path.string());
     }
 };
 
 template <typename T>
-struct std::formatter<std::optional<T>> {
-    constexpr auto parse(std::format_parse_context& ctx) {
+struct formatter<optional<T>> {
+    constexpr auto parse(format_parse_context& ctx) {
         return ctx.begin();
     }
 
-    auto format(const std::optional<T>& opt, std::format_context& ctx) const {
+    auto format(const optional<T>& opt, format_context& ctx) const {
         if (opt) {
-            return std::format_to(ctx.out(), "{}", *opt);
+            return format_to(ctx.out(), "{}", *opt);
         }
         else {
-            return std::format_to(ctx.out(), "<none>");
+            return format_to(ctx.out(), "<none>");
         }
     }
 };
+
+} // namespace std
 
 #endif // __GHOUL___FORMAT___H__
