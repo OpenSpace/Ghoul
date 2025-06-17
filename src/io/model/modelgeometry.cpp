@@ -165,7 +165,7 @@ namespace ghoul::modelgeometry {
 
 ModelGeometry::ModelCacheException::ModelCacheException(std::filesystem::path file,
                                                         std::string msg)
-    : RuntimeError(std::format("Error '{}' with cache file '{}'", msg, file))
+    : RuntimeError(std::format("Error '{}' with cache file '{}'", msg, file.string()))
     , filename(std::move(file))
     , errorMessage(std::move(msg))
 {}

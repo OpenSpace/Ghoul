@@ -23,42 +23,88 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___FORMAT___H__
-#define __GHOUL___FORMAT___H__
+#ifndef __GHOUL___GLM_OSTREAM___H__
+#define __GHOUL___GLM_OSTREAM___H__
+#include <ghoul/format.h>
+#include <ghoul/misc/stringconversion.h>
+#include <ostream>
 
-#include <filesystem>
-#include <format>
-#include <optional>
+#ifndef GLM_META_PROG_HELPERS
+#define GLM_META_PROG_HELPERS
+#endif // GLM_META_PROG_HELPERS
 
-// XCode insists on having namespace std{} block around templates
+#ifndef GLM_ENABLE_EXPERIMENTAL
+#define GLM_ENABLE_EXPERIMENTAL
+#endif // GLM_ENABLE_EXPERIMENTAL
+
+#ifndef __APPLE__
+#ifndef GLM_FORCE_CTOR_INIT
+#define GLM_FORCE_CTOR_INIT
+#endif // GLM_FORCE_CTOR_INIT
+#endif
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext/matrix_common.hpp>
+#include <glm/gtx/component_wise.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <string>
+
 namespace std {
-template <>
-struct formatter<filesystem::path> {
-    constexpr auto parse(format_parse_context& ctx) {
-        return ctx.begin();
-    }
+// adding operator overloads for MacOS instead of std::format overloads
 
-    auto format(const filesystem::path& path, format_context& ctx) const {
-        return format_to(ctx.out(), "{}", path.string());
-    }
-};
+// for glm::vec2, glm::vec3, glm::vec4
+/*
+template<typename T, glm::qualifier Q>
+ostream& operator<<(ostream& os, const glm::vec<2, T, Q>& v) {
+    return os << '(' << v.x << ", " << v.y << ')';
+}
 
-template <typename T>
-struct formatter<optional<T>> {
-    constexpr auto parse(format_parse_context& ctx) {
-        return ctx.begin();
-    }
+template<typename T, glm::qualifier Q>
+ostream& operator<<(ostream& os, const glm::vec<3, T, Q>& v) {
+    return os << '(' << v.x << ", " << v.y << ", " << v.z << ')';
+}
 
-    auto format(const optional<T>& opt, format_context& ctx) const {
-        if (opt) {
-            return format_to(ctx.out(), "{}", *opt);
+template<typename T, glm::qualifier Q>
+ostream& operator<<(ostream& os, const glm::vec<4, T, Q>& v) {
+    return os << '(' << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ')';
+}
+*/
+
+// Generic operator<< for all glm::vec types to match std::formatter
+template <glm::length_t L, typename T, glm::qualifier Q>
+ostream& operator<<(ostream& os, const glm::vec<L, T, Q>& v) {
+    os << '{';
+    for (glm::length_t i = 0; i < L; ++i) {
+        os << v[i];
+        if (i < L - 1) {
+            os << ',';
         }
-        else {
-            return format_to(ctx.out(), "<none>");
+    }
+    os << '}';
+    return os;
+}
+
+// For glm::mat types, implement similarly
+
+template<typename T, glm::length_t C, glm::length_t R, glm::qualifier Q>
+ostream& operator<<(ostream& os, const glm::mat<C, R, T, Q>& mat) {
+    os << "{";
+    for (glm::length_t i = 0; i < C; ++i) {
+        for (glm::length_t j = 0; j < R; ++j) {
+            os << mat[i][j];
+            // Print comma except after the last element
+            if (!(i == C - 1 && j == R - 1)) {
+                os << ",";
+            }
         }
     }
-};
+    os << "}";
+    return os;
+}
 
 } // namespace std
 
-#endif // __GHOUL___FORMAT___H__
+#endif // __GHOUL___GLM_OSTREAM___H__
