@@ -105,6 +105,12 @@ ostream& operator<<(ostream& os, const glm::mat<C, R, T, Q>& mat) {
     return os;
 }
 
+template <typename T>
+std::string to_string(const std::optional<T>& v) {
+    if (!v) return "null";
+    else return to_string(*v);
+}
+
 } // namespace std
 
 #endif // __GHOUL___GLM_OSTREAM___H__
