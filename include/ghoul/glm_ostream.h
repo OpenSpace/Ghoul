@@ -52,6 +52,9 @@
 
 #include <string>
 
+#include <sstream>
+#include <optional>
+
 namespace std {
 // adding operator overloads for MacOS instead of std::format overloads
 
