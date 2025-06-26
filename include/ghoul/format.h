@@ -31,7 +31,8 @@
 #include <optional>
 
 // XCode insists on having namespace std{} block around templates
-namespace std {
+// but runs into std::std::move not found errors when added here.
+//namespace std {
 template <>
 struct formatter<filesystem::path> {
     constexpr auto parse(format_parse_context& ctx) {
@@ -59,6 +60,6 @@ struct formatter<optional<T>> {
     }
 };
 
-} // namespace std
+// } // namespace std
 
 #endif // __GHOUL___FORMAT___H__
