@@ -106,7 +106,7 @@ ostream& operator<<(ostream& os, const glm::mat<C, R, T, Q>& mat) {
 }
 
 template <typename T>
-std::string to_string(const std::optional<T>& v) {
+string to_string(const optional<T>& v) {
     if (!v) return "null";
     else {
         T temp = *v;
