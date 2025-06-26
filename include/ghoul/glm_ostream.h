@@ -105,14 +105,21 @@ ostream& operator<<(ostream& os, const glm::mat<C, R, T, Q>& mat) {
     return os;
 }
 
+} // namespace std
+
+namespace ghoul {
+
+// there is a similar template in misc/stringconversion.h
+// XCode needs a specific template for std::optional
+
 template <typename T>
-string to_string(const optional<T>& v) {
+std::string to_string(const std::optional<T>& v) {
     if (!v) return "null";
     else {
         T temp = *v;
-        return to_string(temp);
+        return std::to_string(temp);
 }
 
-} // namespace std
+} // namespace ghoul
 
 #endif // __GHOUL___GLM_OSTREAM___H__
