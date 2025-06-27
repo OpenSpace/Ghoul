@@ -87,7 +87,7 @@ std::string to_string(const std::optional<T>& v) {
     if (!v) return "null";
     else {
         T temp = *v;
-        return std::to_string(temp);
+        return ghoul::to_string(temp);
     }
 }
 #endif // __APPLE__ - XCode needs a separate template for std::optional
