@@ -110,6 +110,7 @@ ostream& operator<<(ostream& os, const glm::mat<C, R, T, Q>& mat) {
 
 } // namespace std
 
+/* Temporarily commenting out to check for compile errors
 namespace ghoul {
 
 // there is a similar template in misc/stringconversion.h
@@ -123,6 +124,6 @@ std::string to_string(const std::optional<T>& v) {
         return std::to_string(temp);
 }
 
-} // namespace ghoul
+} // namespace ghoul */
 
 #endif // __GHOUL___GLM_OSTREAM___H__
