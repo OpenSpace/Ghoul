@@ -108,6 +108,20 @@ ostream& operator<<(ostream& os, const glm::mat<C, R, T, Q>& mat) {
     return os;
 }
 
+// We need an overload template for std::optional<glm::vec> types
+// for eg. in src/documentation/documentationengine.cpp
+
+template <glm::length_t L, typename T, glm::qualifier Q>
+ostream& operator<<(ostream& os, const optional<glm::vec<L, T, Q>>& opt) {
+    if (opt) {
+        os << *opt; // Use the existing glm::vec operator<<
+    } else {
+        os << "<none>";
+    }
+    return os;
+}
+
+
 } // namespace std
 
 
