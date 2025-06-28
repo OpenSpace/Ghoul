@@ -80,18 +80,6 @@ std::string to_string(const T& value) {
     }
 }
 
-#ifdef __APPLE__
-// XCode 15.4 seems to need a specific template for std::optional
-template <typename T>
-std::string to_string(const std::optional<T>& v) {
-    if (!v) return "null";
-    else {
-        T temp = *v;
-        return ghoul::to_string(temp);
-    }
-}
-#endif // __APPLE__ - XCode needs a separate template for std::optional
-
 } // namespace ghoul
 
 #endif // __GHOUL___STRINGCONVERSION___H__
