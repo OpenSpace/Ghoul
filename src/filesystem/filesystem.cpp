@@ -74,7 +74,7 @@ FileSystem* FileSystem::_instance = nullptr;
 
 FileSystem::FileSystem() {
     std::filesystem::path temporaryPath = std::filesystem::temp_directory_path();
-    LINFO(std::format("Set temporary path ${{TEMPORARY}} to '{}'", temporaryPath));
+    LINFO(std::format("Set temporary path ${{TEMPORARY}} to '{}'", temporaryPath.string()));
     registerPathToken("${TEMPORARY}", temporaryPath);
 
 #if !defined(WIN32) && !defined(__APPLE__)
@@ -259,7 +259,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     if (FAILED(hres)) {
         throw ghoul::RuntimeError(std::format(
             "Failed initializing ShellLink when resolving path '{}' with error: {}",
-            path, hres
+            path.string(), hres
         ));
     }
     defer { psl->Release(); };
@@ -269,7 +269,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     if (FAILED(hres)) {
         throw ghoul::RuntimeError(std::format(
             "Failed querying interface when resolving path '{}' with error: {}",
-            path, hres
+            path.string(), hres
         ));
     }
     defer{ ppf->Release(); };
@@ -280,21 +280,21 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     if (res == 0) {
         DWORD error = GetLastError();
         throw ghoul::RuntimeError(std::format(
-            "Failed converting path '{}' with error: {}", path, error
+            "Failed converting path '{}' with error: {}", path.string(), error
         ));
     }
 
     hres = ppf->Load(wsz, STGM_READ);
     if (FAILED(hres)) {
         throw ghoul::RuntimeError(std::format(
-            "Failed loading ShellLink file at path '{}' with error: {}", path, hres
+            "Failed loading ShellLink file at path '{}' with error: {}", path.string(), hres
         ));
     }
 
     hres = psl->Resolve(nullptr, 0);
     if (FAILED(hres)) {
         throw ghoul::RuntimeError(std::format(
-            "Failed to resolve ShellLink at path '{}' with error: {}", path, hres
+            "Failed to resolve ShellLink at path '{}' with error: {}", path.string(), hres
         ));
     }
 
@@ -303,7 +303,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     hres = psl->GetPath(szGotPath, MAX_PATH, &wfd, SLGP_SHORTPATH);
     if (FAILED(hres)) {
         throw ghoul::RuntimeError(std::format(
-            "Failed to get path of ShellLink at path '{}' with error: {}", path, hres
+            "Failed to get path of ShellLink at path '{}' with error: {}", path.string(), hres
         ));
     }
 

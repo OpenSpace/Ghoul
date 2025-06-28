@@ -28,6 +28,9 @@
 
 #include <ghoul/format.h>
 #include <ghoul/misc/stringconversion.h>
+#ifdef __APPLE__
+#include <ostream>
+#endif // __APPLE__
 
 #ifdef __APPLE__
 // The GLM header throw 'anonymous struct' warnings that we do not want. By marking the
@@ -1075,7 +1078,7 @@ struct std::not_equal_to<glm::dvec4> {
 
 #ifdef __APPLE__
 #pragma clang diagnostic pop
-#endif
+#endif // APPLE
 
 #ifdef __unix__
 #pragma GCC diagnostic pop
