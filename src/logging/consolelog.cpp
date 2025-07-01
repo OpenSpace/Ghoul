@@ -30,7 +30,11 @@
 #include <ghoul/misc/profiling.h>
 #include <iostream>
 #include <string_view>
+#if __has_include(<syncstream>)
 #include <syncstream>
+#else
+#include <mutex>
+#endif
 
 #ifdef WIN32
 #include <Windows.h>
@@ -40,6 +44,22 @@
 #include <assert.h>
 #include <unistd.h>
 #include <sys/sysctl.h>
+
+#if !__has_include(<syncstream>)
+std::mutex sync_mutex;
+
+template <typename T>
+void sync_print_cout(T&& message) {
+    std::lock_guard<std::mutex> lock(sync_mutex);
+    std::cout << std::forward<T>(message) << std::endl;
+}
+
+template <typename T>
+void sync_print_cerr(T&& message) {
+    std::lock_guard<std::mutex> lock(sync_mutex);
+    std::cerr << std::forward<T>(message) << std::endl;
+}
+#endif // if no syncstream, use sync_print instead of osyncstream
 
 // Function is taken from https://developer.apple.com/library/mac/qa/qa1361/_index.html
 // Returns true if the current process is being debugged (either running under the
@@ -142,10 +162,18 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
 
     res += message;
     if (level >= LogLevel::Error) {
+#if __has_include(<syncstream>)
         std::osyncstream(std::cerr) << res << '\n';
+#else
+       sync_print_cerr(res); 
+#endif
     }
     else {
+#if __has_include(<syncstream>)
         std::osyncstream(std::cout) << res << '\n';
+#else
+       sync_print_cout(res);
+#endif
     }
 
 
@@ -154,9 +182,16 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
     }
 }
 
+#if !__has_include(<syncstream>)
+void ConsoleLog::flush() {
+    std::lock_guard<std::mutex> lock(sync_mutex);
+    std::cout.flush();
+}
+#else
 void ConsoleLog::flush() {
     std::osyncstream(std::cout).flush();
 }
+#endif
 
 void ConsoleLog::setColorForLevel(LogLevel level) {
 #ifdef WIN32
