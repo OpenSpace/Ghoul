@@ -47,29 +47,13 @@ public:
 
     using ShaderChangedCallback = std::function<void ()>;
 
-    struct ShaderPreprocessorError : public RuntimeError {
-        explicit ShaderPreprocessorError(std::string msg);
-    };
-
-    struct SubstitutionError : public ShaderPreprocessorError {
-        explicit SubstitutionError(std::string msg);
-    };
-
-    struct ParserError : public ShaderPreprocessorError {
-        explicit ParserError(std::string msg);
-    };
-
-    struct IncludeError : public ShaderPreprocessorError {
-        explicit IncludeError(std::filesystem::path f);
-        const std::filesystem::path file;
-    };
-
-    ShaderPreprocessor(std::string shaderPath = "", Dictionary dictionary = Dictionary());
+    explicit ShaderPreprocessor(std::filesystem::path shaderPath = "",
+        Dictionary dictionary = Dictionary());
 
     const std::filesystem::path& filename() const;
     const Dictionary& dictionary() const;
     void setDictionary(Dictionary dictionary);
-    void setFilename(const std::filesystem::path& shaderPath);
+    void setFilename(std::filesystem::path shaderPath);
     void setCallback(ShaderChangedCallback changeCallback);
     void process(std::string& output);
     std::string getFileIdentifiersString() const;
@@ -135,7 +119,6 @@ private:
     bool parseFor(ShaderPreprocessor::Env& env);
     bool parseEndFor(ShaderPreprocessor::Env& env);
     bool parseInclude(ShaderPreprocessor::Env& env);
-    bool parseVersion(const ShaderPreprocessor::Env& env);
     bool parseOs(ShaderPreprocessor::Env& env);
 
     bool substituteLine(ShaderPreprocessor::Env& env);
@@ -154,7 +137,6 @@ private:
     bool parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min,
         int& max);
     void addLineNumber(ShaderPreprocessor::Env& env);
-    bool isInsideEmptyForStatement(ShaderPreprocessor::Env& env);
 
     std::string debugString(const ShaderPreprocessor::Env& env);
 

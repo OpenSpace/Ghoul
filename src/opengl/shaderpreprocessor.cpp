@@ -40,6 +40,12 @@
 #include <sstream>
 
 namespace {
+    struct ShaderPreprocessorError : public ghoul::RuntimeError {
+        explicit ShaderPreprocessorError(std::string msg)
+            : RuntimeError(std::move(msg), "ShaderPreprocessor")
+        {}
+    };
+
     bool isString(std::string_view str) {
         return str.length() > 1 && str.front() == '"' && str.back() == '"';
     }
@@ -153,28 +159,10 @@ namespace ghoul::opengl {
 std::vector<std::filesystem::path> ShaderPreprocessor::_includePaths =
     std::vector<std::filesystem::path>();
 
-ShaderPreprocessor::ShaderPreprocessorError::ShaderPreprocessorError(std::string msg)
-    : RuntimeError(std::move(msg), "ShaderPreprocessor")
-{}
-
-ShaderPreprocessor::SubstitutionError::SubstitutionError(std::string msg)
-    : ShaderPreprocessorError(std::move(msg))
-{}
-
-ShaderPreprocessor::ParserError::ParserError(std::string msg)
-    : ShaderPreprocessorError(std::move(msg))
-{}
-
-ShaderPreprocessor::ShaderPreprocessor(std::string shaderPath, Dictionary dictionary)
+ShaderPreprocessor::ShaderPreprocessor(std::filesystem::path shaderPath,
+                                       Dictionary dictionary)
     : _shaderPath(std::move(shaderPath))
     , _dictionary(std::move(dictionary))
-{}
-
-ShaderPreprocessor::IncludeError::IncludeError(std::filesystem::path f)
-    : ShaderPreprocessorError(
-        std::format("Could not resolve file path for include file '{}'", f)
-    )
-    , file(std::move(f))
 {}
 
 ShaderPreprocessor::Input::Input(std::ifstream& str, ghoul::filesystem::File& f,
@@ -201,9 +189,9 @@ const Dictionary& ShaderPreprocessor::dictionary() const {
     return _dictionary;
 }
 
-void ShaderPreprocessor::setFilename(const std::filesystem::path& shaderPath) {
+void ShaderPreprocessor::setFilename(std::filesystem::path shaderPath) {
     if (_shaderPath != shaderPath) {
-        _shaderPath = shaderPath;
+        _shaderPath = std::move(shaderPath);
         if (_onChangeCallback) {
             _onChangeCallback();
         }
@@ -218,17 +206,17 @@ void ShaderPreprocessor::process(std::string& output) {
     std::stringstream stream;
     ShaderPreprocessor::Env env{stream};
 
-    includeFile(absPath(_shaderPath), TrackChanges::Yes, env);
+    includeFile(_shaderPath, TrackChanges::Yes, env);
 
     if (!env.forStatements.empty()) {
-        throw ParserError(
+        throw ShaderPreprocessorError(
             "Unexpected end of file in the middle of expanding #for statement. " +
             debugString(env)
         );
     }
 
     if (!env.scopes.empty()) {
-        throw ParserError("Unexpected end of file. " + debugString(env));
+        throw ShaderPreprocessorError("Unexpected end of file. " + debugString(env));
     }
 
     output = stream.str();
@@ -289,7 +277,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
     if (!stream.good()) {
         throw ghoul::RuntimeError(std::format("Error loading include file '{}'", path));
     }
-    ghoul_assert(stream.good() , "Input stream is not good");
+    ghoul_assert(stream.good(), "Input stream is not good");
 
     ghoul::filesystem::File file = ghoul::filesystem::File(path);
 
@@ -303,7 +291,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
 
     while (parseLine(environment)) {
         if (!environment.success) {
-            throw ParserError(std::format(
+            throw ShaderPreprocessorError(std::format(
                 "Could not parse line. '{}': {}",
                 path, environment.inputs.back().lineNumber
             ));
@@ -319,7 +307,7 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
             const std::filesystem::path p = forInput.file.path();
             int lineNumber = forStatement.lineNumber;
 
-            throw ParserError(std::format(
+            throw ShaderPreprocessorError(std::format(
                 "Unexpected end of file. Still processing #for loop from '{}': {}. {}",
                 p, lineNumber, debugString(environment)
             ));
@@ -356,10 +344,6 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
     );
 }
 
-bool ShaderPreprocessor::isInsideEmptyForStatement(ShaderPreprocessor::Env& env) {
-    return !env.forStatements.empty() && (env.forStatements.back().keyIndex == -1);
-}
-
 bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
     Input& input = env.inputs.back();
     if (!ghoul::getline(input.stream, env.line)) {
@@ -372,7 +356,9 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
 
     bool isSpecialLine = parseEndFor(env); // #endfor
 
-    if (isInsideEmptyForStatement(env)) {
+    const bool isInsideEmptyForStatement =
+        !env.forStatements.empty() && (env.forStatements.back().keyIndex == -1);
+    if (isInsideEmptyForStatement) {
         return true;
     }
 
@@ -414,7 +400,7 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
     while ((beginOffset = line.rfind("#{")) != std::string::npos) {
         const size_t endOffset = line.substr(beginOffset).find('}');
         if (endOffset == std::string::npos) {
-            throw ParserError("Could not parse line. " + debugString(env));
+            throw ShaderPreprocessorError("Could not parse line. " + debugString(env));
         }
 
         const std::string in = line.substr(beginOffset + 2, endOffset - 2);
@@ -462,7 +448,7 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
 {
     std::string resolved;
     if (!resolveAlias(in, resolved, env)) {
-        throw SubstitutionError(std::format(
+        throw ShaderPreprocessorError(std::format(
             "Could not resolve variable '{}'. {}", in, debugString(env)
         ));
     }
@@ -499,7 +485,7 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
         return std::format("dvec3({},{},{})", vec.x, vec.y, vec.z);
     }
     else {
-        throw SubstitutionError(std::format(
+        throw ShaderPreprocessorError(std::format(
             "'{}' was resolved to '{}' which is a type that is not supported. {}",
             in, resolved, debugString(env)
         ));
@@ -555,17 +541,17 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
     const size_t p1 = line.find_first_not_of(ws, includeString.length());
     if (p1 == std::string::npos) {
-        throw ParserError("Expected file path after #include. " + debugString(env));
+        throw ShaderPreprocessorError("Expected file path after #include. " + debugString(env));
     }
 
     if ((line[p1] != '\"') && (line[p1] != '<')) {
-        throw ParserError("Expected \" or <. " + debugString(env));
+        throw ShaderPreprocessorError("Expected \" or <. " + debugString(env));
     }
 
     if (line[p1] == '\"') {
         const size_t p2 = line.find_first_of('\"', p1 + 1);
         if (p2 == std::string::npos) {
-            throw ParserError("Expected \"" + debugString(env));
+            throw ShaderPreprocessorError("Expected \"" + debugString(env));
         }
 
         const size_t includeLength = p2 - p1 - 1;
@@ -596,15 +582,17 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
         }
 
         if (!includeFileWasFound) {
-            throw IncludeError(includeFilename);
+            throw ShaderPreprocessorError(std::format(
+                "Could not resolve file path for include file '{}'", includeFilepath
+            ));
         }
 
-        includeFile(absPath(includeFilepath), TrackChanges(tracksInclude), env);
+        includeFile(includeFilepath, TrackChanges(tracksInclude), env);
     }
     else if (line.at(p1) == '<') {
         const size_t p2 = line.find_first_of('>', p1 + 1);
         if (p2 == std::string::npos) {
-            throw ParserError("Expected >. " + debugString(env));
+            throw ShaderPreprocessorError("Expected >. " + debugString(env));
         }
 
         const size_t includeLen = p2 - p1 - 1;
@@ -700,7 +688,7 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     if (line.substr(inPos).length() < inString.length() + 1 ||
         line.substr(inPos, inString.length()) != inString)
     {
-        throw ParserError("Expected 'in' in #for statement. " + debugString(env));
+        throw ShaderPreprocessorError("Expected 'in' in #for statement. " + debugString(env));
     }
 
     const size_t wsBeforeDictionaryPos = inPos + inString.length();
@@ -722,7 +710,7 @@ bool ShaderPreprocessor::parseRange(const std::string& dictionaryName,
     const size_t minEnd = dictionaryName.find(twoDots);
 
     if (minEnd == std::string::npos) {
-        throw ParserError("Expected '..' in range. " + dictionaryName);
+        throw ShaderPreprocessorError("Expected '..' in range. " + dictionaryName);
     }
     const int minimum = std::stoi(dictionaryName.substr(minStart, minEnd - minStart));
 
@@ -769,7 +757,7 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     // Resolve the real dictionary reference.
     std::string dictionaryRef;
     if (!resolveAlias(dictionaryName, dictionaryRef, env)) {
-        throw SubstitutionError(std::format(
+        throw ShaderPreprocessorError(std::format(
             "Could not resolve variable '{}'. {}", dictionaryName, debugString(env)
         ));
     }
@@ -820,7 +808,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
     }
 
     if (env.forStatements.empty()) {
-        throw ParserError(
+        throw ShaderPreprocessorError(
             "Unexpected #endfor. No corresponding #for was found" + debugString(env)
         );
     }
@@ -834,7 +822,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
         std::filesystem::path path = forInput.file.path();
         int lineNumber = forStmnt.lineNumber;
 
-        throw ParserError(std::format(
+        throw ShaderPreprocessorError(std::format(
             "Unexpected #endfor. Last #for was in {}: {}. {}",
             path, lineNumber, debugString(env)
         ));
