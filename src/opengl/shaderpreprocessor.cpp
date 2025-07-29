@@ -127,6 +127,37 @@ namespace {
             return dictionary.value<T>(key);
         }
     }
+
+
+    bool parseRange(const std::string& dictionaryName,
+        Dictionary& dictionary, int& min, int& max)
+    {
+        static const std::string twoDots = "..";
+        const size_t minStart = 0;
+        const size_t minEnd = dictionaryName.find(twoDots);
+
+        if (minEnd == std::string::npos) {
+            throw ShaderPreprocessorError("Expected '..' in range. " + dictionaryName);
+        }
+        const int minimum = std::stoi(dictionaryName.substr(minStart, minEnd - minStart));
+
+        const size_t maxStart = minEnd + 2;
+        const size_t maxEnd = dictionaryName.length();
+
+        const int maximum = std::stoi(dictionaryName.substr(maxStart, maxEnd - maxStart));
+
+        // Create all the elements in the dictionary
+        for (int i = 0; i <= maximum - minimum; i++) {
+            dictionary.setValue(std::to_string(i + 1), std::to_string(minimum + i));
+        }
+
+        // Everything went well. Write over min and max
+        min = minimum;
+        max = maximum;
+
+        return true;
+    }
+
 } // namespace
 
 namespace ghoul::opengl {
@@ -147,10 +178,11 @@ ShaderPreprocessor::Env::Input::Input(std::ifstream& str, ghoul::filesystem::Fil
     , indentation(std::move(indent))
 {}
 
-ShaderPreprocessor::Env::Env(std::stringstream& out, std::string l, std::string indent)
-    : output(out)
-    , line(std::move(l))
-    , indentation(std::move(indent))
+ShaderPreprocessor::Env::Env(std::stringstream& out, std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary)
+    : _output(out)
+    , _includedFiles(includedFiles)
+    , _onChangeCallback(onChangeCallback)
+    , _dictionary(dictionary)
 {}
 
 void ShaderPreprocessor::setDictionary(Dictionary dictionary) {
@@ -179,19 +211,19 @@ const std::filesystem::path& ShaderPreprocessor::filename() const {
 
 std::string ShaderPreprocessor::process() {
     std::stringstream stream;
-    ShaderPreprocessor::Env env{stream};
+    Env env = Env(stream, _includedFiles, _onChangeCallback, _dictionary);
 
-    includeFile(_shaderPath, TrackChanges::Yes, env);
+    env.includeFile(_shaderPath, TrackChanges::Yes);
 
-    if (!env.forStatements.empty()) {
+    if (!env._forStatements.empty()) {
         throw ShaderPreprocessorError(
             "Unexpected end of file in the middle of expanding #for statement. " +
-            debugString(env)
+            env.debugString()
         );
     }
 
-    if (!env.scopes.empty()) {
-        throw ShaderPreprocessorError("Unexpected end of file. " + debugString(env));
+    if (!env._scopes.empty()) {
+        throw ShaderPreprocessorError("Unexpected end of file. " + env.debugString());
     }
 
     return stream.str();
@@ -239,9 +271,8 @@ void ShaderPreprocessor::addIncludePath(const std::filesystem::path& folderPath)
     }
 }
 
-void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
-                                     TrackChanges trackChanges,
-                                     ShaderPreprocessor::Env& environment)
+void ShaderPreprocessor::Env::includeFile(const std::filesystem::path& path,
+                                     TrackChanges trackChanges)
 {
     ghoul_assert(!path.empty(), "Path must not be empty");
     ghoul_assert(std::filesystem::is_regular_file(path), "Path must be an existing file");
@@ -268,48 +299,45 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
 
     ghoul::filesystem::File file = ghoul::filesystem::File(path);
 
-    const std::string prevIndent =
-        !environment.inputs.empty() ? environment.inputs.back().indentation : "";
+    const std::string prevIndent = !_inputs.empty() ? _inputs.back().indentation : "";
 
-    environment.inputs.emplace_back(stream, file, prevIndent + environment.indentation);
-    if (environment.inputs.size() > 1) {
-        addLineNumber(environment);
+    _inputs.emplace_back(stream, file, prevIndent + _indentation);
+    if (_inputs.size() > 1) {
+        addLineNumber();
     }
 
-    while (parseLine(environment)) {
-        if (!environment.success) {
+    while (parseLine()) {
+        if (!_success) {
             throw ShaderPreprocessorError(std::format(
-                "Could not parse line. '{}': {}",
-                path, environment.inputs.back().lineNumber
+                "Could not parse line. '{}': {}", path, _inputs.back().lineNumber
             ));
         }
     }
 
-    if (!environment.forStatements.empty()) {
-        const ShaderPreprocessor::Env::ForStatement& forStatement =
-            environment.forStatements.back();
-        if (forStatement.inputIndex + 1 >= environment.inputs.size()) {
+    if (!_forStatements.empty()) {
+        const ShaderPreprocessor::Env::ForStatement& forStatement = _forStatements.back();
+        if (forStatement.inputIndex + 1 >= _inputs.size()) {
             const int inputIndex = forStatement.inputIndex;
-            const ShaderPreprocessor::Env::Input& forInput = environment.inputs[inputIndex];
+            const ShaderPreprocessor::Env::Input& forInput = _inputs[inputIndex];
             const std::filesystem::path p = forInput.file.path();
             int lineNumber = forStatement.lineNumber;
 
             throw ShaderPreprocessorError(std::format(
                 "Unexpected end of file. Still processing #for loop from '{}': {}. {}",
-                p, lineNumber, debugString(environment)
+                p, lineNumber, debugString()
             ));
         }
     }
 
-    environment.inputs.pop_back();
+    _inputs.pop_back();
 
-    if (!environment.inputs.empty()) {
-        addLineNumber(environment);
+    if (!_inputs.empty()) {
+        addLineNumber();
     }
 }
 
-void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
-    const std::filesystem::path filename = env.inputs.back().file.path();
+void ShaderPreprocessor::Env::addLineNumber() {
+    const std::filesystem::path filename = _inputs.back().file.path();
     ghoul_assert(
         _includedFiles.find(filename) != _includedFiles.end(),
         "File not in included files"
@@ -325,75 +353,75 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
     }
 #endif // __APPLE__
 
-    env.output << std::format(
+    _output << std::format(
         "{}\n#line {} {} // {}\n",
-        includeSeparator, env.inputs.back().lineNumber, fileIdentifier, filename
+        includeSeparator, _inputs.back().lineNumber, fileIdentifier, filename
     );
 }
 
-bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
-    Env::Input& input = env.inputs.back();
-    if (!ghoul::getline(input.stream, env.line)) {
+bool ShaderPreprocessor::Env::parseLine() {
+    Env::Input& input = _inputs.back();
+    if (!ghoul::getline(input.stream, _line)) {
         return false;
     }
     input.lineNumber++;
 
     // Trim away any whitespaces in the start and end of the line.
     static const std::string ws = " \n\r\t";
-    size_t startPos = env.line.find_first_not_of(ws);
-    env.indentation = env.line.substr(0, startPos);
-    trimWhitespace(env.line);
+    size_t startPos = _line.find_first_not_of(ws);
+    _indentation = _line.substr(0, startPos);
+    trimWhitespace(_line);
 
-    bool isSpecialLine = parseEndFor(env); // #endfor
+    bool isSpecialLine = parseEndFor(); // #endfor
 
     const bool isInsideEmptyForStatement =
-        !env.forStatements.empty() && (env.forStatements.back().keyIndex == -1);
+        !_forStatements.empty() && (_forStatements.back().keyIndex == -1);
     if (isInsideEmptyForStatement) {
         return true;
     }
 
     // Replace all #{<name>} strings with data from <name> in dictionary.
-    if (!substituteLine(env)) {
+    if (!substituteLine()) {
         return false;
     }
 
     if (!isSpecialLine) {
         isSpecialLine |=
-            parseVersion(env) ||    // #version __CONTEXT__
-            parseOs(env) ||         // #define __OS__
-            parseInclude(env) ||    // #include
-            parseFor(env);          // #for <key>, <value> in <dictionary>
+            parseVersion() ||    // #version __CONTEXT__
+            parseOs() ||         // #define __OS__
+            parseInclude() ||    // #include
+            parseFor();          // #for <key>, <value> in <dictionary>
     }
 
     if (!isSpecialLine) {
       // Write GLSL code to output.
-        env.output << input.indentation << env.indentation << env.line << '\n';
+        _output << input.indentation << _indentation << _line << '\n';
     }
     return true;
     // Insert all extensions to the preprocessor here.
 }
 
-std::string ShaderPreprocessor::debugString(const ShaderPreprocessor::Env& env) {
-    if (env.inputs.empty()) {
+std::string ShaderPreprocessor::Env::debugString() const {
+    if (_inputs.empty()) {
         return "";
     }
 
-    const ShaderPreprocessor::Env::Input& input = env.inputs.back();
+    const ShaderPreprocessor::Env::Input& input = _inputs.back();
     return std::format("{}: {}", input.file.path(), input.lineNumber);
 }
 
-bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
-    std::string& line = env.line;
+bool ShaderPreprocessor::Env::substituteLine() {
+    std::string& line = line;
     size_t beginOffset = 0;
 
     while ((beginOffset = line.rfind("#{")) != std::string::npos) {
         const size_t endOffset = line.substr(beginOffset).find('}');
         if (endOffset == std::string::npos) {
-            throw ShaderPreprocessorError("Could not parse line. " + debugString(env));
+            throw ShaderPreprocessorError("Could not parse line. " + debugString());
         }
 
         const std::string in = line.substr(beginOffset + 2, endOffset - 2);
-        const std::string out = substitute(in, env);
+        const std::string out = substitute(in);
 
         const std::string first = line.substr(0, beginOffset);
         const std::string last = line.substr(
@@ -406,9 +434,7 @@ bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
     return true;
 }
 
-bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
-                                      ShaderPreprocessor::Env& env)
-{
+bool ShaderPreprocessor::Env::resolveAlias(const std::string& in, std::string& out) {
     std::string beforeDot;
     std::string afterDot;
     if (const size_t firstDotPos = in.find('.');  firstDotPos != std::string::npos) {
@@ -421,9 +447,9 @@ bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
     }
 
     // Resolve only part before dot
-    if (env.aliases.find(beforeDot) != env.aliases.end()) {
-        if (!env.aliases[beforeDot].empty()) {
-            beforeDot = env.aliases[beforeDot].back();
+    if (_aliases.find(beforeDot) != _aliases.end()) {
+        if (!_aliases[beforeDot].empty()) {
+            beforeDot = _aliases[beforeDot].back();
         }
     }
 
@@ -432,13 +458,11 @@ bool ShaderPreprocessor::resolveAlias(const std::string& in, std::string& out,
            hasKeyRecursive(_dictionary, out));
 }
 
-std::string ShaderPreprocessor::substitute(const std::string& in,
-                                           ShaderPreprocessor::Env& env)
-{
+std::string ShaderPreprocessor::Env::substitute(const std::string& in) {
     std::string resolved;
-    if (!resolveAlias(in, resolved, env)) {
+    if (!resolveAlias(in, resolved)) {
         throw ShaderPreprocessorError(std::format(
-            "Could not resolve variable '{}'. {}", in, debugString(env)
+            "Could not resolve variable '{}'. {}", in, debugString()
         ));
     }
 
@@ -476,51 +500,49 @@ std::string ShaderPreprocessor::substitute(const std::string& in,
     else {
         throw ShaderPreprocessorError(std::format(
             "'{}' was resolved to '{}' which is a type that is not supported. {}",
-            in, resolved, debugString(env)
+            in, resolved, debugString()
         ));
     }
 }
 
-void ShaderPreprocessor::pushScope(const std::map<std::string, std::string>& map,
-                                   ShaderPreprocessor::Env& env)
-{
+void ShaderPreprocessor::Env::pushScope(const std::map<std::string, std::string>& map) {
     Env::Scope scope;
     for (const std::pair<const std::string, std::string>& pair : map) {
         const std::string& key = pair.first;
         const std::string& value = pair.second;
         scope.insert(key);
-        if (env.aliases.find(key) == env.aliases.end()) {
-           env.aliases[key] = std::vector<std::string>();
+        if (_aliases.find(key) == _aliases.end()) {
+           _aliases[key] = std::vector<std::string>();
         }
-        env.aliases[key].push_back(value);
+        _aliases[key].push_back(value);
     }
-    env.scopes.push_back(scope);
+    _scopes.push_back(scope);
 }
 
-void ShaderPreprocessor::popScope(ShaderPreprocessor::Env& env) {
-    ghoul_assert(!env.scopes.empty(), "Environment must have open scope");
-    for (const std::string& key : env.scopes.back()) {
+void ShaderPreprocessor::Env::popScope() {
+    ghoul_assert(!_scopes.empty(), "Environment must have open scope");
+    for (const std::string& key : _scopes.back()) {
         (void)key;
-        ghoul_assert(env.aliases.find(key) != env.aliases.end(), "Key not found");
-        ghoul_assert(!env.aliases.at(key).empty(), "No aliases for key");
+        ghoul_assert(_aliases.find(key) != _aliases.end(), "Key not found");
+        ghoul_assert(!_aliases.at(key).empty(), "No aliases for key");
     }
 
-    const Env::Scope& scope = env.scopes.back();
+    const Env::Scope& scope = _scopes.back();
     for (const std::string& key : scope) {
-        env.aliases[key].pop_back();
-        if (env.aliases[key].empty()) {
-            env.aliases.erase(key);
+        _aliases[key].pop_back();
+        if (_aliases[key].empty()) {
+            _aliases.erase(key);
         }
     }
-    env.scopes.pop_back();
+    _scopes.pop_back();
 }
 
-bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
+bool ShaderPreprocessor::Env::parseInclude() {
     static const std::string includeString = "#include";
     static const std::string ws = " \n\r\t";
     static const std::string noTrackString = ":notrack";
 
-    std::string& line = env.line;
+    std::string& line = _line;
 
     const bool tracksInclude = (line.find(noTrackString) == std::string::npos);
 
@@ -530,23 +552,23 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
 
     const size_t p1 = line.find_first_not_of(ws, includeString.length());
     if (p1 == std::string::npos) {
-        throw ShaderPreprocessorError("Expected file path after #include. " + debugString(env));
+        throw ShaderPreprocessorError("Expected file path after #include. " + debugString());
     }
 
     if ((line[p1] != '\"') && (line[p1] != '<')) {
-        throw ShaderPreprocessorError("Expected \" or <. " + debugString(env));
+        throw ShaderPreprocessorError("Expected \" or <. " + debugString());
     }
 
     if (line[p1] == '\"') {
         const size_t p2 = line.find_first_of('\"', p1 + 1);
         if (p2 == std::string::npos) {
-            throw ShaderPreprocessorError("Expected \"" + debugString(env));
+            throw ShaderPreprocessorError("Expected \"" + debugString());
         }
 
         const size_t includeLength = p2 - p1 - 1;
         const std::filesystem::path includeFilename = line.substr(p1 + 1, includeLength);
         std::filesystem::path includeFilepath =
-            env.inputs.back().file.path().parent_path() / includeFilename;
+            _inputs.back().file.path().parent_path() / includeFilename;
 
         bool includeFileWasFound = std::filesystem::is_regular_file(includeFilepath);
 
@@ -576,33 +598,33 @@ bool ShaderPreprocessor::parseInclude(ShaderPreprocessor::Env& env) {
             ));
         }
 
-        includeFile(includeFilepath, TrackChanges(tracksInclude), env);
+        includeFile(includeFilepath, TrackChanges(tracksInclude));
     }
     else if (line.at(p1) == '<') {
         const size_t p2 = line.find_first_of('>', p1 + 1);
         if (p2 == std::string::npos) {
-            throw ShaderPreprocessorError("Expected >. " + debugString(env));
+            throw ShaderPreprocessorError("Expected >. " + debugString());
         }
 
         const size_t includeLen = p2 - p1 - 1;
         const std::filesystem::path include = absPath(line.substr(p1 + 1, includeLen));
-        includeFile(include, TrackChanges(tracksInclude), env);
+        includeFile(include, TrackChanges(tracksInclude));
     }
     return true;
 }
 
-bool ShaderPreprocessor::parseVersion(const ShaderPreprocessor::Env& env) {
+bool ShaderPreprocessor::Env::parseVersion() const {
     static const std::string versionString = "#version __CONTEXT__";
-    if (env.line.substr(0, versionString.length()) == versionString) {
-        env.output << glslVersionString() << '\n';
+    if (_line.substr(0, versionString.length()) == versionString) {
+        _output << glslVersionString() << '\n';
         return true;
     }
     return false;
 }
 
-bool ShaderPreprocessor::parseOs(ShaderPreprocessor::Env& env) {
+bool ShaderPreprocessor::Env::parseOs() {
     static const std::string osString = "#define __OS__";
-    const std::string& line = env.line;
+    const std::string& line = _line;
     if (line.length() >= osString.length() &&
         line.substr(0, osString.length()) == osString)
     {
@@ -615,22 +637,21 @@ bool ShaderPreprocessor::parseOs(ShaderPreprocessor::Env& env) {
 #ifdef __linux__
         constexpr std::string_view os = "linux";
 #endif
-        env.output << std::format(
+        _output << std::format(
             "#ifndef __OS__\n"
             "#define __OS__ {}\n"
             "#define {}\n"
             "#endif\n",
             os, os
         );
-        addLineNumber(env);
+        addLineNumber();
         return true;
     }
     return false;
 }
 
-bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyName,
-                                     std::string& valueName, std::string& dictionaryName,
-                                     ShaderPreprocessor::Env& env)
+bool ShaderPreprocessor::Env::tokenizeFor(const std::string& line, std::string& keyName,
+                                     std::string& valueName, std::string& dictionaryName)
 {
     static const std::string forString = "#for";
     static const std::string inString = "in";
@@ -679,7 +700,7 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     if (line.substr(inPos).length() < inString.length() + 1 ||
         line.substr(inPos, inString.length()) != inString)
     {
-        throw ShaderPreprocessorError("Expected 'in' in #for statement. " + debugString(env));
+        throw ShaderPreprocessorError("Expected 'in' in #for statement. " + debugString());
     }
 
     const size_t wsBeforeDictionaryPos = inPos + inString.length();
@@ -694,40 +715,11 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     return true;
 }
 
-bool ShaderPreprocessor::parseRange(const std::string& dictionaryName,
-                                    Dictionary& dictionary, int& min, int& max)
-{
-    static const std::string twoDots = "..";
-    const size_t minStart = 0;
-    const size_t minEnd = dictionaryName.find(twoDots);
-
-    if (minEnd == std::string::npos) {
-        throw ShaderPreprocessorError("Expected '..' in range. " + dictionaryName);
-    }
-    const int minimum = std::stoi(dictionaryName.substr(minStart, minEnd - minStart));
-
-    const size_t maxStart = minEnd + 2;
-    const size_t maxEnd = dictionaryName.length();
-
-    const int maximum = std::stoi(dictionaryName.substr(maxStart, maxEnd - maxStart));
-
-    // Create all the elements in the dictionary
-    for (int i = 0; i <= maximum - minimum; i++) {
-        dictionary.setValue(std::to_string(i + 1), std::to_string(minimum + i));
-    }
-
-    // Everything went well. Write over min and max
-    min = minimum;
-    max = maximum;
-
-    return true;
-}
-
-bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
+bool ShaderPreprocessor::Env::parseFor() {
     std::string keyName;
     std::string valueName;
     std::string dictionaryName;
-    if (!tokenizeFor(env.line, keyName, valueName, dictionaryName, env)) {
+    if (!tokenizeFor(_line, keyName, valueName, dictionaryName)) {
          return false;
      }
 
@@ -748,16 +740,16 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     // The dictionary name can be an alias.
     // Resolve the real dictionary reference.
     std::string dictionaryRef;
-    if (!resolveAlias(dictionaryName, dictionaryRef, env)) {
+    if (!resolveAlias(dictionaryName, dictionaryRef)) {
         throw ShaderPreprocessorError(std::format(
-            "Could not resolve variable '{}'. {}", dictionaryName, debugString(env)
+            "Could not resolve variable '{}'. {}", dictionaryName, debugString()
         ));
     }
     // Fetch the dictionary to iterate over.
     const Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);
 
     std::vector<std::string_view> keys = innerDictionary.keys();
-    ShaderPreprocessor::Env::Input& input = env.inputs.back();
+    ShaderPreprocessor::Env::Input& input = _inputs.back();
     int keyIndex = 0;
 
     std::map<std::string, std::string> table;
@@ -766,18 +758,18 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
         table[valueName] = dictionaryRef + "." + std::string(keys[0]);
         keyIndex = 0;
 
-        env.output << "//# For loop over " << dictionaryRef << '\n';
-        env.output << "//# Key " << keys[0] << " in " << dictionaryRef << '\n';
-        addLineNumber(env);
+        _output << "//# For loop over " << dictionaryRef << '\n';
+        _output << "//# Key " << keys[0] << " in " << dictionaryRef << '\n';
+        addLineNumber();
     }
     else {
         keyIndex = -1;
-        env.output << "//# Empty for loop\n";
+        _output << "//# Empty for loop\n";
     }
-    pushScope(table, env);
+    pushScope(table);
 
-    env.forStatements.push_back({
-        static_cast<unsigned int>(env.inputs.size() - 1),
+    _forStatements.push_back({
+        static_cast<unsigned int>(env._inputs.size() - 1),
         input.lineNumber,
         static_cast<unsigned int>(input.stream.tellg()),
         keyName,
@@ -789,28 +781,28 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     return true;
 }
 
-bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
+bool ShaderPreprocessor::Env::parseEndFor() {
     static const std::string endForString = "#endfor";
 
-    const std::string& line = env.line;
+    const std::string& line = _line;
     const size_t length = line.length();
 
     if (length <= 6 || line.substr(0, endForString.length()) != endForString) {
         return false;
     }
 
-    if (env.forStatements.empty()) {
+    if (env._forStatements.empty()) {
         throw ShaderPreprocessorError(
             "Unexpected #endfor. No corresponding #for was found" + debugString(env)
         );
     }
 
-    Env::ForStatement& forStmnt = env.forStatements.back();
+    Env::ForStatement& forStmnt = env._forStatements.back();
     // Require #for and #endfor to be in the same input file
-    if (forStmnt.inputIndex != env.inputs.size() - 1) {
-        env.success = false;
+    if (forStmnt.inputIndex != env._inputs.size() - 1) {
+        env._success = false;
         const int inputIndex = forStmnt.inputIndex;
-        const ShaderPreprocessor::Env::Input& forInput = env.inputs[inputIndex];
+        const ShaderPreprocessor::Env::Input& forInput = env._inputs[inputIndex];
         std::filesystem::path path = forInput.file.path();
         int lineNumber = forStmnt.lineNumber;
 
@@ -841,16 +833,16 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
             std::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
         addLineNumber(env);
         // Restore input to its state from when #for was found
-        Env::Input& input = env.inputs.back();
+        Env::Input& input = env._inputs.back();
         input.stream.seekg(forStmnt.streamPos);
         input.lineNumber = forStmnt.lineNumber;
     }
     else {
         // This was the last iteration (or there ware zero iterations)
-        env.output <<
+        env._output <<
             std::format("//# Terminated loop over {}\n", forStmnt.dictionaryReference);
         addLineNumber(env);
-        env.forStatements.pop_back();
+        env._forStatements.pop_back();
     }
     return true;
 }

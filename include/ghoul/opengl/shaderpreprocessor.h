@@ -73,6 +73,12 @@ public:
     static void addIncludePath(const std::filesystem::path& folderPath);
 
 private:
+    struct FileStruct {
+        ghoul::filesystem::File file;
+        size_t fileIdentifier;
+        bool isTracked;
+    };
+
     struct Env {
     public:
         using Scope = std::set<std::string>;
@@ -98,55 +104,55 @@ private:
             int keyIndex;
         };
 
-        explicit Env(std::stringstream& out, std::string l = "", std::string indent = "");
+        explicit Env(std::stringstream& out, std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary);
 
-        std::stringstream& output;
-        std::string line;
-        std::vector<Input> inputs;
-        std::vector<Scope> scopes;
-        std::vector<ForStatement> forStatements;
-        std::map<std::string, std::vector<std::string>> aliases;
-        std::string indentation;
-        bool success = true;
+        bool parseLine();
+        bool parseFor();
+        bool parseEndFor();
+        bool parseInclude();
+        bool parseVersion() const;
+        bool parseOs();
+
+        // pre path exists
+        // pre path not empty
+        // pre path must not contain path tokens
+        // throws std::ios_base::failure if error opening file
+        void includeFile(const std::filesystem::path& path, TrackChanges trackChanges);
+
+        bool substituteLine();
+        std::string substitute(const std::string& in);
+        bool resolveAlias(const std::string& in, std::string& out);
+
+        void pushScope(const std::map<std::string, std::string>& map);
+
+        void popScope();
+
+        bool tokenizeFor(const std::string& line, std::string& keyName,
+            std::string& valueName, std::string& dictionaryName);
+        void addLineNumber();
+
+        std::string debugString() const;
+
+        std::stringstream& _output;
+        std::string _line;
+        std::vector<Input> _inputs;
+        std::vector<Scope> _scopes;
+        std::vector<ForStatement> _forStatements;
+        std::map<std::string, std::vector<std::string>> _aliases;
+        std::string _indentation;
+
+        // Points towards ShaderPreprocessor::_includedFiles
+        std::map<std::filesystem::path, FileStruct>& _includedFiles;
+
+        // Points towards ShaderPreprocessor::_onChangeCallback
+        ShaderChangedCallback& _onChangeCallback;
+
+        // Points towards ShaderPreprocessor::_dictionary
+        Dictionary& _dictionary;
+
+        bool _success = true;
     };
 
-    // pre path exists
-    // pre path not empty
-    // pre path must not contain path tokens
-    // throws std::ios_base::failure if error opening file
-    void includeFile(const std::filesystem::path& path, TrackChanges trackChanges,
-        ShaderPreprocessor::Env& environment);
-    bool parseLine(ShaderPreprocessor::Env& env);
-    bool parseFor(ShaderPreprocessor::Env& env);
-    bool parseEndFor(ShaderPreprocessor::Env& env);
-    bool parseInclude(ShaderPreprocessor::Env& env);
-    bool parseVersion(const ShaderPreprocessor::Env& env);
-    bool parseOs(ShaderPreprocessor::Env& env);
-
-    bool substituteLine(ShaderPreprocessor::Env& env);
-    std::string substitute(const std::string& in, ShaderPreprocessor::Env& env);
-    bool resolveAlias(const std::string& in, std::string& out,
-        ShaderPreprocessor::Env& env);
-
-    void pushScope(const std::map<std::string, std::string>& map,
-        ShaderPreprocessor::Env& env);
-
-    void popScope(ShaderPreprocessor::Env& env);
-
-    bool tokenizeFor(const std::string& line, std::string& keyName,
-        std::string& valueName, std::string& dictionaryName,
-        ShaderPreprocessor::Env& env);
-    bool parseRange(const std::string& dictionaryName, Dictionary& dictionary, int& min,
-        int& max);
-    void addLineNumber(ShaderPreprocessor::Env& env);
-
-    std::string debugString(const ShaderPreprocessor::Env& env);
-
-    struct FileStruct {
-        ghoul::filesystem::File file;
-        size_t fileIdentifier;
-        bool isTracked;
-    };
 
     std::map<std::filesystem::path, FileStruct> _includedFiles;
     static std::vector<std::filesystem::path> _includePaths;
