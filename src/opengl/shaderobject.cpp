@@ -226,8 +226,7 @@ Dictionary ShaderObject::dictionary() const {
 }
 
 void ShaderObject::rebuildFromFile() {
-    std::string contents;
-    _preprocessor.process(contents);
+    std::string contents = _preprocessor.process();
 
     // If in debug mode, output the source to file
 #ifdef GHL_DEBUG
@@ -279,7 +278,7 @@ void ShaderObject::compile() {
         if (logLength == 0) {
             throw ShaderCompileError(
                 "Unknown error",
-                _preprocessor.getFileIdentifiersString(),
+                _preprocessor.includedFiles(),
                 name()
             );
         }
@@ -287,11 +286,7 @@ void ShaderObject::compile() {
         std::vector<GLchar> log(logLength);
         glGetShaderInfoLog(_id, logLength, nullptr, log.data());
         const std::string logMessage = std::string(log.data());
-        throw ShaderCompileError(
-            logMessage,
-            _preprocessor.getFileIdentifiersString(),
-            name()
-        );
+        throw ShaderCompileError(logMessage, _preprocessor.includedFiles(), name());
     }
 }
 

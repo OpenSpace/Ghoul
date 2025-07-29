@@ -55,8 +55,8 @@ public:
     void setDictionary(Dictionary dictionary);
     void setFilename(std::filesystem::path shaderPath);
     void setCallback(ShaderChangedCallback changeCallback);
-    void process(std::string& output);
-    std::string getFileIdentifiersString() const;
+    std::string process();
+    std::string includedFiles() const;
 
     /**
      * Adds the passed folder to the list of include paths that are checked when a shader
@@ -73,29 +73,30 @@ public:
     static void addIncludePath(const std::filesystem::path& folderPath);
 
 private:
-    struct Input {
-        Input(std::ifstream& str, ghoul::filesystem::File& f, std::string indent);
-
-        std::ifstream& stream;
-        ghoul::filesystem::File& file;
-        const std::string indentation;
-        unsigned int lineNumber = 1;
-    };
-
-    struct ForStatement {
-        unsigned int inputIndex;
-        unsigned int lineNumber;
-        unsigned int streamPos;
-
-        std::string keyName;
-        std::string valueName;
-        std::string dictionaryReference;
-
-        int keyIndex;
-    };
-
     struct Env {
+    public:
         using Scope = std::set<std::string>;
+
+        struct Input {
+            Input(std::ifstream& str, ghoul::filesystem::File& f, std::string indent);
+
+            std::ifstream& stream;
+            ghoul::filesystem::File& file;
+            const std::string indentation;
+            unsigned int lineNumber = 1;
+        };
+
+        struct ForStatement {
+            unsigned int inputIndex;
+            unsigned int lineNumber;
+            unsigned int streamPos;
+
+            std::string keyName;
+            std::string valueName;
+            std::string dictionaryReference;
+
+            int keyIndex;
+        };
 
         explicit Env(std::stringstream& out, std::string l = "", std::string indent = "");
 
@@ -119,6 +120,7 @@ private:
     bool parseFor(ShaderPreprocessor::Env& env);
     bool parseEndFor(ShaderPreprocessor::Env& env);
     bool parseInclude(ShaderPreprocessor::Env& env);
+    bool parseVersion(const ShaderPreprocessor::Env& env);
     bool parseOs(ShaderPreprocessor::Env& env);
 
     bool substituteLine(ShaderPreprocessor::Env& env);

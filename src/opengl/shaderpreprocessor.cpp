@@ -36,6 +36,7 @@
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <filesystem>
 #include <fstream>
+#include <numeric>
 #include <string>
 #include <sstream>
 
@@ -46,34 +47,8 @@ namespace {
         {}
     };
 
-    bool isString(std::string_view str) {
+    constexpr bool isString(std::string_view str) {
         return str.length() > 1 && str.front() == '"' && str.back() == '"';
-    }
-
-    std::string trim(const std::string& str, std::string* before = nullptr,
-                     std::string* after = nullptr)
-    {
-        static const std::string ws = " \n\r\t";
-        size_t startPos = str.find_first_not_of(ws);
-        if (startPos == std::string::npos) {
-            startPos = 0;
-        }
-        size_t endPos = str.find_last_not_of(ws);
-        if (endPos == std::string::npos) {
-            endPos = str.length();
-        }
-        else {
-            endPos += 1;
-        }
-
-        const size_t length = endPos - startPos;
-        if (before) {
-            *before = str.substr(0, startPos);
-        }
-        if (after) {
-            *after = str.substr(endPos);
-        }
-        return str.substr(startPos, length);
     }
 
     std::string glslVersionString() {
@@ -165,7 +140,7 @@ ShaderPreprocessor::ShaderPreprocessor(std::filesystem::path shaderPath,
     , _dictionary(std::move(dictionary))
 {}
 
-ShaderPreprocessor::Input::Input(std::ifstream& str, ghoul::filesystem::File& f,
+ShaderPreprocessor::Env::Input::Input(std::ifstream& str, ghoul::filesystem::File& f,
                                  std::string indent)
     : stream(str)
     , file(f)
@@ -202,7 +177,7 @@ const std::filesystem::path& ShaderPreprocessor::filename() const {
     return _shaderPath;
 }
 
-void ShaderPreprocessor::process(std::string& output) {
+std::string ShaderPreprocessor::process() {
     std::stringstream stream;
     ShaderPreprocessor::Env env{stream};
 
@@ -219,7 +194,7 @@ void ShaderPreprocessor::process(std::string& output) {
         throw ShaderPreprocessorError("Unexpected end of file. " + debugString(env));
     }
 
-    output = stream.str();
+    return stream.str();
 }
 
 void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
@@ -231,12 +206,24 @@ void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     }
 }
 
-std::string ShaderPreprocessor::getFileIdentifiersString() const {
+std::string ShaderPreprocessor::includedFiles() const {
+    std::string newStr = std::accumulate(
+        _includedFiles.begin(),
+        _includedFiles.end(),
+        std::string(""),
+        [](std::string lhs, const std::pair<const std::filesystem::path, FileStruct>& f) {
+            return std::format(
+                "{}{}: {}\n", std::move(lhs), f.second.fileIdentifier, f.first
+            );
+        }
+    );
     std::stringstream identifiers;
     for (const std::pair<const std::filesystem::path, FileStruct>& f : _includedFiles) {
         identifiers << f.second.fileIdentifier << ": " << f.first << '\n';
     }
-    return identifiers.str();
+    std::string oldStr = identifiers.str();
+    ghoul_assert(newStr == oldStr, "");
+    return newStr;
 }
 
 void ShaderPreprocessor::addIncludePath(const std::filesystem::path& folderPath) {
@@ -299,11 +286,11 @@ void ShaderPreprocessor::includeFile(const std::filesystem::path& path,
     }
 
     if (!environment.forStatements.empty()) {
-        const ShaderPreprocessor::ForStatement& forStatement =
+        const ShaderPreprocessor::Env::ForStatement& forStatement =
             environment.forStatements.back();
         if (forStatement.inputIndex + 1 >= environment.inputs.size()) {
             const int inputIndex = forStatement.inputIndex;
-            const ShaderPreprocessor::Input& forInput = environment.inputs[inputIndex];
+            const ShaderPreprocessor::Env::Input& forInput = environment.inputs[inputIndex];
             const std::filesystem::path p = forInput.file.path();
             int lineNumber = forStatement.lineNumber;
 
@@ -345,14 +332,17 @@ void ShaderPreprocessor::addLineNumber(ShaderPreprocessor::Env& env) {
 }
 
 bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
-    Input& input = env.inputs.back();
+    Env::Input& input = env.inputs.back();
     if (!ghoul::getline(input.stream, env.line)) {
         return false;
     }
     input.lineNumber++;
 
     // Trim away any whitespaces in the start and end of the line.
-    env.line = trim(env.line, &env.indentation);
+    static const std::string ws = " \n\r\t";
+    size_t startPos = env.line.find_first_not_of(ws);
+    env.indentation = env.line.substr(0, startPos);
+    trimWhitespace(env.line);
 
     bool isSpecialLine = parseEndFor(env); // #endfor
 
@@ -384,13 +374,12 @@ bool ShaderPreprocessor::parseLine(ShaderPreprocessor::Env& env) {
 }
 
 std::string ShaderPreprocessor::debugString(const ShaderPreprocessor::Env& env) {
-    if (!env.inputs.empty()) {
-        const ShaderPreprocessor::Input& input = env.inputs.back();
-        return std::format("{}: {}", input.file.path(), input.lineNumber);
-    }
-    else {
+    if (env.inputs.empty()) {
         return "";
     }
+
+    const ShaderPreprocessor::Env::Input& input = env.inputs.back();
+    return std::format("{}: {}", input.file.path(), input.lineNumber);
 }
 
 bool ShaderPreprocessor::substituteLine(ShaderPreprocessor::Env& env) {
@@ -667,7 +656,8 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     size_t commaPos = 0;
     if (commaOffset != std::string::npos) { // Found a comma
         commaPos = keyPos + commaOffset;
-        keyName = trim(line.substr(keyPos, commaOffset));
+        keyName = line.substr(keyPos, commaOffset);
+        trimWhitespace(keyName);
     }
     else {
         commaPos = keyPos - 1;
@@ -680,7 +670,8 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     const size_t wsBeforeInOffset = line.substr(valuePos).find_first_of(ws);
     const size_t wsBeforeInPos = valuePos + wsBeforeInOffset;
 
-    valueName = trim(line.substr(valuePos, wsBeforeInOffset));
+    valueName = line.substr(valuePos, wsBeforeInOffset);
+    trimWhitespace(valueName);
 
     const size_t inOffset = line.substr(wsBeforeInPos).find_first_not_of(ws);
     const size_t inPos = wsBeforeInPos + inOffset;
@@ -697,7 +688,8 @@ bool ShaderPreprocessor::tokenizeFor(const std::string& line, std::string& keyNa
     const size_t dictionaryPos = wsBeforeDictionaryPos + dictionaryOffset;
 
     const size_t endOffset = line.substr(dictionaryPos).find_first_of(ws);
-    dictionaryName = trim(line.substr(dictionaryPos, endOffset));
+    dictionaryName = line.substr(dictionaryPos, endOffset);
+    trimWhitespace(dictionaryName);
 
     return true;
 }
@@ -765,7 +757,7 @@ bool ShaderPreprocessor::parseFor(ShaderPreprocessor::Env& env) {
     const Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);
 
     std::vector<std::string_view> keys = innerDictionary.keys();
-    ShaderPreprocessor::Input& input = env.inputs.back();
+    ShaderPreprocessor::Env::Input& input = env.inputs.back();
     int keyIndex = 0;
 
     std::map<std::string, std::string> table;
@@ -813,12 +805,12 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
         );
     }
 
-    ForStatement& forStmnt = env.forStatements.back();
+    Env::ForStatement& forStmnt = env.forStatements.back();
     // Require #for and #endfor to be in the same input file
     if (forStmnt.inputIndex != env.inputs.size() - 1) {
         env.success = false;
         const int inputIndex = forStmnt.inputIndex;
-        const ShaderPreprocessor::Input& forInput = env.inputs[inputIndex];
+        const ShaderPreprocessor::Env::Input& forInput = env.inputs[inputIndex];
         std::filesystem::path path = forInput.file.path();
         int lineNumber = forStmnt.lineNumber;
 
@@ -849,7 +841,7 @@ bool ShaderPreprocessor::parseEndFor(ShaderPreprocessor::Env& env) {
             std::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
         addLineNumber(env);
         // Restore input to its state from when #for was found
-        Input& input = env.inputs.back();
+        Env::Input& input = env.inputs.back();
         input.stream.seekg(forStmnt.streamPos);
         input.lineNumber = forStmnt.lineNumber;
     }
