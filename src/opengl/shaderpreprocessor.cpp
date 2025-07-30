@@ -130,7 +130,7 @@ namespace {
 
 
     bool parseRange(const std::string& dictionaryName,
-        Dictionary& dictionary, int& min, int& max)
+        ghoul::Dictionary & dictionary, int& min, int& max)
     {
         static const std::string twoDots = "..";
         const size_t minStart = 0;
@@ -411,7 +411,7 @@ std::string ShaderPreprocessor::Env::debugString() const {
 }
 
 bool ShaderPreprocessor::Env::substituteLine() {
-    std::string& line = line;
+    std::string& line = _line;
     size_t beginOffset = 0;
 
     while ((beginOffset = line.rfind("#{")) != std::string::npos) {
@@ -769,7 +769,7 @@ bool ShaderPreprocessor::Env::parseFor() {
     pushScope(table);
 
     _forStatements.push_back({
-        static_cast<unsigned int>(env._inputs.size() - 1),
+        static_cast<unsigned int>(_inputs.size() - 1),
         input.lineNumber,
         static_cast<unsigned int>(input.stream.tellg()),
         keyName,
@@ -791,28 +791,28 @@ bool ShaderPreprocessor::Env::parseEndFor() {
         return false;
     }
 
-    if (env._forStatements.empty()) {
+    if (_forStatements.empty()) {
         throw ShaderPreprocessorError(
-            "Unexpected #endfor. No corresponding #for was found" + debugString(env)
+            "Unexpected #endfor. No corresponding #for was found" + debugString()
         );
     }
 
-    Env::ForStatement& forStmnt = env._forStatements.back();
+    Env::ForStatement& forStmnt = _forStatements.back();
     // Require #for and #endfor to be in the same input file
-    if (forStmnt.inputIndex != env._inputs.size() - 1) {
-        env._success = false;
+    if (forStmnt.inputIndex != _inputs.size() - 1) {
+        _success = false;
         const int inputIndex = forStmnt.inputIndex;
-        const ShaderPreprocessor::Env::Input& forInput = env._inputs[inputIndex];
+        const ShaderPreprocessor::Env::Input& forInput = _inputs[inputIndex];
         std::filesystem::path path = forInput.file.path();
         int lineNumber = forStmnt.lineNumber;
 
         throw ShaderPreprocessorError(std::format(
             "Unexpected #endfor. Last #for was in {}: {}. {}",
-            path, lineNumber, debugString(env)
+            path, lineNumber, debugString()
         ));
     }
 
-    popScope(env);
+    popScope();
     forStmnt.keyIndex++;
 
     // Fetch the dictionary to iterate over
@@ -828,21 +828,20 @@ bool ShaderPreprocessor::Env::parseEndFor() {
         table[forStmnt.valueName] = std::format(
             "{}.{}", forStmnt.dictionaryReference, key
         );
-        pushScope(table, env);
-        env.output <<
-            std::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
-        addLineNumber(env);
+        pushScope(table);
+        _output << std::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
+        addLineNumber();
         // Restore input to its state from when #for was found
-        Env::Input& input = env._inputs.back();
+        Env::Input& input = _inputs.back();
         input.stream.seekg(forStmnt.streamPos);
         input.lineNumber = forStmnt.lineNumber;
     }
     else {
         // This was the last iteration (or there ware zero iterations)
-        env._output <<
+        _output <<
             std::format("//# Terminated loop over {}\n", forStmnt.dictionaryReference);
-        addLineNumber(env);
-        env._forStatements.pop_back();
+        addLineNumber();
+        _forStatements.pop_back();
     }
     return true;
 }
