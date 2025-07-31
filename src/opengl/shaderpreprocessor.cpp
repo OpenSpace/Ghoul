@@ -197,7 +197,6 @@ const std::filesystem::path& ShaderPreprocessor::filename() const {
 
 std::string ShaderPreprocessor::process() {
     Env env = Env(_includedFiles, _onChangeCallback, _dictionary);
-
     env.includeFile(_shaderPath, TrackChanges::Yes);
 
     if (!env._forStatements.empty()) {
@@ -320,13 +319,11 @@ void ShaderPreprocessor::Env::includeFile(const std::filesystem::path& path,
         const ShaderPreprocessor::Env::ForStatement& forStatement = _forStatements.back();
         if (forStatement.inputIndex + 1 >= _inputs.size()) {
             const int inputIndex = forStatement.inputIndex;
-            const ShaderPreprocessor::Env::Input& forInput = _inputs[inputIndex];
-            const std::filesystem::path p = forInput.file.path();
-            int lineNumber = forStatement.lineNumber;
+            const std::filesystem::path p = _inputs[inputIndex].file.path();
 
             throw ShaderPreprocessorError(std::format(
                 "Unexpected end of file. Still processing #for loop from '{}': {}. {}",
-                p, lineNumber, debugString()
+                p, forStatement.lineNumber, debugString()
             ));
         }
     }
@@ -438,7 +435,7 @@ void ShaderPreprocessor::Env::substituteLine() {
     }
 }
 
-bool ShaderPreprocessor::Env::resolveAlias(const std::string& in, std::string& out) {
+std::string ShaderPreprocessor::Env::resolveAlias(const std::string& in) const {
     std::string beforeDot;
     std::string afterDot;
     if (const size_t firstDotPos = in.find('.');  firstDotPos != std::string::npos) {
@@ -451,22 +448,25 @@ bool ShaderPreprocessor::Env::resolveAlias(const std::string& in, std::string& o
     }
 
     // Resolve only part before dot
-    if ((_aliases.find(beforeDot) != _aliases.end()) && !_aliases[beforeDot].empty()) {
-        beforeDot = _aliases[beforeDot].back();
+    if (auto it = _aliases.find(beforeDot);  it != _aliases.end() && !it->second.empty())
+    {
+        beforeDot = it->second.back();
     }
 
-    out = beforeDot + afterDot;
-    return ((afterDot.empty() && isString(beforeDot)) ||
-           hasKeyRecursive(_dictionary, out));
-}
-
-std::string ShaderPreprocessor::Env::substitute(const std::string& in) {
-    std::string resolved;
-    if (!resolveAlias(in, resolved)) {
+    std::string res = beforeDot + afterDot;
+    if (!(((afterDot.empty() && isString(beforeDot)) ||
+        hasKeyRecursive(_dictionary, res))))
+    {
         throw ShaderPreprocessorError(std::format(
             "Could not resolve variable '{}'. {}", in, debugString()
         ));
     }
+
+    return res;
+}
+
+std::string ShaderPreprocessor::Env::substitute(const std::string& in) {
+    std::string resolved = resolveAlias(in);
 
     if (isString(resolved)) {
         return resolved.substr(1, resolved.length() - 2);
@@ -734,12 +734,8 @@ bool ShaderPreprocessor::Env::parseFor() {
 
     // The dictionary name can be an alias
     // Resolve the real dictionary reference
-    std::string dictionaryRef;
-    if (!resolveAlias(dictionaryName, dictionaryRef)) {
-        throw ShaderPreprocessorError(std::format(
-            "Could not resolve variable '{}'. {}", dictionaryName, debugString()
-        ));
-    }
+    std::string dictionaryRef = resolveAlias(dictionaryName);
+
     // Fetch the dictionary to iterate over
     const Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);
 
@@ -820,8 +816,7 @@ bool ShaderPreprocessor::Env::parseEndFor() {
     if (forStmnt.keyIndex < static_cast<int>(keys.size())) {
         std::string_view key = keys[forStmnt.keyIndex];
         table[forStmnt.keyName] = std::format("\"{}\"", key);
-        table[forStmnt.valueName] = std::format("{}.{}", forStmnt.dictionaryReference, key
-        );
+        table[forStmnt.valueName] = std::format("{}.{}", forStmnt.dictionaryReference, key);
         pushScope(table);
         _output << std::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
         addLineNumber();

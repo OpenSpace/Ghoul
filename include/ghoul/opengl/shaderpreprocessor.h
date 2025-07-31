@@ -121,7 +121,7 @@ private:
 
         void substituteLine();
         std::string substitute(const std::string& in);
-        bool resolveAlias(const std::string& in, std::string& out);
+        std::string resolveAlias(const std::string& in) const;
 
         void pushScope(const std::map<std::string, std::string>& map);
 
