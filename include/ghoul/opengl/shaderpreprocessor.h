@@ -104,13 +104,13 @@ private:
             int keyIndex;
         };
 
-        explicit Env(std::stringstream& out, std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary);
+        explicit Env(std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary);
 
         bool parseLine();
         bool parseFor();
         bool parseEndFor();
         bool parseInclude();
-        bool parseVersion() const;
+        bool parseVersion();
         bool parseOs();
 
         // pre path exists
@@ -119,7 +119,7 @@ private:
         // throws std::ios_base::failure if error opening file
         void includeFile(const std::filesystem::path& path, TrackChanges trackChanges);
 
-        bool substituteLine();
+        void substituteLine();
         std::string substitute(const std::string& in);
         bool resolveAlias(const std::string& in, std::string& out);
 
@@ -127,13 +127,15 @@ private:
 
         void popScope();
 
-        bool tokenizeFor(const std::string& line, std::string& keyName,
-            std::string& valueName, std::string& dictionaryName);
+        bool tokenizeFor(std::string_view line, std::string& keyName,
+            std::string& valueName, std::string& dictionaryName) const;
         void addLineNumber();
 
         std::string debugString() const;
 
-        std::stringstream& _output;
+        std::string output() const;
+
+        std::stringstream _output;
         std::string _line;
         std::vector<Input> _inputs;
         std::vector<Scope> _scopes;
