@@ -76,7 +76,6 @@ private:
     struct FileStruct {
         ghoul::filesystem::File file;
         size_t fileIdentifier;
-        bool isTracked;
     };
 
     struct Env {
@@ -117,11 +116,11 @@ private:
         // pre path not empty
         // pre path must not contain path tokens
         // throws std::ios_base::failure if error opening file
-        void includeFile(const std::filesystem::path& path, TrackChanges trackChanges);
+        void processFile(const std::filesystem::path& path);
 
         void substituteLine();
-        std::string substitute(const std::string& in);
-        std::string resolveAlias(const std::string& in) const;
+        std::string substitute(std::string_view in) const;
+        std::string resolveAlias(std::string_view in) const;
 
         void pushScope(const std::map<std::string, std::string>& map);
 
