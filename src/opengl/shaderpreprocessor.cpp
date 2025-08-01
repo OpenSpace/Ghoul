@@ -158,19 +158,6 @@ ShaderPreprocessor::ShaderPreprocessor(std::filesystem::path shaderPath,
     , _dictionary(std::move(dictionary))
 {}
 
-ShaderPreprocessor::Env::Input::Input(std::ifstream& str, ghoul::filesystem::File& f,
-                                 std::string indent)
-    : stream(str)
-    , file(f)
-    , indentation(std::move(indent))
-{}
-
-ShaderPreprocessor::Env::Env(std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary)
-    : _includedFiles(includedFiles)
-    , _onChangeCallback(onChangeCallback)
-    , _dictionary(dictionary)
-{}
-
 void ShaderPreprocessor::setDictionary(Dictionary dictionary) {
     _dictionary = std::move(dictionary);
     if (_onChangeCallback) {
@@ -268,11 +255,16 @@ void ShaderPreprocessor::addIncludePath(const std::filesystem::path& folderPath)
     }
 }
 
+ShaderPreprocessor::Env::Env(std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary)
+    : _includedFiles(includedFiles)
+    , _onChangeCallback(onChangeCallback)
+    , _dictionary(dictionary)
+{}
+
 void ShaderPreprocessor::Env::processFile(const std::filesystem::path& path) {
     ghoul_assert(!path.empty(), "Path must not be empty");
     ghoul_assert(std::filesystem::is_regular_file(path), "Path must be an existing file");
 
-    
     if (!_includedFiles.contains(path)) {
         filesystem::File file = filesystem::File(path);
         file.setCallback([this]() { _onChangeCallback(); });
@@ -294,29 +286,21 @@ void ShaderPreprocessor::Env::processFile(const std::filesystem::path& path) {
 
     const std::string prevIndent = !_inputs.empty() ? _inputs.back().indentation : "";
 
-    filesystem::File file = filesystem::File(path);
-    _inputs.emplace_back(stream, file, prevIndent + _indentation);
+    _inputs.emplace_back(stream, path, prevIndent + _indentation);
     if (_inputs.size() > 1) {
         addLineNumber();
     }
 
-    while (parseLine()) {
-        if (!_success) {
-            throw ShaderPreprocessorError(std::format(
-                "Could not parse line. '{}': {}", path, _inputs.back().lineNumber
-            ));
-        }
-    }
+    while (parseLine()) {}
 
     if (!_forStatements.empty()) {
         const ShaderPreprocessor::Env::ForStatement& forStatement = _forStatements.back();
         if (forStatement.inputIndex + 1 >= _inputs.size()) {
             const int inputIndex = forStatement.inputIndex;
-            const std::filesystem::path p = _inputs[inputIndex].file.path();
 
             throw ShaderPreprocessorError(std::format(
                 "Unexpected end of file. Still processing #for loop from '{}': {}. {}",
-                p, forStatement.lineNumber, debugString()
+                _inputs[inputIndex].file, forStatement.lineNumber, debugString()
             ));
         }
     }
@@ -329,7 +313,7 @@ void ShaderPreprocessor::Env::processFile(const std::filesystem::path& path) {
 }
 
 void ShaderPreprocessor::Env::addLineNumber() {
-    const std::filesystem::path filename = _inputs.back().file.path();
+    const std::filesystem::path filename = _inputs.back().file;
     ghoul_assert(_includedFiles.contains(filename), "File not in included files");
     const size_t fileIdentifier = _includedFiles.at(filename).fileIdentifier;
 
@@ -356,8 +340,7 @@ bool ShaderPreprocessor::Env::parseLine() {
     input.lineNumber++;
 
     // Trim away any whitespaces in the start and end of the line
-    static const std::string ws = " \n\r\t";
-    size_t startPos = _line.find_first_not_of(ws);
+    size_t startPos = _line.find_first_not_of(" \n\r\t");
     _indentation = _line.substr(0, startPos);
     trimWhitespace(_line);
 
@@ -385,7 +368,6 @@ bool ShaderPreprocessor::Env::parseLine() {
         _output << std::format("{}{}{}\n", input.indentation, _indentation, _line);
     }
     return true;
-    // Insert all extensions to the preprocessor here
 }
 
 std::string ShaderPreprocessor::Env::debugString() const {
@@ -394,7 +376,7 @@ std::string ShaderPreprocessor::Env::debugString() const {
     }
 
     const ShaderPreprocessor::Env::Input& input = _inputs.back();
-    return std::format("{}: {}", input.file.path(), input.lineNumber);
+    return std::format("{}: {}", input.file, input.lineNumber);
 }
 
 std::string ShaderPreprocessor::Env::output() const {
@@ -556,7 +538,7 @@ bool ShaderPreprocessor::Env::parseInclude() {
         const size_t includeLength = p2 - p1 - 1;
         const std::filesystem::path includeFilename = _line.substr(p1 + 1, includeLength);
         std::filesystem::path includeFilepath =
-            _inputs.back().file.path().parent_path() / includeFilename;
+            _inputs.back().file.parent_path() / includeFilename;
 
         bool includeFileWasFound = std::filesystem::is_regular_file(includeFilepath);
 
@@ -776,15 +758,12 @@ bool ShaderPreprocessor::Env::parseEndFor() {
     Env::ForStatement& forStmnt = _forStatements.back();
     // Require #for and #endfor to be in the same input file
     if (forStmnt.inputIndex != _inputs.size() - 1) {
-        _success = false;
         const int inputIndex = forStmnt.inputIndex;
         const ShaderPreprocessor::Env::Input& forInput = _inputs[inputIndex];
-        std::filesystem::path path = forInput.file.path();
-        int lineNumber = forStmnt.lineNumber;
 
         throw ShaderPreprocessorError(std::format(
             "Unexpected #endfor. Last #for was in {}: {}. {}",
-            path, lineNumber, debugString()
+            forInput.file, forStmnt.lineNumber, debugString()
         ));
     }
 

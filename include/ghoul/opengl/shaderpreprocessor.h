@@ -74,7 +74,7 @@ public:
 
 private:
     struct FileStruct {
-        ghoul::filesystem::File file;
+        filesystem::File file;
         size_t fileIdentifier;
     };
 
@@ -83,10 +83,8 @@ private:
         using Scope = std::set<std::string>;
 
         struct Input {
-            Input(std::ifstream& str, ghoul::filesystem::File& f, std::string indent);
-
             std::ifstream& stream;
-            ghoul::filesystem::File& file;
+            const std::filesystem::path file;
             const std::string indentation;
             unsigned int lineNumber = 1;
         };
@@ -150,8 +148,6 @@ private:
 
         // Points towards ShaderPreprocessor::_dictionary
         Dictionary& _dictionary;
-
-        bool _success = true;
     };
 
 
