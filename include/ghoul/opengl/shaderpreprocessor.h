@@ -103,12 +103,11 @@ private:
 
         explicit Env(std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary);
 
-        bool parseLine();
-        bool parseFor();
-        bool parseEndFor();
-        bool parseInclude();
-        bool parseVersion();
-        bool parseOs();
+        bool parseFor(const std::string& line);
+        bool parseEndFor(const std::string& line);
+        bool parseInclude(const std::string& line);
+        bool parseVersion(const std::string& line);
+        bool parseOs(const std::string& line);
 
         // pre path exists
         // pre path not empty
@@ -116,7 +115,7 @@ private:
         // throws std::ios_base::failure if error opening file
         void processFile(const std::filesystem::path& path);
 
-        void substituteLine();
+        void substituteLine(std::string& line) const;
         std::string substitute(std::string_view in) const;
         std::string resolveAlias(std::string_view in) const;
 
@@ -133,7 +132,6 @@ private:
         std::string output() const;
 
         std::stringstream _output;
-        std::string _line;
         std::vector<Input> _inputs;
         std::vector<Scope> _scopes;
         std::vector<ForStatement> _forStatements;

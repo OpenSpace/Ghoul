@@ -42,6 +42,8 @@
 #include <utility>
 
 namespace {
+    constexpr std::string_view Ws = " \n\r\t";
+
     struct ShaderPreprocessorError : public ghoul::RuntimeError {
         explicit ShaderPreprocessorError(std::string msg)
             : RuntimeError(std::move(msg), "ShaderPreprocessor")
@@ -291,7 +293,45 @@ void ShaderPreprocessor::Env::processFile(const std::filesystem::path& path) {
         addLineNumber();
     }
 
-    while (parseLine()) {}
+
+    while (true) {
+        Env::Input& input = _inputs.back();
+        std::string line;
+        if (!ghoul::getline(input.stream, line)) {
+            break;
+        }
+        input.lineNumber++;
+
+        // Trim away any whitespaces in the start and end of the line
+        size_t startPos = line.find_first_not_of(" \n\r\t");
+        _indentation = line.substr(0, startPos);
+        trimWhitespace(line);
+
+        bool isSpecialLine = parseEndFor(line); // #endfor
+
+        const bool isInsideEmptyForStatement =
+            !_forStatements.empty() && (_forStatements.back().keyIndex == -1);
+        if (isInsideEmptyForStatement) {
+            continue;
+        }
+
+        // Replace all #{<name>} strings with data from <name> in dictionary
+        substituteLine(line);
+
+        if (!isSpecialLine) {
+            isSpecialLine |=
+                parseVersion(line) ||    // #version __CONTEXT__
+                parseOs(line) ||         // #define __OS__
+                parseInclude(line) ||    // #include
+                parseFor(line);          // #for <key>, <value> in <dictionary>
+        }
+
+        if (!isSpecialLine) {
+            // Write GLSL code to output
+            _output << std::format("{}{}{}\n", input.indentation, _indentation, line);
+        }
+    }
+
 
     if (!_forStatements.empty()) {
         const ShaderPreprocessor::Env::ForStatement& forStatement = _forStatements.back();
@@ -332,44 +372,6 @@ void ShaderPreprocessor::Env::addLineNumber() {
     );
 }
 
-bool ShaderPreprocessor::Env::parseLine() {
-    Env::Input& input = _inputs.back();
-    if (!ghoul::getline(input.stream, _line)) {
-        return false;
-    }
-    input.lineNumber++;
-
-    // Trim away any whitespaces in the start and end of the line
-    size_t startPos = _line.find_first_not_of(" \n\r\t");
-    _indentation = _line.substr(0, startPos);
-    trimWhitespace(_line);
-
-    bool isSpecialLine = parseEndFor(); // #endfor
-
-    const bool isInsideEmptyForStatement =
-        !_forStatements.empty() && (_forStatements.back().keyIndex == -1);
-    if (isInsideEmptyForStatement) {
-        return true;
-    }
-
-    // Replace all #{<name>} strings with data from <name> in dictionary
-    substituteLine();
-
-    if (!isSpecialLine) {
-        isSpecialLine |=
-            parseVersion() ||    // #version __CONTEXT__
-            parseOs() ||         // #define __OS__
-            parseInclude() ||    // #include
-            parseFor();          // #for <key>, <value> in <dictionary>
-    }
-
-    if (!isSpecialLine) {
-        // Write GLSL code to output
-        _output << std::format("{}{}{}\n", input.indentation, _indentation, _line);
-    }
-    return true;
-}
-
 std::string ShaderPreprocessor::Env::debugString() const {
     if (_inputs.empty()) {
         return "";
@@ -383,27 +385,26 @@ std::string ShaderPreprocessor::Env::output() const {
     return _output.str();
 }
 
-void ShaderPreprocessor::Env::substituteLine() {
-    size_t beginOffset = 0;
-
-    while ((beginOffset = _line.rfind("#{")) != std::string::npos) {
-        const size_t endOffset = _line.substr(beginOffset).find('}');
-        if (endOffset == std::string::npos) {
+void ShaderPreprocessor::Env::substituteLine(std::string& line) const {
+    while (true) {
+        const size_t begin = line.rfind("#{");
+        if (begin == std::string::npos) {
+            break;
+        }
+        const size_t length = line.substr(begin + 2).find('}');
+        if (length == std::string::npos) {
             throw ShaderPreprocessorError(std::format(
                 "Could not parse line. {}", debugString()
             ));
         }
 
-        const std::string in = _line.substr(beginOffset + 2, endOffset - 2);
+        const std::string in = line.substr(begin + 2, length);
         const std::string out = substitute(in);
 
-        const std::string first = _line.substr(0, beginOffset);
-        const std::string last = _line.substr(
-            beginOffset + endOffset + 1,
-            _line.size() - 1 - (beginOffset + endOffset)
-        );
+        const std::string first = line.substr(0, begin);
+        const std::string last = line.substr(begin + 2 + length + 1);
 
-        _line = std::format("{}{}{}", first, out, last);
+        line = std::format("{}{}{}", first, out, last);
     }
 }
 
@@ -510,33 +511,32 @@ void ShaderPreprocessor::Env::popScope() {
     _scopes.pop_back();
 }
 
-bool ShaderPreprocessor::Env::parseInclude() {
+bool ShaderPreprocessor::Env::parseInclude(const std::string& line) {
     constexpr std::string_view IncludeString = "#include";
-    constexpr std::string_view Ws = " \n\r\t";
 
-    if (_line.substr(0, IncludeString.size()) != IncludeString) {
+    if (!line.starts_with(IncludeString)) {
         return false;
     }
 
-    const size_t p1 = _line.find_first_not_of(Ws, IncludeString.size());
+    const size_t p1 = line.find_first_not_of(Ws, IncludeString.size());
     if (p1 == std::string::npos) {
         throw ShaderPreprocessorError(std::format(
             "Expected file path after #include. {}", debugString()
         ));
     }
 
-    if ((_line[p1] != '\"') && (_line[p1] != '<')) {
+    if ((line[p1] != '\"') && (line[p1] != '<')) {
         throw ShaderPreprocessorError(std::format("Expected \" or <. {}", debugString()));
     }
 
-    if (_line[p1] == '\"') {
-        const size_t p2 = _line.find_first_of('\"', p1 + 1);
+    if (line[p1] == '\"') {
+        const size_t p2 = line.find_first_of('\"', p1 + 1);
         if (p2 == std::string::npos) {
             throw ShaderPreprocessorError(std::format("Expected \" {}", debugString()));
         }
 
         const size_t includeLength = p2 - p1 - 1;
-        const std::filesystem::path includeFilename = _line.substr(p1 + 1, includeLength);
+        const std::filesystem::path includeFilename = line.substr(p1 + 1, includeLength);
         std::filesystem::path includeFilepath =
             _inputs.back().file.parent_path() / includeFilename;
 
@@ -570,31 +570,31 @@ bool ShaderPreprocessor::Env::parseInclude() {
 
         processFile(includeFilepath);
     }
-    else if (_line.at(p1) == '<') {
-        const size_t p2 = _line.find_first_of('>', p1 + 1);
+    else if (line.at(p1) == '<') {
+        const size_t p2 = line.find_first_of('>', p1 + 1);
         if (p2 == std::string::npos) {
             throw ShaderPreprocessorError(std::format("Expected >. {}", debugString()));
         }
 
         const size_t includeLen = p2 - p1 - 1;
-        const std::filesystem::path include = absPath(_line.substr(p1 + 1, includeLen));
+        const std::filesystem::path include = absPath(line.substr(p1 + 1, includeLen));
         processFile(include);
     }
     return true;
 }
 
-bool ShaderPreprocessor::Env::parseVersion() {
+bool ShaderPreprocessor::Env::parseVersion(const std::string& line) {
     constexpr std::string_view VersionString = "#version __CONTEXT__";
-    if (_line.starts_with(VersionString)) {
+    if (line.starts_with(VersionString)) {
         _output << std::format("{}\n", glslVersionString());
         return true;
     }
     return false;
 }
 
-bool ShaderPreprocessor::Env::parseOs() {
+bool ShaderPreprocessor::Env::parseOs(const std::string& line) {
     constexpr std::string_view OsString = "#define __OS__";
-    if (_line.starts_with(OsString)) {
+    if (line.starts_with(OsString)) {
 #ifdef WIN32
         constexpr std::string_view os = "WIN32";
 #endif // WIN32
@@ -620,7 +620,6 @@ bool ShaderPreprocessor::Env::parseOs() {
 bool ShaderPreprocessor::Env::tokenizeFor(std::string_view line, std::string& keyName,
                                      std::string& valueName, std::string& dictionaryName) const
 {
-    constexpr std::string_view Ws = " \n\r\t";
 
     // parse this:
     // #for <key>, <value> in <dictionary>
@@ -680,11 +679,11 @@ bool ShaderPreprocessor::Env::tokenizeFor(std::string_view line, std::string& ke
     return true;
 }
 
-bool ShaderPreprocessor::Env::parseFor() {
+bool ShaderPreprocessor::Env::parseFor(const std::string& line) {
     std::string keyName;
     std::string valueName;
     std::string dictionaryName;
-    if (!tokenizeFor(_line, keyName, valueName, dictionaryName)) {
+    if (!tokenizeFor(line, keyName, valueName, dictionaryName)) {
          return false;
      }
 
@@ -742,10 +741,10 @@ bool ShaderPreprocessor::Env::parseFor() {
     return true;
 }
 
-bool ShaderPreprocessor::Env::parseEndFor() {
+bool ShaderPreprocessor::Env::parseEndFor(const std::string& line) {
     constexpr std::string_view EndForString = "#endfor";
 
-    if (!_line.starts_with(EndForString)) {
+    if (!line.starts_with(EndForString)) {
         return false;
     }
 
