@@ -50,10 +50,6 @@ namespace {
         {}
     };
 
-    constexpr bool isString(std::string_view str) {
-        return str.starts_with('"') && str.ends_with('"');
-    }
-
     std::string glslVersionString() {
         int versionMajor = 0;
         int versionMinor = 0;
@@ -87,7 +83,7 @@ namespace {
         if (dictionary.hasKey(before)) {
             const ghoul::Dictionary d = dictionary.value<ghoul::Dictionary>(before);
             const std::string_view after = key.substr(dotPos + 1);
-            return d.hasKey(after);
+            return hasKeyRecursive(d, after);
         }
         else {
             return false;
@@ -105,7 +101,7 @@ namespace {
         if (dictionary.hasValue<ghoul::Dictionary>(before)) {
             const ghoul::Dictionary d = dictionary.value<ghoul::Dictionary>(before);
             const std::string_view after = key.substr(dotPos + 1);
-            return d.hasValue<T>(after);
+            return hasValueRecursive<T>(d, after);
         }
         else {
             return false;
@@ -122,11 +118,10 @@ namespace {
         const std::string_view before = key.substr(0, dotPos);
         const std::string_view after = key.substr(dotPos + 1);
         const ghoul::Dictionary d = dictionary.value<ghoul::Dictionary>(before);
-        return d.value<T>(after);
+        return valueRecursive<T>(d, after);
     }
 
-    std::pair<int, int> parseRange(const std::string& key, ghoul::Dictionary& dictionary)
-    {
+    std::tuple<int, int, ghoul::Dictionary> parseRange(const std::string& key) {
         constexpr std::string_view TwoDots = "..";
 
         const size_t minEnd = key.find(TwoDots);
@@ -140,12 +135,13 @@ namespace {
         const int maximum = std::stoi(key.substr(maxStart, maxEnd - maxStart));
 
         // Create all the elements in the dictionary
+        ghoul::Dictionary dictionary;
         for (int i = 0; i <= maximum - minimum; i++) {
             dictionary.setValue(std::to_string(i + 1), std::to_string(minimum + i));
         }
 
         // Everything went well. Write over min and max
-        return { minimum, maximum };
+        return { minimum, maximum, dictionary };
     }
 } // namespace
 
@@ -427,9 +423,7 @@ std::string ShaderPreprocessor::Env::resolveAlias(std::string_view in) const {
     }
 
     std::string res = beforeDot + afterDot;
-    if (!(((afterDot.empty() && isString(beforeDot)) ||
-        hasKeyRecursive(_dictionary, res))))
-    {
+    if (!afterDot.empty() && !hasKeyRecursive(_dictionary, res)) {
         throw ShaderPreprocessorError(std::format(
             "Could not resolve variable '{}'. {}", in, debugString()
         ));
@@ -441,7 +435,7 @@ std::string ShaderPreprocessor::Env::resolveAlias(std::string_view in) const {
 std::string ShaderPreprocessor::Env::substitute(std::string_view in) const {
     std::string resolved = resolveAlias(in);
 
-    if (isString(resolved)) {
+    if (resolved.starts_with('"') && resolved.ends_with('"')) {
         return resolved.substr(1, resolved.length() - 2);
     }
     else if (hasValueRecursive<bool>(_dictionary, resolved)) {
@@ -464,6 +458,10 @@ std::string ShaderPreprocessor::Env::substitute(std::string_view in) const {
         glm::ivec3 vec = valueRecursive<glm::ivec3>(_dictionary, resolved);
         return std::format("ivec3({},{},{})", vec.x, vec.y, vec.z);
     }
+    else if (hasValueRecursive<glm::ivec4>(_dictionary, resolved)) {
+        glm::ivec4 vec = valueRecursive<glm::ivec4>(_dictionary, resolved);
+        return std::format("ivec4({},{},{},{})", vec.x, vec.y, vec.z, vec.w);
+    }
     else if (hasValueRecursive<glm::dvec2>(_dictionary, resolved)) {
         glm::dvec2 vec = valueRecursive<glm::dvec2>(_dictionary, resolved);
         return std::format("dvec2({},{})", vec.x, vec.y);
@@ -472,12 +470,15 @@ std::string ShaderPreprocessor::Env::substitute(std::string_view in) const {
         glm::dvec3 vec = valueRecursive<glm::dvec3>(_dictionary, resolved);
         return std::format("dvec3({},{},{})", vec.x, vec.y, vec.z);
     }
-    else {
-        throw ShaderPreprocessorError(std::format(
-            "'{}' was resolved to '{}' which is a type that is not supported. {}",
-            in, resolved, debugString()
-        ));
+    else if (hasValueRecursive<glm::dvec4>(_dictionary, resolved)) {
+        glm::dvec4 vec = valueRecursive<glm::dvec4>(_dictionary, resolved);
+        return std::format("dvec4({},{},{},{})", vec.x, vec.y, vec.z, vec.w);
     }
+
+    throw ShaderPreprocessorError(std::format(
+        "'{}' was resolved to '{}' which is a type that is not supported. {}",
+        in, resolved, debugString()
+    ));
 }
 
 void ShaderPreprocessor::Env::pushScope(const std::map<std::string, std::string>& map) {
@@ -511,7 +512,7 @@ void ShaderPreprocessor::Env::popScope() {
     _scopes.pop_back();
 }
 
-bool ShaderPreprocessor::Env::parseInclude(const std::string& line) {
+bool ShaderPreprocessor::Env::parseInclude(std::string_view line) {
     constexpr std::string_view IncludeString = "#include";
 
     if (!line.starts_with(IncludeString)) {
@@ -525,10 +526,6 @@ bool ShaderPreprocessor::Env::parseInclude(const std::string& line) {
         ));
     }
 
-    if ((line[p1] != '\"') && (line[p1] != '<')) {
-        throw ShaderPreprocessorError(std::format("Expected \" or <. {}", debugString()));
-    }
-
     if (line[p1] == '\"') {
         const size_t p2 = line.find_first_of('\"', p1 + 1);
         if (p2 == std::string::npos) {
@@ -540,35 +537,30 @@ bool ShaderPreprocessor::Env::parseInclude(const std::string& line) {
         std::filesystem::path includeFilepath =
             _inputs.back().file.parent_path() / includeFilename;
 
-        bool includeFileWasFound = std::filesystem::is_regular_file(includeFilepath);
-
         // Resolve the include paths if this default includeFilename does not exist
-        if (!includeFileWasFound) {
-            for (const std::filesystem::path& path : _includePaths) {
-                includeFilepath = path / includeFilename;
-                if (std::filesystem::is_regular_file(includeFilepath)) {
-                    includeFileWasFound = true;
-                    break;
-                }
+        if (std::filesystem::is_regular_file(includeFilepath)) {
+            processFile(includeFilepath);
+            return true;
+        }
+
+        for (const std::filesystem::path& path : _includePaths) {
+            includeFilepath = path / includeFilename;
+            if (std::filesystem::is_regular_file(includeFilepath)) {
+                processFile(includeFilepath);
+                return true;
             }
         }
 
-        if (!includeFileWasFound) {
-            // Our last chance is that the include file is an absolute path
-            const bool found = std::filesystem::is_regular_file(includeFilename);
-            if (found) {
-                includeFilepath = includeFilename;
-                includeFileWasFound = true;
-            }
+        // Our last chance is that the include file is an absolute path
+        const bool found = std::filesystem::is_regular_file(includeFilename);
+        if (found) {
+            processFile(includeFilename);
+            return true;
         }
 
-        if (!includeFileWasFound) {
-            throw ShaderPreprocessorError(std::format(
-                "Could not resolve file path for include file '{}'", includeFilepath
-            ));
-        }
-
-        processFile(includeFilepath);
+        throw ShaderPreprocessorError(std::format(
+            "Could not resolve file path for include file '{}'", includeFilepath
+        ));
     }
     else if (line.at(p1) == '<') {
         const size_t p2 = line.find_first_of('>', p1 + 1);
@@ -578,9 +570,19 @@ bool ShaderPreprocessor::Env::parseInclude(const std::string& line) {
 
         const size_t includeLen = p2 - p1 - 1;
         const std::filesystem::path include = absPath(line.substr(p1 + 1, includeLen));
+
+        if (!std::filesystem::is_regular_file(include)) {
+            throw ShaderPreprocessorError(std::format(
+                "Could not resolve file path for include file '{}'", include
+            ));
+        }
+
         processFile(include);
+        return true;
     }
-    return true;
+    else {
+        throw ShaderPreprocessorError(std::format("Expected \" or <. {}", debugString()));
+    }
 }
 
 bool ShaderPreprocessor::Env::parseVersion(const std::string& line) {
@@ -617,28 +619,23 @@ bool ShaderPreprocessor::Env::parseOs(const std::string& line) {
     return false;
 }
 
-bool ShaderPreprocessor::Env::tokenizeFor(std::string_view line, std::string& keyName,
-                                     std::string& valueName, std::string& dictionaryName) const
-{
-
+bool ShaderPreprocessor::Env::parseFor(const std::string& line) {
     // parse this:
     // #for <key>, <value> in <dictionary>
+    // #for <key> in <a>..<b>
 
     constexpr std::string_view ForString = "#for";
     if (!line.starts_with(ForString)) {
         return false;
     }
 
-    const size_t firstWsPos = ForString.size();
-    const size_t keyOffset = line.substr(firstWsPos).find_first_not_of(Ws);
-    const size_t keyPos = firstWsPos + keyOffset;
+    const size_t keyPos = line.find_first_not_of(Ws, ForString.size());
 
-    const size_t commaOffset = line.substr(keyPos).find(',');
-
-    size_t commaPos = 0;
-    if (commaOffset != std::string::npos) { // Found a comma
-        commaPos = keyPos + commaOffset;
-        keyName = line.substr(keyPos, commaOffset);
+    std::string keyName;
+    size_t commaPos = line.find(',');
+    const bool hasKey = commaPos != std::string::npos;
+    if (hasKey) {
+        keyName = line.substr(keyPos, commaPos);
         trimWhitespace(keyName);
     }
     else {
@@ -646,61 +643,40 @@ bool ShaderPreprocessor::Env::tokenizeFor(std::string_view line, std::string& ke
         keyName = "";
     }
 
-    const size_t valueOffset = line.substr(commaPos + 1).find_first_not_of(Ws);
-    const size_t valuePos = commaPos + 1 + valueOffset;
+    const size_t valuePos = line.find_first_not_of(Ws, commaPos + 1);
+    const size_t valueEnd = line.find_first_of(Ws, valuePos);
 
-    const size_t wsBeforeInOffset = line.substr(valuePos).find_first_of(Ws);
-    const size_t wsBeforeInPos = valuePos + wsBeforeInOffset;
-
-    valueName = line.substr(valuePos, wsBeforeInOffset);
+    std::string valueName = line.substr(valuePos, valueEnd - valuePos);
     trimWhitespace(valueName);
 
-    const size_t inOffset = line.substr(wsBeforeInPos).find_first_not_of(Ws);
-    const size_t inPos = wsBeforeInPos + inOffset;
-
+    const size_t inPos = line.find_first_not_of(Ws, valueEnd);
     constexpr std::string_view InString = "in";
-    if (line.substr(inPos).length() < InString.length() + 1 ||
-        line.substr(inPos, InString.length()) != InString)
-    {
+    if (!line.substr(inPos).starts_with(InString)) {
         throw ShaderPreprocessorError(std::format(
             "Expected 'in' in #for statement. {}", debugString()
         ));
     }
+    const size_t inEnd = line.find_first_of(Ws, inPos);
 
-    const size_t wsBeforeDictionaryPos = inPos + InString.size();
-    const size_t dictionaryOffset =
-        line.substr(wsBeforeDictionaryPos).find_first_not_of(Ws);
-    const size_t dictionaryPos = wsBeforeDictionaryPos + dictionaryOffset;
+    const size_t dictPos = line.find_first_not_of(Ws, inEnd);
+    const size_t dictEnd = line.find_first_of(Ws, dictPos);
+    std::string dictName = line.substr(dictPos, dictEnd - dictPos);
+    trimWhitespace(dictName);
 
-    const size_t endOffset = line.substr(dictionaryPos).find_first_of(Ws);
-    dictionaryName = line.substr(dictionaryPos, endOffset);
-    trimWhitespace(dictionaryName);
-
-    return true;
-}
-
-bool ShaderPreprocessor::Env::parseFor(const std::string& line) {
-    std::string keyName;
-    std::string valueName;
-    std::string dictionaryName;
-    if (!tokenizeFor(line, keyName, valueName, dictionaryName)) {
-         return false;
-     }
-
-    if (keyName.empty()) {
+    if (!hasKey) {
         // No key means that the for statement could possibly be a range
-        Dictionary rangeDictionary;
-        auto [min, max] = parseRange(dictionaryName, rangeDictionary);
+        auto [min, max, rangeDictionary] = parseRange(dictName);
 
         // Previous dictionary name is not valid as a key since it has dots in it
-        dictionaryName = std::format("(Range {} to {})", min, max);
+        dictName = std::format("(Range {} to {})", min, max);
+
         // Add the inner dictionary
-        _dictionary.setValue(dictionaryName, rangeDictionary);
+        _dictionary.setValue(dictName, rangeDictionary);
     }
 
     // The dictionary name can be an alias
     // Resolve the real dictionary reference
-    std::string dictionaryRef = resolveAlias(dictionaryName);
+    std::string dictionaryRef = resolveAlias(dictName);
 
     // Fetch the dictionary to iterate over
     const Dictionary innerDictionary = _dictionary.value<Dictionary>(dictionaryRef);

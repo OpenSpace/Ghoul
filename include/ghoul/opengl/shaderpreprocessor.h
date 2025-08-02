@@ -105,7 +105,7 @@ private:
 
         bool parseFor(const std::string& line);
         bool parseEndFor(const std::string& line);
-        bool parseInclude(const std::string& line);
+        bool parseInclude(std::string_view line);
         bool parseVersion(const std::string& line);
         bool parseOs(const std::string& line);
 
@@ -123,8 +123,6 @@ private:
 
         void popScope();
 
-        bool tokenizeFor(std::string_view line, std::string& keyName,
-            std::string& valueName, std::string& dictionaryName) const;
         void addLineNumber();
 
         std::string debugString() const;
