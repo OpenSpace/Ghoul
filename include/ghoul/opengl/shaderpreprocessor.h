@@ -73,11 +73,6 @@ public:
     static void addIncludePath(const std::filesystem::path& folderPath);
 
 private:
-    struct FileStruct {
-        filesystem::File file;
-        size_t fileIdentifier;
-    };
-
     struct Env {
     public:
         using Scope = std::set<std::string>;
@@ -101,7 +96,7 @@ private:
             int keyIndex;
         };
 
-        explicit Env(std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary);
+        explicit Env(std::vector<filesystem::File>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary);
 
         bool parseFor(const std::string& line);
         bool parseEndFor(const std::string& line);
@@ -137,7 +132,7 @@ private:
         std::string _indentation;
 
         // Points towards ShaderPreprocessor::_includedFiles
-        std::map<std::filesystem::path, FileStruct>& _includedFiles;
+        std::vector<filesystem::File>& _includedFiles;
 
         // Points towards ShaderPreprocessor::_onChangeCallback
         ShaderChangedCallback& _onChangeCallback;
@@ -147,7 +142,7 @@ private:
     };
 
 
-    std::map<std::filesystem::path, FileStruct> _includedFiles;
+    std::vector<filesystem::File> _includedFiles;
     static std::vector<std::filesystem::path> _includePaths;
     std::filesystem::path _shaderPath;
     Dictionary _dictionary;

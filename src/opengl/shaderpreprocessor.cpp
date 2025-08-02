@@ -202,39 +202,19 @@ std::string ShaderPreprocessor::process() {
 
 void ShaderPreprocessor::setCallback(ShaderChangedCallback changeCallback) {
     _onChangeCallback = std::move(changeCallback);
-    for (std::pair<const std::filesystem::path, FileStruct>& files : _includedFiles) {
-        files.second.file.setCallback([this]() { _onChangeCallback(); });
+    for (filesystem::File& file : _includedFiles) {
+        file.setCallback([this]() { _onChangeCallback(); });
     }
 }
 
 std::string ShaderPreprocessor::includedFiles() const {
-    std::vector<std::pair<std::filesystem::path, size_t>> inc;
-    inc.resize(_includedFiles.size());
-    std::transform(
+    int i = 0;
+    std::string result = std::accumulate(
         _includedFiles.begin(),
         _includedFiles.end(),
-        inc.begin(),
-        [](const std::pair<const std::filesystem::path, FileStruct>& p) {
-            return std::pair(p.first, p.second.fileIdentifier);
-        }
-    );
-
-    std::sort(
-        inc.begin(),
-        inc.end(),
-        [](const std::pair<std::filesystem::path, size_t>& lhs,
-           const std::pair<std::filesystem::path, size_t>& rhs)
-        {
-            return lhs.second <= rhs.second;
-        }
-    );
-
-    std::string result = std::accumulate(
-        inc.begin(),
-        inc.end(),
         std::string(""),
-        [](std::string lhs, const std::pair<const std::filesystem::path, size_t>& f) {
-            return std::format("{}{}: {}\n", std::move(lhs), f.second, f.first);
+        [&i](std::string lhs, const filesystem::File& f) {
+            return std::format("{}{}: {}\n", std::move(lhs), i++, f.path());
         }
     );
     return result;
@@ -253,7 +233,7 @@ void ShaderPreprocessor::addIncludePath(const std::filesystem::path& folderPath)
     }
 }
 
-ShaderPreprocessor::Env::Env(std::map<std::filesystem::path, FileStruct>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary)
+ShaderPreprocessor::Env::Env(std::vector<filesystem::File>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary)
     : _includedFiles(includedFiles)
     , _onChangeCallback(onChangeCallback)
     , _dictionary(dictionary)
@@ -263,17 +243,15 @@ void ShaderPreprocessor::Env::processFile(const std::filesystem::path& path) {
     ghoul_assert(!path.empty(), "Path must not be empty");
     ghoul_assert(std::filesystem::is_regular_file(path), "Path must be an existing file");
 
-    if (!_includedFiles.contains(path)) {
+    auto it = std::find_if(
+        _includedFiles.begin(),
+        _includedFiles.end(),
+        [&path](const filesystem::File& file) { return file.path() == path; }
+    );
+    if (it == _includedFiles.end()) {
         filesystem::File file = filesystem::File(path);
         file.setCallback([this]() { _onChangeCallback(); });
-
-        _includedFiles.emplace(
-            path,
-            FileStruct {
-                std::move(file),
-                _includedFiles.size()
-            }
-        );
+        _includedFiles.push_back(std::move(file));
     }
 
     std::ifstream stream = std::ifstream(path, std::ifstream::binary);
@@ -350,8 +328,12 @@ void ShaderPreprocessor::Env::processFile(const std::filesystem::path& path) {
 
 void ShaderPreprocessor::Env::addLineNumber() {
     const std::filesystem::path filename = _inputs.back().file;
-    ghoul_assert(_includedFiles.contains(filename), "File not in included files");
-    const size_t fileIdentifier = _includedFiles.at(filename).fileIdentifier;
+    auto it = std::find_if(
+        _includedFiles.begin(),
+        _includedFiles.end(),
+        [&filename](const filesystem::File& file) { return file.path() == filename; }
+    );
+    ghoul_assert(it != _includedFiles.end(), "File not in included files");
 
     std::string_view includeSeparator;
 #ifndef __APPLE__
@@ -364,7 +346,7 @@ void ShaderPreprocessor::Env::addLineNumber() {
 
     _output << std::format(
         "{}\n#line {} {} // {}\n",
-        includeSeparator, _inputs.back().lineNumber, fileIdentifier, filename
+        includeSeparator, _inputs.back().lineNumber, std::distance(_includedFiles.begin(), it), filename
     );
 }
 
