@@ -75,6 +75,7 @@ std::string join(std::vector<std::string> input, const std::string& separator = 
  * \param value The string from which to remove the whitespace
  */
 void trimWhitespace(std::string& value);
+void trimWhitespace(std::string_view& value);
 
 /**
  * Removes a specific character from both the beginning and ending of a string. Any number
