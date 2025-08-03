@@ -44,8 +44,8 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
                                                      std::string name)
     : ShaderObjectError(
         name.empty() ?
-        std::format("Error linking program object: {}\n{}", error, ident) :
-        std::format("Error linking program object [{}]: {}\n{}", name, error, ident)
+        std::format("Error compiling shader object: {}\n{}", error, ident) :
+        std::format("Error compiling shader object [{}]: {}\n{}", name, error, ident)
     )
     , compileError(std::move(error))
     , fileIdentifiers(std::move(ident))
