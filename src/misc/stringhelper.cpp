@@ -103,6 +103,33 @@ void trimWhitespace(std::string& value) {
     );
 }
 
+void trimWhitespace(std::string_view& value) {
+    constexpr std::string_view Ws = " \n\r\t";
+
+    if (value.empty()) {
+        return;
+    }
+
+    if (size_t it = value.find_first_not_of(Ws);  it != std::string_view::npos) {
+        value.remove_prefix(it);
+    }
+
+    for (size_t it = value.size() - 1; ; it--) {
+        if (value[it] != '\n' && value[it] != '\r' &&
+            value[it] != '\t' && value[it] != ' ')
+        {
+            value.remove_suffix(value.size() - (it + 1));
+            break;
+        }
+
+        // Can't use this check inside the for loop as the -1 would cause it to underflow
+        // to std::string_view::npos and things would break
+        if (it == 0) {
+            break;
+        }
+    }
+}
+
 void trimSurroundingCharacters(std::string& valueString, const char charToRemove) {
     while (valueString.front() == charToRemove) {
         valueString.erase(0, 1);
