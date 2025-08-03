@@ -27,13 +27,9 @@
 #define __GHOUL___SHADERPREPROCESSOR___H__
 
 #include <ghoul/filesystem/file.h>
-#include <ghoul/misc/boolean.h>
 #include <ghoul/misc/dictionary.h>
-#include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <functional>
-#include <map>
-#include <set>
 #include <string>
 #include <vector>
 

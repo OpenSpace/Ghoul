@@ -32,6 +32,7 @@
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <filesystem>
 #include <fstream>
+#include <ranges>
 #include <string>
 #include <sstream>
 #include <utility>
@@ -141,15 +142,13 @@ namespace {
 
     class Env {
     public:
-        explicit Env(ghoul::Dictionary& dictionary);
+        explicit Env(ghoul::Dictionary dictionary);
 
         void processFile(const std::filesystem::path& path);
         std::vector<std::filesystem::path> includedFiles() const;
         std::string finalize();
 
     private:
-        using Scope = std::set<std::string>;
-
         struct Input {
             std::ifstream& stream;
             const std::filesystem::path file;
@@ -166,7 +165,7 @@ namespace {
             std::string valueName;
             std::string dictionaryReference;
 
-            int keyIndex;
+            int currentIteration;
         };
 
         bool parseFor(const std::string& line);
@@ -179,28 +178,22 @@ namespace {
         std::string substitute(std::string_view in) const;
         std::string resolveAlias(std::string_view in) const;
 
-        void pushScope(const std::map<std::string, std::string>& map);
-        void popScope();
-
         void addLineNumber();
         std::string debugString() const;
 
 
         std::stringstream _output;
         std::vector<Input> _inputs;
-        std::vector<Scope> _scopes;
+        std::vector<std::map<std::string, std::string>> _scopes;
         std::vector<ForStatement> _forStatements;
-        std::map<std::string, std::vector<std::string>> _aliases;
         std::string _indentation;
 
         std::vector<std::filesystem::path> _includedFiles;
-
-        // Points towards ShaderPreprocessor::_dictionary
-        ghoul::Dictionary& _dictionary;
+        ghoul::Dictionary _dictionary;
     };
 
-    Env::Env(ghoul::Dictionary& dictionary)
-        : _dictionary(dictionary)
+    Env::Env(ghoul::Dictionary dictionary)
+        : _dictionary(std::move(dictionary))
     {}
 
     void Env::processFile(const std::filesystem::path& path) {
@@ -216,7 +209,6 @@ namespace {
         if (!stream.good()) {
             throw ShaderPreprocessorError(std::format("Error loading file '{}'", path));
         }
-        ghoul_assert(stream.good(), "Input stream is not good");
 
         const std::string prevIndent = !_inputs.empty() ? _inputs.back().indentation : "";
         _inputs.emplace_back(stream, path, prevIndent + _indentation);
@@ -225,6 +217,7 @@ namespace {
         }
 
 
+        // Parse the individual lines
         while (true) {
             Env::Input& input = _inputs.back();
             std::string line;
@@ -234,14 +227,15 @@ namespace {
             input.lineNumber++;
 
             // Trim away any whitespaces in the start and end of the line
-            size_t startPos = line.find_first_not_of(Ws);
+            const size_t startPos = line.find_first_not_of(Ws);
             _indentation = line.substr(0, startPos);
             ghoul::trimWhitespace(line);
 
             bool isSpecialLine = parseEndFor(line); // #endfor
 
+            // Empty -> invalid loop variable
             const bool isInsideEmptyForStatement =
-                !_forStatements.empty() && (_forStatements.back().keyIndex == -1);
+                !_forStatements.empty() && (_forStatements.back().currentIteration == -1);
             if (isInsideEmptyForStatement) {
                 continue;
             }
@@ -370,10 +364,13 @@ namespace {
         }
 
         // Resolve only part before dot
-        if (auto it = _aliases.find(beforeDot);
-            it != _aliases.end() && !it->second.empty())
+        for (const std::map<std::string, std::string>& scope :
+             std::ranges::reverse_view(_scopes))
         {
-            beforeDot = it->second.back();
+            if (auto it = scope.find(beforeDot);  it != scope.end()) {
+                beforeDot = it->second;
+                break;
+            }
         }
 
         std::string res = beforeDot + afterDot;
@@ -433,37 +430,6 @@ namespace {
             "'{}' was resolved to '{}' which is a type that is not supported. {}",
             in, resolved, debugString()
         ));
-    }
-
-    void Env::pushScope(const std::map<std::string, std::string>& map) {
-        Env::Scope scope;
-        for (const std::pair<const std::string, std::string>& pair : map) {
-            const std::string& key = pair.first;
-            const std::string& value = pair.second;
-            scope.insert(key);
-            if (!_aliases.contains(key)) {
-               _aliases[key] = std::vector<std::string>();
-            }
-            _aliases[key].push_back(value);
-        }
-        _scopes.push_back(scope);
-    }
-
-    void Env::popScope() {
-        ghoul_assert(!_scopes.empty(), "Environment must have open scope");
-        for ([[maybe_unused]] const std::string& key : _scopes.back()) {
-            ghoul_assert(_aliases.contains(key), "Key not found");
-            ghoul_assert(!_aliases.at(key).empty(), "No aliases for key");
-        }
-
-        const Env::Scope& scope = _scopes.back();
-        for (const std::string& key : scope) {
-            _aliases[key].pop_back();
-            if (_aliases[key].empty()) {
-                _aliases.erase(key);
-            }
-        }
-        _scopes.pop_back();
     }
 
     bool Env::parseInclude(std::string_view line) {
@@ -597,7 +563,7 @@ namespace {
         size_t commaPos = line.find(',');
         const bool hasKey = commaPos != std::string::npos;
         if (hasKey) {
-            keyName = line.substr(keyPos, commaPos);
+            keyName = line.substr(keyPos, commaPos - keyPos);
             ghoul::trimWhitespace(keyName);
         }
         else {
@@ -631,22 +597,18 @@ namespace {
             _dictionary.setValue(dictName, rangeDictionary);
         }
 
-        // The dictionary name can be an alias
-        // Resolve the real dictionary reference
-        std::string dict = resolveAlias(dictName);
-
         // Fetch the dictionary to iterate over
+        std::string dict = resolveAlias(dictName);
         const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(dict);
 
         std::vector<std::string_view> keys = innerDict.keys();
-        Env::Input& input = _inputs.back();
-        int keyIndex = 0;
+        int currentIteration = 0;
 
         std::map<std::string, std::string> table;
         if (!keys.empty()) {
             table[keyName] = std::format("\"{}\"", keys[0]);
             table[valueName] = std::format("{}.{}", dict, keys[0]);
-            keyIndex = 0;
+            currentIteration = 0;
 
             _output << std::format(
                 "//# For loop over {0}\n"
@@ -656,11 +618,12 @@ namespace {
             addLineNumber();
         }
         else {
-            keyIndex = -1;
+            currentIteration = -1;
             _output << "//# Empty for loop\n";
         }
-        pushScope(table);
+        _scopes.push_back(table);
 
+        Env::Input& input = _inputs.back();
         _forStatements.emplace_back(
             static_cast<unsigned int>(_inputs.size() - 1),
             input.lineNumber,
@@ -668,7 +631,7 @@ namespace {
             keyName,
             valueName,
             dict,
-            keyIndex
+            currentIteration
         );
 
         return true;
@@ -699,8 +662,10 @@ namespace {
             ));
         }
 
-        popScope();
-        forStmnt.keyIndex++;
+        // When we get here, we have already processed the first iteration of the for
+        // loop. So we can pop the scope of that variable and move to the next key index
+        _scopes.pop_back();
+        forStmnt.currentIteration++;
 
         // Fetch the dictionary to iterate over
         const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(
@@ -708,12 +673,12 @@ namespace {
         );
         std::vector<std::string_view> keys = innerDict.keys();
 
-        std::map<std::string, std::string> table;
-        if (forStmnt.keyIndex < static_cast<int>(keys.size())) {
-            std::string_view key = keys[forStmnt.keyIndex];
+        if (forStmnt.currentIteration < static_cast<int>(keys.size())) {
+            std::string_view key = keys[forStmnt.currentIteration];
+            std::map<std::string, std::string> table;
             table[forStmnt.keyName] = std::format("\"{}\"", key);
             table[forStmnt.valueName] = std::format("{}.{}", forStmnt.dictionaryReference, key);
-            pushScope(table);
+            _scopes.push_back(table);
             _output << std::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
             addLineNumber();
             // Restore input to its state from when #for was found
@@ -722,7 +687,7 @@ namespace {
             input.lineNumber = forStmnt.lineNumber;
         }
         else {
-            // This was the last iteration (or there ware zero iterations)
+            // This was the last iteration (or there were zero iterations)
             _output <<
                 std::format("//# Terminated loop over {}\n", forStmnt.dictionaryReference);
             addLineNumber();
