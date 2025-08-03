@@ -163,9 +163,10 @@ namespace {
 
             std::string keyName;
             std::string valueName;
-            std::string dictionaryReference;
+            std::string dictionary;
 
-            int currentIteration;
+            static constexpr size_t EmptyLoop = std::numeric_limits<size_t>::max();
+            size_t currentIteration;
         };
 
         bool parseFor(const std::string& line);
@@ -233,9 +234,11 @@ namespace {
 
             bool isSpecialLine = parseEndFor(line); // #endfor
 
-            // Empty -> invalid loop variable
+            // Check for an empty for loop. This can happen when the loop variables is
+            // evaluated to be never true
             const bool isInsideEmptyForStatement =
-                !_forStatements.empty() && (_forStatements.back().currentIteration == -1);
+                !_forStatements.empty() &&
+                (_forStatements.back().currentIteration == ForStatement::EmptyLoop);
             if (isInsideEmptyForStatement) {
                 continue;
             }
@@ -615,12 +618,12 @@ namespace {
                 "//# Key {1} in {0}\n",
                 dict, keys[0]
             );
-            addLineNumber();
         }
         else {
-            currentIteration = -1;
+            currentIteration = ForStatement::EmptyLoop;
             _output << "//# Empty for loop\n";
         }
+        addLineNumber();
         _scopes.push_back(table);
 
         Env::Input& input = _inputs.back();
@@ -669,27 +672,30 @@ namespace {
 
         // Fetch the dictionary to iterate over
         const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(
-            forStmnt.dictionaryReference
+            forStmnt.dictionary
         );
         std::vector<std::string_view> keys = innerDict.keys();
 
-        if (forStmnt.currentIteration < static_cast<int>(keys.size())) {
+        // This part of the code effectively behaves like the check in a for loop, except
+        // that the for loop is extracting all of the lines of the file
+        if (forStmnt.currentIteration < keys.size()) {
             std::string_view key = keys[forStmnt.currentIteration];
             std::map<std::string, std::string> table;
             table[forStmnt.keyName] = std::format("\"{}\"", key);
-            table[forStmnt.valueName] = std::format("{}.{}", forStmnt.dictionaryReference, key);
+            table[forStmnt.valueName] = std::format("{}.{}", forStmnt.dictionary, key);
             _scopes.push_back(table);
-            _output << std::format("//# Key {} in {}\n", key, forStmnt.dictionaryReference);
+            _output << std::format("//# Key {} in {}\n", key, forStmnt.dictionary);
             addLineNumber();
+
             // Restore input to its state from when #for was found
             Env::Input& input = _inputs.back();
             input.stream.seekg(forStmnt.streamPos);
             input.lineNumber = forStmnt.lineNumber;
         }
         else {
-            // This was the last iteration (or there were zero iterations)
+            // This was the last iteration or there were zero iterations
             _output <<
-                std::format("//# Terminated loop over {}\n", forStmnt.dictionaryReference);
+                std::format("//# Terminated loop over {}\n", forStmnt.dictionary);
             addLineNumber();
             _forStatements.pop_back();
         }
