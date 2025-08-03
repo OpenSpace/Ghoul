@@ -61,6 +61,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
             "ShaderObject" :
             std::format("ShaderObject('{}')", _shaderName)
     )
+    , _preprocessor(filename, std::move(dictionary))
 {
     const bool hasFilename = !filename.empty();
 
@@ -78,9 +79,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
             _shaderName.c_str()
         );
     }
-#endif
-    _preprocessor.setFilename(filename);
-    _preprocessor.setDictionary(std::move(dictionary));
+#endif // GL_VERSION_4_3
 
     if (hasFilename) {
         rebuildFromFile();
@@ -112,17 +111,15 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     rebuildFromFile();
 }
 
-ShaderObject::ShaderObject(ShaderObject&& rhs) noexcept {
-    if (this != &rhs) {
-        _id = rhs._id;
-
-        _type = rhs._type;
-        _shaderName = std::move(rhs._shaderName);
-        _loggerCat = std::move(rhs._loggerCat);
-        _onChangeCallback = std::move(rhs._onChangeCallback);
-        _preprocessor = std::move(rhs._preprocessor);
-        setShaderObjectCallback(rhs._onChangeCallback);
-    }
+ShaderObject::ShaderObject(ShaderObject&& rhs) noexcept
+    : _id(rhs._id)
+    , _type(rhs._type)
+    , _shaderName(std::move(rhs._shaderName))
+    , _loggerCat(std::move(rhs._loggerCat))
+    , _onChangeCallback(std::move(rhs._onChangeCallback))
+    , _preprocessor(std::move(rhs._preprocessor))
+{
+    setShaderObjectCallback(rhs._onChangeCallback);
 }
 
 ShaderObject::~ShaderObject() {
@@ -202,15 +199,6 @@ void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) 
     // The ShaderPreprocessor will take care to call the callback whenever the underlying
     // file changes, an included file changes, or the dictionary changes.
     _preprocessor.setCallback(_onChangeCallback);
-}
-
-void ShaderObject::setFilename(const std::filesystem::path& filename) {
-    ghoul_assert(!filename.empty(), "Filename must not be empty");
-    if (!std::filesystem::is_regular_file(filename)) {
-        throw FileNotFoundError(filename);
-    }
-
-    _preprocessor.setFilename(filename);
 }
 
 std::filesystem::path ShaderObject::filename() const {

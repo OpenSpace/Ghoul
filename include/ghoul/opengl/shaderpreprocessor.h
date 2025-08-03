@@ -37,23 +37,18 @@
 #include <string>
 #include <vector>
 
-// @TODO(abock): This class needs cleanup
-
 namespace ghoul::opengl {
 
 class ShaderPreprocessor {
 public:
-    BooleanType(TrackChanges);
+    using ShaderChangedCallback = std::function<void()>;
 
-    using ShaderChangedCallback = std::function<void ()>;
-
-    explicit ShaderPreprocessor(std::filesystem::path shaderPath = "",
-        Dictionary dictionary = Dictionary());
+    explicit ShaderPreprocessor(std::filesystem::path shaderPath,
+        Dictionary dictionary);
 
     const std::filesystem::path& filename() const;
     const Dictionary& dictionary() const;
     void setDictionary(Dictionary dictionary);
-    void setFilename(std::filesystem::path shaderPath);
     void setCallback(ShaderChangedCallback changeCallback);
     std::string process();
     std::string includedFiles() const;
@@ -72,76 +67,9 @@ public:
      */
     static void addIncludePath(const std::filesystem::path& folderPath);
 
+    static const std::vector<std::filesystem::path> includePaths();
+
 private:
-    struct Env {
-    public:
-        using Scope = std::set<std::string>;
-
-        struct Input {
-            std::ifstream& stream;
-            const std::filesystem::path file;
-            const std::string indentation;
-            unsigned int lineNumber = 1;
-        };
-
-        struct ForStatement {
-            unsigned int inputIndex;
-            unsigned int lineNumber;
-            unsigned int streamPos;
-
-            std::string keyName;
-            std::string valueName;
-            std::string dictionaryReference;
-
-            int keyIndex;
-        };
-
-        explicit Env(std::vector<filesystem::File>& includedFiles, ShaderChangedCallback& onChangeCallback, Dictionary& dictionary);
-
-        bool parseFor(const std::string& line);
-        bool parseEndFor(const std::string& line);
-        bool parseInclude(std::string_view line);
-        bool parseVersion(const std::string& line);
-        bool parseOs(const std::string& line);
-
-        // pre path exists
-        // pre path not empty
-        // pre path must not contain path tokens
-        // throws std::ios_base::failure if error opening file
-        void processFile(const std::filesystem::path& path);
-
-        void substituteLine(std::string& line) const;
-        std::string substitute(std::string_view in) const;
-        std::string resolveAlias(std::string_view in) const;
-
-        void pushScope(const std::map<std::string, std::string>& map);
-
-        void popScope();
-
-        void addLineNumber();
-
-        std::string debugString() const;
-
-        std::string output() const;
-
-        std::stringstream _output;
-        std::vector<Input> _inputs;
-        std::vector<Scope> _scopes;
-        std::vector<ForStatement> _forStatements;
-        std::map<std::string, std::vector<std::string>> _aliases;
-        std::string _indentation;
-
-        // Points towards ShaderPreprocessor::_includedFiles
-        std::vector<filesystem::File>& _includedFiles;
-
-        // Points towards ShaderPreprocessor::_onChangeCallback
-        ShaderChangedCallback& _onChangeCallback;
-
-        // Points towards ShaderPreprocessor::_dictionary
-        Dictionary& _dictionary;
-    };
-
-
     std::vector<filesystem::File> _includedFiles;
     static std::vector<std::filesystem::path> _includePaths;
     std::filesystem::path _shaderPath;
