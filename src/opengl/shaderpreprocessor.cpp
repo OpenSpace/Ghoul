@@ -65,7 +65,7 @@ namespace {
         );
 
         std::string_view type =
-            isCore ? " core" : (isCompatibility ? " compatibility" : "");
+            isCore ? "core" : (isCompatibility ? "compatibility" : "");
         return std::format("#version {}{}0 {}", versionMajor, versionMinor, type);
     }
 
@@ -152,30 +152,28 @@ namespace {
         struct Input {
             std::ifstream& stream;
             const std::filesystem::path file;
-            const std::string indentation;
             unsigned int lineNumber = 1;
         };
 
         struct ForStatement {
-            unsigned int inputIndex;
-            unsigned int lineNumber;
-            unsigned int streamPos;
+            const unsigned int inputIndex;
+            const unsigned int lineNumber;
+            const unsigned int streamPos;
 
-            std::string keyName;
-            std::string valueName;
-            std::string dictionary;
+            const std::string keyName;
+            const std::string valueName;
+            const std::string dictionary;
 
             static constexpr size_t EmptyLoop = std::numeric_limits<size_t>::max();
             size_t currentIteration;
         };
 
-        bool parseFor(const std::string& line);
-        bool parseEndFor(const std::string& line);
+        bool parseFor(std::string_view line);
+        bool parseEndFor(std::string_view line);
         bool parseInclude(std::string_view line);
-        bool parseVersion(const std::string& line);
-        bool parseOs(const std::string& line);
+        bool parseVersion(std::string_view line);
+        bool parseOs(std::string_view line);
 
-        void substituteLine(std::string& line) const;
         std::string substitute(std::string_view in) const;
         std::string resolveAlias(std::string_view in) const;
 
@@ -187,7 +185,6 @@ namespace {
         std::vector<Input> _inputs;
         std::vector<std::map<std::string, std::string>> _scopes;
         std::vector<ForStatement> _forStatements;
-        std::string _indentation;
 
         std::vector<std::filesystem::path> _includedFiles;
         ghoul::Dictionary _dictionary;
@@ -211,8 +208,7 @@ namespace {
             throw ShaderPreprocessorError(std::format("Error loading file '{}'", path));
         }
 
-        const std::string prevIndent = !_inputs.empty() ? _inputs.back().indentation : "";
-        _inputs.emplace_back(stream, path, prevIndent + _indentation);
+        _inputs.emplace_back(stream, path);
         if (_inputs.size() > 1) {
             addLineNumber();
         }
@@ -225,12 +221,12 @@ namespace {
             if (!ghoul::getline(input.stream, line)) {
                 break;
             }
-            input.lineNumber++;
 
-            // Trim away any whitespaces in the start and end of the line
-            const size_t startPos = line.find_first_not_of(Ws);
-            _indentation = line.substr(0, startPos);
-            ghoul::trimWhitespace(line);
+            if (!line.empty() && line.back() == '\r') {
+                line.pop_back();
+            }
+
+            input.lineNumber++;
 
             bool isSpecialLine = parseEndFor(line); // #endfor
 
@@ -244,7 +240,26 @@ namespace {
             }
 
             // Replace all #{<name>} strings with data from <name> in dictionary
-            substituteLine(line);
+            while (true) {
+                const size_t begin = line.rfind("#{");
+                if (begin == std::string::npos) {
+                    break;
+                }
+                const size_t length = line.substr(begin + 2).find('}');
+                if (length == std::string::npos) {
+                    throw ShaderPreprocessorError(std::format(
+                        "Could not parse line. {}", debugString()
+                    ));
+                }
+
+                const std::string in = line.substr(begin + 2, length);
+                const std::string out = substitute(in);
+
+                const std::string first = line.substr(0, begin);
+                const std::string last = line.substr(begin + 2 + length + 1);
+
+                line = std::format("{}{}{}", first, out, last);
+            }
 
             if (!isSpecialLine) {
                 isSpecialLine |=
@@ -256,7 +271,7 @@ namespace {
 
             if (!isSpecialLine) {
                 // Write GLSL code to output
-                _output << std::format("{}{}{}\n", input.indentation, _indentation, line);
+                _output << std::format("{}\n", line);
             }
         }
 
@@ -329,29 +344,6 @@ namespace {
         }
 
         return _output.str();
-    }
-
-    void Env::substituteLine(std::string& line) const {
-        while (true) {
-            const size_t begin = line.rfind("#{");
-            if (begin == std::string::npos) {
-                break;
-            }
-            const size_t length = line.substr(begin + 2).find('}');
-            if (length == std::string::npos) {
-                throw ShaderPreprocessorError(std::format(
-                    "Could not parse line. {}", debugString()
-                ));
-            }
-
-            const std::string in = line.substr(begin + 2, length);
-            const std::string out = substitute(in);
-
-            const std::string first = line.substr(0, begin);
-            const std::string last = line.substr(begin + 2 + length + 1);
-
-            line = std::format("{}{}{}", first, out, last);
-        }
     }
 
     std::string Env::resolveAlias(std::string_view in) const {
@@ -438,12 +430,14 @@ namespace {
     bool Env::parseInclude(std::string_view line) {
         constexpr std::string_view IncludeString = "#include";
 
+        ghoul::trimWhitespace(line);
+        
         if (!line.starts_with(IncludeString)) {
             return false;
         }
 
         const size_t p1 = line.find_first_not_of(Ws, IncludeString.size());
-        if (p1 == std::string::npos) {
+        if (p1 == std::string_view::npos) {
             throw ShaderPreprocessorError(std::format(
                 "Expected file path after #include. {}", debugString()
             ));
@@ -451,7 +445,7 @@ namespace {
 
         if (line[p1] == '\"') {
             const size_t p2 = line.find_first_of('\"', p1 + 1);
-            if (p2 == std::string::npos) {
+            if (p2 == std::string_view::npos) {
                 throw ShaderPreprocessorError(std::format(
                     "Expected \" {}", debugString()
                 ));
@@ -491,7 +485,7 @@ namespace {
         }
         else if (line.at(p1) == '<') {
             const size_t p2 = line.find_first_of('>', p1 + 1);
-            if (p2 == std::string::npos) {
+            if (p2 == std::string_view::npos) {
                 throw ShaderPreprocessorError(std::format(
                     "Expected >. {}", debugString()
                 ));
@@ -516,8 +510,11 @@ namespace {
         }
     }
 
-    bool Env::parseVersion(const std::string& line) {
+    bool Env::parseVersion(std::string_view line) {
         constexpr std::string_view VersionString = "#version __CONTEXT__";
+
+        ghoul::trimWhitespace(line);
+
         if (line.starts_with(VersionString)) {
             _output << std::format("{}\n", glslVersionString());
             return true;
@@ -525,8 +522,11 @@ namespace {
         return false;
     }
 
-    bool Env::parseOs(const std::string& line) {
+    bool Env::parseOs(std::string_view line) {
         constexpr std::string_view OsString = "#define __OS__";
+
+        ghoul::trimWhitespace(line);
+
         if (line.starts_with(OsString)) {
     #ifdef WIN32
             constexpr std::string_view os = "WIN32";
@@ -550,10 +550,12 @@ namespace {
         return false;
     }
 
-    bool Env::parseFor(const std::string& line) {
+    bool Env::parseFor(std::string_view line) {
         // parse this:
         // #for <key>, <value> in <dictionary>
         // #for <key> in <a>..<b>
+
+        ghoul::trimWhitespace(line);
 
         constexpr std::string_view ForString = "#for";
         if (!line.starts_with(ForString)) {
@@ -576,7 +578,7 @@ namespace {
 
         const size_t valuePos = line.find_first_not_of(Ws, commaPos + 1);
         const size_t valueEnd = line.find_first_of(Ws, valuePos);
-        std::string valueName = line.substr(valuePos, valueEnd - valuePos);
+        std::string_view valueName = line.substr(valuePos, valueEnd - valuePos);
         ghoul::trimWhitespace(valueName);
 
         const size_t inPos = line.find_first_not_of(Ws, valueEnd);
@@ -590,14 +592,14 @@ namespace {
 
         const size_t dictPos = line.find_first_not_of(Ws, inEnd);
         const size_t dictEnd = line.find_first_of(Ws, dictPos);
-        std::string dictName = line.substr(dictPos, dictEnd - dictPos);
+        std::string_view dictName = line.substr(dictPos, dictEnd - dictPos);
         ghoul::trimWhitespace(dictName);
 
         // No key means that the for statement could possibly be a range
         if (!hasKey) {
-            auto [min, max, rangeDictionary] = parseRange(dictName);
+            auto [min, max, rangeDictionary] = parseRange(std::string(dictName));
             dictName = std::format("(Range {} to {})", min, max);
-            _dictionary.setValue(dictName, rangeDictionary);
+            _dictionary.setValue(std::string(dictName), rangeDictionary);
         }
 
         // Fetch the dictionary to iterate over
@@ -605,12 +607,12 @@ namespace {
         const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(dict);
 
         std::vector<std::string_view> keys = innerDict.keys();
-        int currentIteration = 0;
+        size_t currentIteration = 0;
 
         std::map<std::string, std::string> table;
         if (!keys.empty()) {
             table[keyName] = std::format("\"{}\"", keys[0]);
-            table[valueName] = std::format("{}.{}", dict, keys[0]);
+            table[std::string(valueName)] = std::format("{}.{}", dict, keys[0]);
             currentIteration = 0;
 
             _output << std::format(
@@ -632,7 +634,7 @@ namespace {
             input.lineNumber,
             static_cast<unsigned int>(input.stream.tellg()),
             keyName,
-            valueName,
+            std::string(valueName),
             dict,
             currentIteration
         );
@@ -640,8 +642,10 @@ namespace {
         return true;
     }
 
-    bool Env::parseEndFor(const std::string& line) {
+    bool Env::parseEndFor(std::string_view line) {
         constexpr std::string_view EndForString = "#endfor";
+
+        ghoul::trimWhitespace(line);
 
         if (!line.starts_with(EndForString)) {
             return false;
