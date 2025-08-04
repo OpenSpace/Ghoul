@@ -149,7 +149,7 @@ namespace {
         std::string finalize();
 
     private:
-        struct Input {
+        struct InputFile {
             std::ifstream& stream;
             const std::filesystem::path file;
             unsigned int lineNumber = 1;
@@ -180,9 +180,8 @@ namespace {
         void addLineNumber();
         std::string debugString() const;
 
-
         std::stringstream _output;
-        std::vector<Input> _inputs;
+        std::vector<InputFile> _inputs;
         std::vector<std::map<std::string, std::string>> _scopes;
         std::vector<ForStatement> _forStatements;
 
@@ -216,7 +215,7 @@ namespace {
 
         // Parse the individual lines
         while (true) {
-            Env::Input& input = _inputs.back();
+            Env::InputFile& input = _inputs.back();
             std::string line;
             if (!ghoul::getline(input.stream, line)) {
                 break;
@@ -317,11 +316,7 @@ namespace {
     }
 
     std::string Env::debugString() const {
-        if (_inputs.empty()) {
-            return "";
-        }
-
-        const Env::Input& input = _inputs.back();
+        const Env::InputFile& input = _inputs.back();
         return std::format("{}: {}", input.file, input.lineNumber);
     }
 
@@ -331,16 +326,13 @@ namespace {
 
     std::string Env::finalize() {
         if (!_forStatements.empty()) {
-            throw ShaderPreprocessorError(std::format(
-                "Unexpected end of file in the middle of expanding #for statement. {}",
-                debugString()
-            ));
+            throw ShaderPreprocessorError(
+                "Unexpected end of file in the middle of expanding #for statement"
+            );
         }
 
         if (!_scopes.empty()) {
-            throw ShaderPreprocessorError(std::format(
-                "Unexpected end of file. {}", debugString()
-            ));
+            throw ShaderPreprocessorError("Unexpected end of file");
         }
 
         return _output.str();
@@ -349,9 +341,9 @@ namespace {
     std::string Env::resolveAlias(std::string_view in) const {
         std::string beforeDot;
         std::string afterDot;
-        if (const size_t firstDotPos = in.find('.');  firstDotPos != std::string::npos) {
-            beforeDot = in.substr(0, firstDotPos);
-            afterDot = in.substr(firstDotPos);
+        if (const size_t pos = in.find('.');  pos != std::string_view::npos) {
+            beforeDot = in.substr(0, pos);
+            afterDot = in.substr(pos);
         }
         else {
             beforeDot = in;
@@ -566,7 +558,7 @@ namespace {
 
         std::string keyName;
         size_t commaPos = line.find(',');
-        const bool hasKey = commaPos != std::string::npos;
+        const bool hasKey = commaPos != std::string_view::npos;
         if (hasKey) {
             keyName = line.substr(keyPos, commaPos - keyPos);
             ghoul::trimWhitespace(keyName);
@@ -592,7 +584,7 @@ namespace {
 
         const size_t dictPos = line.find_first_not_of(Ws, inEnd);
         const size_t dictEnd = line.find_first_of(Ws, dictPos);
-        std::string_view dictName = line.substr(dictPos, dictEnd - dictPos);
+        std::string dictName = std::string(line.substr(dictPos, dictEnd - dictPos));
         ghoul::trimWhitespace(dictName);
 
         // No key means that the for statement could possibly be a range
@@ -628,7 +620,7 @@ namespace {
         addLineNumber();
         _scopes.push_back(table);
 
-        Env::Input& input = _inputs.back();
+        Env::InputFile& input = _inputs.back();
         _forStatements.emplace_back(
             static_cast<unsigned int>(_inputs.size() - 1),
             input.lineNumber,
@@ -661,7 +653,7 @@ namespace {
         // Require #for and #endfor to be in the same input file
         if (forStmnt.inputIndex != _inputs.size() - 1) {
             const int inputIndex = forStmnt.inputIndex;
-            const Env::Input& forInput = _inputs[inputIndex];
+            const Env::InputFile& forInput = _inputs[inputIndex];
 
             throw ShaderPreprocessorError(std::format(
                 "Unexpected #endfor. Last #for was in {}: {}. {}",
@@ -692,7 +684,7 @@ namespace {
             addLineNumber();
 
             // Restore input to its state from when #for was found
-            Env::Input& input = _inputs.back();
+            Env::InputFile& input = _inputs.back();
             input.stream.seekg(forStmnt.streamPos);
             input.lineNumber = forStmnt.lineNumber;
         }
