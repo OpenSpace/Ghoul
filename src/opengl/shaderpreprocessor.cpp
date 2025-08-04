@@ -30,6 +30,7 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
+#include <scn/scan.h>
 #include <filesystem>
 #include <fstream>
 #include <ranges>
@@ -123,36 +124,13 @@ namespace {
         return valueRecursive<T>(d, after);
     }
 
-    std::tuple<int, int, ghoul::Dictionary> parseRange(const std::string& key) {
-        constexpr std::string_view TwoDots = "..";
-
-        const size_t minEnd = key.find(TwoDots);
-        if (minEnd == std::string::npos) {
-            throw ShaderPreprocessorError(std::format("Expected '..' in range. {}", key));
-        }
-        const int minimum = std::stoi(key.substr(0, minEnd));
-
-        const size_t maxStart = minEnd + 2;
-        const size_t maxEnd = key.size();
-        const int maximum = std::stoi(key.substr(maxStart, maxEnd - maxStart));
-
-        // Create all the elements in the dictionary
-        ghoul::Dictionary dictionary;
-        for (int i = 0; i <= maximum - minimum; i++) {
-            dictionary.setValue(std::to_string(i + 1), std::to_string(minimum + i));
-        }
-
-        // Everything went well. Write over min and max
-        return { minimum, maximum, dictionary };
-    }
-
     class Env {
     public:
         explicit Env(ghoul::Dictionary dictionary);
 
         void processFile(const std::filesystem::path& path);
         std::vector<std::filesystem::path> includedFiles() const;
-        std::string finalize();
+        std::string output();
 
     private:
         struct InputFile {
@@ -163,7 +141,7 @@ namespace {
 
         struct ForStatement {
             const unsigned int lineNumber;
-            const unsigned int streamPos;
+            const std::streampos streamPos;
 
             const std::string keyName;
             const std::string valueName;
@@ -296,20 +274,13 @@ namespace {
         return _includedFiles;
     }
 
-    std::string Env::finalize() {
-        if (!_forStatements.empty()) {
-            throw ShaderPreprocessorError(
-                "Unexpected end of file in the middle of expanding #for statement"
-            );
-        }
-
+    std::string Env::output() {
         return _output.str();
     }
     
     bool Env::parseFor(std::string_view line) {
-        // parse this:
-        // #for <key>, <value> in <dictionary>
-        // #for <key> in <a>..<b>
+        // Form 1: #for <key>, <value> in <dictionary>
+        // Form 2: #for <key> in <a>..<b>
 
         ghoul::trimWhitespace(line);
 
@@ -318,55 +289,47 @@ namespace {
             return false;
         }
 
-        const size_t keyPos = line.find_first_not_of(Ws, ForString.size());
+        std::string key;
+        std::string value;
+        std::string dictionary;
 
-        std::string keyName;
-        size_t commaPos = line.find(',');
-        const bool hasKey = commaPos != std::string_view::npos;
-        if (hasKey) {
-            keyName = line.substr(keyPos, commaPos - keyPos);
-            ghoul::trimWhitespace(keyName);
-        }
-        else {
-            commaPos = keyPos - 1;
-            keyName = "";
+        auto form1 = scn::scan<std::string, std::string, std::string>(
+            line,
+            "#for {:[^,]}, {} in {}"
+        );
+        if (form1) {
+            std::tie(key, value, dictionary) = form1->values();
         }
 
-        const size_t valuePos = line.find_first_not_of(Ws, commaPos + 1);
-        const size_t valueEnd = line.find_first_of(Ws, valuePos);
-        std::string_view valueName = line.substr(valuePos, valueEnd - valuePos);
-        ghoul::trimWhitespace(valueName);
+        auto form2 = scn::scan<std::string, int, int>(line, "#for {} in {}..{}");
+        if (form2) {
+            auto& [v, minimum, maximum] = form2->values();
+            value = std::move(v);
 
-        const size_t inPos = line.find_first_not_of(Ws, valueEnd);
-        constexpr std::string_view InString = "in";
-        if (!line.substr(inPos).starts_with(InString)) {
+            // Create all the elements in the dictionary
+            ghoul::Dictionary d;
+            for (int i = 0; i <= maximum - minimum; i++) {
+                d.setValue(std::to_string(i + 1), std::to_string(minimum + i));
+            }
+
+            dictionary = std::format("(Range {} to {})", minimum, maximum);
+            _dictionary.setValue(dictionary, d);
+        }
+
+        if (!form1 && !form2) {
             throw ShaderPreprocessorError(std::format(
-                "Expected 'in' in #for statement. {}", debugString()
+                "Error parsing #for  {}. {}", line, debugString()
             ));
-        }
-        const size_t inEnd = line.find_first_of(Ws, inPos);
-
-        const size_t dictPos = line.find_first_not_of(Ws, inEnd);
-        const size_t dictEnd = line.find_first_of(Ws, dictPos);
-        std::string dictName = std::string(line.substr(dictPos, dictEnd - dictPos));
-        ghoul::trimWhitespace(dictName);
-
-        // No key means that the for statement could possibly be a range
-        if (!hasKey) {
-            auto [min, max, rangeDictionary] = parseRange(std::string(dictName));
-            dictName = std::format("(Range {} to {})", min, max);
-            _dictionary.setValue(std::string(dictName), rangeDictionary);
         }
 
         // Fetch the dictionary to iterate over
-        std::string dict = resolveAlias(dictName);
+        std::string dict = resolveAlias(dictionary);
         const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(dict);
 
         size_t currentIteration = 0;
         std::vector<std::string_view> keys = innerDict.keys();
         if (!keys.empty()) {
             currentIteration = 0;
-
             _output << std::format(
                 "//# For loop over {0}\n"
                 "//# Key {1} in {0}\n",
@@ -382,11 +345,10 @@ namespace {
         Env::InputFile& input = _inputFiles.back();
         _forStatements.emplace_back(
             input.lineNumber,
-            static_cast<unsigned int>(input.stream.tellg()),
-            keyName,
-            std::string(valueName),
-            dict,
-            currentIteration
+            input.stream.tellg(),
+            key,
+            value,
+            dict, currentIteration
         );
 
         return true;
@@ -706,7 +668,7 @@ const std::filesystem::path& ShaderPreprocessor::filename() const {
 std::string ShaderPreprocessor::process() {
     Env env = Env(_dictionary);
     env.processFile(_shaderPath);
-    std::string result = env.finalize();
+    std::string result = env.output();
     for (const std::filesystem::path& file : env.includedFiles()) {
         filesystem::File f = filesystem::File(file);
         f.setCallback([this]() { _onChangeCallback(); });
