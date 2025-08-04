@@ -258,12 +258,13 @@ namespace {
     }
     
     bool Env::parseFor(std::string_view line) {
+        constexpr std::string_view ForString = "#for";
+
         // Form 1: #for <key>, <value> in <dictionary>
         // Form 2: #for <key> in <a>..<b>
 
         ghoul::trimWhitespace(line);
 
-        constexpr std::string_view ForString = "#for";
         if (!line.starts_with(ForString)) {
             return false;
         }
@@ -327,7 +328,8 @@ namespace {
             input.stream.tellg(),
             key,
             value,
-            dict, currentIteration
+            dict,
+            currentIteration
         );
 
         return true;
@@ -586,9 +588,8 @@ namespace {
             );
             std::vector<std::string_view> keys = innerDict.keys();
             std::string_view key = keys[fs.currentIteration];
-
             if (beforeDot == fs.keyName) {
-                beforeDot = std::format("\"{}\"", keys[fs.currentIteration]);
+                beforeDot = std::format("\"{}\"", key);
             }
             if (beforeDot == fs.valueName) {
                 beforeDot = std::format("{}.{}", fs.dictionary, key);
