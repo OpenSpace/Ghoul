@@ -37,6 +37,12 @@
 #include <sstream>
 #include <utility>
 
+// #endfor
+// #version __CONTEXT__
+// #define __OS__
+// #include
+// #for <key>, <value> in <dictionary>
+
 namespace {
     constexpr std::string_view Ws = " \n\r\t";
 
@@ -156,7 +162,6 @@ namespace {
         };
 
         struct ForStatement {
-            const unsigned int inputIndex;
             const unsigned int lineNumber;
             const unsigned int streamPos;
 
@@ -181,8 +186,7 @@ namespace {
         std::string debugString() const;
 
         std::stringstream _output;
-        std::vector<InputFile> _inputs;
-        std::vector<std::map<std::string, std::string>> _scopes;
+        std::vector<InputFile> _inputFiles;
         std::vector<ForStatement> _forStatements;
 
         std::vector<std::filesystem::path> _includedFiles;
@@ -207,27 +211,28 @@ namespace {
             throw ShaderPreprocessorError(std::format("Error loading file '{}'", path));
         }
 
-        _inputs.emplace_back(stream, path);
-        if (_inputs.size() > 1) {
+        _inputFiles.emplace_back(stream, path);
+        if (_inputFiles.size() > 1) {
             addLineNumber();
         }
 
 
         // Parse the individual lines
         while (true) {
-            Env::InputFile& input = _inputs.back();
+            Env::InputFile& input = _inputFiles.back();
             std::string line;
             if (!ghoul::getline(input.stream, line)) {
                 break;
             }
+            input.lineNumber++;
 
             if (!line.empty() && line.back() == '\r') {
                 line.pop_back();
             }
 
-            input.lineNumber++;
-
-            bool isSpecialLine = parseEndFor(line); // #endfor
+            // We need to check for the termination of the for loop already here or else
+            // the next `continue` will always be called once it starts
+            bool isLineProcessed = parseEndFor(line); 
 
             // Check for an empty for loop. This can happen when the loop variables is
             // evaluated to be never true
@@ -244,32 +249,28 @@ namespace {
                 if (begin == std::string::npos) {
                     break;
                 }
-                const size_t length = line.substr(begin + 2).find('}');
-                if (length == std::string::npos) {
+                const size_t end = line.find('}', begin + 2);
+                if (end == std::string::npos) {
                     throw ShaderPreprocessorError(std::format(
                         "Could not parse line. {}", debugString()
                     ));
                 }
 
-                const std::string in = line.substr(begin + 2, length);
+                const std::string in = line.substr(begin + 2, end - (begin + 2));
                 const std::string out = substitute(in);
 
                 const std::string first = line.substr(0, begin);
-                const std::string last = line.substr(begin + 2 + length + 1);
+                const std::string last = line.substr(end + 1);
 
                 line = std::format("{}{}{}", first, out, last);
             }
 
-            if (!isSpecialLine) {
-                isSpecialLine |=
-                    parseVersion(line) ||    // #version __CONTEXT__
-                    parseOs(line) ||         // #define __OS__
-                    parseInclude(line) ||    // #include
-                    parseFor(line);          // #for <key>, <value> in <dictionary>
-            }
+            isLineProcessed |= parseVersion(line);
+            isLineProcessed |= parseOs(line);
+            isLineProcessed |= parseInclude(line);
+            isLineProcessed |= parseFor(line);
 
-            if (!isSpecialLine) {
-                // Write GLSL code to output
+            if (!isLineProcessed) {
                 _output << std::format("{}\n", line);
             }
         }
@@ -277,47 +278,18 @@ namespace {
 
         if (!_forStatements.empty()) {
             const ForStatement& forStatement = _forStatements.back();
-            if (forStatement.inputIndex + 1 >= _inputs.size()) {
-                const int inputIndex = forStatement.inputIndex;
-
-                throw ShaderPreprocessorError(std::format(
-                    "Unexpected end of file. Still processing #for loop from {}:{}. {}",
-                    _inputs[inputIndex].file, forStatement.lineNumber, debugString()
-                ));
-            }
+            const InputFile& input = _inputFiles.back();
+            throw ShaderPreprocessorError(std::format(
+                "Unexpected end of file. Still processing #for loop from {}:{}. {}",
+                input.file, forStatement.lineNumber, debugString()
+            ));
         }
 
-        _inputs.pop_back();
+        _inputFiles.pop_back();
 
-        if (!_inputs.empty()) {
+        if (!_inputFiles.empty()) {
             addLineNumber();
         }
-    }
-
-    void Env::addLineNumber() {
-        const std::filesystem::path filename = _inputs.back().file;
-        auto it = std::find(_includedFiles.begin(), _includedFiles.end(), filename);
-        ghoul_assert(it != _includedFiles.end(), "File not in included files");
-
-        std::string_view includeSep;
-    #ifndef __APPLE__
-        // Sofar, only Nvidia on Windows supports empty statements in the shader
-        using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
-        if (OpenGLCap.gpuVendor() == Vendor::Nvidia) {
-            includeSep = "; // preprocessor add semicolon to isolate error messages";
-        }
-    #endif // __APPLE__
-
-        ptrdiff_t number = std::distance(_includedFiles.begin(), it);
-        _output << std::format(
-            "{}\n#line {} {} // {}\n",
-            includeSep, _inputs.back().lineNumber, number, filename
-        );
-    }
-
-    std::string Env::debugString() const {
-        const Env::InputFile& input = _inputs.back();
-        return std::format("{}: {}", input.file, input.lineNumber);
     }
 
     std::vector<std::filesystem::path> Env::includedFiles() const {
@@ -331,94 +303,143 @@ namespace {
             );
         }
 
-        if (!_scopes.empty()) {
-            throw ShaderPreprocessorError("Unexpected end of file");
-        }
-
         return _output.str();
     }
+    
+    bool Env::parseFor(std::string_view line) {
+        // parse this:
+        // #for <key>, <value> in <dictionary>
+        // #for <key> in <a>..<b>
 
-    std::string Env::resolveAlias(std::string_view in) const {
-        std::string beforeDot;
-        std::string afterDot;
-        if (const size_t pos = in.find('.');  pos != std::string_view::npos) {
-            beforeDot = in.substr(0, pos);
-            afterDot = in.substr(pos);
+        ghoul::trimWhitespace(line);
+
+        constexpr std::string_view ForString = "#for";
+        if (!line.starts_with(ForString)) {
+            return false;
+        }
+
+        const size_t keyPos = line.find_first_not_of(Ws, ForString.size());
+
+        std::string keyName;
+        size_t commaPos = line.find(',');
+        const bool hasKey = commaPos != std::string_view::npos;
+        if (hasKey) {
+            keyName = line.substr(keyPos, commaPos - keyPos);
+            ghoul::trimWhitespace(keyName);
         }
         else {
-            beforeDot = in;
-            afterDot = "";
+            commaPos = keyPos - 1;
+            keyName = "";
         }
 
-        // Resolve only part before dot
-        for (const std::map<std::string, std::string>& scope :
-             std::ranges::reverse_view(_scopes))
-        {
-            if (auto it = scope.find(beforeDot);  it != scope.end()) {
-                beforeDot = it->second;
-                break;
-            }
-        }
+        const size_t valuePos = line.find_first_not_of(Ws, commaPos + 1);
+        const size_t valueEnd = line.find_first_of(Ws, valuePos);
+        std::string_view valueName = line.substr(valuePos, valueEnd - valuePos);
+        ghoul::trimWhitespace(valueName);
 
-        std::string res = beforeDot + afterDot;
-        if (!afterDot.empty() && !hasKeyRecursive(_dictionary, res)) {
+        const size_t inPos = line.find_first_not_of(Ws, valueEnd);
+        constexpr std::string_view InString = "in";
+        if (!line.substr(inPos).starts_with(InString)) {
             throw ShaderPreprocessorError(std::format(
-                "Could not resolve variable '{}'. {}", in, debugString()
+                "Expected 'in' in #for statement. {}", debugString()
+            ));
+        }
+        const size_t inEnd = line.find_first_of(Ws, inPos);
+
+        const size_t dictPos = line.find_first_not_of(Ws, inEnd);
+        const size_t dictEnd = line.find_first_of(Ws, dictPos);
+        std::string dictName = std::string(line.substr(dictPos, dictEnd - dictPos));
+        ghoul::trimWhitespace(dictName);
+
+        // No key means that the for statement could possibly be a range
+        if (!hasKey) {
+            auto [min, max, rangeDictionary] = parseRange(std::string(dictName));
+            dictName = std::format("(Range {} to {})", min, max);
+            _dictionary.setValue(std::string(dictName), rangeDictionary);
+        }
+
+        // Fetch the dictionary to iterate over
+        std::string dict = resolveAlias(dictName);
+        const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(dict);
+
+        size_t currentIteration = 0;
+        std::vector<std::string_view> keys = innerDict.keys();
+        if (!keys.empty()) {
+            currentIteration = 0;
+
+            _output << std::format(
+                "//# For loop over {0}\n"
+                "//# Key {1} in {0}\n",
+                dict, keys[0]
+            );
+        }
+        else {
+            currentIteration = ForStatement::EmptyLoop;
+            _output << "//# Empty for loop\n";
+        }
+        addLineNumber();
+
+        Env::InputFile& input = _inputFiles.back();
+        _forStatements.emplace_back(
+            input.lineNumber,
+            static_cast<unsigned int>(input.stream.tellg()),
+            keyName,
+            std::string(valueName),
+            dict,
+            currentIteration
+        );
+
+        return true;
+    }
+
+    bool Env::parseEndFor(std::string_view line) {
+        constexpr std::string_view EndForString = "#endfor";
+
+        ghoul::trimWhitespace(line);
+
+        if (!line.starts_with(EndForString)) {
+            return false;
+        }
+
+        if (_forStatements.empty()) {
+            throw ShaderPreprocessorError(std::format(
+                "Unexpected #endfor. No corresponding #for was found. {}", debugString()
             ));
         }
 
-        return res;
+        Env::ForStatement& forStmnt = _forStatements.back();
+
+        // When we get here, we have already processed the first iteration of the for
+        // loop. So we can pop the scope of that variable and move to the next key index
+        forStmnt.currentIteration++;
+
+        // Fetch the dictionary to iterate over
+        const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(
+            forStmnt.dictionary
+        );
+        std::vector<std::string_view> keys = innerDict.keys();
+        // This part of the code effectively behaves like the check in a for loop, except
+        // that the for loop is extracting all of the lines of the file
+        if (forStmnt.currentIteration < keys.size()) {
+            std::string_view key = keys[forStmnt.currentIteration];
+            _output << std::format("//# Key {} in {}\n", key, forStmnt.dictionary);
+            addLineNumber();
+
+            // Restore input to its state from when #for was found
+            Env::InputFile& input = _inputFiles.back();
+            input.stream.seekg(forStmnt.streamPos);
+            input.lineNumber = forStmnt.lineNumber;
+        }
+        else {
+            // This was the last iteration or there were zero iterations
+            _output <<
+                std::format("//# Terminated loop over {}\n", forStmnt.dictionary);
+            addLineNumber();
+            _forStatements.pop_back();
+        }
+        return true;
     }
-
-    std::string Env::substitute(std::string_view in) const {
-        std::string resolved = resolveAlias(in);
-
-        if (resolved.starts_with('"') && resolved.ends_with('"')) {
-            return resolved.substr(1, resolved.length() - 2);
-        }
-        else if (hasValueRecursive<bool>(_dictionary, resolved)) {
-            return std::to_string(valueRecursive<bool>(_dictionary, resolved));
-        }
-        else if (hasValueRecursive<std::string>(_dictionary, resolved)) {
-            return valueRecursive<std::string>(_dictionary, resolved);
-        }
-        else if (hasValueRecursive<int>(_dictionary, resolved)) {
-            return std::to_string(valueRecursive<int>(_dictionary, resolved));
-        }
-        else if (hasValueRecursive<double>(_dictionary, resolved)) {
-            return std::to_string(valueRecursive<double>(_dictionary, resolved));
-        }
-        else if (hasValueRecursive<glm::ivec2>(_dictionary, resolved)) {
-            glm::ivec2 vec = valueRecursive<glm::ivec2>(_dictionary, resolved);
-            return std::format("ivec2({},{})", vec.x, vec.y);
-        }
-        else if (hasValueRecursive<glm::ivec3>(_dictionary, resolved)) {
-            glm::ivec3 vec = valueRecursive<glm::ivec3>(_dictionary, resolved);
-            return std::format("ivec3({},{},{})", vec.x, vec.y, vec.z);
-        }
-        else if (hasValueRecursive<glm::ivec4>(_dictionary, resolved)) {
-            glm::ivec4 vec = valueRecursive<glm::ivec4>(_dictionary, resolved);
-            return std::format("ivec4({},{},{},{})", vec.x, vec.y, vec.z, vec.w);
-        }
-        else if (hasValueRecursive<glm::dvec2>(_dictionary, resolved)) {
-            glm::dvec2 vec = valueRecursive<glm::dvec2>(_dictionary, resolved);
-            return std::format("dvec2({},{})", vec.x, vec.y);
-        }
-        else if (hasValueRecursive<glm::dvec3>(_dictionary, resolved)) {
-            glm::dvec3 vec = valueRecursive<glm::dvec3>(_dictionary, resolved);
-            return std::format("dvec3({},{},{})", vec.x, vec.y, vec.z);
-        }
-        else if (hasValueRecursive<glm::dvec4>(_dictionary, resolved)) {
-            glm::dvec4 vec = valueRecursive<glm::dvec4>(_dictionary, resolved);
-            return std::format("dvec4({},{},{},{})", vec.x, vec.y, vec.z, vec.w);
-        }
-
-        throw ShaderPreprocessorError(std::format(
-            "'{}' was resolved to '{}' which is a type that is not supported. {}",
-            in, resolved, debugString()
-        ));
-    }
-
+    
     bool Env::parseInclude(std::string_view line) {
         constexpr std::string_view IncludeString = "#include";
 
@@ -446,7 +467,7 @@ namespace {
             const size_t includeLength = p2 - p1 - 1;
             const std::string_view includeFilename = line.substr(p1 + 1, includeLength);
             std::filesystem::path includeFilepath =
-                _inputs.back().file.parent_path() / includeFilename;
+                _inputFiles.back().file.parent_path() / includeFilename;
 
             // Resolve the include paths if this default includeFilename does not exist
             if (std::filesystem::is_regular_file(includeFilepath)) {
@@ -542,160 +563,117 @@ namespace {
         return false;
     }
 
-    bool Env::parseFor(std::string_view line) {
-        // parse this:
-        // #for <key>, <value> in <dictionary>
-        // #for <key> in <a>..<b>
+    std::string Env::substitute(std::string_view in) const {
+        std::string resolved = resolveAlias(in);
 
-        ghoul::trimWhitespace(line);
-
-        constexpr std::string_view ForString = "#for";
-        if (!line.starts_with(ForString)) {
-            return false;
+        if (resolved.starts_with('"') && resolved.ends_with('"')) {
+            return resolved.substr(1, resolved.length() - 2);
+        }
+        else if (hasValueRecursive<bool>(_dictionary, resolved)) {
+            return std::to_string(valueRecursive<bool>(_dictionary, resolved));
+        }
+        else if (hasValueRecursive<std::string>(_dictionary, resolved)) {
+            return valueRecursive<std::string>(_dictionary, resolved);
+        }
+        else if (hasValueRecursive<int>(_dictionary, resolved)) {
+            return std::to_string(valueRecursive<int>(_dictionary, resolved));
+        }
+        else if (hasValueRecursive<double>(_dictionary, resolved)) {
+            return std::to_string(valueRecursive<double>(_dictionary, resolved));
+        }
+        else if (hasValueRecursive<glm::ivec2>(_dictionary, resolved)) {
+            glm::ivec2 vec = valueRecursive<glm::ivec2>(_dictionary, resolved);
+            return std::format("ivec2({},{})", vec.x, vec.y);
+        }
+        else if (hasValueRecursive<glm::ivec3>(_dictionary, resolved)) {
+            glm::ivec3 vec = valueRecursive<glm::ivec3>(_dictionary, resolved);
+            return std::format("ivec3({},{},{})", vec.x, vec.y, vec.z);
+        }
+        else if (hasValueRecursive<glm::ivec4>(_dictionary, resolved)) {
+            glm::ivec4 vec = valueRecursive<glm::ivec4>(_dictionary, resolved);
+            return std::format("ivec4({},{},{},{})", vec.x, vec.y, vec.z, vec.w);
+        }
+        else if (hasValueRecursive<glm::dvec2>(_dictionary, resolved)) {
+            glm::dvec2 vec = valueRecursive<glm::dvec2>(_dictionary, resolved);
+            return std::format("dvec2({},{})", vec.x, vec.y);
+        }
+        else if (hasValueRecursive<glm::dvec3>(_dictionary, resolved)) {
+            glm::dvec3 vec = valueRecursive<glm::dvec3>(_dictionary, resolved);
+            return std::format("dvec3({},{},{})", vec.x, vec.y, vec.z);
+        }
+        else if (hasValueRecursive<glm::dvec4>(_dictionary, resolved)) {
+            glm::dvec4 vec = valueRecursive<glm::dvec4>(_dictionary, resolved);
+            return std::format("dvec4({},{},{},{})", vec.x, vec.y, vec.z, vec.w);
         }
 
-        const size_t keyPos = line.find_first_not_of(Ws, ForString.size());
-
-        std::string keyName;
-        size_t commaPos = line.find(',');
-        const bool hasKey = commaPos != std::string_view::npos;
-        if (hasKey) {
-            keyName = line.substr(keyPos, commaPos - keyPos);
-            ghoul::trimWhitespace(keyName);
-        }
-        else {
-            commaPos = keyPos - 1;
-            keyName = "";
-        }
-
-        const size_t valuePos = line.find_first_not_of(Ws, commaPos + 1);
-        const size_t valueEnd = line.find_first_of(Ws, valuePos);
-        std::string_view valueName = line.substr(valuePos, valueEnd - valuePos);
-        ghoul::trimWhitespace(valueName);
-
-        const size_t inPos = line.find_first_not_of(Ws, valueEnd);
-        constexpr std::string_view InString = "in";
-        if (!line.substr(inPos).starts_with(InString)) {
-            throw ShaderPreprocessorError(std::format(
-                "Expected 'in' in #for statement. {}", debugString()
-            ));
-        }
-        const size_t inEnd = line.find_first_of(Ws, inPos);
-
-        const size_t dictPos = line.find_first_not_of(Ws, inEnd);
-        const size_t dictEnd = line.find_first_of(Ws, dictPos);
-        std::string dictName = std::string(line.substr(dictPos, dictEnd - dictPos));
-        ghoul::trimWhitespace(dictName);
-
-        // No key means that the for statement could possibly be a range
-        if (!hasKey) {
-            auto [min, max, rangeDictionary] = parseRange(std::string(dictName));
-            dictName = std::format("(Range {} to {})", min, max);
-            _dictionary.setValue(std::string(dictName), rangeDictionary);
-        }
-
-        // Fetch the dictionary to iterate over
-        std::string dict = resolveAlias(dictName);
-        const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(dict);
-
-        std::vector<std::string_view> keys = innerDict.keys();
-        size_t currentIteration = 0;
-
-        std::map<std::string, std::string> table;
-        if (!keys.empty()) {
-            table[keyName] = std::format("\"{}\"", keys[0]);
-            table[std::string(valueName)] = std::format("{}.{}", dict, keys[0]);
-            currentIteration = 0;
-
-            _output << std::format(
-                "//# For loop over {0}\n"
-                "//# Key {1} in {0}\n",
-                dict, keys[0]
-            );
-        }
-        else {
-            currentIteration = ForStatement::EmptyLoop;
-            _output << "//# Empty for loop\n";
-        }
-        addLineNumber();
-        _scopes.push_back(table);
-
-        Env::InputFile& input = _inputs.back();
-        _forStatements.emplace_back(
-            static_cast<unsigned int>(_inputs.size() - 1),
-            input.lineNumber,
-            static_cast<unsigned int>(input.stream.tellg()),
-            keyName,
-            std::string(valueName),
-            dict,
-            currentIteration
-        );
-
-        return true;
+        throw ShaderPreprocessorError(std::format(
+            "'{}' was resolved to '{}' which is a type that is not supported. {}",
+            in, resolved, debugString()
+        ));
     }
 
-    bool Env::parseEndFor(std::string_view line) {
-        constexpr std::string_view EndForString = "#endfor";
-
-        ghoul::trimWhitespace(line);
-
-        if (!line.starts_with(EndForString)) {
-            return false;
-        }
-
-        if (_forStatements.empty()) {
-            throw ShaderPreprocessorError(std::format(
-                "Unexpected #endfor. No corresponding #for was found. {}", debugString()
-            ));
-        }
-
-        Env::ForStatement& forStmnt = _forStatements.back();
-        // Require #for and #endfor to be in the same input file
-        if (forStmnt.inputIndex != _inputs.size() - 1) {
-            const int inputIndex = forStmnt.inputIndex;
-            const Env::InputFile& forInput = _inputs[inputIndex];
-
-            throw ShaderPreprocessorError(std::format(
-                "Unexpected #endfor. Last #for was in {}: {}. {}",
-                forInput.file, forStmnt.lineNumber, debugString()
-            ));
-        }
-
-        // When we get here, we have already processed the first iteration of the for
-        // loop. So we can pop the scope of that variable and move to the next key index
-        _scopes.pop_back();
-        forStmnt.currentIteration++;
-
-        // Fetch the dictionary to iterate over
-        const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(
-            forStmnt.dictionary
-        );
-        std::vector<std::string_view> keys = innerDict.keys();
-
-        // This part of the code effectively behaves like the check in a for loop, except
-        // that the for loop is extracting all of the lines of the file
-        if (forStmnt.currentIteration < keys.size()) {
-            std::string_view key = keys[forStmnt.currentIteration];
-            std::map<std::string, std::string> table;
-            table[forStmnt.keyName] = std::format("\"{}\"", key);
-            table[forStmnt.valueName] = std::format("{}.{}", forStmnt.dictionary, key);
-            _scopes.push_back(table);
-            _output << std::format("//# Key {} in {}\n", key, forStmnt.dictionary);
-            addLineNumber();
-
-            // Restore input to its state from when #for was found
-            Env::InputFile& input = _inputs.back();
-            input.stream.seekg(forStmnt.streamPos);
-            input.lineNumber = forStmnt.lineNumber;
+    std::string Env::resolveAlias(std::string_view in) const {
+        std::string beforeDot;
+        std::string afterDot;
+        if (const size_t pos = in.find('.');  pos != std::string_view::npos) {
+            beforeDot = in.substr(0, pos);
+            afterDot = in.substr(pos);
         }
         else {
-            // This was the last iteration or there were zero iterations
-            _output <<
-                std::format("//# Terminated loop over {}\n", forStmnt.dictionary);
-            addLineNumber();
-            _forStatements.pop_back();
+            beforeDot = in;
+            afterDot = "";
         }
-        return true;
+
+        // Resolve only part before dot
+        for (const Env::ForStatement& fs : std::ranges::reverse_view(_forStatements)) {
+            const ghoul::Dictionary innerDict = _dictionary.value<ghoul::Dictionary>(
+                fs.dictionary
+            );
+            std::vector<std::string_view> keys = innerDict.keys();
+            std::string_view key = keys[fs.currentIteration];
+
+            if (beforeDot == fs.keyName) {
+                beforeDot = std::format("\"{}\"", keys[fs.currentIteration]);
+            }
+            if (beforeDot == fs.valueName) {
+                beforeDot = std::format("{}.{}", fs.dictionary, key);
+            }
+        }
+
+        std::string res = beforeDot + afterDot;
+        if (!afterDot.empty() && !hasKeyRecursive(_dictionary, res)) {
+            throw ShaderPreprocessorError(std::format(
+                "Could not resolve variable '{}'. {}", in, debugString()
+            ));
+        }
+
+        return res;
+    }
+    
+    void Env::addLineNumber() {
+        const std::filesystem::path filename = _inputFiles.back().file;
+        auto it = std::find(_includedFiles.begin(), _includedFiles.end(), filename);
+        ghoul_assert(it != _includedFiles.end(), "File not in included files");
+
+        std::string_view includeSep;
+    #ifndef __APPLE__
+        // Sofar, only Nvidia on Windows supports empty statements in the shader
+        using Vendor = ghoul::systemcapabilities::OpenGLCapabilitiesComponent::Vendor;
+        if (OpenGLCap.gpuVendor() == Vendor::Nvidia) {
+            includeSep = "; // preprocessor add semicolon to isolate error messages";
+        }
+    #endif // __APPLE__
+
+        ptrdiff_t number = std::distance(_includedFiles.begin(), it);
+        _output << std::format(
+            "{}\n#line {} {} // {}\n",
+            includeSep, _inputFiles.back().lineNumber, number, filename
+        );
+    }
+
+    std::string Env::debugString() const {
+        const Env::InputFile& input = _inputFiles.back();
+        return std::format("{}: {}", input.file, input.lineNumber);
     }
 } // namespace
 
