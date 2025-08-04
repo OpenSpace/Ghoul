@@ -28,6 +28,7 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/glm.h>
 #include <ghoul/misc/dictionary.h>
+#include <ghoul/misc/profiling.h>
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <scn/scan.h>
@@ -52,29 +53,6 @@ namespace {
             : RuntimeError(std::move(msg), "ShaderPreprocessor")
         {}
     };
-
-    std::string glslVersionString() {
-        int versionMajor = 0;
-        int versionMinor = 0;
-        int profileMask = 0;
-        glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-        glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-        glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profileMask);
-
-        const ContextProfileMask cpm = ContextProfileMask(profileMask);
-        const bool isCore = cpm == ContextProfileMask::GL_CONTEXT_CORE_PROFILE_BIT;
-        const bool isCompatibility =
-            cpm == ContextProfileMask::GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
-
-        ghoul_assert(
-            isCore || isCompatibility,
-            "OpenGL context is neither core nor compatibility"
-        );
-
-        std::string_view type =
-            isCore ? "core" : (isCompatibility ? "compatibility" : "");
-        return std::format("#version {}{}0 {}", versionMajor, versionMinor, type);
-    }
 
     bool hasKeyRecursive(const ghoul::Dictionary& dictionary, std::string_view key) {
         const size_t dotPos = key.find('.');
@@ -161,7 +139,7 @@ namespace {
         std::string resolveAlias(std::string_view in) const;
 
         void addLineNumber();
-        std::string debugString() const;
+        std::string fileInfo() const;
 
         std::stringstream _output;
         std::vector<InputFile> _inputFiles;
@@ -176,6 +154,8 @@ namespace {
     {}
 
     void Env::processFile(const std::filesystem::path& path) {
+        ZoneScoped;
+
         ghoul_assert(!path.empty(), "Path must not be empty");
         ghoul_assert(std::filesystem::is_regular_file(path), "Path must exist");
 
@@ -230,7 +210,7 @@ namespace {
                 const size_t end = line.find('}', begin + 2);
                 if (end == std::string::npos) {
                     throw ShaderPreprocessorError(std::format(
-                        "Could not parse line. {}", debugString()
+                        "Could not parse line. {}", fileInfo()
                     ));
                 }
 
@@ -239,7 +219,6 @@ namespace {
 
                 const std::string first = line.substr(0, begin);
                 const std::string last = line.substr(end + 1);
-
                 line = std::format("{}{}{}", first, out, last);
             }
 
@@ -259,7 +238,7 @@ namespace {
             const InputFile& input = _inputFiles.back();
             throw ShaderPreprocessorError(std::format(
                 "Unexpected end of file. Still processing #for loop from {}:{}. {}",
-                input.file, forStatement.lineNumber, debugString()
+                input.file, forStatement.lineNumber, fileInfo()
             ));
         }
 
@@ -318,7 +297,7 @@ namespace {
 
         if (!form1 && !form2) {
             throw ShaderPreprocessorError(std::format(
-                "Error parsing #for  {}. {}", line, debugString()
+                "Error parsing #for  {}. {}", line, fileInfo()
             ));
         }
 
@@ -365,7 +344,7 @@ namespace {
 
         if (_forStatements.empty()) {
             throw ShaderPreprocessorError(std::format(
-                "Unexpected #endfor. No corresponding #for was found. {}", debugString()
+                "Unexpected #endfor. No corresponding #for was found. {}", fileInfo()
             ));
         }
 
@@ -394,8 +373,7 @@ namespace {
         }
         else {
             // This was the last iteration or there were zero iterations
-            _output <<
-                std::format("//# Terminated loop over {}\n", forStmnt.dictionary);
+            _output << std::format("//# Terminated loop over {}\n", forStmnt.dictionary);
             addLineNumber();
             _forStatements.pop_back();
         }
@@ -414,16 +392,14 @@ namespace {
         const size_t p1 = line.find_first_not_of(Ws, IncludeString.size());
         if (p1 == std::string_view::npos) {
             throw ShaderPreprocessorError(std::format(
-                "Expected file path after #include. {}", debugString()
+                "Expected file path after #include. {}", fileInfo()
             ));
         }
 
         if (line[p1] == '\"') {
             const size_t p2 = line.find_first_of('\"', p1 + 1);
             if (p2 == std::string_view::npos) {
-                throw ShaderPreprocessorError(std::format(
-                    "Expected \" {}", debugString()
-                ));
+                throw ShaderPreprocessorError(std::format("Expected \" {}", fileInfo()));
             }
 
             const size_t includeLength = p2 - p1 - 1;
@@ -440,9 +416,9 @@ namespace {
             for (const std::filesystem::path& path :
                  ghoul::opengl::ShaderPreprocessor::includePaths())
             {
-                includeFilepath = path / includeFilename;
-                if (std::filesystem::is_regular_file(includeFilepath)) {
-                    processFile(includeFilepath);
+                const std::filesystem::path inc = path / includeFilename;
+                if (std::filesystem::is_regular_file(inc)) {
+                    processFile(inc);
                     return true;
                 }
             }
@@ -455,20 +431,17 @@ namespace {
             }
 
             throw ShaderPreprocessorError(std::format(
-                "Could not resolve file path for include file '{}'", includeFilepath
+                "Could not resolve file path for include file '{}'", includeFilename
             ));
         }
         else if (line.at(p1) == '<') {
             const size_t p2 = line.find_first_of('>', p1 + 1);
             if (p2 == std::string_view::npos) {
-                throw ShaderPreprocessorError(std::format(
-                    "Expected >. {}", debugString()
-                ));
+                throw ShaderPreprocessorError(std::format("Expected >. {}", fileInfo()));
             }
 
             const size_t includeLen = p2 - p1 - 1;
             const std::filesystem::path inc = absPath(line.substr(p1 + 1, includeLen));
-
             if (!std::filesystem::is_regular_file(inc)) {
                 throw ShaderPreprocessorError(std::format(
                     "Could not resolve file path for include file '{}'", inc
@@ -480,7 +453,7 @@ namespace {
         }
         else {
             throw ShaderPreprocessorError(std::format(
-                "Expected \" or <. {}", debugString()
+                "Expected \" or <. {}", fileInfo()
             ));
         }
     }
@@ -490,11 +463,30 @@ namespace {
 
         ghoul::trimWhitespace(line);
 
-        if (line.starts_with(VersionString)) {
-            _output << std::format("{}\n", glslVersionString());
-            return true;
+        if (!line.starts_with(VersionString)) {
+            return false;
         }
-        return false;
+
+        int major = 0;
+        int minor = 0;
+        int mask = 0;
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
+        glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &mask);
+
+        const ContextProfileMask cpm = ContextProfileMask(mask);
+        const bool isCore = cpm == ContextProfileMask::GL_CONTEXT_CORE_PROFILE_BIT;
+        const bool isCompatibility =
+            cpm == ContextProfileMask::GL_CONTEXT_COMPATIBILITY_PROFILE_BIT;
+
+        ghoul_assert(
+            isCore || isCompatibility,
+            "OpenGL context is neither core nor compatibility"
+        );
+
+        std::string_view t = isCore ? "core" : (isCompatibility ? "compatibility" : "");
+        _output << std::format("#version {}{}0 {}\n", major, minor, t);
+        return true;
     }
 
     bool Env::parseOs(std::string_view line) {
@@ -502,27 +494,28 @@ namespace {
 
         ghoul::trimWhitespace(line);
 
-        if (line.starts_with(OsString)) {
-    #ifdef WIN32
-            constexpr std::string_view os = "WIN32";
-    #endif // WIN32
-    #ifdef __APPLE__
-            constexpr std::string_view os = "APPLE";
-    #endif // __APPLE__
-    #ifdef __linux__
-            constexpr std::string_view os = "linux";
-    #endif // __linux__
-            _output << std::format(
-                "#ifndef __OS__\n"
-                "#define __OS__ {0}\n"
-                "#define {0}\n"
-                "#endif\n",
-                os
-            );
-            addLineNumber();
-            return true;
+        if (!line.starts_with(OsString)) {
+            return false;
         }
-        return false;
+
+#ifdef WIN32
+        constexpr std::string_view os = "WIN32";
+#endif // WIN32
+#ifdef __APPLE__
+        constexpr std::string_view os = "APPLE";
+#endif // __APPLE__
+#ifdef __linux__
+        constexpr std::string_view os = "linux";
+#endif // __linux__
+        _output << std::format(
+            "#ifndef __OS__\n"
+            "#define __OS__ {0}\n"
+            "#define {0}\n"
+            "#endif\n",
+            os
+        );
+        addLineNumber();
+        return true;
     }
 
     std::string Env::substitute(std::string_view in) const {
@@ -570,7 +563,7 @@ namespace {
 
         throw ShaderPreprocessorError(std::format(
             "'{}' was resolved to '{}' which is a type that is not supported. {}",
-            in, resolved, debugString()
+            in, resolved, fileInfo()
         ));
     }
 
@@ -605,7 +598,7 @@ namespace {
         std::string res = beforeDot + afterDot;
         if (!afterDot.empty() && !hasKeyRecursive(_dictionary, res)) {
             throw ShaderPreprocessorError(std::format(
-                "Could not resolve variable '{}'. {}", in, debugString()
+                "Could not resolve variable '{}'. {}", in, fileInfo()
             ));
         }
 
@@ -633,7 +626,7 @@ namespace {
         );
     }
 
-    std::string Env::debugString() const {
+    std::string Env::fileInfo() const {
         const Env::InputFile& input = _inputFiles.back();
         return std::format("{}: {}", input.file, input.lineNumber);
     }
