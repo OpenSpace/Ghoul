@@ -58,10 +58,6 @@ class WebSocketServerInternal;
  */
 class WebSocket : public Socket {
 public:
-    struct WebSocketError : public ghoul::RuntimeError {
-        explicit WebSocketError(std::string msg, std::string comp = "");
-    };
-
     /**
      * WebSocket close event reason:
      * https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent

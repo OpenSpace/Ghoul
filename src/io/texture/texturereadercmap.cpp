@@ -114,22 +114,10 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         );
     }
 
-    const GLenum type = [](int d) {
-        switch (d) {
-            case 1: return GL_TEXTURE_1D;
-            case 2: return GL_TEXTURE_2D;
-            case 3: return GL_TEXTURE_3D;
-            default:
-                throw ghoul::RuntimeError(std::format(
-                    "Unsupported dimensionality '{}'", d
-                ));
-        }
-    }(nDimensions);
-
     return std::make_unique<opengl::Texture>(
         values,
         glm::size3_t(width, 1, 1),
-        type,
+        GL_TEXTURE_1D,
         opengl::Texture::Format::RGBA
     );
 }

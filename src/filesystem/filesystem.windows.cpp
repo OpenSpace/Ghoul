@@ -82,9 +82,9 @@ int FileSystem::addFileListener(std::filesystem::path path,
 
         if (handle->_handle == INVALID_HANDLE_VALUE) {
             delete handle;
-            throw ghoul::RuntimeError(
-                std::format("Directory handle for '{}' could not be obtained", dir)
-            );
+            throw ghoul::RuntimeError(std::format(
+                "Directory handle for '{}' could not be obtained", dir
+            ));
         }
 
         _directories[dir] = handle;

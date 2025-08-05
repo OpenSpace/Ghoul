@@ -36,6 +36,12 @@ namespace {
 
 constexpr std::string_view _loggerCat = "CommandlineParser";
 
+struct CommandlineParserError : public ghoul::RuntimeError {
+    explicit CommandlineParserError(std::string message)
+        : ghoul::RuntimeError(std::move(message), "CommandlineParser")
+    {}
+};
+
 /**
  * Extracts multiple arguments from a single list.
  *
@@ -171,13 +177,10 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 else {
                     // We have found an unknown command but we don't allow them, so we
                     // have to bail out here
-                    throw ghoul::RuntimeError(
-                        std::format(
-                            "Found unknown command '{}' but none are allowed",
-                            _arguments[i]
-                        ),
-                        "CommandlineParser"
-                    );
+                    throw CommandlineParserError(std::format(
+                        "Found unknown command '{}' but none are allowed",
+                        _arguments[i]
+                    ));
                 }
             }
         }
@@ -200,10 +203,9 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                     continue;
                 }
                 else {
-                    throw ghoul::RuntimeError(
-                        std::format("{} is not a valid command", _arguments[i]),
-                        "CommandlineParser"
-                    );
+                    throw CommandlineParserError(std::format(
+                        "{} is not a valid command", _arguments[i]
+                    ));
                 }
             }
 
@@ -221,13 +223,10 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             if (!currentCmd->allowsMultipleCalls() &&
                 parameterMap.find(currentCmd) != parameterMap.end())
             {
-                throw ghoul::RuntimeError(
-                    std::format(
-                        "'{}' does not allow multiple calls in a single line",
-                        currentCmd->name()
-                    ),
-                    "CommandlineParser"
-                );
+                throw CommandlineParserError(std::format(
+                    "'{}' does not allow multiple calls in a single line",
+                    currentCmd->name()
+                ));
             }
 
             parameterMap.emplace(currentCmd, params);
@@ -247,10 +246,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             );
         }
         else {
-            throw ghoul::RuntimeError(
-                "No command available for nameless parameters",
-                "CommandlineParser"
-            );
+            throw CommandlineParserError("No command available for nameless parameters");
         }
     }
 
