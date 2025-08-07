@@ -44,8 +44,8 @@ namespace {
     constexpr int CacheVersion = 2;
 
     struct CacheError : public ghoul::RuntimeError {
-        explicit CacheError(std::string message)
-            : ghoul::RuntimeError(std::move(message), "Cache")
+        explicit CacheError(std::string msg)
+            : ghoul::RuntimeError(std::move(msg), "Cache")
         {}
     };
 

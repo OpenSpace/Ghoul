@@ -111,7 +111,7 @@ constexpr unsigned int hashCRC32(std::string_view s) {
     return res ^ 0xFFFFFFFF;
 }
 
-constexpr unsigned int operator "" _crc32(const char* s, size_t) {
+constexpr unsigned int operator ""_crc32(const char* s, size_t) {
     return hashCRC32(s);
 }
 
