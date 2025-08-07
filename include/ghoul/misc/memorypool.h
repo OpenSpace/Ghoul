@@ -119,7 +119,7 @@ private:
         /// The number of bytes that have been used in this Bucket
         size_t usage = 0;
         /// The bucket's data storage
-        std::array<std::byte, BucketSize> payload;
+        std::array<std::byte, BucketSize> payload = {};
     };
 
     struct EmptyPair {
