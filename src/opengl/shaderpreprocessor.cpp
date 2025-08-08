@@ -118,6 +118,7 @@ namespace {
         };
 
         struct ForStatement {
+            const std::filesystem::path file;
             const unsigned int lineNumber;
             const std::streampos streamPos;
 
@@ -233,13 +234,32 @@ namespace {
         }
 
 
+        // We need to check that we don't have any dangling for statements that might not
+        // have been closed. We only want to throw an error when the file that opened the
+        // for loop has not closed it at the end. The extra checks are necessary as we
+        // might include other shader files inside the for loop, which should not trip the
+        // exception
         if (!_forStatements.empty()) {
-            const ForStatement& forStatement = _forStatements.back();
-            const InputFile& input = _inputFiles.back();
-            throw ShaderPreprocessorError(std::format(
-                "Unexpected end of file. Still processing #for loop from {}:{}. {}",
-                input.file, forStatement.lineNumber, fileInfo()
-            ));
+            if (_inputFiles.size() == 1) {
+                // If there are no other input files left, this was the last file and we
+                // were responsible for the dangling for loop
+                throw ShaderPreprocessorError(std::format(
+                    "Unexpected end of file. Still processing #for loop from {}:{}. {}",
+                    _inputFiles.back().file, _forStatements.back().lineNumber, fileInfo()
+                ));
+            }
+
+            // Get the second-to-last input file. It has to be the one responsible for the
+            // for loop
+            const Env::InputFile& prev = _inputFiles[_inputFiles.size() - 2];
+            if (_forStatements.back().file != prev.file) {
+                const ForStatement& forStatement = _forStatements.back();
+                const InputFile& input = _inputFiles.back();
+                throw ShaderPreprocessorError(std::format(
+                    "Unexpected end of file. Still processing #for loop from {}:{}. {}",
+                    input.file, forStatement.lineNumber, fileInfo()
+                ));
+            }
         }
 
         _inputFiles.pop_back();
@@ -324,6 +344,7 @@ namespace {
 
         Env::InputFile& input = _inputFiles.back();
         _forStatements.emplace_back(
+            input.file,
             input.lineNumber,
             input.stream.tellg(),
             key,
