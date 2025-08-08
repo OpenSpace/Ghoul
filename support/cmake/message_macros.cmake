@@ -32,17 +32,24 @@ macro(h1 title)
   message(STATUS "======= ${_title} =======")
 endmacro ()
 
+
+
 macro (h2 title)
   message(STATUS "**** ${title} ****")
 endmacro ()
+
+
 
 macro (h3 title)
   message(STATUS "--- ${title} ---")
 endmacro ()
 
+
+
 macro (hx title)
   message(STATUS "${title}")
 endmacro ()
+
 
 
 # This method uses the currently active indentation level to automatically call the
@@ -63,6 +70,8 @@ macro (begin_header title)
   endif ()
   MATH(EXPR __current_header_indent "${__current_header_indent}+1")
 endmacro ()
+
+
 
 # Ends the block defined by a `begin_header`. If an optional argument is provided to this
 # macro, it is printed with the same level of importance as the initial `begin_header`
@@ -97,6 +106,8 @@ macro (begin_dependency name)
   message(STATUS "Dependency: ${name}")
 endmacro ()
 
+
+
 macro (end_dependency)
   set(extra_macro_argv ${ARGN})
   list(LENGTH extra_macro_argv extra_macro_argc)
@@ -112,6 +123,8 @@ macro (begin_module name)
   set(__current_module_name ${name})
   begin_header("Module: ${name}")
 endmacro ()
+
+
 
 macro (end_module)
   set(extra_macro_argv ${ARGN})

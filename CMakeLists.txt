@@ -52,26 +52,6 @@ option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries" OFF)
 
-if (MSVC)
-  option(GHOUL_OPTIMIZATION_ENABLE_AVX "Enable AVX instruction set for compilation" OFF)
-  option(GHOUL_OPTIMIZATION_ENABLE_AVX2 "Enable AVX2 instruction set for compilation" OFF)
-  option(GHOUL_OPTIMIZATION_ENABLE_AVX512 "Enable AVX2 instruction set for compilation" OFF)
-  option(GHOUL_OPTIMIZATION_ENABLE_OTHER_OPTIMIZATIONS "Enable other optimizations, like LTCG, intrinsics, etc")
-
-  if (GHOUL_OPTIMIZATION_ENABLE_AVX AND GHOUL_OPTIMIZATION_ENABLE_AVX2)
-    message(FATAL_ERROR "Cannot enable AVX and AVX2 instructions simultaneously")
-  endif ()
-
-  if (GHOUL_OPTIMIZATION_ENABLE_AVX AND GHOUL_OPTIMIZATION_ENABLE_AVX512)
-    message(FATAL_ERROR "Cannot enable AVX and AVX512 instructions simultaneously")
-  endif ()
-
-  if (GHOUL_OPTIMIZATION_ENABLE_AVX2 AND GHOUL_OPTIMIZATION_ENABLE_AVX512)
-    message(FATAL_ERROR "Cannot enable AVX2 and AVX512 instructions simultaneously")
-  endif ()
-endif ()
-
-
 if (WIN32)
   option(GHOUL_ENABLE_EDIT_CONTINUE "Enable Edit&Continue" ON)
 
