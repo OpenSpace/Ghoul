@@ -43,7 +43,7 @@ namespace {
     const std::filesystem::path CacheFile = "cache";
     constexpr int CacheVersion = 2;
 
-    struct CacheError : public ghoul::RuntimeError {
+    struct CacheError final : public ghoul::RuntimeError {
         explicit CacheError(std::string msg)
             : ghoul::RuntimeError(std::move(msg), "Cache")
         {}
