@@ -44,7 +44,7 @@ namespace pmr = std::pmr;
 
 namespace ghoul {
 
-class MemoryPoolBase final : public pmr::memory_resource {
+class MemoryPoolBase : public pmr::memory_resource {
 public:
     virtual ~MemoryPoolBase() override = default;
 
@@ -64,7 +64,7 @@ public:
  * \tparam BucketSize The size of each bucket in bytes
  */
 template <int BucketSize = 4096, bool InjectDebugMemory = false, bool NoDealloc = false>
-class MemoryPool : public MemoryPoolBase {
+class MemoryPool final : public MemoryPoolBase {
 public:
     const static int _bucketSize = BucketSize;
 
