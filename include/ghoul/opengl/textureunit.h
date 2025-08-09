@@ -46,7 +46,7 @@ public:
     /**
      * Main exception that is thrown if a new TextureUnit could not be assigned.
      */
-    struct TextureUnitError : public RuntimeError {
+    struct TextureUnitError final : public RuntimeError {
         explicit TextureUnitError(std::string msg);
     };
 

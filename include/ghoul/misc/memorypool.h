@@ -44,7 +44,7 @@ namespace pmr = std::pmr;
 
 namespace ghoul {
 
-class MemoryPoolBase : public pmr::memory_resource {
+class MemoryPoolBase final : public pmr::memory_resource {
 public:
     virtual ~MemoryPoolBase() override = default;
 

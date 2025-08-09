@@ -60,7 +60,7 @@ public:
     /**
      * The exception that is thrown if the compilation of a ShaderObject failed.
      */
-    struct ShaderCompileError : public ShaderObjectError {
+    struct ShaderCompileError final : public ShaderObjectError {
         /**
          * The constructor constructing a ShaderCompileError containing the cause for the
          * error (\p error) as well as the, optional, \p ident and \p name

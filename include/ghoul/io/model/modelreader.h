@@ -50,7 +50,7 @@ public:
     BooleanType(NotifyInvisibleDropped);
 
     /// Exception that gets thrown when there is no reader for the provided \p extension
-    struct MissingReaderException : public RuntimeError {
+    struct MissingReaderException final : public RuntimeError {
         explicit MissingReaderException(std::string extension,
             std::filesystem::path file_);
 

@@ -678,7 +678,9 @@ public:
      * return value.
      *
      * \tparam T The type of the data that is returned
-     * \param x, y, z The coordinates for the `width`, `height`, and `depth` axes
+     * \param x The coordinates for the `width` axis
+     * \param y The coordinates for the `height` axis
+     * \param z The coordinates for the `depth` axis
      * \return The texel at the specified position casted to the requested type T
      *
      * \pre The Texture must be a three dimensional Texture

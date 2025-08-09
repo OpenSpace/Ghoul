@@ -48,7 +48,7 @@ struct TemplateFactoryError : public RuntimeError {
 /**
  * Exception that is thrown if a requested class has not been registered before.
  */
-struct TemplateClassNotFoundError : public TemplateFactoryError {
+struct TemplateClassNotFoundError final : public TemplateFactoryError {
     explicit TemplateClassNotFoundError(std::string name);
     const std::string className;
 };
@@ -56,7 +56,7 @@ struct TemplateClassNotFoundError : public TemplateFactoryError {
 /**
  * Exception that is thrown if a registered class is called with a wrong constructor.
  */
-struct TemplateConstructionError : public TemplateFactoryError {
+struct TemplateConstructionError final : public TemplateFactoryError {
     explicit TemplateConstructionError(std::string msg);
 };
 
@@ -127,7 +127,8 @@ public:
      *        constructor, but a Dictionary was used.
      */
     using FactoryFunction = std::function<
-        BaseClass* (bool, const ghoul::Dictionary&, MemoryPoolBase* pool)
+        BaseClass* (bool useDictionary, const ghoul::Dictionary& dict,
+                    MemoryPoolBase* pool)
     >;
 
     /**

@@ -52,7 +52,7 @@ public:
      * there is either no registered MemoryExhaustedCallback or the registered callback
      * failed to free enough memory.
      */
-    struct MemoryExhaustionException : public RuntimeError {
+    struct MemoryExhaustionException final : public RuntimeError {
         explicit MemoryExhaustionException(int sizeTotal, int sizeRequested);
 
         const int totalSize;

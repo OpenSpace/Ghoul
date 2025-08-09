@@ -35,7 +35,7 @@ class Dictionary;
 /**
  * This exception is thrown if an unknown type is being converted.
  */
-struct JsonFormattingError : public RuntimeError {
+struct JsonFormattingError final : public RuntimeError {
     explicit JsonFormattingError(std::string msg);
 };
 
