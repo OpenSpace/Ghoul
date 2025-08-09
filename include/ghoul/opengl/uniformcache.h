@@ -568,7 +568,7 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
  * The order of arguments in the \p uniformNames has to be the same as the location
  * definitions.
  *
- * \tparam A type that was created through the UniformCache command
+ * \tparam T A type that was created through the UniformCache command
  */
 template <typename T> // @CONCEPTS
 void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& uniformCache)

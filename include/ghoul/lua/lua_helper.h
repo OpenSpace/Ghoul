@@ -503,8 +503,8 @@ bool isScriptBinary(std::string_view script);
  * \param L The stack from which the value is checked
  * \param location The location at which the value is checked
  *
- * \return `true` if the value at location exists and has the requested type \tparam T
- *         `false` otherwise
+ * \return `true` if the value at location exists and has the requested type `T` `false`
+ *         otherwise
  *
  * \pre L must not be nullptr
  */

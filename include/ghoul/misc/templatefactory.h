@@ -128,7 +128,7 @@ public:
      */
     using FactoryFunction = std::function<
         BaseClass* (bool useDictionary, const ghoul::Dictionary& dict,
-                    MemoryPoolBase* pool)
+                    pmr::memory_resource* pool)
     >;
 
     /**
@@ -148,7 +148,8 @@ public:
      *        not have a default constructor
      * \pre \p className must not be empty
      */
-    BaseClass* create(std::string_view className, MemoryPoolBase* pool = nullptr) const;
+    BaseClass* create(std::string_view className,
+        pmr::memory_resource* pool = nullptr) const;
 
     /**
      * Creates an instance of the class which was registered under the provided
@@ -172,7 +173,7 @@ public:
      * \pre \p className must not be empty
      */
     BaseClass* create(std::string_view className, const Dictionary& dictionary,
-        MemoryPoolBase* pool = nullptr) const;
+        pmr::memory_resource* pool = nullptr) const;
 
     /**
      * Registers a `Class` with the provided \p className so that it can later be
@@ -212,8 +213,8 @@ public:
      * \pre \p factoryFunction must not be `nullptr`
      */
     void registerClass(std::string className,
-        std::function<BaseClass*(bool, const ghoul::Dictionary&, MemoryPoolBase* pool)>
-            factoryFunction);
+        std::function<BaseClass*(bool, const ghoul::Dictionary&,
+                                 pmr::memory_resource* pool)> factoryFunction);
 
     /**
      * Checks if any class has been registered under the provided \p className As any

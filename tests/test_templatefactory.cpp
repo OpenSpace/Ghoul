@@ -270,7 +270,7 @@ TEST_CASE("TemplateFactory: Std Function Construction", "[templatefactory]") {
     ghoul::TemplateFactory<BaseClass> factory;
 
     ghoul::TemplateFactory<BaseClass>::FactoryFunction function =
-        [](bool use, const ghoul::Dictionary&, ghoul::MemoryPoolBase*) -> BaseClass* {
+        [](bool use, const ghoul::Dictionary&, pmr::memory_resource*) -> BaseClass* {
             return use ? new StdFunctionClass : nullptr;
     };
     factory.registerClass("ptr", function);
