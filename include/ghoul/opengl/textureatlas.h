@@ -81,28 +81,11 @@ public:
     explicit TextureAtlas(glm::ivec3 size);
 
     /**
-     * Copy constructor that performs a deep copy of all the element in the TextureAtlas
-     * such that the resulting atlas can be used independently.
-     *
-     * \param rhs The original TextureAtlas
-     */
-    TextureAtlas(const TextureAtlas& rhs);
-
-    /**
      * Move constructor that leaves the incoming atlas invalid.
      *
      * \param rhs The origin TextureAtlas
      */
     TextureAtlas(TextureAtlas&& rhs) noexcept;
-
-    /**
-     * Assignment operator that performs a deep copy of all the elements in the
-     * TextureAtlas such that the resulting atlas can be used independently.
-     *
-     * \param rhs The original TextureAtlas
-     * \return A copy of the original TextureAtlas
-     */
-    TextureAtlas& operator=(const TextureAtlas& rhs);
 
     /**
      * Move operator that moves the data into the new atlas without performing any copy

@@ -59,9 +59,13 @@ std::vector<uint8_t> decodeBase64(const std::string_view base64) {
                 char4[i] = static_cast<unsigned char>(base64Chars.find(char4[i]));
             }
 
-            char3[0] = (char4[0] << 2) + ((char4[1] & 0x30) >> 4);
-            char3[1] = ((char4[1] & 0xf) << 4) + ((char4[2] & 0x3c) >> 2);
-            char3[2] = ((char4[2] & 0x3) << 6) + char4[3];
+            char3[0] = static_cast<unsigned char>(
+                (char4[0] << 2) + ((char4[1] & 0x30) >> 4)
+            );
+            char3[1] = static_cast<unsigned char>(
+                ((char4[1] & 0xf) << 4) + ((char4[2] & 0x3c) >> 2)
+            );
+            char3[2] = static_cast<unsigned char>(((char4[2] & 0x3) << 6) + char4[3]);
 
             for (i = 0; (i < 3); i++) {
                 ret.push_back(char3[i]);
@@ -79,9 +83,11 @@ std::vector<uint8_t> decodeBase64(const std::string_view base64) {
             char4[j] = static_cast<unsigned char>(base64Chars.find(char4[j]));
         }
 
-        char3[0] = (char4[0] << 2) + ((char4[1] & 0x30) >> 4);
-        char3[1] = ((char4[1] & 0xf) << 4) + ((char4[2] & 0x3c) >> 2);
-        char3[2] = ((char4[2] & 0x3) << 6) + char4[3];
+        char3[0] = static_cast<unsigned char>((char4[0] << 2) + ((char4[1] & 0x30) >> 4));
+        char3[1] = static_cast<unsigned char>(
+            ((char4[1] & 0xf) << 4) + ((char4[2] & 0x3c) >> 2)
+        );
+        char3[2] = static_cast<unsigned char>(((char4[2] & 0x3) << 6) + char4[3]);
 
         for (j = 0; (j < i - 1); j++) {
             ret.push_back(char3[j]);

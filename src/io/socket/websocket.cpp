@@ -121,11 +121,6 @@ void WebSocket::startStreams() {
     _tcpSocket->startStreams();
 }
 
-/**
- * Callback for incoming messages
- * \param hdl A handle to uniquely identify a connection.
- * \param msg The message
- */
 void WebSocket::onMessage(const websocketpp::connection_hdl&,
                    const websocketpp::server<websocketpp::config::core>::message_ptr& msg)
 {
