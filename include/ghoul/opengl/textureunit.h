@@ -61,6 +61,9 @@ public:
      */
     ~TextureUnit();
 
+    TextureUnit(const TextureUnit&) = default;
+    TextureUnit(TextureUnit&&) noexcept = default;
+
     /**
      * This method will activate the enum assigned to this TextureUnit. If this is the
      * first call to either activate, #glEnum, or #unitNumber, a free unit number will be

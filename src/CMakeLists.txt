@@ -244,7 +244,6 @@ if (GHOUL_MODULE_OPENGL)
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterstb.h
-      opengl/bufferbinding.cpp
       opengl/debugcontext.cpp
       opengl/framebufferobject.cpp
       opengl/openglstatecache.cpp
