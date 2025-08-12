@@ -340,7 +340,6 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
         }
         if (sorted) {
             std::sort(result.begin(), result.end());
-
         }
     }
     catch (const fs::filesystem_error& e) {
