@@ -38,7 +38,7 @@ namespace ghoul { class Dictionary; }
 
 namespace ghoul::lua {
 
-struct LuaError : public RuntimeError {
+struct LuaError final : public RuntimeError {
     explicit LuaError(std::string msg);
 };
 
@@ -46,18 +46,18 @@ struct LuaRuntimeException : public RuntimeError {
     explicit LuaRuntimeException(std::string msg);
 };
 
-struct LuaFormatException : public LuaRuntimeException {
+struct LuaFormatException final : public LuaRuntimeException {
     explicit LuaFormatException(std::string msg, std::filesystem::path file = "");
     const std::filesystem::path filename;
 };
 
-struct LuaLoadingException : public LuaRuntimeException {
+struct LuaLoadingException final : public LuaRuntimeException {
     explicit LuaLoadingException(std::string error, std::filesystem::path file = "");
     const std::string errorMessage;
     const std::filesystem::path filename;
 };
 
-struct LuaExecutionException : public LuaRuntimeException {
+struct LuaExecutionException final : public LuaRuntimeException {
     explicit LuaExecutionException(std::string error, std::filesystem::path file = "");
     const std::string errorMessage;
     const std::filesystem::path filename;
@@ -503,8 +503,8 @@ bool isScriptBinary(std::string_view script);
  * \param L The stack from which the value is checked
  * \param location The location at which the value is checked
  *
- * \return `true` if the value at location exists and has the requested type \tparam T
- *         `false` otherwise
+ * \return `true` if the value at location exists and has the requested type `T` `false`
+ *         otherwise
  *
  * \pre L must not be nullptr
  */

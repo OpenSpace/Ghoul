@@ -44,13 +44,6 @@ namespace pmr = std::pmr;
 
 namespace ghoul {
 
-class MemoryPoolBase : public pmr::memory_resource {
-public:
-    virtual ~MemoryPoolBase() override = default;
-
-    virtual void reset() = 0;
-};
-
 /**
  * This class represents a MemoryPool with a specific size from which individual memory
  * blocks can be requested. The MemoryPool is organized into multiple separate buckets
@@ -64,7 +57,7 @@ public:
  * \tparam BucketSize The size of each bucket in bytes
  */
 template <int BucketSize = 4096, bool InjectDebugMemory = false, bool NoDealloc = false>
-class MemoryPool : public MemoryPoolBase {
+class MemoryPool final : public pmr::memory_resource {
 public:
     const static int _bucketSize = BucketSize;
 
@@ -78,7 +71,7 @@ public:
     /**
      * Frees the memory that was allocated during the existence of this MemoryPool.
      */
-    virtual void reset() final;
+    void reset();
 
     /**
      * Function that will make sure the list of returned pointers is nice and clean.
@@ -119,7 +112,7 @@ private:
         /// The number of bytes that have been used in this Bucket
         size_t usage = 0;
         /// The bucket's data storage
-        std::array<std::byte, BucketSize> payload;
+        std::array<std::byte, BucketSize> payload = {};
     };
 
     struct EmptyPair {

@@ -54,7 +54,7 @@ public:
     /**
      * Exception that is thrown if there was an error detecting the operating system.
      */
-    struct OperatingSystemError : public GeneralCapabilitiesComponentError {
+    struct OperatingSystemError final : public GeneralCapabilitiesComponentError {
         explicit OperatingSystemError(std::string desc, std::string errorMsg);
 
         /// The general description of the error
@@ -67,7 +67,7 @@ public:
     /**
      * Exception that is thrown if there was an error detecting the main memory.
      */
-    struct MainMemoryError : public GeneralCapabilitiesComponentError {
+    struct MainMemoryError final : public GeneralCapabilitiesComponentError {
         explicit MainMemoryError(std::string msg);
     };
 

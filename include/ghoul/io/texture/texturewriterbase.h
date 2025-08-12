@@ -41,7 +41,7 @@ namespace ghoul::io {
 class TextureWriterBase {
 public:
     /// The exception that gets thrown if there was an error writing the Texture
-    struct TextureWriteException : public RuntimeError {
+    struct TextureWriteException final : public RuntimeError {
         explicit TextureWriteException(std::string name, std::string msg,
             const TextureWriterBase& w);
 

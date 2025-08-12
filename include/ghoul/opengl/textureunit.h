@@ -46,7 +46,7 @@ public:
     /**
      * Main exception that is thrown if a new TextureUnit could not be assigned.
      */
-    struct TextureUnitError : public RuntimeError {
+    struct TextureUnitError final : public RuntimeError {
         explicit TextureUnitError(std::string msg);
     };
 
@@ -60,6 +60,9 @@ public:
      * The destructor will free the used texture unit and mark it as free again.
      */
     ~TextureUnit();
+
+    TextureUnit(const TextureUnit&) = default;
+    TextureUnit(TextureUnit&&) noexcept = default;
 
     /**
      * This method will activate the enum assigned to this TextureUnit. If this is the

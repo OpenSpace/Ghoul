@@ -78,7 +78,7 @@ public:
     /**
      * Exception that is thrown if the linking of a ProgramObject fails.
      */
-    struct ProgramObjectLinkingError : public ProgramObjectError {
+    struct ProgramObjectLinkingError final : public ProgramObjectError {
         ProgramObjectLinkingError(std::string msg, std::string name);
 
         /// The linker error that was returned from the GLSL linker

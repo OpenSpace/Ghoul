@@ -45,7 +45,7 @@ namespace ghoul::io {
 class ModelReaderBase {
 public:
     /// The exception that gets thrown if there was an error loading the Model from file
-    struct ModelLoadException : public RuntimeError {
+    struct ModelLoadException final : public RuntimeError {
         explicit ModelLoadException(std::filesystem::path name, std::string msg,
             const ModelReaderBase* r);
 

@@ -35,13 +35,13 @@ namespace ghoul {
  * Exception that gets thrown if an assertion is triggered and the user selects the
  * `AssertionException` option.
  */
-struct AssertionException : public std::runtime_error {
+struct AssertionException final : public std::runtime_error {
     explicit AssertionException(std::string exp, std::string msg, std::string file,
         std::string func, int line);
 };
 
 /// Exception that gets thrown if switch-case statement is missing a case.
-struct MissingCaseException : public std::logic_error {
+struct MissingCaseException final : public std::logic_error {
     MissingCaseException();
 };
 

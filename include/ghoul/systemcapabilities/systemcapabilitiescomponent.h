@@ -138,17 +138,6 @@ public:
 protected:
 #ifdef WIN32
     /**
-     * Exception that will be thrown if there was an error regarding Windows' Management
-     * Instrumentation.
-     */
-    struct WMIError : public ghoul::RuntimeError {
-        explicit WMIError(std::string msg, long code);
-
-        const std::string message;
-        const long errorCode;
-    };
-
-    /**
      * This method initializes the Windows Management Instrumentation.
      *
      * \throw WMIError If there was an error initializing the Windows Management

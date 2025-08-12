@@ -49,7 +49,7 @@ class TextureReaderBase;
 class TextureReader {
 public:
     /// Exception that gets thrown when there is no reader for the provided \p extension
-    struct MissingReaderException : public RuntimeError {
+    struct MissingReaderException final : public RuntimeError {
         explicit MissingReaderException(std::string extension,
             std::filesystem::path file_);
 
@@ -58,7 +58,7 @@ public:
     };
 
     /// Exception that gets thrown when an invalid load result occurs
-    struct InvalidLoadException : public RuntimeError {
+    struct InvalidLoadException final : public RuntimeError {
         explicit InvalidLoadException(void* memory, size_t size);
 
         const void* _memory;

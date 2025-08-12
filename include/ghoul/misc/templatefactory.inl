@@ -54,7 +54,8 @@ constexpr int DICTIONARY_CONSTRUCTOR = 2;
 
 /// Create Class using only the default constructor
 template <typename BaseClass, typename Class>
-BaseClass* createDefault(bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool)
+BaseClass* createDefault(bool useDictionary, const Dictionary& dict,
+                         pmr::memory_resource* pool)
 {
 #ifdef GHL_DEBUG
     // We don't have a dictionary constructor, but the user tried to create it with a
@@ -78,7 +79,7 @@ BaseClass* createDefault(bool useDictionary, const Dictionary& dict, MemoryPoolB
 // Create Class using the default constructor or the Dictionary
 template <typename BaseClass, typename Class>
 BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict,
-                                      MemoryPoolBase* pool)
+                                      pmr::memory_resource* pool)
 {
     if (useDictionary) {
         if (pool) {
@@ -103,7 +104,7 @@ BaseClass* createDefaultAndDictionary(bool useDictionary, const Dictionary& dict
 // Create Class using only the Dictionary constructor
 template <typename BaseClass, typename Class>
 BaseClass* createDictionary(bool useDictionary, const Dictionary& dict,
-                            MemoryPoolBase* pool)
+                            pmr::memory_resource* pool)
 {
     if (!useDictionary) {
         std::string className = typeid(Class).name();
@@ -124,7 +125,7 @@ BaseClass* createDictionary(bool useDictionary, const Dictionary& dict,
 template <typename BaseClass, typename Class, int Constructor>
 struct CreateHelper {
     using FactoryFuncPtr = BaseClass* (*)(
-        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+        bool useDictionary, const Dictionary& dict, pmr::memory_resource* pool
     );
     FactoryFuncPtr createFunction();
 };
@@ -132,7 +133,7 @@ struct CreateHelper {
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCTOR> {
     using FactoryFuncPtr = BaseClass* (*)(
-        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+        bool useDictionary, const Dictionary& dict, pmr::memory_resource* pool
     );
     FactoryFuncPtr createFunction() {
         return &createDefaultAndDictionary<BaseClass, Class>;
@@ -142,7 +143,7 @@ struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCT
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
     using FactoryFuncPtr = BaseClass* (*)(
-        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+        bool useDictionary, const Dictionary& dict, pmr::memory_resource* pool
     );
     FactoryFuncPtr createFunction() {
         return &createDefault<BaseClass, Class>;
@@ -152,7 +153,7 @@ struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
 template <typename BaseClass, typename Class>
 struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
     using FactoryFuncPtr = BaseClass* (*)(
-        bool useDictionary, const Dictionary& dict, MemoryPoolBase* pool
+        bool useDictionary, const Dictionary& dict, pmr::memory_resource* pool
     );
     FactoryFuncPtr createFunction() {
         return &createDictionary<BaseClass, Class>;
@@ -163,7 +164,7 @@ struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
 
 template <typename BaseClass>
 BaseClass* TemplateFactory<BaseClass>::create(std::string_view className,
-                                              MemoryPoolBase* pool) const
+                                              pmr::memory_resource* pool) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 
@@ -182,7 +183,7 @@ BaseClass* TemplateFactory<BaseClass>::create(std::string_view className,
 template <typename BaseClass>
 BaseClass* TemplateFactory<BaseClass>::create(std::string_view className,
                                               const Dictionary& dictionary,
-                                              MemoryPoolBase* pool) const
+                                              pmr::memory_resource* pool) const
 {
     ghoul_assert(!className.empty(), "Classname must not be empty");
 

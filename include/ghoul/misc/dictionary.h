@@ -189,6 +189,91 @@ private:
     std::map<std::string, StorageTypes, std::less<>> _storage;
 };
 
+extern template void Dictionary::setValue(std::string, Dictionary value);
+extern template void Dictionary::setValue(std::string, bool value);
+extern template void Dictionary::setValue(std::string, double);
+extern template void Dictionary::setValue(std::string, int);
+extern template void Dictionary::setValue(std::string, std::string);
+extern template void Dictionary::setValue(std::string, std::filesystem::path);
+extern template void Dictionary::setValue(std::string, void*);
+extern template void Dictionary::setValue(std::string, std::vector<int>);
+extern template void Dictionary::setValue(std::string, std::vector<double>);
+extern template void Dictionary::setValue(std::string, std::vector<std::string>);
+extern template void Dictionary::setValue(std::string,
+    std::vector<std::filesystem::path>);
+extern template void Dictionary::setValue(std::string, glm::ivec2);
+extern template void Dictionary::setValue(std::string, glm::ivec3);
+extern template void Dictionary::setValue(std::string, glm::ivec4);
+extern template void Dictionary::setValue(std::string, glm::dvec2);
+extern template void Dictionary::setValue(std::string, glm::dvec3);
+extern template void Dictionary::setValue(std::string, glm::dvec4);
+extern template void Dictionary::setValue(std::string, glm::dmat2x2);
+extern template void Dictionary::setValue(std::string, glm::dmat2x3);
+extern template void Dictionary::setValue(std::string, glm::dmat2x4);
+extern template void Dictionary::setValue(std::string, glm::dmat3x2);
+extern template void Dictionary::setValue(std::string, glm::dmat3x3);
+extern template void Dictionary::setValue(std::string, glm::dmat3x4);
+extern template void Dictionary::setValue(std::string, glm::dmat4x2);
+extern template void Dictionary::setValue(std::string, glm::dmat4x3);
+extern template void Dictionary::setValue(std::string, glm::dmat4x4);
+
+extern template Dictionary Dictionary::value(std::string_view) const;
+extern template bool Dictionary::value(std::string_view) const;
+extern template double Dictionary::value(std::string_view) const;
+extern template int Dictionary::value(std::string_view) const;
+extern template std::string Dictionary::value(std::string_view) const;
+extern template std::filesystem::path Dictionary::value(std::string_view) const;
+extern template void* Dictionary::value(std::string_view) const;
+extern template std::vector<int> Dictionary::value(std::string_view) const;
+extern template std::vector<double> Dictionary::value(std::string_view) const;
+extern template std::vector<std::string> Dictionary::value(std::string_view) const;
+extern template std::vector<std::filesystem::path> Dictionary::value(
+    std::string_view) const;
+extern template glm::ivec2 Dictionary::value(std::string_view) const;
+extern template glm::ivec3 Dictionary::value(std::string_view) const;
+extern template glm::ivec4 Dictionary::value(std::string_view) const;
+extern template glm::dvec2 Dictionary::value(std::string_view) const;
+extern template glm::dvec3 Dictionary::value(std::string_view) const;
+extern template glm::dvec4 Dictionary::value(std::string_view) const;
+extern template glm::dmat2x2 Dictionary::value(std::string_view) const;
+extern template glm::dmat2x3 Dictionary::value(std::string_view) const;
+extern template glm::dmat2x4 Dictionary::value(std::string_view) const;
+extern template glm::dmat3x2 Dictionary::value(std::string_view) const;
+extern template glm::dmat3x3 Dictionary::value(std::string_view) const;
+extern template glm::dmat3x4 Dictionary::value(std::string_view) const;
+extern template glm::dmat4x2 Dictionary::value(std::string_view) const;
+extern template glm::dmat4x3 Dictionary::value(std::string_view) const;
+extern template glm::dmat4x4 Dictionary::value(std::string_view) const;
+
+extern template bool Dictionary::hasValue<Dictionary>(std::string_view) const;
+extern template bool Dictionary::hasValue<bool>(std::string_view) const;
+extern template bool Dictionary::hasValue<double>(std::string_view) const;
+extern template bool Dictionary::hasValue<int>(std::string_view) const;
+extern template bool Dictionary::hasValue<std::string>(std::string_view) const;
+extern template bool Dictionary::hasValue<std::filesystem::path>(std::string_view) const;
+extern template bool Dictionary::hasValue<void*>(std::string_view) const;
+extern template bool Dictionary::hasValue<std::vector<int>>(std::string_view) const;
+extern template bool Dictionary::hasValue<std::vector<double>>(std::string_view) const;
+extern template bool Dictionary::hasValue<std::vector<std::string>>(
+    std::string_view) const;
+extern template bool Dictionary::hasValue<std::vector<std::filesystem::path>>(
+    std::string_view) const;
+extern template bool Dictionary::hasValue<glm::ivec2>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::ivec3>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::ivec4>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dvec2>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dvec3>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dvec4>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat2x2>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat2x3>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat2x4>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat3x2>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat3x3>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat3x4>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat4x2>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat4x3>(std::string_view) const;
+extern template bool Dictionary::hasValue<glm::dmat4x4>(std::string_view) const;
+
 } // namespace ghoul
 
 #endif // __GHOUL___DICTIONARY___H__

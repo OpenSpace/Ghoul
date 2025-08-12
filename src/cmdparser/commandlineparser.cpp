@@ -36,9 +36,9 @@ namespace {
 
 constexpr std::string_view _loggerCat = "CommandlineParser";
 
-struct CommandlineParserError : public ghoul::RuntimeError {
-    explicit CommandlineParserError(std::string message)
-        : ghoul::RuntimeError(std::move(message), "CommandlineParser")
+struct CommandlineParserError final : public ghoul::RuntimeError {
+    explicit CommandlineParserError(std::string msg)
+        : ghoul::RuntimeError(std::move(msg), "CommandlineParser")
     {}
 };
 

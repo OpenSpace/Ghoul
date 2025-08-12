@@ -174,9 +174,10 @@ if (GHOUL_MODULE_ASSIMP)
     )
   endif ()
 
-  if (UNIX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # Clang started throwing these warnings in assimp
-    target_compile_options(assimp PRIVATE "-Wdeprecated-non-prototype")
+  if (MSVC)
+    target_compile_options(assimp PRIVATE "/W0")
+  else ()
+    target_compile_options(assimp PRIVATE "-w")
   endif ()
 
   set_target_properties(uninstall PROPERTIES FOLDER "External")

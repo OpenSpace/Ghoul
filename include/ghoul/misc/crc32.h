@@ -78,7 +78,7 @@ unsigned int hashCRC32File(const std::string& file);
  * \param len The length of the character array
  * \return The CRC32 hash of \p s
  */
-constexpr unsigned int operator "" _crc32(const char* s, size_t len);
+constexpr unsigned int operator ""_crc32(const char* s, size_t len);
 
 } // namespace ghoul
 

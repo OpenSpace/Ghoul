@@ -48,7 +48,7 @@
 namespace {
     constexpr std::string_view Ws = " \n\r\t";
 
-    struct ShaderPreprocessorError : public ghoul::RuntimeError {
+    struct ShaderPreprocessorError final : public ghoul::RuntimeError {
         explicit ShaderPreprocessorError(std::string msg)
             : RuntimeError(std::move(msg), "ShaderPreprocessor")
         {}

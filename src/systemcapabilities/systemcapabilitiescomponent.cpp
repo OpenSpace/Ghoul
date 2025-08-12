@@ -40,7 +40,7 @@ namespace {
 #ifdef WIN32
     /// Exception that will be thrown if there was an error regarding Windows'
     /// Management Instrumentation
-    struct WMIError : public ghoul::RuntimeError {
+    struct WMIError final : public ghoul::RuntimeError {
         explicit WMIError(std::string msg, HRESULT code)
             : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
             , message(std::move(msg))
@@ -152,11 +152,6 @@ IWbemServices* SystemCapabilitiesComponent::_iwbemServices = nullptr;
 // header, which is quite heavy, so we guard here against that type not changing
 static_assert(std::is_same_v<HRESULT, long>);
 
-SystemCapabilitiesComponent::WMIError::WMIError(std::string msg, long code)
-    : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
-    , message(std::move(msg))
-    , errorCode(std::move(code))
-{}
 #endif // WIN32
 
 SystemCapabilitiesComponent::SystemCapabilitiesComponent(

@@ -67,7 +67,7 @@ public:
     /**
      * Exception that is thrown if a specific shared memory did not exist.
      */
-    struct SharedMemoryNotFoundError : public SharedMemoryError {
+    struct SharedMemoryNotFoundError final : public SharedMemoryError {
         explicit SharedMemoryNotFoundError();
     };
 

@@ -200,8 +200,8 @@ TEST_CASE("MemoryPool: MemoryPool 2048 Reusing pointers", "[memorypool]") {
 }
 
 TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memorypool]") {
-    const unsigned long long alignment = alignof(max_align_t);
-    if (alignment == 8) {
+    constexpr unsigned long long alignment = alignof(max_align_t);
+    if constexpr (alignment == 8) {
         ghoul::MemoryPool<32> pool;
         REQUIRE(pool.occupancies().size() == 1);
         CHECK(pool.occupancies()[0] == 0);
@@ -223,7 +223,7 @@ TEST_CASE("MemoryPool: MemoryPool Reusing pointers w/o fragmentation", "[memoryp
         REQUIRE(pool.occupancies().size() == 1);
         CHECK(pool.occupancies()[0] == 32);
     }
-    else if (alignment == 16) {
+    else if constexpr (alignment == 16) {
         // Exactly the same test setup as the alignment == 8 part, but with doubled sizes
 
         ghoul::MemoryPool<64> pool;

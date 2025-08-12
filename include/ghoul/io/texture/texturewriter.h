@@ -46,7 +46,7 @@ class TextureWriterBase;
 class TextureWriter {
 public:
     /// Exception that gets thrown when there is no writer for the provided \p extension
-    struct MissingWriterException : public RuntimeError {
+    struct MissingWriterException final : public RuntimeError {
         explicit MissingWriterException(std::string extension);
         const std::string fileExtension;
     };

@@ -60,7 +60,7 @@ struct RuntimeError : public std::runtime_error {
 /**
  * Exception that is thrown if an IO access failed because a file could was not found.
  */
-struct FileNotFoundError : public RuntimeError {
+struct FileNotFoundError final : public RuntimeError {
     /**
      * Main constructor constructing the exception with the provided missing file \p f and
      * the component \p comp that threw the exception.
