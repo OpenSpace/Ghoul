@@ -321,25 +321,35 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
 
     namespace fs = std::filesystem;
     std::vector<std::filesystem::path> result;
-    if (fs::is_directory(path)) {
-        if (recursive) {
-            for (fs::directory_entry e : fs::recursive_directory_iterator(path)) {
-                if (filter(e)) {
-                    result.push_back(e.path());
+    try {
+        if (fs::is_directory(path)) {
+            if (recursive) {
+                for (fs::directory_entry e : fs::recursive_directory_iterator(path)) {
+                    if (filter(e)) {
+                        result.push_back(e.path());
+                    }
+                }
+            }
+            else {
+                for (fs::directory_entry e : fs::directory_iterator(path)) {
+                    if (filter(e)) {
+                        result.push_back(e.path());
+                    }
                 }
             }
         }
-        else {
-            for (fs::directory_entry e : fs::directory_iterator(path)) {
-                if (filter(e)) {
-                    result.push_back(e.path());
-                }
-            }
+        if (sorted) {
+            std::sort(result.begin(), result.end());
+
         }
     }
-    if (sorted) {
-        std::sort(result.begin(), result.end());
+    catch (const fs::filesystem_error& e) {
+        LERROR(std::format(
+            "Failed accessing directory {}, with error: {}", path, e.what()
+        ));
+        return {};
     }
+
     return result;
 }
 
