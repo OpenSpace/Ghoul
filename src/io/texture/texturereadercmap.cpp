@@ -55,7 +55,6 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 
     int width = 0;
     uint8_t* values = nullptr;
-//    std::vector<uint8_t> values;
 
     std::string line;
     int i = 0;
@@ -69,7 +68,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             continue;
         }
 
-        std::stringstream s(line);
+        std::stringstream s = std::stringstream(line);
         if (!values) {
             s >> width;
             values = new uint8_t[width * 4];
