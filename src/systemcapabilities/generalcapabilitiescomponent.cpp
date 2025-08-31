@@ -377,6 +377,8 @@ void GeneralCapabilitiesComponent::detectMemory() {
 void GeneralCapabilitiesComponent::detectCPU() {
     // @TODO This function needs cleanup ---abock
 #ifdef WIN32
+
+#ifndef _M_ARM64
     constexpr std::array<std::string_view, 32> szFeatures = {
         "fpu", "vme", "de", "pse", "tsc", "msr", "pae", "mce", "cx8", "apic", "Unknown1",
         "sep", "mtrr", "pge", "mca", "cmov", "pat", "pse36", "psn", "clflush", "Unknown2",
@@ -474,6 +476,13 @@ void GeneralCapabilitiesComponent::detectCPU() {
     SYSTEM_INFO systemInfo;
     GetNativeSystemInfo(&systemInfo);
     _cores = systemInfo.dwNumberOfProcessors;
+#else // // ^^^^ WIN32 // _M_ARM64 vvvv
+    _cpu = "arm64";
+
+    SYSTEM_INFO systemInfo;
+    GetNativeSystemInfo(&systemInfo);
+    _cores = systemInfo.dwNumberOfProcessors;
+#endif // _M_ARM64 
 #elif defined(__APPLE__)
     int mib[2];
     size_t len = 512;

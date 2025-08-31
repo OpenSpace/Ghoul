@@ -222,7 +222,7 @@ protected:
     unsigned int _installedMainMemory = 0;
 
     /// Information about the CPU
-    std::string _cpu = "";
+    std::string _cpu;
 
     /// Number of CPU cores
     unsigned int _cores = 0;
@@ -237,7 +237,7 @@ protected:
     unsigned int _cacheSize = 0;
 
     /// Available CPU extensions
-    std::string _extensions = "";
+    std::string _extensions;
 };
 
 } // namespace ghoul::systemcapabilities
