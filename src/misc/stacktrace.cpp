@@ -46,7 +46,7 @@
  */
 class VectorStackWalker : public StackWalker {
 public:
-    VectorStackWalker(StackWalkOptions level, std::vector<std::string>& vector_)
+    VectorStackWalker(int level, std::vector<std::string>& vector_)
         : StackWalker(level)
         , vector(vector_)
     {}
@@ -59,6 +59,8 @@ protected:
         // Remove trailing newline character
         str = str.substr(0, str.size() - 1);
         vector.push_back(str);
+
+        StackWalker::OnOutput(szText);
     }
 };
 
@@ -147,19 +149,7 @@ std::vector<std::string> stackTrace() {
     }
     free(strs);
 #elif WIN32
-    static VectorStackWalker sw(StackWalker::OptionsAll, stackFrames);
-    static bool IsInitialized = false;
-    if (!IsInitialized) {
-        // We only want to load the modules once as it is a very expensive operation
-        sw.LoadModules();
-        IsInitialized = true;
-    }
-
-    // The vector has to be set as the StackWalker library is statically initialized the
-    // first time this function is called (and thus with a different stackFrames
-    // reference. If this call is removed, invalid memory will be accessed
-    sw.vector = stackFrames;
-
+    VectorStackWalker sw = VectorStackWalker(StackWalker::OptionsAll, stackFrames);
     sw.ShowCallstack();
 #endif
 
