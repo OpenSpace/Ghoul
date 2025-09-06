@@ -201,18 +201,6 @@ target_link_libraries(Ghoul PUBLIC stb_image)
 set_target_properties(stb_image PROPERTIES FOLDER "External")
 end_dependency("stb_image")
 
-# Stackwalker
-if (MSVC)
-  begin_dependency("Stackwalker")
-  set(StackWalker_DISABLE_TESTS ON CACHE BOOL "" FORCE)
-  add_subdirectory(stackwalker)
-  target_link_libraries(Ghoul PRIVATE StackWalker)
-  set_target_properties(StackWalker PROPERTIES FOLDER "External")
-  # The StackWalker CMakeLists file is doing weird things, so we need to patch it here
-  target_include_directories(StackWalker PUBLIC stackwalker/Main/StackWalker)
-  end_dependency("Stackwalker")
-endif ()
-
 # WebSocket++ / WebSocketPP
 begin_dependency("WebSocketPP")
 include(ExternalProject)

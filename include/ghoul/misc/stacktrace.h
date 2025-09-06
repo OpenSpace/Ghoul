@@ -27,6 +27,9 @@
 #define __GHOUL___STACKTRACE___H__
 
 #include <string>
+#if WIN32
+#include <stacktrace>
+#endif
 #include <vector>
 
 namespace ghoul {
@@ -39,7 +42,11 @@ namespace ghoul {
  *
  * \return A list of the full stack trace at the calling site
  */
+#ifdef WIN32
+std::vector<std::string> stackTrace(std::stacktrace trace = std::stacktrace::current());
+#else // ^^^^ WIN32 // !WIN32 vvvv
 std::vector<std::string> stackTrace();
+#endif // WIN32
 
 } // namespace ghoul
 

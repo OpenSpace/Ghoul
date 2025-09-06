@@ -35,40 +35,15 @@
 #include <cstdlib>
 #include <cxxabi.h>
 #include <execinfo.h>
-#elif defined _MSC_VER
-#include <StackWalker.h>
 #endif
-
-#ifdef _MSC_VER
-/**
- * The internal class that is used by the StackWalker library to customize the output.
- * In our case, we want to store each stackframe in a vector.
- */
-class VectorStackWalker : public StackWalker {
-public:
-    VectorStackWalker(int level, std::vector<std::string>& vector_)
-        : StackWalker(level)
-        , vector(vector_)
-    {}
-
-    std::vector<std::string>& vector;
-
-protected:
-    void OnOutput(LPCSTR szText) override {
-        std::string str(szText);
-        // Remove trailing newline character
-        str = str.substr(0, str.size() - 1);
-        vector.push_back(str);
-
-        StackWalker::OnOutput(szText);
-    }
-};
-
-#endif // _MSC_VER
 
 namespace ghoul {
 
+#ifdef WIN32
+std::vector<std::string> stackTrace(std::stacktrace trace) {
+#else // ^^^^ WIN32 // !WIN32 vvvv
 std::vector<std::string> stackTrace() {
+#endif // WIN32
     std::vector<std::string> stackFrames;
 
 #if defined __unix__ || defined __APPLE__
@@ -149,8 +124,10 @@ std::vector<std::string> stackTrace() {
     }
     free(strs);
 #elif WIN32
-    VectorStackWalker sw = VectorStackWalker(StackWalker::OptionsAll, stackFrames);
-    sw.ShowCallstack();
+    stackFrames.reserve(trace.size());
+    for (const std::stacktrace_entry& e : trace) {
+        stackFrames.push_back(std::to_string(e));
+    }
 #endif
 
     return stackFrames;
