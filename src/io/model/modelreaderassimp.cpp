@@ -594,20 +594,20 @@ namespace {
 
         // Check animations
         if (scene.HasAnimations()) {
-            for (unsigned int a = 0; a < scene.mNumAnimations; ++a) {
+            for (unsigned int a = 0; a < scene.mNumAnimations; a++) {
                 aiAnimation* animation = scene.mAnimations[a];
                 if (modelAnimation->name() != animation->mName.C_Str()) {
                     continue;
                 }
 
-                for (unsigned int c = 0; c < animation->mNumChannels; ++c) {
+                for (unsigned int c = 0; c < animation->mNumChannels; c++) {
                     aiNodeAnim* nodeAnim = animation->mChannels[c];
 
                     if (nodeAnim->mNodeName == node.mName) {
                         ModelAnimation::NodeAnimation nodeAnimation;
                         nodeAnimation.node = newNode;
 
-                        for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; ++p) {
+                        for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; p++) {
                             const aiVectorKey posKey = nodeAnim->mPositionKeys[p];
 
                             ModelAnimation::PositionKeyframe positionKf;
@@ -624,7 +624,7 @@ namespace {
                             nodeAnimation.positions.push_back(std::move(positionKf));
                         }
 
-                        for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; ++r) {
+                        for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++) {
                             const aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
 
                             ModelAnimation::RotationKeyframe rotationKf;
@@ -642,7 +642,7 @@ namespace {
                             nodeAnimation.rotations.push_back(std::move(rotationKf));
                         }
 
-                        for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; ++s) {
+                        for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++) {
                             const aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
 
                             ModelAnimation::ScaleKeyframe scaleKeyframe;

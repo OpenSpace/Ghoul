@@ -114,7 +114,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
 
-    for (int32_t te = 0; te < nTextureEntries; ++te) {
+    for (int32_t te = 0; te < nTextureEntries; te++) {
         modelgeometry::ModelGeometry::TextureEntry textureEntry;
 
         // Name
@@ -203,7 +203,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     // Nodes
     std::vector<io::ModelNode> nodeArray;
     nodeArray.reserve(nNodes);
-    for (int32_t n = 0; n < nNodes; ++n) {
+    for (int32_t n = 0; n < nNodes; n++) {
         // Read how many meshes to read
         int32_t nMeshes = 0;
         fileStream.read(reinterpret_cast<char*>(&nMeshes), sizeof(int32_t));
@@ -218,7 +218,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Meshes
         std::vector<io::ModelMesh> meshArray;
         meshArray.reserve(nMeshes);
-        for (int32_t m = 0; m < nMeshes; ++m) {
+        for (int32_t m = 0; m < nMeshes; m++) {
             bool hasVertexColors = false;
             if (version >= VertexColorUpdateVersion) {
                 // HasVertexColors
@@ -240,7 +240,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             std::vector<io::ModelMesh::Vertex> vertexArray;
             vertexArray.reserve(nVertices);
 
-            for (int32_t v = 0; v < nVertices; ++v) {
+            for (int32_t v = 0; v < nVertices; v++) {
                 io::ModelMesh::Vertex vertex;
 
                 // Set the vertex size based on version
@@ -291,7 +291,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             std::vector<io::ModelMesh::Texture> textureArray;
             textureArray.reserve(nTextures);
 
-            for (int32_t t = 0; t < nTextures; ++t) {
+            for (int32_t t = 0; t < nTextures; t++) {
                 io::ModelMesh::Texture texture;
 
                 if (version >= SkipMarkerUpdateVersion) {
@@ -453,7 +453,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // NodeAnimations
         auto animation = std::make_unique<io::ModelAnimation>(name, duration);
         animation->nodeAnimations().reserve(nNodeAnimations);
-        for (int32_t na = 0; na < nNodeAnimations; ++na) {
+        for (int32_t na = 0; na < nNodeAnimations; na++) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
             // Node index
@@ -465,7 +465,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             uint32_t nPos = 0;
             fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint32_t));
             nodeAnimation.positions.reserve(nPos);
-            for (uint32_t p = 0; p < nPos; ++p) {
+            for (uint32_t p = 0; p < nPos; p++) {
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
@@ -486,7 +486,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             uint32_t nRot = 0;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
-            for (uint32_t r = 0; r < nRot; ++r) {
+            for (uint32_t r = 0; r < nRot; r++) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
@@ -506,7 +506,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             uint32_t nScale = 0;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
-            for (uint32_t s = 0; s < nScale; ++s) {
+            for (uint32_t s = 0; s < nScale; s++) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
