@@ -24,8 +24,6 @@
  *****************************************************************************************
  * The Linux/Mac code is taken from Sarang Baheti                                        *
  * www.nullptr.me/2013/04/14/generating-stack-trace-on-os-x/                             *
- *****************************************************************************************
- * The VectorStackWalker is taken from the Inviwo project found at http://www.inviwo.org *
  ****************************************************************************************/
 
 #include <ghoul/misc/stacktrace.h>
