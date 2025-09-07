@@ -223,7 +223,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorageArray;
     textureStorageArray.reserve(nTextureEntries);
 
-    for (int32_t te = 0; te < nTextureEntries; ++te) {
+    for (int32_t te = 0; te < nTextureEntries; te++) {
         modelgeometry::ModelGeometry::TextureEntry textureEntry;
 
         // Name
@@ -306,7 +306,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
     // Nodes
     std::vector<io::ModelNode> nodeArray;
     nodeArray.reserve(nNodes);
-    for (int32_t n = 0; n < nNodes; ++n) {
+    for (int32_t n = 0; n < nNodes; n++) {
         // Read how many meshes to read
         int32_t nMeshes = 0;
         fileStream.read(reinterpret_cast<char*>(&nMeshes), sizeof(int32_t));
@@ -321,7 +321,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Meshes
         std::vector<io::ModelMesh> meshArray;
         meshArray.reserve(nMeshes);
-        for (int32_t m = 0; m < nMeshes; ++m) {
+        for (int32_t m = 0; m < nMeshes; m++) {
             // HasVertexColors
             uint8_t col = 0;
             fileStream.read(reinterpret_cast<char*>(&col), sizeof(uint8_t));
@@ -339,7 +339,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             std::vector<io::ModelMesh::Vertex> vertexArray;
             vertexArray.reserve(nVertices);
 
-            for (int32_t v = 0; v < nVertices; ++v) {
+            for (int32_t v = 0; v < nVertices; v++) {
                 io::ModelMesh::Vertex vertex;
                 fileStream.read(
                     reinterpret_cast<char*>(&vertex),
@@ -381,7 +381,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             std::vector<io::ModelMesh::Texture> textureArray;
             textureArray.reserve(nTextures);
 
-            for (int32_t t = 0; t < nTextures; ++t) {
+            for (int32_t t = 0; t < nTextures; t++) {
                 io::ModelMesh::Texture texture;
 
                 // Skip marker
@@ -532,7 +532,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // NodeAnimations
         auto animation = std::make_unique<io::ModelAnimation>(name, duration);
         animation->nodeAnimations().reserve(nNodeAnimations);
-        for (int32_t na = 0; na < nNodeAnimations; ++na) {
+        for (int32_t na = 0; na < nNodeAnimations; na++) {
             io::ModelAnimation::NodeAnimation nodeAnimation;
 
             // Node index
@@ -544,7 +544,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint32_t nPos = 0;
             fileStream.read(reinterpret_cast<char*>(&nPos), sizeof(uint32_t));
             nodeAnimation.positions.reserve(nPos);
-            for (uint32_t p = 0; p < nPos; ++p) {
+            for (uint32_t p = 0; p < nPos; p++) {
                 io::ModelAnimation::PositionKeyframe posKeyframe;
 
                 // Position
@@ -565,7 +565,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint32_t nRot = 0;
             fileStream.read(reinterpret_cast<char*>(&nRot), sizeof(uint32_t));
             nodeAnimation.rotations.reserve(nRot);
-            for (uint32_t r = 0; r < nRot; ++r) {
+            for (uint32_t r = 0; r < nRot; r++) {
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
@@ -585,7 +585,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             uint32_t nScale = 0;
             fileStream.read(reinterpret_cast<char*>(&nScale), sizeof(uint32_t));
             nodeAnimation.scales.reserve(nScale);
-            for (uint32_t s = 0; s < nScale; ++s) {
+            for (uint32_t s = 0; s < nScale; s++) {
                 io::ModelAnimation::ScaleKeyframe scaleKeyframe;
 
                 // Scale
@@ -665,7 +665,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     }
     fileStream.write(reinterpret_cast<const char*>(&nTextureEntries), sizeof(int32_t));
 
-    for (int32_t te = 0; te < nTextureEntries; ++te) {
+    for (int32_t te = 0; te < nTextureEntries; te++) {
         // Name
         int32_t nameSize = static_cast<int32_t>(
             _textureStorage[te].name.size() * sizeof(char)
@@ -756,7 +756,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             }
             fileStream.write(reinterpret_cast<const char*>(&nVertices), sizeof(int32_t));
 
-            for (int32_t v = 0; v < nVertices; ++v) {
+            for (int32_t v = 0; v < nVertices; v++) {
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.vertices()[v]),
                     sizeof(io::ModelMesh::Vertex)
@@ -792,7 +792,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             }
             fileStream.write(reinterpret_cast<const char*>(&nTextures), sizeof(int32_t));
 
-            for (int32_t t = 0; t < nTextures; ++t) {
+            for (int32_t t = 0; t < nTextures; t++) {
                 // Don't save the debug texture to the cache
                 // Write matching skip marker
                 if (mesh.textures()[t].useForcedColor) {
@@ -845,7 +845,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                 if (mesh.textures()[t].hasTexture) {
                     // Search the textureStorage to find the texture entry
                     bool wasFound = false;
-                    for (size_t te = 0; te < _textureStorage.size(); ++te) {
+                    for (size_t te = 0; te < _textureStorage.size(); te++) {
                         if (_textureStorage[te].name ==
                             mesh.textures()[t].texture->name())
                         {
