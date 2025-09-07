@@ -66,7 +66,7 @@ void ModelMesh::generateDebugTexture(ModelMesh::Texture& texture) {
     texture.type = ModelMesh::TextureType::ColorDiffuse;
 }
 
-void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTransform,
+void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTransform,
                        bool isFullyTexturedModel, bool isProjection) const
 {
     // Count how many textures have image textures
@@ -195,7 +195,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4x4& meshTr
     glActiveTexture(GL_TEXTURE0);
 }
 
-float ModelMesh::calculateBoundingRadius(glm::mat4x4& transform) const {
+float ModelMesh::calculateBoundingRadius(glm::mat4& transform) const {
     // Calculate the bounding sphere of the mesh
     float maximumDistanceSquared = 0.f;
     for (const Vertex& v : _vertices) {

@@ -73,9 +73,9 @@ public:
 
     void initialize();
     void deinitialize();
-    void render(opengl::ProgramObject& program, const glm::mat4x4& meshTransform,
+    void render(opengl::ProgramObject& program, const glm::mat4& meshTransform,
         bool isFullyTexturedModel = true, bool isProjection = false) const;
-    float calculateBoundingRadius(glm::mat4x4& transform) const;
+    float calculateBoundingRadius(glm::mat4& transform) const;
 
     void setInvisible(bool isInvisible);
     bool isInvisible() const;

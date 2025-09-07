@@ -34,7 +34,7 @@
 #include <Windows.h>
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #include <cerrno>
 #include <cstring>
 #include <dirent.h>
@@ -43,11 +43,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#endif
+#endif // WIN32
 
 #if !defined(WIN32) && !defined(__APPLE__)
 #include <sys/inotify.h>
-#endif
+#endif // !defined(WIN32) && !defined(__APPLE__)
 
 namespace {
     constexpr std::string_view _loggerCat = "FileSystem";

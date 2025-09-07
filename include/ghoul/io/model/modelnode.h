@@ -35,7 +35,7 @@ namespace ghoul::io {
 
 class ModelNode {
 public:
-    ModelNode(glm::mat4x4 transform, std::vector<io::ModelMesh> meshes);
+    ModelNode(glm::mat4 transform, std::vector<io::ModelMesh> meshes);
 
     ModelNode(ModelNode&&) noexcept = default;
     ~ModelNode() noexcept = default;
@@ -43,19 +43,19 @@ public:
     void setParent(int parent);
     void setChildren(std::vector<int> children);
     void addChild(int child);
-    void setAnimation(const glm::mat4x4& animation);
+    void setAnimation(const glm::mat4& animation);
 
     std::vector<io::ModelMesh>& meshes();
     const std::vector<io::ModelMesh>& meshes() const;
     int parent() const;
     std::vector<int>& children();
     const std::vector<int>& children() const;
-    glm::mat4x4 transform() const;
-    glm::mat4x4 animationTransform() const;
+    glm::mat4 transform() const;
+    glm::mat4 animationTransform() const;
     bool hasAnimation() const;
 
 private:
-    // glm::mat4x4 is not noexcept move constructable, use an array instead for transform
+    // glm::mat4 is not noexcept move constructable, use an array instead for transform
     // Array is column major
     GLfloat _transform[16] = {
         1.f, 0.f, 0.f, 0.f,
