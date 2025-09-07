@@ -376,12 +376,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Transform
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        const glm::mat4x4 transform = glm::make_mat4(rawTransform);
+        const glm::mat4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         GLfloat rawAnimTransform[16];
         fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
-        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
+        const glm::mat4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
         int32_t parent = 0;

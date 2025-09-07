@@ -59,9 +59,8 @@ namespace {
         if (library) {
             FT_Done_FreeType(library);
         }
-        using namespace ghoul;
-        fontrendering::Error e = fontrendering::error(error);
-        throw RuntimeError(
+        ghoul::fontrendering::Error e = ghoul::fontrendering::error(error);
+        throw ghoul::RuntimeError(
             std::format(
                 "Error loading font '{}' for size '{}': {} {}",
                 name, size, e.code, e.message

@@ -57,14 +57,14 @@ namespace {
 
     std::string formatToString(ghoul::opengl::Texture::Format format) {
         switch (format) {
-            case ghoul::opengl::Texture::Format::Red: return "Red ";
-            case ghoul::opengl::Texture::Format::RG: return "RG  ";
-            case ghoul::opengl::Texture::Format::RGB: return "RGB ";
-            case ghoul::opengl::Texture::Format::BGR: return "BGR ";
-            case ghoul::opengl::Texture::Format::RGBA: return "RGBA";
-            case ghoul::opengl::Texture::Format::BGRA: return "BGRA";
+            case ghoul::opengl::Texture::Format::Red:            return "Red ";
+            case ghoul::opengl::Texture::Format::RG:             return "RG  ";
+            case ghoul::opengl::Texture::Format::RGB:            return "RGB ";
+            case ghoul::opengl::Texture::Format::BGR:            return "BGR ";
+            case ghoul::opengl::Texture::Format::RGBA:           return "RGBA";
+            case ghoul::opengl::Texture::Format::BGRA:           return "BGRA";
             case ghoul::opengl::Texture::Format::DepthComponent: return "Dept";
-            default: throw ghoul::MissingCaseException();
+            default:                                  throw ghoul::MissingCaseException();
         }
     }
 
@@ -82,22 +82,21 @@ namespace {
 
     std::string dataTypeToString(GLenum dataType) {
         switch (dataType) {
-            case GL_BYTE: return "byte";
-            case GL_UNSIGNED_BYTE: return "ubyt";
-            case GL_SHORT: return "shor";
+            case GL_BYTE:           return "byte";
+            case GL_UNSIGNED_BYTE:  return "ubyt";
+            case GL_SHORT:          return "shor";
             case GL_UNSIGNED_SHORT: return "usho";
-            case GL_INT: return "int ";
-            case GL_UNSIGNED_INT: return "uint";
-            case GL_FLOAT: return "floa";
-            case GL_DOUBLE: return "doub";
-            default: throw ghoul::MissingCaseException();
+            case GL_INT:            return "int ";
+            case GL_UNSIGNED_INT:   return "uint";
+            case GL_FLOAT:          return "floa";
+            case GL_DOUBLE:         return "doub";
+            default:                throw ghoul::MissingCaseException();
         }
     }
 
-
     void calculateBoundingRadiusRecursive(const std::vector<ghoul::io::ModelNode>& nodes,
                                           const ghoul::io::ModelNode* node,
-                                          const glm::mat4x4& parentTransform,
+                                          const glm::mat4& parentTransform,
                                           float& maximumDistanceSquared)
     {
         if (!node) {
@@ -106,7 +105,7 @@ namespace {
         }
 
         // NOTE: The bounding radius will not change along with an animation
-        glm::mat4x4 globalTransform = parentTransform * node->transform();
+        glm::mat4 globalTransform = parentTransform * node->transform();
 
         for (const ghoul::io::ModelMesh& mesh : node->meshes()) {
             const float d = mesh.calculateBoundingRadius(globalTransform);
@@ -126,7 +125,7 @@ namespace {
     void renderRecursive(const std::vector<ghoul::io::ModelNode>& nodes,
                          const ghoul::io::ModelNode* node,
                          ghoul::opengl::ProgramObject& program,
-                         const glm::mat4x4& parentTransform, bool isFullyTexturedModel,
+                         const glm::mat4& parentTransform, bool isFullyTexturedModel,
                          bool isProjection)
     {
         if (!node) {
@@ -134,7 +133,7 @@ namespace {
             return;
         }
 
-        glm::mat4x4 globalTransform;
+        glm::mat4 globalTransform;
         if (node->hasAnimation()) {
             // Animation is given by Assimp in absolute format
             // i.e. animation replaces old transform
@@ -456,12 +455,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         // Transform
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        const glm::mat4x4 transform = glm::make_mat4(rawTransform);
+        glm::mat4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         GLfloat rawAnimTransform[16];
         fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
-        const glm::mat4x4 animationTransform = glm::make_mat4(rawAnimTransform);
+        const glm::mat4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
         int32_t parent = 0;
@@ -870,11 +869,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         }
 
         // Transform
-        glm::mat4x4 transform = node.transform();
+        glm::mat4 transform = node.transform();
         fileStream.write(reinterpret_cast<const char*>(&transform), 16 * sizeof(GLfloat));
 
         // AnimationTransform
-        glm::mat4x4 animationTransform = node.animationTransform();
+        glm::mat4 animationTransform = node.animationTransform();
         fileStream.write(
             reinterpret_cast<const char*>(&animationTransform),
             16 * sizeof(GLfloat)
@@ -1071,7 +1070,7 @@ void ModelGeometry::calculateBoundingRadius() {
         return;
     }
 
-    const glm::mat4x4 parentTransform = glm::mat4x4(1.f);
+    const glm::mat4 parentTransform = glm::mat4(1.f);
     float maximumDistanceSquared = 0.f;
     calculateBoundingRadiusRecursive(
         _nodes,
@@ -1160,7 +1159,7 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedM
         return;
     }
 
-    const glm::mat4x4 parentTransform = glm::mat4x4(1.f);
+    const glm::mat4 parentTransform = glm::mat4(1.f);
     renderRecursive(
         _nodes,
         _nodes.data(),
