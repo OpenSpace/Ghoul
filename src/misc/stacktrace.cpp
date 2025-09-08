@@ -122,6 +122,9 @@ std::vector<std::string> stackTrace() {
     }
     free(strs);
 #elif WIN32
+    // Note that in order for the stackframes to work correctly on client machines,
+    // `_NT_SYMBOL_PATH` has to be defined as an environment variable
+
     stackFrames.reserve(trace.size());
     for (const std::stacktrace_entry& e : trace) {
         stackFrames.push_back(std::to_string(e));
