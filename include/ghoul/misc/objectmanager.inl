@@ -95,7 +95,7 @@ T* ObjectManager<T>::request(const std::string& name,
     }
     else {
         // If we found the name, we increase the reference counter and return the pointer
-        ++(it->second.refCount);
+        (it->second.refCount)++;
         return it->second.object.get();
     }
 }

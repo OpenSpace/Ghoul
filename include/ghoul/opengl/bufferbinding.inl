@@ -112,7 +112,7 @@ void BufferBinding<T>::assignBinding() {
         if (!_busyBindings[i]) {
             _number = static_cast<GLint>(i);
             _busyBindings[i] = true;
-            ++_totalActive;
+            _totalActive++;
             break;
         }
     }

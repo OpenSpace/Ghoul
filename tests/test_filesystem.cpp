@@ -85,14 +85,14 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     int count = 0;
     while ((b1 == false || b2 == false) && count < 100 * seconds) {
         Sleep(10);
-        ++count;
+        count++;
     }
 #else
     int count = 0;
     while ((!b1 || !b2) && count < 10000 * seconds) {
         usleep(100);
         FileSys.triggerFilesystemEvents();
-        ++count;
+        count++;
     }
 #endif
     REQUIRE(b1);
