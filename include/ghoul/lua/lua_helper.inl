@@ -439,7 +439,7 @@ void push(lua_State* L, T value) {
         for (glm::length_t i = 0; i < ghoul::glm_components<T>::value; i++) {
             lua_pushnumber(L, static_cast<lua_Number>(value[i]));
             lua_rawseti(L, -2, number);
-            ++number;
+            number++;
         }
     }
     else if constexpr (isGlmMatrix<T>()) {
@@ -449,7 +449,7 @@ void push(lua_State* L, T value) {
             for (glm::length_t j = 0; j < T::type::col_type::length(); j++) {
                 lua_pushnumber(L, static_cast<lua_Number>(value[i][j]));
                 lua_rawseti(L, -2, number);
-                ++number;
+                number++;
             }
         }
     }

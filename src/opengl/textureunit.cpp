@@ -103,7 +103,7 @@ void TextureUnit::assignUnit() {
             _number = static_cast<GLint>(i);
             _glEnum = GL_TEXTURE0 + _number;
             _busyUnits[i] = true;
-            ++_totalActive;
+            _totalActive++;
             break;
         }
     }

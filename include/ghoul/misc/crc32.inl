@@ -83,7 +83,7 @@ constexpr unsigned int hashCRC32(const char* s) {
         res = CRC32Table[
             static_cast<unsigned char>(res) ^ static_cast<unsigned char>(*s)
         ] ^ (res >> 8);
-        ++s;
+        s++;
     }
 
     return res ^ 0xFFFFFFFF;

@@ -73,7 +73,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
     int counter = 0;
     for (const Texture& texture : _textures) {
         if (texture.hasTexture) {
-            ++counter;
+            counter++;
         }
     }
 
@@ -123,7 +123,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                     texture.texture->bind();
 
                     // Advance the texture unit index
-                    ++textureUnitIndex;
+                    textureUnitIndex++;
                 }
                 // Use embedded simple colors instead of textures
                 else {
@@ -162,7 +162,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                         texture.texture->bind();
 
                         // Advance the texture unit index
-                        ++textureUnitIndex;
+                        textureUnitIndex++;
                         break;
                     }
                     // Use embedded simple colors instead of textures
@@ -338,14 +338,14 @@ void ModelMesh::initialize() {
         switch (texture.type) {
             case TextureType::TextureDiffuse:
             case TextureType::ColorDiffuse:
-                ++nDiffuse;
+                nDiffuse++;
                 break;
             case TextureType::TextureSpecular:
             case TextureType::ColorSpecular:
-                ++nSpecular;
+                nSpecular++;
                 break;
             case TextureType::TextureNormal:
-                ++nNormal;
+                nNormal++;
                 break;
         }
 
