@@ -121,7 +121,7 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
         }
 
         const int l = std::underlying_type_t<LogLevel>(level);
-        ++(_logCounters[l]);
+        (_logCounters[l])++;
     }
 }
 

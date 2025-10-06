@@ -572,7 +572,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     if (file) {
         while (fgets(line, maxSize, file) != nullptr) {
             if (strncmp(line, "processor", 9) == 0) {
-                ++_cores;
+                _cores++;
             }
             if (strncmp(line, "model name", 10) == 0) {
                 _cpu = line;
