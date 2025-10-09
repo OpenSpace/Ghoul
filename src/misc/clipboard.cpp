@@ -97,31 +97,9 @@ std::string clipboardText() {
     return "";
 #else
     std::string text;
-    // Try UTF8_STRING first
-    if (exec("xclip -o -selection clipboard -target UTF8_STRING", text)) {
-        if (!text.empty() && text.back() == '\n') {
-            text.pop_back();
-        }
-        return text;
+    if (exec("timeout --kill-after=0.2s 0.3s xclip -o -sel c -f", text)) {
+        return text.substr(0, text.length());  // remove a line ending
     }
-
-    // Fallback: try text/plain;charset=utf-8
-    if (exec("xclip -o -selection clipboard -target text/plain;charset=utf-8", text)) {
-        if (!text.empty() && text.back() == '\n') {
-            text.pop_back();
-        }
-        return text;
-    }
-
-    // Final fallback: default text/plain
-    if (exec("xclip -o -selection clipboard -target text/plain", text)) {
-        if (!text.empty() && text.back() == '\n') {
-            text.pop_back();
-        }
-        return text;
-    }
-
-    // If all else fails
     return "";
 #endif
 }
