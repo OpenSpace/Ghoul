@@ -26,6 +26,7 @@
 #ifndef __GHOUL___STRINGHELPER___H__
 #define __GHOUL___STRINGHELPER___H__
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -132,6 +133,23 @@ std::istream& getline(std::istream& inputStream, std::string& str);
  * \return The same as parameter inputStream
  */
 std::istream& getline(std::istream& inputStream, std::string& str, char delim);
+
+/**
+ * Converts a filesystem path into a ASCII safe string by replacing all non-ASCII
+ * characters.
+ *
+ * \param p The path to convert to ASCII safe string
+ * \param replacement The character to replace non-ASCII characters with
+ * \return The resulting ASCII safe path string
+ */
+std::string toAsciiSafePathString(const std::filesystem::path& p, char replacement = '?');
+
+/**
+ * Checks whether a given filesystem path contain non-ASCII characters.
+ *
+ * \return True if the path contains non-ASCII characters, false otherwise
+ */
+bool containsNonAscii(const std::filesystem::path& p);
 
 } // namespace ghoul
 
