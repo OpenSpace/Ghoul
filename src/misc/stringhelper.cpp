@@ -194,4 +194,52 @@ std::istream& getline(std::istream& inputStream, std::string& str, char delim) {
     return inputStream;
 }
 
+std::string toAsciiSafePathString(const std::filesystem::path& p, char replacement) {
+    std::u8string s8 = p.generic_u8string();
+    std::string result;
+    result.reserve(s8.size());
+
+    for (size_t i = 0; i < s8.size(); ) {
+        unsigned char byte = s8[i];
+
+        size_t charLen = 1;
+
+        // Determine length of UTF-8 character
+        if ((byte & 0b10000000) == 0) {
+            charLen = 1; // ASCII
+        }
+        else if ((byte & 0b11100000) == 0b11000000) {
+            charLen = 2; // 2-byte UTF-8
+        }
+        else if ((byte & 0b11110000) == 0b11100000) {
+            charLen = 3; // 3-byte UTF-8
+        }
+        else if ((byte & 0b11111000) == 0b11110000) {
+            charLen = 4; // 4-byte UTF-8
+        }
+
+        // If ASCII, copy as-is; otherwise, replace with replacement character
+        if (charLen == 1) {
+            result.push_back(static_cast<char>(byte));
+        }
+        else {
+            result.push_back(replacement);
+        }
+
+        i += charLen;
+    }
+
+    return result;
+}
+
+bool containsNonAscii(const std::filesystem::path& p) {
+    const std::u8string s = p.generic_u8string();
+    for (auto it = s.begin(); it != s.end(); it++) {
+        if (static_cast<unsigned char>(*it) > 0x7F) {
+            return true;
+        }
+    }
+    return false;
+};
+
 } // namespace ghoul
