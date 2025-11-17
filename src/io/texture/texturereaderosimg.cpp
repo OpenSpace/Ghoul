@@ -35,7 +35,7 @@
 
 namespace {
     constexpr int8_t CurrentMajorVersion = 0;
-    constexpr int8_t CurrentMinorVersion = 1;
+    constexpr int8_t CurrentMinorVersion = 2;
 }
 
 namespace ghoul::io {
@@ -55,7 +55,9 @@ std::unique_ptr<opengl::Texture> TextureReaderOsImg::loadTexture(
 
     std::ifstream fileStream(filename, std::ifstream::binary);
     if (!fileStream.good()) {
-        throw ghoul::RuntimeError(std::format("Could not open OS image file {}", filename));
+        throw ghoul::RuntimeError(std::format(
+            "Could not open OS image file {}", filename
+        ));
     }
 
     // First read the header
@@ -79,31 +81,66 @@ std::unique_ptr<opengl::Texture> TextureReaderOsImg::loadTexture(
     int height = 0;
     fileStream.read(reinterpret_cast<char*>(&height), sizeof(uint32_t));
 
-    // TODO: Read the number of channels
+    // Read the number of channels
+    int8_t nChannels = 0;
+    fileStream.read(reinterpret_cast<char*>(&nChannels), sizeof(uint8_t));
+    ghoul_assert(nChannels > 0, "Number of channels must be greater than zero");
+    ghoul_assert(nChannels <= 4, "Maximum 4 channels are supported for textures");
 
     // Min and max value
-    float minValue = 0.f;
-    fileStream.read(reinterpret_cast<char*>(&minValue), sizeof(float));
-    float maxValue = 0.f;
-    fileStream.read(reinterpret_cast<char*>(&maxValue), sizeof(float));
+    std::vector<float> minValues(nChannels);
+    fileStream.read(reinterpret_cast<char*>(minValues.data()), nChannels * sizeof(float));
+    std::vector<float> maxValues(nChannels);
+    fileStream.read(reinterpret_cast<char*>(maxValues.data()), nChannels * sizeof(float));
 
-    // Now read the pixel data
+    // Read the pixel data
     const size_t nPixels = static_cast<size_t>(width) * static_cast<size_t>(height);
-    std::vector<float> values(nPixels);
-    fileStream.read(reinterpret_cast<char*>(values.data()), nPixels * sizeof(float));
+    std::vector<float> values(nPixels * nChannels);
+    fileStream.read(
+        reinterpret_cast<char*>(values.data()),
+        nPixels * nChannels * sizeof(float)
+    );
 
-    // Scale the pixel values using the min and max values
-    const float scale = maxValue - minValue;
-    for (float& v : values) {
-        v = minValue + v / scale;
+    // Scale the pixel values for each channel using the respective min and max values
+    for (int c = 0; c < nChannels; c++) {
+        const float minValue = minValues[c];
+        const float scale = maxValues[c] - minValue;
+
+        for (int p = 0; p < nPixels; p++) {
+            values[p * nChannels + c] = minValue + values[p * nChannels + c] / scale;
+        }
+    }
+
+    // Determine the texture formats based on the number of channels
+    opengl::Texture::Format format = opengl::Texture::Format::Red;
+    GLenum internalFormat = GL_RED;
+    switch (nChannels) {
+        case 1:
+            format = opengl::Texture::Format::Red;
+            internalFormat = GL_RED;
+            break;
+        case 2:
+            format = opengl::Texture::Format::RG;
+            internalFormat = GL_RG;
+            break;
+        case 3:
+            format = opengl::Texture::Format::RGB;
+            internalFormat = GL_RGB;
+            break;
+        case 4:
+            format = opengl::Texture::Format::RGBA;
+            internalFormat = GL_RGBA;
+        default:
+            // This should never happen due to the earlier asserts
+            throw ghoul::MissingCaseException();
     }
 
     return std::make_unique<opengl::Texture>(
         values.data(),
-        glm::size3_t(width, height, 1),
+        glm::size3_t(width, height, 4),
         GL_TEXTURE_2D,
-        opengl::Texture::Format::Red,
-        GL_RED,
+        format,
+        internalFormat,
         GL_FLOAT
     );
 }
