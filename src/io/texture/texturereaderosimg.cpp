@@ -108,7 +108,7 @@ std::unique_ptr<opengl::Texture> TextureReaderOsImg::loadTexture(
         const float scale = maxValues[c] - minValue;
 
         for (int p = 0; p < nPixels; p++) {
-            values[p * nChannels + c] = minValue + values[p * nChannels + c] / scale;
+            values[p * nChannels + c] = (values[p * nChannels + c] - minValue) / scale;
         }
     }
 
