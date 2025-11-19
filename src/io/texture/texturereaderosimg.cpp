@@ -95,9 +95,10 @@ std::unique_ptr<opengl::Texture> TextureReaderOsImg::loadTexture(
 
     // Read the pixel data
     const size_t nPixels = static_cast<size_t>(width) * static_cast<size_t>(height);
-    std::vector<float> values(nPixels * nChannels);
+    float* values = new float[nPixels * static_cast<size_t>(nChannels)];
+    std::memset(values, 0, nPixels * static_cast<size_t>(nChannels));
     fileStream.read(
-        reinterpret_cast<char*>(values.data()),
+        reinterpret_cast<char*>(values),
         nPixels * nChannels * sizeof(float)
     );
 
@@ -113,31 +114,32 @@ std::unique_ptr<opengl::Texture> TextureReaderOsImg::loadTexture(
 
     // Determine the texture formats based on the number of channels
     opengl::Texture::Format format = opengl::Texture::Format::Red;
-    GLenum internalFormat = GL_RED;
+    GLenum internalFormat = GL_R32F;
     switch (nChannels) {
         case 1:
             format = opengl::Texture::Format::Red;
-            internalFormat = GL_RED;
+            internalFormat = GL_R32F;
             break;
         case 2:
             format = opengl::Texture::Format::RG;
-            internalFormat = GL_RG;
+            internalFormat = GL_RG32F;
             break;
         case 3:
             format = opengl::Texture::Format::RGB;
-            internalFormat = GL_RGB;
+            internalFormat = GL_RGB32F;
             break;
         case 4:
             format = opengl::Texture::Format::RGBA;
-            internalFormat = GL_RGBA;
+            internalFormat = GL_RGBA32F;
+            break;
         default:
             // This should never happen due to the earlier asserts
             throw ghoul::MissingCaseException();
     }
 
     return std::make_unique<opengl::Texture>(
-        values.data(),
-        glm::size3_t(width, height, 4),
+        values,
+        glm::size3_t(width, height, 1),
         GL_TEXTURE_2D,
         format,
         internalFormat,
