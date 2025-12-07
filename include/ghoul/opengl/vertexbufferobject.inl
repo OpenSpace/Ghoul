@@ -29,7 +29,7 @@ namespace ghoul::opengl {
 
 template <typename T>
 void VertexBufferObject::initialize(const std::vector<T>& vertexArray,
-                                                   const std::vector<GLint>& indexArray)
+                                    const std::vector<GLint>& indexArray)
 {
     static_assert(std::is_trivially_copyable_v<T>, "T has to be trivially copyable");
 

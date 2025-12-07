@@ -40,7 +40,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <filesystem>
-#include <fstream>
 #include <memory>
 #include <vector>
 

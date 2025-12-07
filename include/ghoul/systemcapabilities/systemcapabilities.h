@@ -30,7 +30,6 @@
 
 #include <ghoul/misc/exception.h>
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace ghoul::systemcapabilities {

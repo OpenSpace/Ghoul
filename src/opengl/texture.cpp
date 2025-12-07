@@ -362,7 +362,7 @@ void Texture::setMipMapLevel(int mipMapLevel) {
     applyFilter();
 }
 
-void Texture::applyWrapping() {
+void Texture::applyWrapping() const {
     ZoneScoped;
 
     bind();
@@ -389,7 +389,7 @@ void Texture::applySwizzleMask() {
     }
 }
 
-void Texture::uploadDataToTexture(void* pixelData) {
+void Texture::uploadDataToTexture(void* pixelData) const {
     bind();
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, _pixelAlignment);
@@ -439,7 +439,7 @@ void Texture::uploadDataToTexture(void* pixelData) {
     }
 }
 
-void Texture::reUploadDataToTexture(void* pixelData) {
+void Texture::reUploadDataToTexture(void* pixelData) const {
     bind();
 
     switch (_type) {

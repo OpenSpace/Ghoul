@@ -33,14 +33,13 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#include <tchar.h>
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "Kernel32.lib")
 typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
-#else
+#else // ^^^ WIN32 | !WIN32 vvv
 #include <sys/utsname.h>
-#endif
+#endif // WIN32
 
 namespace {
     constexpr std::string_view _loggerCat = "OpenGLCapabilities";
@@ -49,7 +48,7 @@ namespace {
 namespace ghoul::systemcapabilities {
 
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponentError::
-    OpenGLCapabilitiesComponentError(std::string msg)
+OpenGLCapabilitiesComponentError(std::string msg)
     : RuntimeError(std::move(msg), "OpenGLCapabilitiesComponent")
 {}
 

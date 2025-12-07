@@ -30,7 +30,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringconversion.h>
-#include <string>
+#include <string_view>
 
 namespace ghoul::logging {
 

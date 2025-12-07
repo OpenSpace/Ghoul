@@ -26,6 +26,7 @@
 #ifndef __GHOUL___BASE64___H__
 #define __GHOUL___BASE64___H__
 
+#include <cstdint>
 #include <string_view>
 #include <vector>
 

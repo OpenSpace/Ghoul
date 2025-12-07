@@ -28,8 +28,7 @@
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/misc/stringconversion.h>
-#include <map>
+#include <string_view>
 
 #ifdef WIN32
 #include <wbemidl.h>

@@ -31,7 +31,7 @@
 namespace ghoul {
 
 RuntimeError::RuntimeError(std::string msg, std::string comp)
-    : std::runtime_error(comp.empty() ? msg : "(" + comp + ") " + msg)
+    : std::runtime_error(comp.empty() ? msg : std::format("({}) {}", comp, msg))
     , message(std::move(msg))
     , component(std::move(comp))
 {

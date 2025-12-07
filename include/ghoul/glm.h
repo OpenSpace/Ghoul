@@ -68,7 +68,6 @@
 #include <glm/ext/matrix_common.hpp>
 #include <glm/gtx/component_wise.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include <string>
 
 namespace {

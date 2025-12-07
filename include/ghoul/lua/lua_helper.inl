@@ -33,7 +33,6 @@
 #include <algorithm>
 #include <charconv>
 #include <filesystem>
-#include <format>
 #include <optional>
 #include <type_traits>
 #include <variant>

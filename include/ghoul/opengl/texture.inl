@@ -53,7 +53,7 @@ T& Texture::texel(unsigned int x, unsigned int y) {
     return (reinterpret_cast<T*>(_pixels)[y * _dimensions.x + x]);
 }
 
-template<class T>
+template <class T>
 const T& Texture::texel(unsigned int x, unsigned int y) const {
     ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
     ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
@@ -77,7 +77,7 @@ T& Texture::texel(const glm::uvec2& position) {
     return (reinterpret_cast<T*>(_pixels)[(position.y * _dimensions.x) + position.x]);
 }
 
-template<class T>
+template <class T>
 const T& Texture::texel(const glm::uvec2& position) const {
     ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
     ghoul_assert(
@@ -103,7 +103,7 @@ T& Texture::texel(unsigned int x, unsigned int y, unsigned int z) {
                                           (y * _dimensions.x) + x]);
 }
 
-template<class T>
+template <class T>
 const T& Texture::texel(unsigned int x, unsigned int y, unsigned int z) const {
     ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
     ghoul_assert(x < _dimensions.x, "x must be smaller than the width of the Texture");
@@ -134,7 +134,7 @@ T& Texture::texel(const glm::uvec3& position) {
         (position.y * _dimensions.x) + position.x]);
 }
 
-template<class T>
+template <class T>
 const T& Texture::texel(const glm::uvec3& position) const {
     ghoul_assert(sizeof(T) == _bpp, "Size of T must be equal to texel size");
     ghoul_assert(

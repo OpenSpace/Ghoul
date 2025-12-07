@@ -30,7 +30,6 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <algorithm>
-#include <map>
 #include <vector>
 
 namespace {

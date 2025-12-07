@@ -25,7 +25,6 @@
 
 #include <ghoul/opengl/programobject.h>
 
-#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -73,7 +72,7 @@ ProgramObject::ProgramObjectError::ProgramObjectError(std::string msg)
 {}
 
 ProgramObject::ProgramObjectLinkingError::ProgramObjectLinkingError(std::string msg,
-                                                                         std::string name)
+                                                                    std::string name)
     : ProgramObjectError(
         name.empty() ?
         std::format("Error linking program object: {}", msg) :

@@ -25,8 +25,6 @@
 
 #include <ghoul/misc/templatefactory.h>
 
-#include <ghoul/misc/dictionary.h>
-
 namespace ghoul {
 
 TemplateFactoryError::TemplateFactoryError(std::string msg)

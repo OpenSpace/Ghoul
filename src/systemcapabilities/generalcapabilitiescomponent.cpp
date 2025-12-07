@@ -28,10 +28,11 @@
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
-#include <algorithm>
 #include <array>
+#include <exception>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #ifdef WIN32
 #include <intrin.h>

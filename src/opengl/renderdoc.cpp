@@ -50,22 +50,24 @@ void loadRenderDoc() {
     }
 #endif // WIN32
 
-    if (getApi) {
-        const int ret = getApi(
-            eRENDERDOC_API_Version_1_6_0,
-            reinterpret_cast<void**>(&renderdocApi)
-        );
-        if (!ret) {
-            LERRORC("RenderDoc", "Error loading API");
-            return;
-        }
-
-        int major = 0;
-        int minor = 0;
-        int patch = 0;
-        renderdocApi->GetAPIVersion(&major, &minor, &patch);
-        LINFOC("RenderDoc", std::format("Loaded API {}.{}.{}", major, minor, patch));
+    if (!getApi) {
+        return;
     }
+
+    const int ret = getApi(
+        eRENDERDOC_API_Version_1_6_0,
+        reinterpret_cast<void**>(&renderdocApi)
+    );
+    if (!ret) {
+        LERRORC("RenderDoc", "Error loading API");
+        return;
+    }
+
+    int major = 0;
+    int minor = 0;
+    int patch = 0;
+    renderdocApi->GetAPIVersion(&major, &minor, &patch);
+    LINFOC("RenderDoc", std::format("Loaded API {}.{}.{}", major, minor, patch));
 }
 
 } // namespace ghoul::opengl

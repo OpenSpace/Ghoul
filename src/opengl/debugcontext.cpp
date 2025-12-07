@@ -26,8 +26,6 @@
 #include <ghoul/opengl/debugcontext.h>
 
 #include <ghoul/misc/assert.h>
-#include <ghoul/misc/exception.h>
-#include <map>
 #include <type_traits>
 
 namespace ghoul::opengl::debug {

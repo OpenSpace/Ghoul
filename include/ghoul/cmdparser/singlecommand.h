@@ -43,7 +43,7 @@ class SingleCommand : public CommandlineCommand {};
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T>
+template <typename T>
 class SingleCommand<T> : public CommandlineCommand {
 public:
     /**
@@ -97,7 +97,7 @@ protected:
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T, typename U>
+template <typename T, typename U>
 class SingleCommand<T, U> : public CommandlineCommand {
 public:
     /**
@@ -156,7 +156,7 @@ protected:
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T, typename U, typename V>
+template <typename T, typename U, typename V>
 class SingleCommand<T, U, V> : public CommandlineCommand {
 public:
     /**
@@ -220,7 +220,7 @@ protected:
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T, typename U, typename V, typename W>
+template <typename T, typename U, typename V, typename W>
 class SingleCommand<T, U, V, W> : public CommandlineCommand {
 public:
     /**

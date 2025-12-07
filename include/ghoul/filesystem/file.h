@@ -28,7 +28,6 @@
 
 #include <filesystem>
 #include <functional>
-#include <string>
 
 namespace ghoul::filesystem {
 

@@ -27,8 +27,6 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/dictionary.h>
-#include <cmath>
-#include <functional>
 #include <numeric>
 #include <string>
 

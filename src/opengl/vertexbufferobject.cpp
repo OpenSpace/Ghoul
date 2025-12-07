@@ -127,7 +127,7 @@ void VertexBufferObject::unbind() const {
     glBindVertexArray(0);
 }
 
-void VertexBufferObject::render() {
+void VertexBufferObject::render() const {
     glBindVertexArray(_vaoID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
     glDrawElements(_mode, _iSize, GL_UNSIGNED_INT, nullptr);

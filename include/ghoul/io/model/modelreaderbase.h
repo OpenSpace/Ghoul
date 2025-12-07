@@ -26,9 +26,7 @@
 #ifndef __GHOUL___MODELREADERBASE___H__
 #define __GHOUL___MODELREADERBASE___H__
 
-#include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/opengl/ghoul_gl.h>
 #include <filesystem>
 #include <memory>
 #include <string>

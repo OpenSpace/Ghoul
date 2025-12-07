@@ -27,7 +27,6 @@
 #define __GHOUL___SOCKETSERVER___H__
 
 #include <memory>
-#include <string>
 
 namespace ghoul::io {
 

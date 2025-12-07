@@ -110,7 +110,7 @@ std::string Log::dateString() {
     GetLocalTime(&t);
 
     return std::format("{}-{:0>2}-{:0>2}", t.wYear, t.wMonth, t.wDay);
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     auto now = std::chrono::system_clock::now();
     const time_t time = std::chrono::system_clock::to_time_t(now);
 
@@ -118,7 +118,7 @@ std::string Log::dateString() {
 
     ss << std::put_time(std::localtime(&time), "%F");
     return ss.str();
-#endif
+#endif // WIN32
 }
 
 std::string Log::createFullMessageString(LogLevel level, std::string_view category,

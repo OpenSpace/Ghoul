@@ -29,7 +29,6 @@
 #include <ghoul/misc/assert.h>
 #include <array>
 #include <cstddef>
-#include <cstring>
 #include <memory>
 
 #if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))

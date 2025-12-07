@@ -28,8 +28,8 @@
 
 #include <ghoul/io/socket/socketserver.h>
 
-#include <ghoul/io/socket/sockettype.h>
 #include <ghoul/io/socket/tcpsocket.h>
+#include <ghoul/io/socket/sockettype.h>
 #include <condition_variable>
 #include <deque>
 #include <memory>

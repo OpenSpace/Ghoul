@@ -36,12 +36,11 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
+#include <ghoul/opengl/texture.h>
 #include <memory>
 #include <vector>
 
 namespace ghoul::opengl {
-
-class Texture;
 
 /**
  * This class represents a texture atlas which automatically organizes smaller textures
