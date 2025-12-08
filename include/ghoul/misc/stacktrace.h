@@ -27,9 +27,9 @@
 #define __GHOUL___STACKTRACE___H__
 
 #include <string>
-#if WIN32
+#ifdef WIN32
 #include <stacktrace>
-#endif
+#endif // WIN32
 #include <vector>
 
 namespace ghoul {

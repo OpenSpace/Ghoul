@@ -240,6 +240,6 @@ bool containsNonAscii(const std::filesystem::path& p) {
         }
     }
     return false;
-};
+}
 
 } // namespace ghoul
