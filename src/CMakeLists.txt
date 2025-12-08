@@ -89,6 +89,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/map.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.inl
