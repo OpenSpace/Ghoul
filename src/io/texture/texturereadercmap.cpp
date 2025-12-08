@@ -127,6 +127,37 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void*, size_t, i
     return nullptr;
 }
 
+glm::ivec2 TextureReaderCMAP::imageSize(const std::filesystem::path& filename) const {
+    std::ifstream file;
+    file.exceptions(std::ifstream::failbit);
+    file.open(filename, std::ifstream::in);
+    file.exceptions(std::ifstream::goodbit);
+
+    int width = 0;
+
+    std::string line;
+    while (ghoul::getline(file, line)) {
+        // Skip empty lines
+        if (line.empty() || line == "\r") {
+            continue;
+        }
+        // # defines a comment
+        if (line[0] == '#') {
+            continue;
+        }
+
+        std::stringstream s = std::stringstream(line);
+        s >> width;
+        return glm::ivec2(width, 1);
+    }
+
+    throw TextureLoadException(
+        filename,
+        "The first non-comment, non-empty line must contain the image width",
+        this
+    );
+}
+
 std::vector<std::string> TextureReaderCMAP::supportedExtensions() const {
     return { "cmap" };
 }

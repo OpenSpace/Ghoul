@@ -99,6 +99,23 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
     return reader->loadTexture(memory, size, nDimensions);
 }
 
+glm::ivec2 TextureReader::imageSize(const std::filesystem::path& filename) const {
+    ghoul_assert(!_readers.empty(), "No readers were registered before");
+
+    std::string extension = std::filesystem::path(filename).extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
+    ghoul_assert(!extension.empty(), "Filename must have an extension");
+
+    TextureReaderBase* reader = readerForExtension(extension);
+    if (!reader) {
+        throw MissingReaderException(extension, filename);
+    }
+
+    return reader->imageSize(filename);
+}
+
 std::vector<std::string> TextureReader::supportedExtensions() {
     std::vector<std::string> result;
     for (const std::unique_ptr<TextureReaderBase>& i : _readers) {
@@ -112,7 +129,7 @@ void TextureReader::addReader(std::unique_ptr<TextureReaderBase> reader) {
     _readers.push_back(std::move(reader));
 }
 
-TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) {
+TextureReaderBase* TextureReader::readerForExtension(const std::string& extension) const {
     const std::string lowerExtension = toLowerCase(extension);
 
     for (const std::unique_ptr<TextureReaderBase>& reader : _readers) {

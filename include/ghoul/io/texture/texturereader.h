@@ -124,6 +124,19 @@ public:
         int nDimensions, const std::string& format = "");
 
     /**
+     * Returns the size of the image pointed to by \p filename.
+     *
+     * \param filename The image file that should be inspected
+     * \return The size of the image in pixels
+     *
+     * \throw TextureLoadException If there was an error loading the texture
+     * \pre \p filename must not be empty
+     * \pre The extension of \p filename must be among the supported extensions as
+     *      reported by supportedExtensions
+     */
+    glm::ivec2 imageSize(const std::filesystem::path& filename) const;
+
+    /**
      * Returns a list of all the extensions that are supported by registered readers. If
      * a file with an extension included in this list is passed to the loadTexture file
      * and the file is not corrupted, it will be successfully loaded.
@@ -151,7 +164,7 @@ private:
      * \return The first match of a reader that can read the provided \p extension, or
      *         `nullptr` if no such reader exists
      */
-    TextureReaderBase* readerForExtension(const std::string& extension);
+    TextureReaderBase* readerForExtension(const std::string& extension) const;
 
     /// The list of all registered readers
     std::vector<std::unique_ptr<TextureReaderBase>> _readers;

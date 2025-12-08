@@ -142,7 +142,16 @@ std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory, siz
     );
 
     return load(data, x, y, n, "Memory", this, nDimensions);
+}
 
+glm::ivec2 TextureReaderSTB::imageSize(const std::filesystem::path& filename) const {
+    const std::string f = filename.string();
+    int x = 0;
+    int y = 0;
+    int n = 0;
+    stbi_load(f.c_str(), &x, &y, &n, 0);
+
+    return glm::ivec2(x, y);
 }
 
 std::vector<std::string> TextureReaderSTB::supportedExtensions() const {

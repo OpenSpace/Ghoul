@@ -68,6 +68,19 @@ public:
         size_t size, int nDimensions) const override;
 
     /**
+     * Returns the size of the image pointed to by \p filename.
+     *
+     * \param filename The image file that should be inspected
+     * \return The size of the image in pixels
+     *
+     * \throw TextureLoadException If there was an error loading the texture
+     * \pre \p filename must not be empty
+     * \pre The extension of \p filename must be among the supported extensions as
+     *      reported by supportedExtensions
+     */
+    virtual glm::ivec2 imageSize(const std::filesystem::path& filename) const;
+
+    /**
      * Returns the supported file extensions.
      *
      * \return The supported file extensions

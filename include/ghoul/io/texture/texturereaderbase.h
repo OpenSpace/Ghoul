@@ -26,6 +26,7 @@
 #ifndef __GHOUL___TEXTUREREADERBASE___H__
 #define __GHOUL___TEXTUREREADERBASE___H__
 
+#include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <memory>
@@ -94,6 +95,19 @@ public:
      */
     virtual std::unique_ptr<opengl::Texture> loadTexture(void* memory,
         size_t size, int nDimensions) const = 0;
+
+    /**
+     * Returns the size of the image pointed to by \p filename.
+     *
+     * \param filename The image file that should be inspected
+     * \return The size of the image in pixels
+     *
+     * \throw TextureLoadException If there was an error loading the texture
+     * \pre \p filename must not be empty
+     * \pre The extension of \p filename must be among the supported extensions as
+     *      reported by supportedExtensions
+     */
+    virtual glm::ivec2 imageSize(const std::filesystem::path& filename) const = 0;
 
     /**
      * Returns a list of all extensions that this TextureReaderBase supports.
