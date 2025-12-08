@@ -25,14 +25,9 @@
 
 #include <ghoul/io/model/modelgeometry.h>
 
-#include <ghoul/filesystem/file.h>
-#include <ghoul/filesystem/filesystem.h>
-#include <ghoul/io/texture/texturereader.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 #include <ghoul/misc/profiling.h>
-#include <ghoul/misc/templatefactory.h>
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 

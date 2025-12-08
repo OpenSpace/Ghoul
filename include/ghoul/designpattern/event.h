@@ -33,7 +33,7 @@
 
 namespace ghoul {
 
-template<typename... T>
+template <typename... T>
 class Event {
 public:
     using Callback = std::function<void(const T&...)>;

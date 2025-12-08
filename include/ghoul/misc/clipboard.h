@@ -27,6 +27,7 @@
 #define __GHOUL___CLIPBOARD___H__
 
 #include <string>
+#include <string_view>
 
 namespace ghoul {
 
@@ -46,7 +47,7 @@ std::string clipboardText();
  *
  * \throw RuntimeError If there was an error writing the text to the clipboard
  */
-void setClipboardText(const std::string& text);
+void setClipboardText(std::string_view text);
 
 } // namespace ghoul
 

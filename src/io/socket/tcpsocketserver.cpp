@@ -71,10 +71,10 @@ namespace {
 #ifdef WIN32
             shutdown(socket, SD_BOTH);
             closesocket(socket);
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
             shutdown(socket, SHUT_RDWR);
             ::close(socket);
-#endif
+#endif // WIN32
         }
     }
 

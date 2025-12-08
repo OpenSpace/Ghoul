@@ -27,11 +27,9 @@
 
 #include <ghoul/format.h>
 #include <ghoul/glm.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
 #include <stb_image.h>
-#include <iostream>
 
 namespace {
     std::unique_ptr<ghoul::opengl::Texture> load(unsigned char* data, int x, int y,

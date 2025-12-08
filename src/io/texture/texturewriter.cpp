@@ -25,8 +25,6 @@
 
 #include <ghoul/io/texture/texturewriter.h>
 
-#include <ghoul/filesystem/filesystem.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/format.h>
 #include <ghoul/io/texture/texturewriterbase.h>
 #include <ghoul/opengl/texture.h>

@@ -96,7 +96,7 @@ public:
      *
      * \pre VertexBufferObject must not have been initialized before
      */
-    template<typename T>
+    template <typename T>
     void initialize(const std::vector<T>& vertexArray,
         const std::vector<GLint>& indexArray);
 
@@ -138,7 +138,7 @@ public:
     /**
      * Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
      */
-    void render();
+    void render() const;
 
 private:
     /**

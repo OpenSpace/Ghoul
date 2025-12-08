@@ -27,7 +27,7 @@
 
 namespace ghoul::io {
 
-std::atomic<int> Socket::_nextSocketId{ 0 };
+std::atomic<int> Socket::_nextSocketId = std::atomic<int>(0);
 
 Socket::Socket() : _socketId(_nextSocketId++) {}
 

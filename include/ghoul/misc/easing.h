@@ -30,7 +30,7 @@
 #ifndef __GHOUL___EASING___H__
 #define __GHOUL___EASING___H__
 
-#include <string>
+#include <string_view>
 
 namespace ghoul {
 

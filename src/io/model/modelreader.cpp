@@ -26,7 +26,6 @@
 #include <ghoul/io/model/modelreader.h>
 
 #include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/format.h>
 #include <ghoul/io/model/modelreaderbase.h>

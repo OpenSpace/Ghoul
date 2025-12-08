@@ -23,7 +23,6 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 
 namespace ghoul::opengl {

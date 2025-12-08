@@ -115,7 +115,7 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
 
     return std::make_unique<opengl::Texture>(
         values,
-        glm::size3_t(width, 1, 1),
+        glm::uvec3(width, 1, 1),
         GL_TEXTURE_1D,
         opengl::Texture::Format::RGBA
     );

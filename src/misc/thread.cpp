@@ -26,13 +26,12 @@
 #include <ghoul/misc/thread.h>
 
 #include <ghoul/misc/assert.h>
-#include <ghoul/misc/exception.h>
 
 #ifdef WIN32
 #include <Windows.h>
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #include <pthread.h>
-#endif
+#endif // WIN32
 
 namespace ghoul::thread {
 namespace {

@@ -26,7 +26,6 @@
 #include <ghoul/logging/bufferlog.h>
 
 #include <ghoul/format.h>
-#include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <atomic>
 #include <fstream>

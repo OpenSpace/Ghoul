@@ -25,10 +25,6 @@
 
 #include <ghoul/io/model/modelnode.h>
 
-#include <ghoul/format.h>
-#include <ghoul/logging/logmanager.h>
-#include <glm/gtc/type_ptr.hpp>
-
 namespace ghoul::io {
 
 ModelNode::ModelNode(glm::mat4 transform, std::vector<io::ModelMesh> meshes)

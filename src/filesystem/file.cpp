@@ -26,23 +26,8 @@
 #include <ghoul/filesystem/file.h>
 
 #include <ghoul/filesystem/filesystem.h>
-#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <filesystem>
-
-#ifdef WIN32
-#include <Windows.h>
-#else // ^^^^ WIN32 // !WIN32 vvvv
-#include <ctime>
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif // WIN32
-
-#ifdef WIN32
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif // _CRT_SECURE_NO_WARNINGS
-#endif // WIN32
 
 namespace ghoul::filesystem {
 

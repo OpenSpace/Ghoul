@@ -26,7 +26,6 @@
 #include <ghoul/io/socket/websocketserver.h>
 
 #include <ghoul/io/socket/websocket.h>
-#include <ghoul/logging/logmanager.h>
 
 namespace ghoul::io {
 

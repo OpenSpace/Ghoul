@@ -26,12 +26,10 @@
 #ifndef __GHOUL___CACHEMANAGER___H__
 #define __GHOUL___CACHEMANAGER___H__
 
-#include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <map>
 #include <optional>
-#include <string>
+#include <string_view>
 
 namespace ghoul::filesystem {
 

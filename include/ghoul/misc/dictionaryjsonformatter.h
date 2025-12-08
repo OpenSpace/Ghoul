@@ -28,6 +28,8 @@
 
 #include <ghoul/misc/exception.h>
 
+#include <string>
+
 namespace ghoul {
 
 class Dictionary;

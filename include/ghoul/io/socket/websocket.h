@@ -28,16 +28,14 @@
 
 #include <ghoul/io/socket/tcpsocket.h>
 
-#include <ghoul/misc/exception.h>
-
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable: 4244 4267)
 #endif // WIN32
 
 #include <websocketpp/config/core.hpp>
-#include <websocketpp/common/functional.hpp>
-#include <websocketpp/server.hpp>
+#include <websocketpp/endpoint.hpp>
+#include <websocketpp/roles/server_endpoint.hpp>
 
 #ifdef WIN32
 #pragma warning(pop)

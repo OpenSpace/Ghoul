@@ -26,6 +26,7 @@
 #ifndef __GHOUL___CSVREADER___H__
 #define __GHOUL___CSVREADER___H__
 
+#include <filesystem>
 #include <string>
 #include <vector>
 

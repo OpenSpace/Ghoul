@@ -25,7 +25,6 @@
 
 #include <ghoul/ghoul.h>
 
-#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/lua/lua_helper.h>
 #include <ghoul/misc/profiling.h>

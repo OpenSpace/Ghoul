@@ -36,7 +36,6 @@
 #include <deque>
 #include <mutex>
 #include <thread>
-#include <unordered_map>
 #include <functional>
 
 struct addrinfo;

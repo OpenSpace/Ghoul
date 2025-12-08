@@ -27,14 +27,6 @@
 #include <algorithm>
 #include <numeric>
 
-#if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
-#include <experimental/memory_resource>
-namespace pmr = std::experimental::pmr;
-#else
-#include <memory_resource>
-namespace pmr = std::pmr;
-#endif
-
 namespace {
     constexpr int DebugByte = 0x0F;
     constexpr int AlignmentByte = 0x1F;

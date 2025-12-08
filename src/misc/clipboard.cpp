@@ -27,8 +27,6 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/format.h>
-#include <algorithm>
-#include <sstream>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -126,7 +124,7 @@ std::string clipboardText() {
 #endif
 }
 
-void setClipboardText(const std::string& text) {
+void setClipboardText(std::string_view text) {
 #ifdef WIN32
     HANDLE hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.length() + 1);
     if (!hData) {
@@ -138,7 +136,8 @@ void setClipboardText(const std::string& text) {
         GlobalFree(hData);
         throw RuntimeError("Error acquiring lock", "Clipboard");
     }
-    std::memcpy(ptrData, text.c_str(), text.length() + 1);
+    std::memset(ptrData, 0, text.length() + 1);
+    std::memcpy(ptrData, text.data(), text.length());
 
     GlobalUnlock(hData);
 

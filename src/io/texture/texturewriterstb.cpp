@@ -27,7 +27,6 @@
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/texture.h>
-#include <stb_image.h>
 #include <stb_image_write.h>
 #include <filesystem>
 #include <string_view>

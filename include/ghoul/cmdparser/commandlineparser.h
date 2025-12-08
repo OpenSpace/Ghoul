@@ -27,7 +27,6 @@
 #define __GHOUL___COMMANDLINEPARSER___H__
 
 #include <ghoul/misc/boolean.h>
-#include <ghoul/misc/exception.h>
 #include <memory>
 #include <string>
 #include <vector>

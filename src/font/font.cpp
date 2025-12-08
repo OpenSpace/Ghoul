@@ -32,11 +32,9 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/profiling.h>
-#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/textureatlas.h>
 #include <algorithm>
 #include <array>
-#include <tuple>
 
 namespace {
     // Sizes in FT are given in 1/64th of pt
