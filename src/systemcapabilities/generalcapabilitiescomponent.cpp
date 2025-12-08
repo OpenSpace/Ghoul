@@ -483,7 +483,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     SYSTEM_INFO systemInfo;
     GetNativeSystemInfo(&systemInfo);
     _cores = systemInfo.dwNumberOfProcessors;
-#endif // _M_ARM64 
+#endif // _M_ARM64
 #elif defined(__APPLE__)
     int mib[2];
     size_t len = 512;

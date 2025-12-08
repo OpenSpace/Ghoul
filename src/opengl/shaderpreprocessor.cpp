@@ -191,7 +191,7 @@ namespace {
 
             // We need to check for the termination of the for loop already here or else
             // the next `continue` will always be called once it starts
-            bool isLineProcessed = parseEndFor(line); 
+            bool isLineProcessed = parseEndFor(line);
 
             // Check for an empty for loop. This can happen when the loop variables is
             // evaluated to be never true
@@ -276,7 +276,7 @@ namespace {
     std::string Env::output() {
         return _output.str();
     }
-    
+
     bool Env::parseFor(std::string_view line) {
         constexpr std::string_view ForString = "#for";
 
@@ -402,12 +402,12 @@ namespace {
         }
         return true;
     }
-    
+
     bool Env::parseInclude(std::string_view line) {
         constexpr std::string_view IncludeString = "#include";
 
         ghoul::trimWhitespace(line);
-        
+
         if (!line.starts_with(IncludeString)) {
             return false;
         }
@@ -626,7 +626,7 @@ namespace {
 
         return res;
     }
-    
+
     void Env::addLineNumber() {
         const std::filesystem::path filename = _inputFiles.back().file;
         auto it = std::find(_includedFiles.begin(), _includedFiles.end(), filename);
