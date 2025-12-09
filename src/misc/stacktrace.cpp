@@ -64,7 +64,7 @@ std::vector<std::string> stackTrace() {
         std::vector<char> functionSymbol(MaxFunctionSymbolLength);
         std::vector<char> moduleName(MaxModuleNameLength);
         std::vector<char> addr(MaxAddressLength);
-        int  offset = 0;
+        int offset = 0;
 
         //
         // Typically this is how the backtrace looks like:

@@ -26,7 +26,9 @@
 #ifndef __GHOUL___CONSTMAP___H__
 #define __GHOUL___CONSTMAP___H__
 
+#include <array>
 #include <optional>
+#include <utility>
 
 template <typename Key, typename Value, int Size>
 struct Map {

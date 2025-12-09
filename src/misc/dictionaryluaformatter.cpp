@@ -27,8 +27,10 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/dictionary.h>
+#include <iterator>
 #include <numeric>
-#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace ghoul {
 

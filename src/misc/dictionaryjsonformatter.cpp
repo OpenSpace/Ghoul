@@ -27,9 +27,17 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/dictionary.h>
+#include <algorithm>
+#include <charconv>
+#include <cmath>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <sstream>
+#include <string_view>
+#include <system_error>
+#include <type_traits>
+#include <utility>
 
 namespace ghoul {
 

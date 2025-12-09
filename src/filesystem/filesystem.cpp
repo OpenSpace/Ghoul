@@ -27,9 +27,14 @@
 
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
+#include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/misc/profiling.h>
+#include <algorithm>
+#include <string_view>
+#include <utility>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -245,7 +250,6 @@ void FileSystem::triggerFilesystemEvents() {
     SleepEx(0, TRUE);
 #endif
 }
-
 
 #ifdef WIN32
 std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {

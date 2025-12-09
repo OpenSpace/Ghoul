@@ -28,8 +28,6 @@
 
 #include <ghoul/logging/log.h>
 
-#include <ghoul/misc/boolean.h>
-
 namespace ghoul::logging {
 
 /**

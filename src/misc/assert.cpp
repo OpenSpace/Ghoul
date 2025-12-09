@@ -29,8 +29,14 @@
 #include <ghoul/misc/stacktrace.h>
 #include <ghoul/misc/stringhelper.h>
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
+#include <utility>
 #include <vector>
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif // _MSC_VER
 
 namespace {
     constexpr bool AlwaysAssert = false;
@@ -59,7 +65,8 @@ namespace ghoul {
 
 AssertionException::AssertionException(std::string exp, std::string msg,
                                        std::string file, std::string func, int line)
-    : std::runtime_error(std::format("{}, \"{}\" ({}:{} ({})",
+    : std::runtime_error(std::format(
+        "{}, \"{}\" ({}:{} ({})",
         std::move(exp), std::move(msg), std::move(file), line, std::move(func)
     ))
 {}

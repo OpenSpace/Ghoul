@@ -26,11 +26,15 @@
 #ifndef __GHOUL___SHADEROBJECT___H__
 #define __GHOUL___SHADEROBJECT___H__
 
+#include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderpreprocessor.h>
+#include <filesystem>
 #include <functional>
 #include <string>
+#include <string_view>
+#include <type_traits>
 
 namespace ghoul::filesystem { class File; }
 

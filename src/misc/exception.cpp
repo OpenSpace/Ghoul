@@ -27,6 +27,7 @@
 
 #include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
+#include <utility>
 
 namespace ghoul {
 

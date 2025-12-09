@@ -31,17 +31,27 @@
 #include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/io/model/modelmesh.h>
+#include <ghoul/io/model/modelnode.h>
+#include <ghoul/io/model/modelreaderbase.h>
 #include <ghoul/io/texture/texturereader.h>
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
-#include <assimp/scene.h>
+#include <assimp/anim.h>
+#include <assimp/color4.h>
 #include <assimp/Importer.hpp>
+#include <assimp/material.h>
+#include <assimp/mesh.h>
 #include <assimp/postprocess.h>
-#include <filesystem>
-#include <memory>
-#include <vector>
+#include <assimp/scene.h>
+#include <assimp/texture.h>
+#include <assimp/types.h>
+#include <algorithm>
+#include <cstdlib>
+#include <limits>
+#include <string_view>
+#include <utility>
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelReaderAssimp";

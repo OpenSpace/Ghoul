@@ -26,10 +26,10 @@
 #include <ghoul/io/texture/texturereadercmap.h>
 
 #include <ghoul/format.h>
-#include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
+#include <cstdint>
 #include <fstream>
 #include <sstream>
 

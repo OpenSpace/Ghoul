@@ -38,6 +38,7 @@
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/texture.h>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace ghoul::opengl {

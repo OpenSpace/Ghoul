@@ -28,8 +28,6 @@
 
 #include <ghoul/cmdparser/commandlinecommand.h>
 
-#include <vector>
-
 namespace ghoul::cmdparser {
 
 template <typename... T>

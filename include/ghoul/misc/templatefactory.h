@@ -30,8 +30,10 @@
 #include <ghoul/misc/memorypool.h>
 #include <functional>
 #include <map>
+#include <memory_resource>
 #include <string>
 #include <string_view>
+#include <typeinfo>
 #include <vector>
 
 namespace ghoul {

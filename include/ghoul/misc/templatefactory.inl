@@ -27,6 +27,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/dictionary.h>
 #include <type_traits>
+#include <utility>
 
 namespace ghoul {
 
@@ -248,15 +249,13 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
 }
 
 template <typename BaseClass>
-bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const
-{
+bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
     ghoul_assert(!className.empty(), "Classname must not be empty");
     return (_map.find(className) != _map.end());
 }
 
 template <typename BaseClass>
-std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const
-{
+std::vector<std::string> TemplateFactory<BaseClass>::registeredClasses() const {
     std::vector<std::string> result;
     result.reserve(_map.size());
     for (const std::pair<const std::string, FactoryFunction>& it : _map) {

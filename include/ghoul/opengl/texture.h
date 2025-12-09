@@ -32,7 +32,7 @@
 #include <array>
 #include <string>
 
-//#define Debugging_Ghoul_Textures_Indices
+// #define Debugging_Ghoul_Textures_Indices
 
 namespace ghoul::opengl {
 

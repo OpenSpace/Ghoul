@@ -36,6 +36,7 @@
 #endif // WIN32
 
 #include <websocketpp/config/core.hpp>
+#include <websocketpp/roles/server_endpoint.hpp>
 #include <websocketpp/server.hpp>
 
 #ifdef WIN32
@@ -44,6 +45,7 @@
 
 namespace ghoul::io {
 
+class Socket;
 class WebSocket;
 
 class WebSocketServer : public SocketServer {

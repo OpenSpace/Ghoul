@@ -25,6 +25,7 @@
 
 #include <ghoul/misc/interpolator.h>
 
+#include <ghoul/misc/assert.h>
 #include <glm/gtx/quaternion.hpp>
 
 namespace ghoul {

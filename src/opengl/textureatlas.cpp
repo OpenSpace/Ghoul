@@ -28,7 +28,7 @@
 #include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/opengl/texture.h>
+#include <utility>
 
 namespace ghoul::opengl {
 

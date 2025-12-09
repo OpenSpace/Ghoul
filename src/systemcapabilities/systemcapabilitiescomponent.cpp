@@ -27,12 +27,15 @@
 
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
-#include <string_view>
+#include <type_traits>
+#include <utility>
 
 #ifdef WIN32
-#include <wbemidl.h>
+#include <Windows.h>
 #include <comdef.h>
+#include <comutil.h>
+#include <WbemCli.h>
+#include <wbemidl.h>
 #endif // WIN32
 
 namespace {

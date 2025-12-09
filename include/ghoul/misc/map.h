@@ -26,6 +26,7 @@
 #ifndef __GHOUL___MAP___H__
 #define __GHOUL___MAP___H__
 
+#include <functional>
 #include <string>
 #include <string_view>
 

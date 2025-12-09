@@ -26,8 +26,9 @@
 #include <ghoul/misc/easing.h>
 
 #include <ghoul/format.h>
+#include <algorithm>
 #include <array>
-#include <string_view>
+#include <type_traits>
 
 namespace {
 

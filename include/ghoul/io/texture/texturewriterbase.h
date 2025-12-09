@@ -27,9 +27,10 @@
 #define __GHOUL___TEXTUREWRITERBASE___H__
 
 #include <ghoul/misc/exception.h>
-#include <ghoul/opengl/texture.h>
 #include <string>
 #include <vector>
+
+namespace ghoul::opengl { class Texture; }
 
 namespace ghoul::io {
 

@@ -28,7 +28,6 @@
 
 #include <ghoul/logging/log.h>
 
-#include <ghoul/misc/boolean.h>
 #include <filesystem>
 #include <fstream>
 #include <mutex>

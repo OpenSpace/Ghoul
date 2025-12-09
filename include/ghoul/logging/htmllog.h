@@ -28,7 +28,6 @@
 
 #include <ghoul/logging/textlog.h>
 
-#include <filesystem>
 #include <vector>
 
 namespace ghoul::logging {

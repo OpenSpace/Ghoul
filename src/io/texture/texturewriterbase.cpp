@@ -26,6 +26,7 @@
 #include <ghoul/io/texture/texturewriterbase.h>
 
 #include <ghoul/format.h>
+#include <utility>
 
 namespace ghoul::io {
 

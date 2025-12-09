@@ -28,6 +28,8 @@
 
 #include <ghoul/io/model/modelreaderbase.h>
 
+namespace ghoul::modelgeometry { class ModelGeometry; }
+
 namespace ghoul::io {
 
 /**

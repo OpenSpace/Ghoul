@@ -31,7 +31,6 @@
 #include <ghoul/io/socket/sockettype.h>
 #include <ghoul/misc/exception.h>
 #include <array>
-#include <atomic>
 #include <condition_variable>
 #include <deque>
 #include <mutex>

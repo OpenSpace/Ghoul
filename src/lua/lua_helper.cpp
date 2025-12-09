@@ -30,8 +30,9 @@
 #include <ghoul/lua/ghoul_lua.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/stringhelper.h>
-#include <filesystem>
-#include <string>
+#include <cstring>
+#include <stdexcept>
+#include <vector>
 
 namespace {
 

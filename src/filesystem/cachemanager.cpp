@@ -26,9 +26,15 @@
 #include <ghoul/filesystem/cachemanager.h>
 
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
+#include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringhelper.h>
 #include <fstream>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -169,7 +175,7 @@ CacheManager::CacheManager(std::filesystem::path directory)
     ghoul_assert(std::filesystem::is_directory(_directory), "Directory must exit");
 
     const std::filesystem::path cacheFile = _directory / CacheFile;
-    std::ifstream file(cacheFile);
+    std::ifstream file = std::ifstream(cacheFile);
     if (file.good()) {
         std::string line;
         ghoul::getline(file, line);

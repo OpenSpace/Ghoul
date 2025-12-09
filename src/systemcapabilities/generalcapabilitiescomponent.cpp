@@ -27,11 +27,10 @@
 
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
 #include <array>
+#include <cstring>
 #include <exception>
 #include <sstream>
-#include <string>
 #include <utility>
 
 #ifdef WIN32
@@ -42,16 +41,16 @@
 #pragma comment(lib, "Kernel32.lib")
 typedef void (WINAPI* PGNSI)(LPSYSTEM_INFO);
 typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #ifdef __APPLE__
 #include <sys/sysctl.h>
-#else
+#else // ^^^^ __APPLE__ // !__APPLE__vvvv
 #include <sys/types.h>
 #include <sys/sysinfo.h>
 #include <cstring>
-#endif
+#endif // __APPLE__
 #include <sys/utsname.h>
-#endif
+#endif // WIN32
 
 namespace ghoul {
 

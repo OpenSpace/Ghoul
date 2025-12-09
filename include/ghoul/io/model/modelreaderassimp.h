@@ -28,10 +28,15 @@
 
 #include <ghoul/io/model/modelreaderbase.h>
 
+#include <filesystem>
+#include <memory>
+#include <string>
 #include <vector>
 
 struct aiMesh;
 struct aiScene;
+
+namespace ghoul::modelgeometry { class ModelGeometry; }
 
 namespace ghoul::io {
 

@@ -25,9 +25,9 @@
 
 #include <ghoul/logging/textlog.h>
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
-#include <filesystem>
 
 namespace ghoul::logging {
 

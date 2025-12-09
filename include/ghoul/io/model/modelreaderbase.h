@@ -30,6 +30,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace ghoul::modelgeometry { class ModelGeometry; }
 

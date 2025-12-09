@@ -24,6 +24,8 @@
  ****************************************************************************************/
 
 #include <ghoul/misc/stringhelper.h>
+#include <type_traits>
+#include <utility>
 
 namespace ghoul::cmdparser {
 

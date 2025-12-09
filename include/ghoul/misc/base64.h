@@ -39,7 +39,7 @@ namespace ghoul {
  * \param base64 The Base64-encoded input string.
  * \return A vector containing the decoded bytes.
  */
-std::vector<uint8_t> decodeBase64(const std::string_view base64);
+std::vector<uint8_t> decodeBase64(std::string_view base64);
 
 } // namespace ghoul
 

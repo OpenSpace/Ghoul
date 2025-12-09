@@ -27,7 +27,9 @@
 #define __GHOUL___STRINGHELPER___H__
 
 #include <filesystem>
+#include <istream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace ghoul {

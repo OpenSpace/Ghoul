@@ -45,12 +45,16 @@
 
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/thread.h>
+#include <atomic>
+#include <condition_variable>
+#include <functional>
 #include <future>
 #include <memory>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <tuple>
+#include <vector>
 
 namespace ghoul {
 

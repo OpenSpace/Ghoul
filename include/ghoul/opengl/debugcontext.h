@@ -32,6 +32,7 @@
 #include <ghoul/misc/stringconversion.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace ghoul::opengl::debug {

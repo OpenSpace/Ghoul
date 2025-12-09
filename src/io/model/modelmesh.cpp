@@ -26,9 +26,13 @@
 #include <ghoul/io/model/modelmesh.h>
 
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/textureunit.h>
+#include <cstddef>
+#include <string>
+#include <utility>
 
 namespace {
     std::string textureTypeToString(const ghoul::io::ModelMesh::TextureType& type) {

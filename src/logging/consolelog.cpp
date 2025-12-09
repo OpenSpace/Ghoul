@@ -28,8 +28,8 @@
 #include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
+#include <algorithm>
 #include <iostream>
-#include <string_view>
 #include <syncstream>
 
 #ifdef WIN32
@@ -75,8 +75,11 @@ namespace ghoul::logging {
 
 ConsoleLog::ConsoleLog(ColorOutput colorOutput, LogLevel minimumLogLevel)
     : Log(
-        Log::TimeStamping::No, Log::DateStamping::No, Log::CategoryStamping::Yes,
-        Log::LogLevelStamping::Yes, minimumLogLevel
+        Log::TimeStamping::No,
+        Log::DateStamping::No,
+        Log::CategoryStamping::Yes,
+        Log::LogLevelStamping::Yes,
+        minimumLogLevel
     )
     , _colorOutput(colorOutput)
 {}

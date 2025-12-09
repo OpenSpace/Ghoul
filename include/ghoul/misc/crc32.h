@@ -33,6 +33,7 @@
 #define __GHOUL___CRC32___H__
 
 #include <string>
+#include <string_view>
 
 namespace ghoul {
 

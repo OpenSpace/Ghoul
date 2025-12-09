@@ -25,8 +25,11 @@
 
 #include <ghoul/misc/dictionary.h>
 
+#include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>
+#include <cstring>
+#include <utility>
 
 namespace {
     // Boolean constant used to check whether a value T is part of a parameter pack Ts

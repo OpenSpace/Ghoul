@@ -27,10 +27,6 @@
 #define __GHOUL___MODELREADER___H__
 
 #include <ghoul/misc/exception.h>
-#include <filesystem>
-#include <memory>
-#include <string>
-#include <vector>
 
 namespace ghoul::modelgeometry { class ModelGeometry; }
 

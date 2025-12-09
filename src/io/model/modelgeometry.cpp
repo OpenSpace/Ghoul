@@ -25,11 +25,21 @@
 
 #include <ghoul/io/model/modelgeometry.h>
 
+#include <ghoul/format.h>
+#include <ghoul/io/model/modelmesh.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/invariants.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
-#include <fstream>
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <fstream>
+#include <limits>
+#include <string_view>
+#include <utility>
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelGeometry";
@@ -47,7 +57,7 @@ namespace {
         else if (format == "RGBA") { return Format::RGBA; }
         else if (format == "BGRA") { return Format::BGRA; }
         else if (format == "Dept") { return Format::DepthComponent; }
-        else { throw ghoul::MissingCaseException(); }
+        else                       { throw ghoul::MissingCaseException(); }
     }
 
     std::string formatToString(ghoul::opengl::Texture::Format format) {
@@ -72,7 +82,7 @@ namespace {
         else if (dataType == "uint") { return GL_UNSIGNED_INT; }
         else if (dataType == "floa") { return GL_FLOAT; }
         else if (dataType == "doub") { return GL_DOUBLE; }
-        else { throw ghoul::MissingCaseException(); }
+        else                         { throw ghoul::MissingCaseException(); }
     }
 
     std::string dataTypeToString(GLenum dataType) {
@@ -894,10 +904,10 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     }
 
     // Animation
-    uint8_t a = _animation != nullptr ? 1 : 0;
+    uint8_t a = _animation ? 1 : 0;
     fileStream.write(reinterpret_cast<const char*>(&a), sizeof(uint8_t));
 
-    if (_animation != nullptr) {
+    if (_animation) {
         // Name
         if (_animation->name().size() >= std::numeric_limits<uint8_t>::max()) {
             LWARNING(std::format(

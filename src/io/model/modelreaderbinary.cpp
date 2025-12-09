@@ -26,9 +26,16 @@
 #include <ghoul/io/model/modelreaderbinary.h>
 
 #include <ghoul/io/model/modelgeometry.h>
+#include <ghoul/io/model/modelmesh.h>
+#include <ghoul/io/model/modelanimation.h>
+#include <ghoul/io/model/modelnode.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/texture.h>
+#include <cstdint>
 #include <fstream>
+#include <string_view>
+#include <cstddef>
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelReaderBinary";

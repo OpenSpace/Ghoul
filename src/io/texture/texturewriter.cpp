@@ -30,8 +30,7 @@
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
 #include <filesystem>
-
-using std::string;
+#include <utility>
 
 namespace ghoul::io {
 
@@ -45,7 +44,9 @@ TextureWriter& TextureWriter::ref() {
     return textureWriter;
 }
 
-void TextureWriter::saveTexture(const opengl::Texture& texture, const string& filename) {
+void TextureWriter::saveTexture(const opengl::Texture& texture,
+                                const std::string& filename)
+{
     ghoul_assert(!_writers.empty(), "No writers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 

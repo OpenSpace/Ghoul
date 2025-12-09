@@ -25,6 +25,8 @@
 
 #include <ghoul/cmdparser/singlecommand.h>
 
+#include <utility>
+
 namespace ghoul::cmdparser {
 
 SingleCommandZeroArguments::SingleCommandZeroArguments(std::optional<bool>& ptr,

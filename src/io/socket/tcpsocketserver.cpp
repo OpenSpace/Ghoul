@@ -27,7 +27,9 @@
 
 #include <ghoul/format.h>
 #include <ghoul/io/socket/tcpsocket.h>
+#include <array>
 #include <cstring>
+#include <string>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -36,7 +38,7 @@
 #ifndef _ERRNO
 #define _ERRNO WSAGetLastError()
 #endif
-#else //Use BSD sockets
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #ifdef _XCODE
 #include <unistd.h>
 #endif
@@ -82,7 +84,7 @@ namespace {
         const char trueFlag = 1;
 
         // Set no delay
-        setsockopt(socket,IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
+        setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
 
         // Set send timeout
         const char timeout = 0; // infinite
@@ -172,9 +174,9 @@ void TcpSocketServer::listen(int port) {
 #ifdef WIN32
         WSACleanup();
 #endif // WIN32
-        throw TcpSocket::TcpSocketError(
-            std::format("Bind failed (returned '{}') with error: {}", iResult, error)
-        );
+        throw TcpSocket::TcpSocketError(std::format(
+            "Bind failed (returned '{}') with error: {}", iResult, error
+        ));
     }
 
     // Clean up

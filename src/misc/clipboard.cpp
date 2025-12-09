@@ -27,6 +27,8 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/format.h>
+#include <cstring>
+#include <memory>
 
 #ifdef WIN32
 #include <Windows.h>

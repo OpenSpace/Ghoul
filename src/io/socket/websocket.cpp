@@ -26,9 +26,12 @@
 #include <ghoul/io/socket/websocket.h>
 
 #include <ghoul/format.h>
+#include <ghoul/io/socket/tcpsocket.h>
 #include <ghoul/logging/logmanager.h>
 #include <chrono>
 #include <functional>
+#include <string_view>
+#include <utility>
 
 namespace {
     constexpr std::string_view _loggerCat = "WebSocket";

@@ -25,6 +25,7 @@
 
 #include <ghoul/misc/stringhelper.h>
 
+#include <ghoul/misc/assert.h>
 #include <algorithm>
 #include <cctype>
 

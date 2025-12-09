@@ -25,7 +25,9 @@
 
 #include <ghoul/opengl/textureunit.h>
 
+#include <ghoul/systemcapabilities/systemcapabilities.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
+#include <utility>
 
 namespace ghoul::opengl {
 

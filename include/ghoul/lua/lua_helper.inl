@@ -31,11 +31,13 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 #include <algorithm>
+#include <array>
 #include <charconv>
-#include <filesystem>
 #include <optional>
+#include <string_view>
 #include <type_traits>
 #include <variant>
+#include <vector>
 
 namespace ghoul::lua {
 

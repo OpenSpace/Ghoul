@@ -26,17 +26,20 @@
 #include <ghoul/opengl/shaderpreprocessor.h>
 
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/format.h>
 #include <ghoul/glm.h>
-#include <ghoul/misc/dictionary.h>
+#include <ghoul/misc/assert.h>
+#include <ghoul/misc/exception.h>
 #include <ghoul/misc/profiling.h>
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <scn/scan.h>
-#include <filesystem>
 #include <fstream>
+#include <iterator>
+#include <limits>
 #include <ranges>
-#include <string>
 #include <sstream>
+#include <tuple>
 #include <utility>
 
 // #endfor

@@ -30,7 +30,8 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <algorithm>
-#include <vector>
+#include <type_traits>
+#include <utility>
 
 namespace {
     // The always-present console log. Definining it here as we'd other need to include

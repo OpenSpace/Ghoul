@@ -26,6 +26,7 @@
 #include <ghoul/lua/luastate.h>
 
 #include <ghoul/lua/lua_helper.h>
+#include <string>
 
 namespace {
     int luaPanicFunction(lua_State* L) {

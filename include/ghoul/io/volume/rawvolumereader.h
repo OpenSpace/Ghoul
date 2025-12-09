@@ -29,6 +29,7 @@
 #include <ghoul/io/volume/volumereader.h>
 
 #include <ghoul/glm.h>
+#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/texture.h>
 
 namespace ghoul::io {

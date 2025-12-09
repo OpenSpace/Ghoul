@@ -26,6 +26,8 @@
 #ifndef __GHOUL___GHOUL_LUA_TYPES___H__
 #define __GHOUL___GHOUL_LUA_TYPES___H__
 
+#include <cstdint>
+
 namespace ghoul::lua {
 
 // Supported Lua types. The values are powers of two in order to be able to combine them

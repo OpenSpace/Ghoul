@@ -29,8 +29,8 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
-#include <ghoul/misc/stringconversion.h>
 #include <string>
+#include <string_view>
 #include <vector>
 
 // X11 #defines 'None' in its X.h header file. We don't want it here

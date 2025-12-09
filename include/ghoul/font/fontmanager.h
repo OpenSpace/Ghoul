@@ -30,6 +30,7 @@
 #include <ghoul/opengl/textureatlas.h>
 #include <ghoul/misc/boolean.h>
 #include <filesystem>
+#include <map>
 #include <memory>
 #include <string_view>
 #include <unordered_map>

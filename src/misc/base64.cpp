@@ -25,9 +25,11 @@
 
 #include <ghoul/misc/base64.h>
 
+#include <array>
+
 namespace ghoul {
 
-std::vector<uint8_t> decodeBase64(const std::string_view base64) {
+std::vector<uint8_t> decodeBase64(std::string_view base64) {
     // Implementation of this function based on:
     // 1. https://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base
     //    64-with-cpp/

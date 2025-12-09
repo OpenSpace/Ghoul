@@ -26,6 +26,7 @@
 #include <ghoul/opengl/framebufferobject.h>
 
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/texture.h>
 
 namespace {
     constexpr std::string_view _loggerCat = "ghoul.opengl.FramebufferObject";

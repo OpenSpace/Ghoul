@@ -31,7 +31,7 @@
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
-#include <filesystem>
+#include <utility>
 
 namespace ghoul::io {
 

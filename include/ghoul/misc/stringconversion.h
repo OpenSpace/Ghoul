@@ -26,9 +26,10 @@
 #ifndef __GHOUL___STRINGCONVERSION___H__
 #define __GHOUL___STRINGCONVERSION___H__
 
-#include <format>
+#include <ghoul/format.h>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 namespace ghoul {
 

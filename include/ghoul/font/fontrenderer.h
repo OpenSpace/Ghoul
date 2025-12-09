@@ -27,8 +27,11 @@
 #define __GHOUL___FONTRENDERER___H__
 
 #include <ghoul/glm.h>
+#include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/uniformcache.h>
 #include <memory>
+#include <string_view>
+#include <vector>
 
 namespace ghoul::opengl { class ProgramObject; }
 

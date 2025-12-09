@@ -26,10 +26,13 @@
 #ifndef __GHOUL___FRAMEBUFFEROBJECT___H__
 #define __GHOUL___FRAMEBUFFEROBJECT___H__
 
-#include <ghoul/opengl/texture.h>
+#include <ghoul/opengl/ghoul_gl.h>
 #include <map>
+#include <string_view>
 
 namespace ghoul::opengl {
+
+class Texture;
 
 class FramebufferObject {
 public:

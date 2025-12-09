@@ -26,6 +26,7 @@
 #ifndef __GHOUL___TEXTUREREADER___H__
 #define __GHOUL___TEXTUREREADER___H__
 
+#include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
 #include <filesystem>
 #include <memory>

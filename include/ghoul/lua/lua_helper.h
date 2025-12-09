@@ -30,7 +30,10 @@
 #include <ghoul/misc/boolean.h>
 #include <ghoul/misc/exception.h>
 #include <filesystem>
+#include <string>
+#include <string_view>
 #include <tuple>
+#include <utility>
 
 struct lua_State;
 

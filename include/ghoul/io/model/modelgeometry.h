@@ -26,11 +26,14 @@
 #ifndef __GHOUL___MODELGEOMETRY___H__
 #define __GHOUL___MODELGEOMETRY___H__
 
+#include <ghoul/misc/exception.h>
 #include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelnode.h>
 #include <ghoul/opengl/texture.h>
 #include <filesystem>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace ghoul::opengl { class ProgramObject; }
 

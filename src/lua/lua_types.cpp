@@ -26,6 +26,7 @@
 #include <ghoul/lua/lua_types.h>
 
 #include <ghoul/lua/ghoul_lua.h>
+#include <stdexcept>
 
 namespace ghoul::lua {
 

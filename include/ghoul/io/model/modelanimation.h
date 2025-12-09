@@ -28,6 +28,7 @@
 
 #include <ghoul/io/model/modelnode.h>
 #include <ghoul/glm.h>
+#include <string>
 #include <vector>
 
 namespace ghoul::io {

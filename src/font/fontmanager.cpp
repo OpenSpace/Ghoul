@@ -26,8 +26,12 @@
 #include <ghoul/font/fontmanager.h>
 
 #include <ghoul/font/font.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/crc32.h>
 #include <ghoul/misc/profiling.h>
+#include <array>
+#include <utility>
+#include <vector>
 
 namespace {
     /// The default set of glyphs that are loaded when a new Font is initialized

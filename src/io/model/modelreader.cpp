@@ -35,7 +35,9 @@
 #include <ghoul/misc/profiling.h>
 #include <ghoul/misc/stringhelper.h>
 #include <algorithm>
-#include <filesystem>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelReader";

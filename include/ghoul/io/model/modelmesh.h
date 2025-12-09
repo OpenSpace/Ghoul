@@ -26,9 +26,10 @@
 #ifndef __GHOUL___MODELMESH___H__
 #define __GHOUL___MODELMESH___H__
 
+#include <ghoul/glm.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/texture.h>
-#include <ghoul/glm.h>
+#include <cstdint>
 #include <vector>
 
 namespace ghoul::opengl { class ProgramObject; }

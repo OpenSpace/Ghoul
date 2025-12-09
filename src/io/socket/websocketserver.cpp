@@ -25,7 +25,9 @@
 
 #include <ghoul/io/socket/websocketserver.h>
 
+#include <ghoul/io/socket/tcpsocket.h>
 #include <ghoul/io/socket/websocket.h>
+#include <utility>
 
 namespace ghoul::io {
 

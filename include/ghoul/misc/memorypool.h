@@ -26,7 +26,6 @@
 #ifndef __GHOUL___MEMORYPOOL___H__
 #define __GHOUL___MEMORYPOOL___H__
 
-#include <ghoul/misc/assert.h>
 #include <array>
 #include <cstddef>
 #include <memory>

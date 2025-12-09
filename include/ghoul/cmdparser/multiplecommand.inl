@@ -23,6 +23,8 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <utility>
+
 namespace ghoul::cmdparser {
 
 template <class T>

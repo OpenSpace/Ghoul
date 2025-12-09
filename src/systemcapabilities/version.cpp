@@ -25,6 +25,8 @@
 
 #include <ghoul/systemcapabilities/version.h>
 
+#include <ghoul/format.h>
+
 namespace {
     constexpr unsigned int packVersion(int major, int minor, int release) {
         // safe since: 2^8 * 1000 * 1000 < 2^32

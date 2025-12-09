@@ -25,6 +25,9 @@
 
 #include <ghoul/misc/templatefactory.h>
 
+#include <ghoul/format.h>
+#include <utility>
+
 namespace ghoul {
 
 TemplateFactoryError::TemplateFactoryError(std::string msg)
@@ -32,7 +35,7 @@ TemplateFactoryError::TemplateFactoryError(std::string msg)
 {}
 
 TemplateClassNotFoundError::TemplateClassNotFoundError(std::string name)
-    : TemplateFactoryError("Could not find class '" + name + "'")
+    : TemplateFactoryError(std::format("Could not find class '{}", name))
     , className(std::move(name))
 {}
 

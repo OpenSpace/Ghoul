@@ -27,7 +27,7 @@
 
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/misc/assert.h>
-#include <filesystem>
+#include <utility>
 
 namespace ghoul::filesystem {
 

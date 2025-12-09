@@ -28,7 +28,6 @@
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
-#include <ghoul/misc/exception.h>
 #include <ghoul/systemcapabilities/systemcapabilities.h>
 
 namespace ghoul::systemcapabilities {

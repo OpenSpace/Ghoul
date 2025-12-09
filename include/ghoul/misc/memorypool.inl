@@ -23,9 +23,12 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <algorithm>
+#include <cstring>
 #include <numeric>
+#include <stdexcept>
 
 namespace {
     constexpr int DebugByte = 0x0F;

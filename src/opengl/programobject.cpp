@@ -28,42 +28,8 @@
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <filesystem>
-
-using glm::bvec2;
-using glm::bvec3;
-using glm::bvec4;
-using glm::ivec2;
-using glm::ivec3;
-using glm::ivec4;
-using glm::uvec2;
-using glm::uvec3;
-using glm::uvec4;
-using glm::vec2;
-using glm::vec3;
-using glm::vec4;
-using glm::dvec2;
-using glm::dvec3;
-using glm::dvec4;
-using glm::mat2x2;
-using glm::mat2x3;
-using glm::mat2x4;
-using glm::mat3x2;
-using glm::mat3x3;
-using glm::mat3x4;
-using glm::mat4x2;
-using glm::mat4x3;
-using glm::mat4x4;
-using glm::dmat2x2;
-using glm::dmat2x3;
-using glm::dmat2x4;
-using glm::dmat3x2;
-using glm::dmat3x3;
-using glm::dmat3x4;
-using glm::dmat4x2;
-using glm::dmat4x3;
-using glm::dmat4x4;
-using glm::value_ptr;
+#include <algorithm>
+#include <utility>
 
 namespace ghoul::opengl {
 
@@ -1337,13 +1303,13 @@ void ProgramObject::setUniform(GLint location, const glm::uvec2& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform2uiv.isResolved()) {
-        glProgramUniform2uiv(_id, location, 1, value_ptr(value));
+        glProgramUniform2uiv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform2uiv(location, 1, value_ptr(value));
+        glUniform2uiv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1352,13 +1318,13 @@ void ProgramObject::setUniform(GLint location, const glm::uvec3& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform3uiv.isResolved()) {
-        glProgramUniform3uiv(_id, location, 1, value_ptr(value));
+        glProgramUniform3uiv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform3uiv(location, 1, value_ptr(value));
+        glUniform3uiv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1367,13 +1333,13 @@ void ProgramObject::setUniform(GLint location, const glm::uvec4& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform4uiv.isResolved()) {
-        glProgramUniform4uiv(_id, location, 1, value_ptr(value));
+        glProgramUniform4uiv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform4uiv(location, 1, value_ptr(value));
+        glUniform4uiv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1542,13 +1508,13 @@ void ProgramObject::setUniform(GLint location, const glm::ivec2& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform2iv.isResolved()) {
-        glProgramUniform2iv(_id, location, 1, value_ptr(value));
+        glProgramUniform2iv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform2iv(location, 1, value_ptr(value));
+        glUniform2iv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1557,13 +1523,13 @@ void ProgramObject::setUniform(GLint location, const glm::ivec3& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform3iv.isResolved()) {
-        glProgramUniform3iv(_id, location, 1, value_ptr(value));
+        glProgramUniform3iv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform3iv(location, 1, value_ptr(value));
+        glUniform3iv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1572,13 +1538,13 @@ void ProgramObject::setUniform(GLint location, const glm::ivec4& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform4iv.isResolved()) {
-        glProgramUniform4iv(_id, location, 1, value_ptr(value));
+        glProgramUniform4iv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform4iv(location, 1, value_ptr(value));
+        glUniform4iv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1747,13 +1713,13 @@ void ProgramObject::setUniform(GLint location, const glm::vec2& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform2fv.isResolved()) {
-        glProgramUniform2fv(_id, location, 1, value_ptr(value));
+        glProgramUniform2fv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform2fv(location, 1, value_ptr(value));
+        glUniform2fv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1762,13 +1728,13 @@ void ProgramObject::setUniform(GLint location, const glm::vec3& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform3fv.isResolved()) {
-        glProgramUniform3fv(_id, location, 1, value_ptr(value));
+        glProgramUniform3fv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform3fv(location, 1, value_ptr(value));
+        glUniform3fv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1777,13 +1743,13 @@ void ProgramObject::setUniform(GLint location, const glm::vec4& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform4fv.isResolved()) {
-        glProgramUniform4fv(_id, location, 1, value_ptr(value));
+        glProgramUniform4fv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform4fv(location, 1, value_ptr(value));
+        glUniform4fv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1951,13 +1917,13 @@ void ProgramObject::setUniform(GLint location, const glm::dvec2& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform2dv.isResolved()) {
-        glProgramUniform2dv(_id, location, 1, value_ptr(value));
+        glProgramUniform2dv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform2dv(location, 1, value_ptr(value));
+        glUniform2dv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1966,13 +1932,13 @@ void ProgramObject::setUniform(GLint location, const glm::dvec3& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform3dv.isResolved()) {
-        glProgramUniform3dv(_id, location, 1, value_ptr(value));
+        glProgramUniform3dv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform3dv(location, 1, value_ptr(value));
+        glUniform3dv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -1981,13 +1947,13 @@ void ProgramObject::setUniform(GLint location, const glm::dvec4& value) const {
     ghoul_assert(location != -1, "Location must not be -1");
 
     if (glbinding::Binding::ProgramUniform4dv.isResolved()) {
-        glProgramUniform4dv(_id, location, 1, value_ptr(value));
+        glProgramUniform4dv(_id, location, 1, glm::value_ptr(value));
     }
     else {
         GLint oldProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
         glUseProgram(_id);
-        glUniform4dv(location, 1, value_ptr(value));
+        glUniform4dv(location, 1, glm::value_ptr(value));
         glUseProgram(static_cast<GLuint>(oldProgram));
     }
 }
@@ -3210,17 +3176,17 @@ void ProgramObject::setAttribute(GLuint location, bool v1, bool v2, bool v3, boo
 
 void ProgramObject::setAttribute(GLuint location, const glm::bvec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribI2iv(location, value_ptr(glm::ivec2(value)));
+    glVertexAttribI2iv(location, glm::value_ptr(glm::ivec2(value)));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::bvec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribI3iv(location, value_ptr(glm::ivec3(value)));
+    glVertexAttribI3iv(location, glm::value_ptr(glm::ivec3(value)));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::bvec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribI4iv(location, value_ptr(glm::ivec4(value)));
+    glVertexAttribI4iv(location, glm::value_ptr(glm::ivec4(value)));
 }
 
 void ProgramObject::setAttribute(GLuint location, GLint value) {
@@ -3246,17 +3212,17 @@ void ProgramObject::setAttribute(GLuint location, GLint v1, GLint v2, GLint v3, 
 
 void ProgramObject::setAttribute(GLuint location, const glm::ivec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribI2iv(location, value_ptr(value));
+    glVertexAttribI2iv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::ivec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribI3iv(location, value_ptr(value));
+    glVertexAttribI3iv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::ivec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribI4iv(location, value_ptr(value));
+    glVertexAttribI4iv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, GLfloat value) {
@@ -3283,17 +3249,17 @@ void ProgramObject::setAttribute(GLuint location,
 
 void ProgramObject::setAttribute(GLuint location, const glm::vec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttrib2fv(location, value_ptr(value));
+    glVertexAttrib2fv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::vec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttrib3fv(location, value_ptr(value));
+    glVertexAttrib3fv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::vec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttrib4fv(location, value_ptr(value));
+    glVertexAttrib4fv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, GLdouble value) {
@@ -3320,17 +3286,17 @@ void ProgramObject::setAttribute(GLuint location,
 
 void ProgramObject::setAttribute(GLuint location, const glm::dvec2& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribL2dv(location, value_ptr(value));
+    glVertexAttribL2dv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dvec3& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribL3dv(location, value_ptr(value));
+    glVertexAttribL3dv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::dvec4& value) {
     ghoul_assert(location != GL_INVALID_INDEX, "Location must not be GL_INVALID_INDEX");
-    glVertexAttribL4dv(location, value_ptr(value));
+    glVertexAttribL4dv(location, glm::value_ptr(value));
 }
 
 void ProgramObject::setAttribute(GLuint location, const glm::mat2x2& value,
@@ -3341,8 +3307,8 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x2& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib2fv(location, value_ptr(value[0]));
-        glVertexAttrib2fv(location + 1, value_ptr(value[1]));
+        glVertexAttrib2fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib2fv(location + 1, glm::value_ptr(value[1]));
     }
 }
 
@@ -3354,8 +3320,8 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x3& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib3fv(location, value_ptr(value[0]));
-        glVertexAttrib3fv(location + 1, value_ptr(value[1]));
+        glVertexAttrib3fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib3fv(location + 1, glm::value_ptr(value[1]));
     }
 }
 
@@ -3367,8 +3333,8 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat2x4& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib4fv(location, value_ptr(value[0]));
-        glVertexAttrib4fv(location + 1, value_ptr(value[1]));
+        glVertexAttrib4fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib4fv(location + 1, glm::value_ptr(value[1]));
     }
 }
 
@@ -3380,9 +3346,9 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x2& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib2fv(location, value_ptr(value[0]));
-        glVertexAttrib2fv(location + 1, value_ptr(value[1]));
-        glVertexAttrib2fv(location + 2, value_ptr(value[2]));
+        glVertexAttrib2fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib2fv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttrib2fv(location + 2, glm::value_ptr(value[2]));
     }
 }
 
@@ -3394,9 +3360,9 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x3& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib3fv(location, value_ptr(value[0]));
-        glVertexAttrib3fv(location + 1, value_ptr(value[1]));
-        glVertexAttrib3fv(location + 2, value_ptr(value[2]));
+        glVertexAttrib3fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib3fv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttrib3fv(location + 2, glm::value_ptr(value[2]));
     }
 }
 
@@ -3408,9 +3374,9 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat3x4& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib4fv(location, value_ptr(value[0]));
-        glVertexAttrib4fv(location + 1, value_ptr(value[1]));
-        glVertexAttrib4fv(location + 2, value_ptr(value[2]));
+        glVertexAttrib4fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib4fv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttrib4fv(location + 2, glm::value_ptr(value[2]));
     }
 }
 
@@ -3422,10 +3388,10 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x2& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib2fv(location, value_ptr(value[0]));
-        glVertexAttrib2fv(location + 1, value_ptr(value[1]));
-        glVertexAttrib2fv(location + 2, value_ptr(value[2]));
-        glVertexAttrib2fv(location + 3, value_ptr(value[3]));
+        glVertexAttrib2fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib2fv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttrib2fv(location + 2, glm::value_ptr(value[2]));
+        glVertexAttrib2fv(location + 3, glm::value_ptr(value[3]));
     }
 }
 
@@ -3437,10 +3403,10 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x3& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib3fv(location, value_ptr(value[0]));
-        glVertexAttrib3fv(location + 1, value_ptr(value[1]));
-        glVertexAttrib3fv(location + 2, value_ptr(value[2]));
-        glVertexAttrib3fv(location + 3, value_ptr(value[3]));
+        glVertexAttrib3fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib3fv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttrib3fv(location + 2, glm::value_ptr(value[2]));
+        glVertexAttrib3fv(location + 3, glm::value_ptr(value[3]));
     }
 }
 
@@ -3452,10 +3418,10 @@ void ProgramObject::setAttribute(GLuint location, const glm::mat4x4& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttrib4fv(location, value_ptr(value[0]));
-        glVertexAttrib4fv(location + 1, value_ptr(value[1]));
-        glVertexAttrib4fv(location + 2, value_ptr(value[2]));
-        glVertexAttrib4fv(location + 3, value_ptr(value[3]));
+        glVertexAttrib4fv(location, glm::value_ptr(value[0]));
+        glVertexAttrib4fv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttrib4fv(location + 2, glm::value_ptr(value[2]));
+        glVertexAttrib4fv(location + 3, glm::value_ptr(value[3]));
     }
 }
 
@@ -3467,8 +3433,8 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x2& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL2dv(location, value_ptr(value[0]));
-        glVertexAttribL2dv(location + 1, value_ptr(value[1]));
+        glVertexAttribL2dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL2dv(location + 1, glm::value_ptr(value[1]));
     }
 }
 
@@ -3480,8 +3446,8 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x3& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL3dv(location, value_ptr(value[0]));
-        glVertexAttribL3dv(location + 1, value_ptr(value[1]));
+        glVertexAttribL3dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL3dv(location + 1, glm::value_ptr(value[1]));
     }
 }
 
@@ -3493,8 +3459,8 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat2x4& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL4dv(location, value_ptr(value[0]));
-        glVertexAttribL4dv(location + 1, value_ptr(value[1]));
+        glVertexAttribL4dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL4dv(location + 1, glm::value_ptr(value[1]));
     }
 }
 
@@ -3506,9 +3472,9 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x2& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL2dv(location, value_ptr(value[0]));
-        glVertexAttribL2dv(location + 1, value_ptr(value[1]));
-        glVertexAttribL2dv(location + 2, value_ptr(value[2]));
+        glVertexAttribL2dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL2dv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttribL2dv(location + 2, glm::value_ptr(value[2]));
     }
 }
 
@@ -3520,9 +3486,9 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x3& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL3dv(location, value_ptr(value[0]));
-        glVertexAttribL3dv(location + 1, value_ptr(value[1]));
-        glVertexAttribL3dv(location + 2, value_ptr(value[2]));
+        glVertexAttribL3dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL3dv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttribL3dv(location + 2, glm::value_ptr(value[2]));
     }
 }
 
@@ -3534,9 +3500,9 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat3x4& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL4dv(location, value_ptr(value[0]));
-        glVertexAttribL4dv(location + 1, value_ptr(value[1]));
-        glVertexAttribL4dv(location + 2, value_ptr(value[2]));
+        glVertexAttribL4dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL4dv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttribL4dv(location + 2, glm::value_ptr(value[2]));
     }
 }
 
@@ -3548,10 +3514,10 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x2& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL2dv(location, value_ptr(value[0]));
-        glVertexAttribL2dv(location + 1, value_ptr(value[1]));
-        glVertexAttribL2dv(location + 2, value_ptr(value[2]));
-        glVertexAttribL2dv(location + 3, value_ptr(value[3]));
+        glVertexAttribL2dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL2dv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttribL2dv(location + 2, glm::value_ptr(value[2]));
+        glVertexAttribL2dv(location + 3, glm::value_ptr(value[3]));
     }
 }
 
@@ -3563,10 +3529,10 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x3& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL3dv(location, value_ptr(value[0]));
-        glVertexAttribL3dv(location + 1, value_ptr(value[1]));
-        glVertexAttribL3dv(location + 2, value_ptr(value[2]));
-        glVertexAttribL3dv(location + 3, value_ptr(value[3]));
+        glVertexAttribL3dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL3dv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttribL3dv(location + 2, glm::value_ptr(value[2]));
+        glVertexAttribL3dv(location + 3, glm::value_ptr(value[3]));
     }
 }
 
@@ -3578,10 +3544,10 @@ void ProgramObject::setAttribute(GLuint location, const glm::dmat4x4& value,
         setAttribute(location, glm::transpose(value));
     }
     else {
-        glVertexAttribL4dv(location, value_ptr(value[0]));
-        glVertexAttribL4dv(location + 1, value_ptr(value[1]));
-        glVertexAttribL4dv(location + 2, value_ptr(value[2]));
-        glVertexAttribL4dv(location + 3, value_ptr(value[3]));
+        glVertexAttribL4dv(location, glm::value_ptr(value[0]));
+        glVertexAttribL4dv(location + 1, glm::value_ptr(value[1]));
+        glVertexAttribL4dv(location + 2, glm::value_ptr(value[2]));
+        glVertexAttribL4dv(location + 3, glm::value_ptr(value[3]));
     }
 }
 

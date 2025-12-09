@@ -28,6 +28,7 @@
 
 #include <ghoul/glm.h>
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <string>
 #include <string_view>

@@ -29,8 +29,12 @@
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/exception.h>
 #include <algorithm>
 #include <map>
+#include <sstream>
+#include <string_view>
+#include <utility>
 
 namespace {
     constexpr std::string_view _loggerCat = "CommandlineParser";

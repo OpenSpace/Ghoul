@@ -26,6 +26,7 @@
 #ifndef __GHOUL___LOGLEVEL___H__
 #define __GHOUL___LOGLEVEL___H__
 
+#include <ghoul/format.h>
 #include <ghoul/glm.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/exception.h>

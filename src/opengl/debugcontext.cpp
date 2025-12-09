@@ -25,18 +25,19 @@
 
 #include <ghoul/opengl/debugcontext.h>
 
-#include <ghoul/misc/assert.h>
-#include <type_traits>
+#include <utility>
 
 namespace ghoul::opengl::debug {
 
 namespace {
-void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
-                      const GLchar* message, const GLvoid* userParam)
-{
-    const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(userParam);
-    cb(Source(source), Type(type), Severity(severity), id, std::string(message));
-}
+
+    void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
+                          const GLchar* message, const GLvoid* userParam)
+    {
+        const CallbackFunction& f = *reinterpret_cast<const CallbackFunction*>(userParam);
+        f(Source(source), Type(type), Severity(severity), id, std::string(message));
+    }
+
 } // namespace
 
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {

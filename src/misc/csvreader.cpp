@@ -31,6 +31,8 @@
 #include <ghoul/misc/stringhelper.h>
 #include <algorithm>
 #include <fstream>
+#include <iterator>
+#include <utility>
 
 namespace {
     std::string readFirstValidLine(std::ifstream& file) {

@@ -25,13 +25,10 @@
 
 #include <ghoul/opengl/shaderobject.h>
 
-#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/misc/crc32.h>
-#include <algorithm>
-#include <filesystem>
+#include <ghoul/filesystem/filesystem.h>
 #include <fstream>
-#include <functional>
+#include <utility>
 
 namespace ghoul::opengl {
 

@@ -29,6 +29,8 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
 #include <chrono>
+#include <exception>
+#include <utility>
 
 namespace {
     // The wait-out time for the condition_variable inside the worker threads

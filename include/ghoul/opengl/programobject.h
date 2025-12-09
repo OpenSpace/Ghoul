@@ -27,10 +27,12 @@
 #define __GHOUL___PROGRAMOBJECT___H__
 
 #include <ghoul/misc/boolean.h>
+#include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/opengl/shaderobject.h>
 #include <ghoul/glm.h>
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <string>

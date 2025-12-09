@@ -25,6 +25,8 @@
 
 #include <ghoul/io/model/modelnode.h>
 
+#include <utility>
+
 namespace ghoul::io {
 
 ModelNode::ModelNode(glm::mat4 transform, std::vector<io::ModelMesh> meshes)

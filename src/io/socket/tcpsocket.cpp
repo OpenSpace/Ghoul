@@ -29,10 +29,13 @@
 #include <ghoul/logging/logmanager.h>
 #include <algorithm>
 #include <cstring>
+#include <string_view>
+#include <utility>
 
 #ifdef WIN32
 #include <Windows.h>
 #include <winsock2.h>
+#include <ws2def.h>
 #include <ws2tcpip.h>
 #ifndef _ERRNO
 #define _ERRNO WSAGetLastError()

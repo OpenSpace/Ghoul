@@ -28,6 +28,8 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
+namespace ghoul::opengl { class Texture; }
+
 namespace ghoul::io {
 
 /// Loads the texture using the Sean Barrett's stb_image library.
@@ -49,7 +51,6 @@ public:
      */
     std::unique_ptr<opengl::Texture> loadTexture(
         const std::filesystem::path& filename, int nDimensions) const override;
-
 
     /**
      * Loads a Texture from the memory pointed at by \p memory using the STB library. The
