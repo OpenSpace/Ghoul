@@ -25,10 +25,13 @@
 
 #include <ghoul/io/volume/rawvolumereader.h>
 
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/format.h>
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/texture.h>
 #include <fstream>
 #include <string_view>
+#include <string>
+#include <utility>
 
 namespace {
     constexpr std::string_view _loggerCat = "RawVolumeReader";
