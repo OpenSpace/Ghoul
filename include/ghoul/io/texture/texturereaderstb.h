@@ -28,8 +28,6 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
-namespace ghoul::opengl { class Texture; }
-
 namespace ghoul::io {
 
 /// Loads the texture using the Sean Barrett's stb_image library.

@@ -41,7 +41,6 @@
 // and it allows the lookup of string_view and char* in the map without the memory
 // allocation otherwise required
 
-
 template <typename... Bases>
 struct overload : Bases ... {
     using is_transparent = void;

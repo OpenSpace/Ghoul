@@ -27,7 +27,6 @@
 #define __GHOUL___PROGRAMOBJECTMANAGER___H__
 
 #include <ghoul/misc/objectmanager.h>
-
 #include <ghoul/opengl/programobject.h>
 
 namespace ghoul::opengl {

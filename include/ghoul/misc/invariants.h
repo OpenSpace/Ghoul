@@ -37,11 +37,11 @@
 #define ghoul_postcondition(__condition__, __message__) \
     defer { ghoul_assert(__condition__, "Postcondition failed: " __message__); };
 
-#else
+#else // ^^^^ DEBUG // !DEBUG vvvv
 
 #define ghoul_precondition(__condition__, __message__)
 #define ghoul_postcondition(__condition__, __message__)
 
-#endif // NDEBUG
+#endif // DEBUG
 
 #endif // __GHOUL___INVARIANTS___H__

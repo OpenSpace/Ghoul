@@ -35,9 +35,8 @@
 #include <tuple>
 #include <utility>
 
-struct lua_State;
-
 namespace ghoul { class Dictionary; }
+struct lua_State;
 
 namespace ghoul::lua {
 

@@ -49,7 +49,6 @@ namespace ghoul::logging {
  *   - LogLevel::Error -> Red
  *   - LogLevel::Fatal -> Cyan
  */
-
 class ConsoleLog : public Log {
 public:
     BooleanType(ColorOutput);

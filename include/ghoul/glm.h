@@ -36,7 +36,6 @@
 #pragma clang system_header
 #endif // __APPLE__
 
-
 #ifdef __unix__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"

@@ -28,8 +28,6 @@
 
 #include <ghoul/io/texture/texturereaderbase.h>
 
-namespace ghoul::opengl { class Texture; }
-
 namespace ghoul::io {
 
 /**

@@ -27,7 +27,6 @@
 #define __GHOUL___TEXTUREMANAGER___H__
 
 #include <ghoul/misc/objectmanager.h>
-
 #include <ghoul/opengl/texture.h>
 
 namespace ghoul::opengl {

@@ -34,16 +34,14 @@
 namespace ghoul {
 
 namespace detail {
-
-template <typename T>
-struct placement_delete {
-    void operator()(T* ptr) {
-        if (ptr) {
-            ptr->~T();
+    template <typename T>
+    struct placement_delete {
+        void operator()(T* ptr) {
+            if (ptr) {
+                ptr->~T();
+            }
         }
-    }
-};
-
+    };
 } // namespace detail
 
 template <typename T>

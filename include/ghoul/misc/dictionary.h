@@ -27,6 +27,7 @@
 #define __GHOUL___DICTIONARY___H__
 
 #include <ghoul/glm.h>
+#include <concepts>
 #include <filesystem>
 #include <functional>
 #include <map>

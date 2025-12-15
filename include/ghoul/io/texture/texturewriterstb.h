@@ -28,8 +28,6 @@
 
 #include <ghoul/io/texture/texturewriterbase.h>
 
-namespace ghoul::opengl { class Texture; }
-
 namespace ghoul::io {
 
 /// Writes the texture using the Sean Barrett's stb_image library

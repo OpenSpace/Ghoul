@@ -36,8 +36,6 @@
 struct aiMesh;
 struct aiScene;
 
-namespace ghoul::modelgeometry { class ModelGeometry; }
-
 namespace ghoul::io {
 
 /**
