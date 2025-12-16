@@ -64,7 +64,7 @@ public:
      *
      * \param nBuckets the number of buckets that should be created at creation time
      */
-    MemoryPool(int nBuckets = 1);
+    explicit MemoryPool(int nBuckets = 1);
 
     /**
      * Frees the memory that was allocated during the existence of this MemoryPool.
@@ -141,7 +141,7 @@ public:
      *
      * \param nBuckets the number of buckets that should be created at creation time
      */
-    ReusableTypedMemoryPool(int nBuckets = 1);
+    explicit ReusableTypedMemoryPool(int nBuckets = 1);
 
     /**
      * Frees the memory that was allocated during the existence of this MemoryPool or the
