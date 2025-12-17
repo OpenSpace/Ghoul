@@ -73,7 +73,6 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/boolean.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/clipboard.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constexpr.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constmap.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/csvreader.h
