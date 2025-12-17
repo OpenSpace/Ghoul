@@ -31,15 +31,14 @@
 namespace ghoul::logging {
 
 /**
-  * A concrete subclass of Log that logs the messages to the Visual Studio output window
-  * or the system debugger using the `OutputDebugString` method. If neither Visual Studio
-  * nor a system debugger is attached, this log will silently ignore all incoming log
-  * messages.
-  *
-  * If this logger is included in any non `WIN32` system, it will also silently ignore all
-  * logging messages
-  */
-
+ * A concrete subclass of Log that logs the messages to the Visual Studio output window
+ * or the system debugger using the `OutputDebugString` method. If neither Visual Studio
+ * nor a system debugger is attached, this log will silently ignore all incoming log
+ * messages.
+ *
+ * If this logger is included in any non `WIN32` system, it will also silently ignore all
+ * logging messages
+ */
 class VisualStudioOutputLog : public Log {
 public:
     /**
