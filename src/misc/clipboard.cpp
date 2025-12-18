@@ -108,7 +108,7 @@ std::string clipboardText([[maybe_unused]] SelectionArea selectionArea) {
     std::string text;
     // Try UTF8_STRING first
     std::string cmd = std::format("xclip -o -selection {} -target UTF8_STRING", s);
-    if (exec(cmd.c_string(), text)) {
+    if (exec(cmd.c_str(), text)) {
         if (!text.empty() && text.back() == '\n') {
             text.pop_back();
         }
@@ -117,7 +117,7 @@ std::string clipboardText([[maybe_unused]] SelectionArea selectionArea) {
 
     // Fallback: try text/plain;charset=utf-8
     cmd = std::format("xclip -o -selection {} -target text/plain;charset=utf-8", s);
-    if (exec(cmd.c_string(), text)) {
+    if (exec(cmd.c_str(), text)) {
         if (!text.empty() && text.back() == '\n') {
             text.pop_back();
         }
@@ -126,7 +126,7 @@ std::string clipboardText([[maybe_unused]] SelectionArea selectionArea) {
 
     // Final fallback: default text/plain
     cmd = std::format("xclip -o -selection {} -target text/plain", s);
-    if (exec(cmd.c_string(), text)) {
+    if (exec(cmd.c_str(), text)) {
         if (!text.empty() && text.back() == '\n') {
             text.pop_back();
         }
@@ -184,7 +184,7 @@ void setClipboardText(std::string_view text, [[maybe_unused]] SelectionArea sele
 
     std::string cmd = std::format("echo \"{{}}\" | xclip -i -selection {} -f", s);
     std::string buf;
-    const bool success = exec(std::format(cmd.c_string(), text), buf);
+    const bool success = exec(std::format(cmd.c_str(), text), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }
