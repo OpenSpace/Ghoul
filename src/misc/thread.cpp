@@ -34,6 +34,7 @@
 #endif // WIN32
 
 namespace ghoul::thread {
+
 namespace {
 
 int convertThreadPriorityLevel([[maybe_unused]] ThreadPriorityClass c,

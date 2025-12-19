@@ -27,7 +27,6 @@
 #define __GHOUL___VERTEXBUFFEROBJECT___H__
 
 #include <ghoul/opengl/ghoul_gl.h>
-
 #include <vector>
 
 namespace ghoul::opengl {

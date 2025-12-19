@@ -27,7 +27,6 @@
 
 #include <ghoul/format.h>
 #include <ghoul/misc/assert.h>
-#include <ghoul/misc/exception.h>
 #include <utility>
 
 namespace ghoul::cmdparser {

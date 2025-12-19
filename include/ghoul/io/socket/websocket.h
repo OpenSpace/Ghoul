@@ -28,6 +28,13 @@
 
 #include <ghoul/io/socket/socket.h>
 
+#include <condition_variable>
+#include <deque>
+#include <memory>
+#include <mutex>
+#include <set>
+#include <sstream>
+
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable: 4244 4267)
@@ -41,13 +48,6 @@
 #ifdef WIN32
 #pragma warning(pop)
 #endif // WIN32
-
-#include <condition_variable>
-#include <deque>
-#include <memory>
-#include <mutex>
-#include <set>
-#include <sstream>
 
 namespace ghoul::io {
 

@@ -25,8 +25,8 @@
 
 #include <ghoul/opengl/renderdoc.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <format>
 
 #ifdef WIN32
 #include <Windows.h>

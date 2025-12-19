@@ -26,7 +26,6 @@
 #include <ghoul/io/socket/tcpsocketserver.h>
 
 #include <ghoul/format.h>
-#include <ghoul/io/socket/tcpsocket.h>
 #include <array>
 #include <cstring>
 #include <string>

@@ -24,8 +24,8 @@
  ****************************************************************************************/
 
 #include <ghoul/logging/callbacklog.h>
-#include <utility>
 
+#include <utility>
 
 namespace ghoul::logging {
 

@@ -27,7 +27,6 @@
 #define __GHOUL___DICTIONARYJSONFORMATTER___H__
 
 #include <ghoul/misc/exception.h>
-
 #include <string>
 
 namespace ghoul {

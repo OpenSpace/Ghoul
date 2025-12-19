@@ -31,7 +31,6 @@
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringhelper.h>
 #include <fstream>
-#include <map>
 #include <string>
 #include <utility>
 #include <vector>
