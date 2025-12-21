@@ -182,7 +182,7 @@ void setClipboardText(std::string_view text, [[maybe_unused]] SelectionArea sele
         }
     }(selectionArea);
 
-    std::string cmd = std::format("echo \"{{}}\" | xclip -i -selection {} -f", s);
+    std::string cmd = std::format("echo \"{}\" | xclip -i -selection {} -f", text, s);
     std::string buf;
     const bool success = exec(cmd.c_str(), buf);
     if (!success) {
