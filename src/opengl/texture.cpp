@@ -115,6 +115,20 @@ void Texture::initialize(bool allocateData) {
     applyWrapping();
 }
 
+void Texture::resize(glm::uvec3 dimensions) {
+    if (dimensions == _dimensions) {
+        return;
+    }
+
+    _dimensions = std::move(dimensions);
+
+    if (_hasOwnershipOfData) {
+        purgeFromRAM();
+    }
+
+    uploadDataToTexture(nullptr);
+}
+
 void Texture::allocateMemory() {
     ZoneScoped;
 

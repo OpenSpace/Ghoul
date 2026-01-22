@@ -192,6 +192,15 @@ public:
     ~Texture();
 
     /**
+     * Resizes the textures to the new size. If the new size is different from the
+     * previous size, the contents of the texture are erased and if the Texture class
+     * owned the RAM pixel data, it is erased.
+     *
+     * \param dimensions The new size of the texture
+     */
+    void resize(glm::uvec3 dimensions);
+
+    /**
      * Enables this texture type by calling `glEnable`.
      */
     void enable() const;
