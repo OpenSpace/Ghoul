@@ -1,37 +1,67 @@
-/*
-levmarq.c, levmarq.h, and examples are provided under the MIT license.
+/*****************************************************************************************
+ *                                                                                       *
+ * GHOUL                                                                                 *
+ * General Helpful Open Utility Library                                                  *
+ *                                                                                       *
+ * Copyright (c) 2012-2026                                                               *
+ *                                                                                       *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
+ * software and associated documentation files (the "Software"), to deal in the Software *
+ * without restriction, including without limitation the rights to use, copy, modify,    *
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
+ * permit persons to whom the Software is furnished to do so, subject to the following   *
+ * conditions:                                                                           *
+ *                                                                                       *
+ * The above copyright notice and this permission notice shall be included in all copies *
+ * or substantial portions of the Software.                                              *
+ *                                                                                       *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,   *
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A         *
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT    *
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
+ ****************************************************************************************/
 
-Copyright (c) 2008-2016 Ron Babich
+/*****************************************************************************************
+ * Modified parts of the code from Ron Babich is used in the following code.             *
+ ****************************************************************************************/
 
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+/**
+ * levmarq.c, levmarq.h, and examples are provided under the MIT license.
+ *
+ * Copyright (c) 2008-2016 Ron Babich
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include <ghoul/misc/levmarqsolver.h>
 
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/defer.h>
-#include <cstdio>
-#include <cmath>
 #include <chrono>
+#include <cmath>
+#include <cstdio>
+#include <sstream>
 
 namespace {
     std::chrono::milliseconds TimeLimit(200);
@@ -51,24 +81,22 @@ void levmarq_init(LMstat* lmstat) {
 }
 
 
-/*
-perform least-squares minimization using the Levenberg-Marquardt algorithm.
-The arguments are as follows:
-    npar    number of parameters
-    par     array of parameters to be varied
-    ny      number of measurements to be fit
-    y       array of measurements
-    dysq    array of error in measurements, squared
-            (set dysq=NULL for unweighted least-squares)
-    func    function to be fit
-    grad    gradient of "func" with respect to the input parameters
-    fdata   pointer to any additional data required by the function
-    lmstat  pointer to the "status" structure, where minimization parameters
-            are set and the final status is returned.
-
-Before calling levmarq, several of the parameters in lmstat must be set.
-For default values, call levmarq_init(lmstat).
-*/
+// perform least-squares minimization using the Levenberg-Marquardt algorithm.
+// The arguments are as follows:
+//    npar    number of parameters
+//    par     array of parameters to be varied
+//    ny      number of measurements to be fit
+//    y       array of measurements
+//    dysq    array of error in measurements, squared
+//            (set dysq=NULL for unweighted least-squares)
+//    func    function to be fit
+//    grad    gradient of "func" with respect to the input parameters
+//    fdata   pointer to any additional data required by the function
+//    lmstat  pointer to the "status" structure, where minimization parameters
+//            are set and the final status is returned.
+//
+// Before calling levmarq, several of the parameters in lmstat must be set.
+// For default values, call levmarq_init(lmstat).
 bool levmarq(int npar, double* par, int ny, double* dysq,
     double (*func)(double*, int, void*, LMstat*),
     void (*grad)(double*, double*, int, void*, LMstat*),
@@ -268,7 +296,9 @@ double error_func(double* par, int ny, double* dysq,
 }
 
 
-// solve Ax=b for a symmetric positive-definite matrix A using the Cholesky decomposition A=LL^T, L is passed in "l", elements above the diagonal are ignored.
+// solve the equation Ax=b for a symmetric positive-definite matrix A,
+// using the Cholesky decomposition A=LL^T.  The matrix L is passed in "l".
+// Elements above the diagonal are ignored.
 void solve_axb_cholesky(int n, double** l, double* x, double* b) { // n = npar, l = ch, x = delta (solution), b = d (func(par, x, fdata) * g[i]);
     int i, j;
     double sum;
@@ -292,7 +322,10 @@ void solve_axb_cholesky(int n, double** l, double* x, double* b) { // n = npar, 
 
 
 
-// symmetric, positive-definite matrix "a" and returns its (lower-triangular) Cholesky factor in "l", if l=a the decomposition is performed in place, elements above the diagonal are ignored.
+// This function takes a symmetric, positive-definite matrix "a" and returns
+// its (lower-triangular) Cholesky factor in "l".  Elements above the
+// diagonal are neither used nor modified.  The same array may be passed
+// as both l and a, in which case the decomposition is performed in place.
 int cholesky_decomp(int n, double** l, double** a) {
     int i, j, k;
     double sum;
