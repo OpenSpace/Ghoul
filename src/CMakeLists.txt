@@ -88,6 +88,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/levmarqsolver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/map.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
@@ -146,6 +147,7 @@ target_sources(
     misc/easing.cpp
     misc/exception.cpp
     misc/interpolator.cpp
+    misc/levmarqsolver.cpp
     misc/sharedmemory.cpp
     misc/stacktrace.cpp
     misc/stringhelper.cpp
