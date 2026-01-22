@@ -64,20 +64,20 @@ typedef struct {
     bool verbose;
     std::string data;
     std::vector<glm::dvec2> pos;
-    int max_it;
-    double init_lambda;
-    double up_factor;
-    double down_factor;
-    double target_derr;
-    int final_it;
-    double final_err;
-    double final_derr;
+    int maxIt;
+    double initLambda;
+    double upFactor;
+    double downFactor;
+    double targetDerr;
+    int finalIt;
+    double finalErr;
+    double finalDerr;
 } LMstat;
 
 /**
  * Initialize parameters to good values.
  */
-void levmarq_init(LMstat* lmstat);
+void initializeLevmarqStats(LMstat* lmstat);
 
 /**
  * Main function call, finds appropriate values for par[nDOF] that manipulates the

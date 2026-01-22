@@ -145,13 +145,13 @@ namespace {
 namespace ghoul {
 
 // set parameters required by levmarq() to default values
-void levmarq_init(LMstat* lmstat) {
+void initializeLevmarqStats(LMstat* lmstat) {
     lmstat->verbose = false;
-    lmstat->max_it = 3000;
-    lmstat->init_lambda = 1e-6;
-    lmstat->up_factor = 10;
-    lmstat->down_factor = 10;
-    lmstat->target_derr = 1e-12;
+    lmstat->maxIt = 3000;
+    lmstat->initLambda = 1e-6;
+    lmstat->upFactor = 10.0;
+    lmstat->downFactor = 10.0;
+    lmstat->targetDerr = 1e-12;
 }
 
 
@@ -172,10 +172,10 @@ void levmarq_init(LMstat* lmstat) {
 // Before calling levmarq, several of the parameters in lmstat must be set.
 // For default values, call levmarq_init(lmstat).
 bool levmarq(int npar, double* par, int ny, double* dysq,
-    double (*func)(double*, int, void*, LMstat*),
-    void (*grad)(double*, double*, int, void*, LMstat*),
-    void* fdata, LMstat* lmstat) {
-
+             double (*func)(double*, int, void*, LMstat*),
+             void (*grad)(double*, double*, int, void*, LMstat*),
+             void* fdata, LMstat* lmstat)
+{
     int x, j, it, nit, ill;
     bool verbose;
     std::string data;
@@ -208,13 +208,13 @@ bool levmarq(int npar, double* par, int ny, double* dysq,
     };
 
     verbose = lmstat->verbose;
-    nit = lmstat->max_it;
-    lambda = lmstat->init_lambda;
-    up = lmstat->up_factor;
-    down = 1 / lmstat->down_factor;
-    target_derr = lmstat->target_derr;
-    weight = 1;
-    derr = newerr = 0; // to avoid compiler warnings
+    nit = lmstat->maxIt;
+    lambda = lmstat->initLambda;
+    up = lmstat->upFactor;
+    down = 1.0 / lmstat->downFactor;
+    target_derr = lmstat->targetDerr;
+    weight = 1.0;
+    derr = newerr = 0.0; // to avoid compiler warnings
 
     if (verbose) {
         std::ostringstream qs, gs, ds, ps, oss;
@@ -342,12 +342,12 @@ bool levmarq(int npar, double* par, int ny, double* dysq,
         }
     }
 
-    lmstat->final_it = it;
-    lmstat->final_err = err;
-    lmstat->final_derr = derr;
+    lmstat->finalIt = it;
+    lmstat->finalErr = err;
+    lmstat->finalDerr = derr;
     lmstat->data = data;
 
-    return (it != lmstat->max_it);
+    return (it != lmstat->maxIt);
 }
 
 } // namespace ghoul
