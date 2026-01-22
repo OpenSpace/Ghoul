@@ -88,15 +88,4 @@ bool levmarq(int npar, double* par, int ny, double* dysq,
     void (*grad)(double*, double*, int, void*, LMstat*),
     void* fdata, LMstat* lmstat);
 
-/**
- * Returns the total L2 error (to be minimized) with each contact point's distance from
- * the projected coordinates depending on par[nDOF].
- */
-double error_func(double* par, int ny, double* dysq,
-    double (*func)(double*, int, void*, LMstat*), void* fdata, LMstat* lmstat);
-
-void solve_axb_cholesky(int n, double** l, double* x, double* b);
-
-int cholesky_decomp(int n, double** l, double** a);
-
 } // namespace ghoul

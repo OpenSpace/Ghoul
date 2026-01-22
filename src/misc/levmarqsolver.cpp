@@ -66,6 +66,80 @@
 namespace {
     std::chrono::milliseconds TimeLimit(200);
     double TOL = 1e-30; // smallest value allowed in cholesky_decomp()
+
+    // calculate the error function (chi-squared)
+    double error_func(double* par, int ny, double* dysq,
+                      double (*func)(double*, int, void*, ghoul::LMstat*),
+                      void* fdata, ghoul::LMstat* lmstat)
+    {
+        int x;
+        double res, e = 0;
+
+        for (x = 0; x < ny; x++) {
+            res = func(par, x, fdata, lmstat);
+            if (dysq) { // weighted least-squares
+                e += res * res / dysq[x];
+            }
+            else {
+                e += res * res;
+            }
+        }
+        return e;
+    }
+
+    // solve the equation Ax=b for a symmetric positive-definite matrix A,
+    // using the Cholesky decomposition A=LL^T.  The matrix L is passed in "l".
+    // Elements above the diagonal are ignored.
+    void solve_axb_cholesky(int n, double** l, double* x, double* b) { // n = npar, l = ch, x = delta (solution), b = d (func(par, x, fdata) * g[i]);
+        int i, j;
+        double sum;
+        // solve L*y = b for y (where x[] is used to store y)
+        for (i = 0; i < n; i++) {
+            sum = 0;
+            for (j = 0; j < i; j++) {
+                sum += l[i][j] * x[j];
+            }
+            x[i] = (b[i] - sum) / l[i][i];
+        }
+        // solve L^T*x = y for x (where x[] is used to store both y and x)
+        for (i = n - 1; i >= 0; i--) {
+            sum = 0;
+            for (j = i + 1; j < n; j++) {
+                sum += l[j][i] * x[j];
+            }
+            x[i] = (x[i] - sum) / l[i][i];
+        }
+    }
+
+
+
+    // This function takes a symmetric, positive-definite matrix "a" and returns
+    // its (lower-triangular) Cholesky factor in "l".  Elements above the
+    // diagonal are neither used nor modified.  The same array may be passed
+    // as both l and a, in which case the decomposition is performed in place.
+    int cholesky_decomp(int n, double** l, double** a) {
+        int i, j, k;
+        double sum;
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < i; j++) {
+                sum = 0;
+                for (k = 0; k < j; k++) {
+                    sum += l[i][k] * l[j][k];
+                }
+                l[i][j] = (a[i][j] - sum) / l[j][j];
+            }
+            sum = 0;
+            for (k = 0; k < i; k++) {
+                sum += l[i][k] * l[i][k];
+            }
+            sum = a[i][i] - sum;
+            if (sum < TOL) {
+                return 1; // not positive-definite
+            }
+            l[i][i] = sqrt(sum);
+        }
+        return 0;
+    }
 }
 
 namespace ghoul {
@@ -274,80 +348,6 @@ bool levmarq(int npar, double* par, int ny, double* dysq,
     lmstat->data = data;
 
     return (it != lmstat->max_it);
-}
-
-
-// calculate the error function (chi-squared)
-double error_func(double* par, int ny, double* dysq,
-    double (*func)(double*, int, void*, LMstat*), void* fdata, LMstat* lmstat) {
-    int x;
-    double res, e = 0;
-
-    for (x = 0; x < ny; x++) {
-        res = func(par, x, fdata, lmstat);
-        if (dysq) { // weighted least-squares
-            e += res * res / dysq[x];
-        }
-        else {
-            e += res * res;
-        }
-    }
-    return e;
-}
-
-
-// solve the equation Ax=b for a symmetric positive-definite matrix A,
-// using the Cholesky decomposition A=LL^T.  The matrix L is passed in "l".
-// Elements above the diagonal are ignored.
-void solve_axb_cholesky(int n, double** l, double* x, double* b) { // n = npar, l = ch, x = delta (solution), b = d (func(par, x, fdata) * g[i]);
-    int i, j;
-    double sum;
-    // solve L*y = b for y (where x[] is used to store y)
-    for (i = 0; i < n; i++) {
-        sum = 0;
-        for (j = 0; j < i; j++) {
-            sum += l[i][j] * x[j];
-        }
-        x[i] = (b[i] - sum) / l[i][i];
-    }
-    // solve L^T*x = y for x (where x[] is used to store both y and x)
-    for (i = n - 1; i >= 0; i--) {
-        sum = 0;
-        for (j = i + 1; j < n; j++) {
-            sum += l[j][i] * x[j];
-        }
-        x[i] = (x[i] - sum) / l[i][i];
-    }
-}
-
-
-
-// This function takes a symmetric, positive-definite matrix "a" and returns
-// its (lower-triangular) Cholesky factor in "l".  Elements above the
-// diagonal are neither used nor modified.  The same array may be passed
-// as both l and a, in which case the decomposition is performed in place.
-int cholesky_decomp(int n, double** l, double** a) {
-    int i, j, k;
-    double sum;
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < i; j++) {
-            sum = 0;
-            for (k = 0; k < j; k++) {
-                sum += l[i][k] * l[j][k];
-            }
-            l[i][j] = (a[i][j] - sum) / l[j][j];
-        }
-        sum = 0;
-        for (k = 0; k < i; k++) {
-            sum += l[i][k] * l[i][k];
-        }
-        sum = a[i][i] - sum;
-        if (sum < TOL) {
-            return 1; // not positive-definite
-        }
-        l[i][i] = sqrt(sum);
-    }
-    return 0;
 }
 
 } // namespace ghoul
