@@ -68,7 +68,7 @@ Texture::Texture(glm::uvec3 dimensions, GLenum type, Format format, GLenum inter
 
 Texture::Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format,
                  GLenum internalFormat, GLenum dataType, FilterMode filter,
-                 WrappingMode wrapping, int pixelAlignment)
+                 WrappingMode wrapping, TakeOwnership takeOwnership, int pixelAlignment)
     : _dimensions(std::move(dimensions))
     , _format(format)
     , _internalFormat(internalFormat)
@@ -76,7 +76,7 @@ Texture::Texture(void* data, glm::uvec3 dimensions, GLenum type, Format format,
     , _filter(filter)
     , _wrapping({ wrapping })
     , _type(type)
-    , _hasOwnershipOfData(true)
+    , _hasOwnershipOfData(takeOwnership)
     , _pixels(data)
     , _pixelAlignment(pixelAlignment)
 {
