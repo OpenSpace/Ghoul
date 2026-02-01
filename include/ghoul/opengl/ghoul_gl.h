@@ -43,7 +43,7 @@
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
-#include <glbinding/gl41core/gl.h>
+#include <glbinding/gl46core/gl.h>
 #include <glbinding/Binding.h>
 #define __GL_H__
 
@@ -69,20 +69,16 @@ namespace ghoul {
 
 struct GLDebugGroup {
     explicit GLDebugGroup(std::string_view name) {
-        if (glbinding::Binding::PushDebugGroup.isResolved()) {
-            glPushDebugGroup(
-                GL_DEBUG_SOURCE_APPLICATION,
-                0,
-                static_cast<GLsizei>(name.length()),
-                name.data()
-            );
-        }
+        glPushDebugGroup(
+            GL_DEBUG_SOURCE_APPLICATION,
+            0,
+            static_cast<GLsizei>(name.length()),
+            name.data()
+        );
     }
 
     ~GLDebugGroup() {
-        if (glbinding::Binding::PopDebugGroup.isResolved()) {
-            glPopDebugGroup();
-        }
+        glPopDebugGroup();
     }
 };
 

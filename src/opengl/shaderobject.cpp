@@ -67,8 +67,7 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
         throw ShaderObjectError("glCreateShader returned 0");
     }
 
-#ifdef GL_VERSION_4_3
-    if (glbinding::Binding::ObjectLabel.isResolved() && !_shaderName.empty()) {
+    if (!_shaderName.empty()) {
         glObjectLabel(
             GL_SHADER,
             _id,
@@ -76,7 +75,6 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
             _shaderName.c_str()
         );
     }
-#endif // GL_VERSION_4_3
 
     if (hasFilename) {
         rebuildFromFile();
@@ -94,8 +92,7 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
     if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
     }
-#ifdef GL_VERSION_4_3
-    if (glbinding::Binding::ObjectLabel.isResolved()) {
+    if (!_shaderName.empty()) {
         glObjectLabel(
             GL_SHADER,
             _id,
@@ -103,7 +100,6 @@ ShaderObject::ShaderObject(const ShaderObject& cpy)
             _shaderName.c_str()
         );
     }
-#endif
     setShaderObjectCallback(_onChangeCallback);
     rebuildFromFile();
 }
@@ -142,8 +138,7 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
         if (_id == 0) {
             throw ShaderObjectError("glCreateShader returned 0");
         }
-#ifdef GL_VERSION_4_3
-        if (glbinding::Binding::ObjectLabel.isResolved()) {
+        if (!_shaderName.empty()) {
             glObjectLabel(
                 GL_SHADER,
                 _id,
@@ -151,7 +146,6 @@ ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
                 _shaderName.c_str()
             );
         }
-#endif
         rebuildFromFile();
     }
     return *this;
@@ -175,16 +169,12 @@ ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) noexcept {
 void ShaderObject::setName(std::string name) {
     _shaderName = std::move(name);
     _loggerCat = std::format("ShaderObject['{}']", _shaderName);
-#ifdef GL_VERSION_4_3
-    if (glbinding::Binding::ObjectLabel.isResolved()) {
-        glObjectLabel(
-            GL_SHADER,
-            _id,
-            GLsizei(_shaderName.length() + 1),
-            _shaderName.c_str()
-        );
-    }
-#endif
+    glObjectLabel(
+        GL_SHADER,
+        _id,
+        GLsizei(_shaderName.length() + 1),
+        _shaderName.c_str()
+    );
 }
 
 const std::string& ShaderObject::name() const {
