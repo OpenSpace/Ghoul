@@ -206,12 +206,12 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
 {
     ghoul_assert(_program, "No program provided");
 
-        //
+    //
     // Configure the OpenGL objects for the orthogonal font rendering
-    glGenVertexArrays(1, &_orthogonal.vao);
+    glCreateVertexArrays(1, &_orthogonal.vao);
     glBindVertexArray(_orthogonal.vao);
 
-    glGenBuffers(1, &_orthogonal.vbo);
+    glCreateBuffers(1, &_orthogonal.vbo);
     glBindBuffer(GL_ARRAY_BUFFER, _orthogonal.vbo);
 
     struct OrthogonalVertex {
@@ -246,16 +246,16 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         reinterpret_cast<const void*>(offsetof(OrthogonalVertex, outlineS))
     );
 
-    glGenBuffers(1, &_orthogonal.ibo);
+    glCreateBuffers(1, &_orthogonal.ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _orthogonal.ibo);
 
 
     //
     // Configure the OpenGL objects for the projective font rendering
-    glGenVertexArrays(1, &_perspective.vao);
+    glCreateVertexArrays(1, &_perspective.vao);
     glBindVertexArray(_perspective.vao);
 
-    glGenBuffers(1, &_perspective.vbo);
+    glCreateBuffers(1, &_perspective.vbo);
     glBindBuffer(GL_ARRAY_BUFFER, _perspective.vbo);
 
     struct PerspectiveVertex {
@@ -291,7 +291,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         reinterpret_cast<const void*>(offsetof(PerspectiveVertex, outlineS))
     );
 
-    glGenBuffers(1, &_perspective.ibo);
+    glCreateBuffers(1, &_perspective.ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _perspective.ibo);
     glBindVertexArray(0);
 
@@ -524,32 +524,29 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         glm::ortho(0.f, _framebufferSize.x, 0.f, _framebufferSize.y)
     );
 
-    glBindVertexArray(_orthogonal.vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, _orthogonal.vbo);
-    glBufferData(
-        GL_ARRAY_BUFFER,
+    glNamedBufferData(
+        _orthogonal.vbo,
         _vertexBuffer.size() * sizeof(float),
         _vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _orthogonal.ibo);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
+    glNamedBufferData(
+        _orthogonal.ibo,
         _indexBuffer.size() * sizeof(GLushort),
         _indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
+    glBindVertexArray(_orthogonal.vao);
     glDrawElements(
         GL_TRIANGLES,
         static_cast<GLsizei>(_indexBuffer.size()),
         GL_UNSIGNED_SHORT,
         nullptr
     );
-
     glBindVertexArray(0);
+
     glEnable(GL_DEPTH_TEST);
 
     return { size, static_cast<int>(lines) };
@@ -744,32 +741,30 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         labelInfo.disableTransmittance
     );
 
-    glBindVertexArray(_perspective.vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, _perspective.vbo);
-    glBufferData(
-        GL_ARRAY_BUFFER,
+    glNamedBufferData(
+        _perspective.vbo,
         _vertexBuffer.size() * sizeof(float),
         _vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _perspective.ibo);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
+    glNamedBufferData(
+        _perspective.ibo,
         _indexBuffer.size() * sizeof(GLushort),
         _indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
+    glBindVertexArray(_perspective.vao);
     glDrawElements(
         GL_TRIANGLES,
         static_cast<GLsizei>(_indexBuffer.size()),
         GL_UNSIGNED_SHORT,
         nullptr
     );
-
     glBindVertexArray(0);
+
     if (!labelInfo.enableDepth) {
         glEnable(GL_DEPTH_TEST);
     }

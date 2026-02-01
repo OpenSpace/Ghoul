@@ -72,23 +72,24 @@ void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
     ghoul_assert(!vertexArray.empty(), "Vertex array must not be empty");
     ghoul_assert(!indexArray.empty(), "Index array must not be empty");
 
-    generateGLObjects();
+    glCreateVertexArrays(1, &_vaoID);
+    glBindVertexArray(_vaoID);
 
     _iSize = static_cast<unsigned int>(indexArray.size());
 
-    glBindVertexArray(_vaoID);
-
+    glCreateBuffers(1, &_vBufferID);
     glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
-    glBufferData(
-        GL_ARRAY_BUFFER,
+    glNamedBufferData(
+        _vBufferID,
         vertexArray.size() * sizeof(GLfloat),
         vertexArray.data(),
         GL_STATIC_DRAW
     );
 
+    glCreateBuffers(1, &_iBufferID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
+    glNamedBufferData(
+        _iBufferID,
         indexArray.size() * sizeof(GLint),
         indexArray.data(),
         GL_STATIC_DRAW
@@ -132,12 +133,6 @@ void VertexBufferObject::render() const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
     glDrawElements(_mode, _iSize, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
-}
-
-void VertexBufferObject::generateGLObjects() {
-    glGenVertexArrays(1, &_vaoID);
-    glGenBuffers(1, &_vBufferID);
-    glGenBuffers(1, &_iBufferID);
 }
 
 } // namespace ghoul::opengl

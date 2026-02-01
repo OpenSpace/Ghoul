@@ -258,26 +258,27 @@ void ModelMesh::initialize() {
         return;
     }
 
-    glGenVertexArrays(1, &_vaoID);
-    glGenBuffers(1, &_vbo);
-    glGenBuffers(1, &_ibo);
-
+    glCreateVertexArrays(1, &_vaoID);
     glBindVertexArray(_vaoID);
+
+    glCreateBuffers(1, &_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-    glBufferData(
-        GL_ARRAY_BUFFER,
+    glNamedBufferData(
+        _vbo,
         _vertices.size() * sizeof(Vertex),
         _vertices.data(),
         GL_STATIC_DRAW
     );
 
+    glCreateBuffers(1, &_ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
+    glNamedBufferData(
+        _ibo,
         _indices.size() * sizeof(unsigned int),
         _indices.data(),
         GL_STATIC_DRAW
     );
+
 
     // Set vertex attributes pointers
     // Vertex position

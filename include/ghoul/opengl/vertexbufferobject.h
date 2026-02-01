@@ -140,12 +140,6 @@ public:
     void render() const;
 
 private:
-    /**
-     * Constructs the internal GL objects by calling `glGenVertexArrays` and
-     * `glGenBuffers`.
-     */
-    void generateGLObjects();
-
     /// The vertex array object that stores the created VertexBufferObject
     GLuint _vaoID = 0;
 

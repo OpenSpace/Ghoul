@@ -141,7 +141,7 @@ void Texture::generateId() {
     ZoneScoped;
 
     _id = 0;
-    glGenTextures(1, &_id);
+    glCreateTextures(_type, 1, &_id);
 }
 
 void Texture::enable() const {
