@@ -467,6 +467,7 @@ public:
      * \param mipMapLevel The MipMap level that should be used in this texture.
      */
     void setMipMapLevel(int mipMapLevel);
+    int mipMapLevel() const;
 
     /**
      * Sets the maximum anisotropy level that should be used. This is only valid when the
@@ -834,6 +835,9 @@ public:
      */
     glm::vec4 texelAsFloat(const glm::uvec3& pos) const;
 
+    void setBorderColor(glm::vec4 borderColor);
+    glm::vec4 borderColor() const;
+
 protected:
     /**
      * Initializes the Texture by determining the Texture type, the bytes per pixel,
@@ -915,11 +919,293 @@ private:
     void* _pixels = nullptr;
     int _pixelAlignment = 1;
 
+    glm::vec4 _borderColor;
+
 #ifdef Debugging_Ghoul_Textures_Indices
     int index = 0;
     static int nextIndex;
 #endif // Debugging_Ghoul_Textures_Indices
 };
+
+class NewTexture {
+public:
+    /**
+     * This enum specifies the allowed formats for the Texture%s. These are directly
+     * mapped to the appropriate OpenGL constants.
+     *
+     * \see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
+     */
+    enum class Format : std::underlying_type_t<GLenum> {
+        Red = static_cast<std::underlying_type_t<GLenum>>(GL_RED),
+        RG = static_cast<std::underlying_type_t<GLenum>>(GL_RG),
+        RGB = static_cast<std::underlying_type_t<GLenum>>(GL_RGB),
+        BGR = static_cast<std::underlying_type_t<GLenum>>(GL_BGR),
+        RGBA = static_cast<std::underlying_type_t<GLenum>>(GL_RGBA),
+        BGRA = static_cast<std::underlying_type_t<GLenum>>(GL_BGRA),
+        DepthComponent = static_cast<std::underlying_type_t<GLenum>>(GL_DEPTH_COMPONENT)
+    };
+
+    /**
+     * This enum specifies the filtering method this texture will use to interpolate
+     * between two texel. The values for this enum correspond directly to OpenGL settings.
+     * See the OpenGL specification for details.
+     */
+    enum class FilterMode {
+        Nearest, ///< GL_NEAREST
+        Linear, ///< GL_LINEAR
+        LinearMipMap, ///< GL_LINEAR_MIPMAP_LINEAR
+        AnisotropicMipMap
+    };
+
+    /**
+     * This enum specifies the wrapping mode this texture will use at the edges of the
+     * texture. The values for this enum correspond directly to OpenGL settings. See the
+     * OpenGL specification for details.
+     */
+    enum class WrappingMode : std::underlying_type_t<GLenum> {
+        Repeat = static_cast<std::underlying_type_t<GLenum>>(GL_REPEAT),
+        Clamp = static_cast<std::underlying_type_t<GLenum>>(GL_CLAMP),
+        ClampToEdge = static_cast<std::underlying_type_t<GLenum>>(GL_CLAMP_TO_EDGE),
+        ClampToBorder = static_cast<std::underlying_type_t<GLenum>>(GL_CLAMP_TO_BORDER),
+        MirroredRepeat = static_cast<std::underlying_type_t<GLenum>>(GL_MIRRORED_REPEAT)
+    };
+
+    /**
+     * Encapsulating the wrapping mode state for 1D, 2D, and 3D textures.  1D textures
+     * only use `s`, 2D textures use `s` and `t`, where as 3D textures use all three
+     * specified wrapping modes.
+     */
+    struct WrappingModes {
+        WrappingMode s;
+        WrappingMode t = s;
+        WrappingMode r = t;
+    };
+
+    static int numberOfChannels(Format format);
+
+    /**
+     * This constructor will create storage internally to fit the amount of data that is
+     * necessary for the \p dimensions `* bytesPerPixel` (which is in turn
+     * dependent on the \p dataType). The Texture can be 1D, 2D, or 3D depending on how
+     * many components are equal to `1`.
+     *
+     * \param dimensions The dimensions of the texture. A 3D texture will be created
+     *        if all components are bigger than `1`, a 2D texture will be created if the
+     *        `z` component is equal to `1`, while a 1D texture is created if the `y` and
+     *        `z` component is equal to `1`
+     * \param type The type of the texture. Must be one of GL_TEXTURE_1D, GL_TEXTURE_2D,
+     *        or GL_TEXTURE_3D
+     * \param format Specifies the format of the data
+     * \param internalFormat The internal format for the texture. See
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and 3
+     *        for concrete values. In addition, the S3TC_DXT formats can be used to
+     *        support hardware compression. See
+     *        http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for more information
+     * \param dataType The data type of the pixel data. See
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of
+     *        possible values
+     * \param filter The Texture::FilterMode that will be used to interpolate between
+     *        texels
+     * \param wrapping The Texture::WrappingMode that will be used to generate values on
+     *        the border of the texture
+     *
+     * \pre Element of \p dimensions must be bigger or equal `1`
+     */
+    NewTexture(glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
+        GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
+        FilterMode filter = FilterMode::Linear,
+        WrappingModes wrapping = { WrappingMode::Repeat },
+        std::array<GLenum, 4> swizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA },
+        int mipMapLevel = 8, glm::vec4 borderColor = glm::vec4(0.f, 0.f, 0.f, 1.f));
+
+    /**
+     * This constructor will generate a Texture out of the passed data. The data should
+     * contain enough bytes to fill `dimensions * bytesPerPixel` (which is in
+     * turn dependent on the dataType) pixel. The Texture can be 1D, 2D, or 3D depending
+     * on how many components are equal to `1`.
+     *
+     * \param data The data from which to generate the Texture. The data must be in a
+     *        linear format and (in 2D and 3D cases) aligned so that it can be accessed
+     *        using the following equations: `(y * dimensions.x) + x` in the 2D case and
+     *        `(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x` in the 3D case.
+     * \param dimensions The dimensions of the texture. A 3D texture will be created if
+     *        all components are bigger than `1`, a 2D texture will be created if the `z`
+     *        component is equal to `1`, while a 1D texture is created if the `y` and `z`
+     *        component is equal to `1`
+     * \param type The type of the texture. Must be one of GL_TEXTURE_1D, GL_TEXTURE_2D,
+     *        or GL_TEXTURE_3D
+     * \param format Specifies the format of the data
+     * \param internalFormat The internal format for the texture. See
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1,2, and 3
+     *        for concrete values. In addition, the S3TC_DXT formats can be used to
+     *        support hardware compression.
+     *        See http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for more information
+     * \param dataType The data type of the pixel data. See
+     *        http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of
+     *        possible values
+     * \param filter The Texture::FilterMode that will be used to interpolate between
+     *        texels
+     * \param wrapping The Texture::WrappingMode that will be used to generate values on
+     *        the border of the texture
+     * \param pixelAlignment The byte-alignment for each of the pixels in the provided
+     *        \p data array
+     */
+    NewTexture(const void* data, glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
+        GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
+        FilterMode filter = FilterMode::Linear,
+        WrappingModes wrapping = { WrappingMode::Repeat }, int pixelAlignment = 1,
+        std::array<GLenum, 4> swizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA },
+        int mipMapLevel = 8, glm::vec4 borderColor = glm::vec4(0.f, 0.f, 0.f, 1.f));
+
+    explicit NewTexture(const Texture& texture);
+
+    /**
+     * Unloads the Texture from GPU memory and destroys the id. The destructor will also
+     * remove the data associated with this texture.
+     */
+    ~NewTexture();
+
+    /**
+     * Resizes the textures to the new size. If the new size is different from the
+     * previous size, the contents of the texture are erased and if the Texture class
+     * owned the RAM pixel data, it is erased.
+     *
+     * \param dimensions The new size of the texture
+     */
+    //void resize(glm::uvec3 dimensions);
+
+    void makeResident();
+    void makeUnresident();
+
+    /**
+     * Returns `true` if the OpenGL texture is resident in the GPU memory.
+     *
+     * \return `true` if the OpenGL texture is resident
+     */
+    bool isResident() const;
+
+    /**
+     * Returns the OpenGL handle of this texture.
+     */
+    operator GLuint64() const;
+
+    /**
+     * Returns the OpenGL name of this texture.
+     */
+    operator GLuint() const;
+
+    /**
+     * Returns the type for this texture.
+     *
+     * \return The type for this texture. This value can either be `GL_TEXTURE_1D`,
+     *         `GL_TEXTURE_2D` or `GL_TEXTURE_3D` depending on the dimension of the stored
+     *         texture.
+     */
+    GLenum type() const;
+
+    /**
+     * Returns the dimensions of this texture. If the texture is a 2D texture, the `z`
+     * component will be equal to `1` and if the texture is a 1D texture, the `y` and `z`
+     * components will be equal to `1`.
+     *
+     * \return The dimensions of this texture
+     */
+    const glm::uvec3& dimensions() const;
+
+    /**
+     * Returns the format for this texture.
+     *
+     * \return The format for this texture
+     */
+    Format format() const;
+
+    /**
+     * Returns the internal format for this texture. See
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information and
+     * the possible return values.
+     */
+    GLenum internalFormat() const;
+
+    /**
+     * Returns the Texture::FilterMode used by this texture.
+     *
+     * \return The Texture::FilterMode used by this texture
+     */
+    FilterMode filter() const;
+
+    /**
+     * Returns the currently used swizzle mask for this Texture.
+     *
+     * \return The currently used swizzle mask for this Texture
+     */
+    std::array<GLenum, 4> swizzleMask() const;
+
+    /**
+     * Returns the storage data type for this Texture. For a complete list of available
+     * return values see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for
+     * more information.
+     *
+     * \return The storage data type
+     */
+    GLenum dataType() const;
+
+    /**
+     * Returns the number of channels that are stored in this texture. If the format of
+     * the Texture is not in the list of formats found at
+     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml, an assertion will be
+     * triggered.
+     *
+     * \return The number of channels that are stored in this texture
+     */
+    int numberOfChannels() const;
+
+    /*
+     * Returns the number of bytes each pixel stores.
+     *
+     * \return The number of bytes each pixel stores
+     */
+    GLubyte bytesPerPixel() const;
+
+    /**
+     * Returns the currently used Texture::WrappingMode for this texture.
+     *
+     * \return The currently used Texture::WrappingMode for this texture
+     */
+    WrappingModes wrapping() const;
+
+    /**
+     * Sets new data for the texture to use. If the dimensions are not updated and the new
+     * data has a different size, undefined behavior will occur. This Texture will take
+     * ownership of the data array.
+     *
+     * \param pixels The pointer to the new data array that should be used.
+     * \param takeOwnership Should this Texture take ownership of the data and delete it?
+     * \param pixelAlignment The byte-alignment for each of the pixels in the provided
+     *        \p pixels array
+     */
+    void uploadDataToTexture(const void* pixelData, int pixelAlignment = 1) const;
+
+private:
+    GLuint _id = 0;
+    GLuint64 _handle = 0;
+    glm::uvec3 _dimensions = glm::uvec3(0);
+    Format _format;
+    GLenum _internalFormat;
+    std::array<GLenum, 4> _swizzleMask;
+    GLenum _dataType;
+    FilterMode _filter;
+    WrappingModes _wrapping;
+    GLenum _type;
+    int _mipMapLevel = 8;
+    float _anisotropyLevel = -1.f;
+
+#ifdef Debugging_Ghoul_Textures_Indices
+    int index = 0;
+    static int nextIndex;
+#endif // Debugging_Ghoul_Textures_Indices
+};
+
+
 
 } // namespace ghoul::opengl
 

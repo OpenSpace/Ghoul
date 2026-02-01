@@ -27,6 +27,7 @@
 
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/texture.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <algorithm>
 #include <utility>
@@ -1234,6 +1235,17 @@ bool ProgramObject::setUniform(const std::string& name, const glm::dmat4x4& valu
         return false;
     }
     setUniform(location, value, transpose);
+    return true;
+}
+
+bool ProgramObject::setUniform(const std::string& name, const NewTexture& value) const {
+    ghoul_assert(!name.empty(), "Name must not be empty");
+
+    const GLint location = uniformLocation(name);
+    if (location == -1) {
+        return false;
+    }
+    setUniform(location, value);
     return true;
 }
 

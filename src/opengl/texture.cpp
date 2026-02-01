@@ -367,6 +367,10 @@ void Texture::setMipMapLevel(int mipMapLevel) {
     applyFilter();
 }
 
+int Texture::mipMapLevel() const {
+    return _mipMapLevel;
+}
+
 void Texture::applyWrapping() const {
     ZoneScoped;
 
@@ -1372,6 +1376,18 @@ glm::vec4 Texture::texelAsFloat(const glm::uvec3& pos) const {
     return texelAsFloat(pos.x, pos.y, pos.z);
 }
 
+
+void Texture::setBorderColor(glm::vec4 borderColor) {
+    _borderColor = std::move(borderColor);
+
+    bind();
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(_borderColor));
+}
+
+glm::vec4 Texture::borderColor() const {
+    return _borderColor;
+}
+
 void Texture::calculateBytesPerPixel() {
     const size_t numChannels = numberOfChannels();
     int szType = 0;
@@ -1406,6 +1422,366 @@ void Texture::calculateBytesPerPixel() {
     }
 
     _bpp = static_cast<GLubyte>(szType * numChannels);
+}
+
+
+#ifdef Debugging_Ghoul_Textures_Indices
+int NewTexture::nextIndex = 0;
+#endif // Debugging_Ghoul_Textures_Indices
+
+int NewTexture::numberOfChannels(Format format) {
+    switch (format) {
+        case Format::Red:
+        case Format::DepthComponent:
+            return 1;
+        case Format::RG:
+            return 2;
+        case Format::RGB:
+        case Format::BGR:
+            return 3;
+        case Format::RGBA:
+        case Format::BGRA:
+            return 4;
+    }
+    return 0;
+}
+
+NewTexture::NewTexture(glm::uvec3 dimensions, GLenum type, Format format, GLenum internalFormat,
+                 GLenum dataType, FilterMode filter, WrappingModes wrapping,
+                std::array<GLenum, 4> swizzleMask, int mipMapLevel, glm::vec4 borderColor)
+    : _dimensions(std::move(dimensions))
+    , _format(format)
+    , _internalFormat(internalFormat)
+    , _swizzleMask(std::move(swizzleMask))
+    , _dataType(dataType)
+    , _filter(filter)
+    , _wrapping(wrapping)
+    , _type(type)
+    , _mipMapLevel(mipMapLevel)
+{
+#ifdef Debugging_Ghoul_Textures_Indices
+    index = nextIndex++;
+#endif // Debugging_Ghoul_Textures_Indices
+
+    ghoul_assert(_dimensions.x >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(_dimensions.y >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(_dimensions.z >= 1, "Element of dimensions must be bigger or equal 1");
+    ghoul_assert(
+        _type == GL_TEXTURE_1D || _type == GL_TEXTURE_2D || _type == GL_TEXTURE_3D,
+        "Type must be one of GL_TEXTURE_1D, GL_TEXTURE_2D, or GL_TEXTURE_3D"
+    );
+
+    glCreateTextures(_type, 1, &_id);
+
+    // Apply filter
+    switch (_filter) {
+        case FilterMode::Nearest:
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            break;
+        case FilterMode::Linear:
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
+        case FilterMode::LinearMipMap:
+            glGenerateTextureMipmap(_id);
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
+            break;
+        case FilterMode::AnisotropicMipMap:
+            glGenerateTextureMipmap(_id);
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
+            if (std::equal_to<>()(_anisotropyLevel, -1.f)) {
+                GLfloat maxTextureAnisotropy = 1.0;
+                glGetFloatv(
+                    GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT,
+                    &maxTextureAnisotropy
+                );
+                _anisotropyLevel = maxTextureAnisotropy;
+            }
+            glTextureParameterf(_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
+            glTextureParameteri(_id, GL_TEXTURE_BASE_LEVEL, 0);
+            break;
+    }
+
+    // Apply wrap
+    switch (_type) {
+        case GL_TEXTURE_3D:
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_R, static_cast<GLint>(_wrapping.r));
+            [[fallthrough]];
+        case GL_TEXTURE_2D:
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_T, static_cast<GLint>(_wrapping.t));
+            [[fallthrough]];
+        case GL_TEXTURE_1D:
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_S, static_cast<GLint>(_wrapping.s));
+            break;
+        default:
+            throw MissingCaseException();
+    }
+
+    // Apply swizzle
+    glTextureParameteriv(_id, GL_TEXTURE_SWIZZLE_RGBA, _swizzleMask.data());
+
+    // Apply border color
+    // @TODO Check since DSA textures have limitations on which are allowed
+    glTextureParameterfv(_id, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(borderColor));
+
+    switch (_type) {
+        case GL_TEXTURE_1D:
+            glTextureStorage1D(_id, 1, _internalFormat, _dimensions.x);
+            break;
+        case GL_TEXTURE_2D:
+            glTextureStorage2D(_id, 1, _internalFormat, _dimensions.x, _dimensions.y);
+            break;
+        case GL_TEXTURE_3D:
+            glTextureStorage3D(_id, 1, _internalFormat, _dimensions.x, _dimensions.y, _dimensions.z);
+            break;
+        default:
+            throw MissingCaseException();
+    }
+
+    _handle = glGetTextureHandleARB(_id);
+}
+
+NewTexture::NewTexture(const void* data, glm::uvec3 dimensions, GLenum type, Format format, GLenum internalFormat,
+    GLenum dataType, FilterMode filter, WrappingModes wrapping, int pixelAlignment,
+    std::array<GLenum, 4> swizzleMask, int mipMapLevel, glm::vec4 borderColor)
+    : NewTexture(dimensions, type, format, internalFormat, dataType, filter, wrapping, swizzleMask, mipMapLevel, borderColor)
+{
+    uploadDataToTexture(data, pixelAlignment);
+}
+
+static GLenum internalFormatToSized(GLenum internalFormat, GLenum dataType) {
+    switch (internalFormat) {
+        case GL_RED:
+            switch (dataType) {
+                case GL_UNSIGNED_BYTE:
+                    return GL_R8;
+                case GL_BYTE:
+                    return GL_R8;
+                case GL_UNSIGNED_SHORT:
+                    return GL_R16UI;
+                case GL_SHORT:
+                    return GL_R16I;
+                case GL_UNSIGNED_INT:
+                    return GL_R16UI;
+                case GL_INT:
+                    return GL_R16I;
+                case GL_FLOAT:
+                    return GL_R32F;
+                default:
+                    throw MissingCaseException();
+            }
+        case GL_RG:
+            switch (dataType) {
+                case GL_UNSIGNED_BYTE:
+                    return GL_RG8;
+                case GL_BYTE:
+                    return GL_RG8;
+                case GL_UNSIGNED_SHORT:
+                    return GL_RG16UI;
+                case GL_SHORT:
+                    return GL_RG16I;
+                case GL_UNSIGNED_INT:
+                    return GL_RG16UI;
+                case GL_INT:
+                    return GL_RG16I;
+                case GL_FLOAT:
+                    return GL_RG32F;
+                default:
+                    throw MissingCaseException();
+            }
+        case GL_RGB:
+            switch (dataType) {
+                case GL_UNSIGNED_BYTE:
+                    return GL_RGB8;
+                case GL_BYTE:
+                    return GL_RGB8;
+                case GL_UNSIGNED_BYTE_3_3_2:
+                    return GL_R3_G3_B2;
+                case GL_UNSIGNED_SHORT:
+                    return GL_RGB16UI;
+                case GL_SHORT:
+                    return GL_RGB16I;
+                case GL_UNSIGNED_INT:
+                    return GL_RGB16UI;
+                case GL_INT:
+                    return GL_RGB16I;
+                case GL_FLOAT:
+                    return GL_RGB32F;
+                default:
+                    throw MissingCaseException();
+            }
+        case GL_RGBA:
+            switch (dataType) {
+                case GL_UNSIGNED_BYTE:
+                    return GL_RGBA8;
+                case GL_BYTE:
+                    return GL_RGBA8;
+                case GL_UNSIGNED_SHORT:
+                    return GL_RGBA16UI;
+                case GL_SHORT:
+                    return GL_RGBA16I;
+                case GL_UNSIGNED_INT:
+                    return GL_RGBA16UI;
+                case GL_INT:
+                    return GL_RGBA16I;
+                case GL_FLOAT:
+                    return GL_RGBA32F;
+                default:
+                    throw MissingCaseException();
+            }
+        default:
+            throw MissingCaseException();
+    }
+}
+
+NewTexture::NewTexture(const Texture& texture)
+    : NewTexture(
+        texture.pixelData(),
+        texture.dimensions(),
+        texture.type(),
+        Format(texture.format()),
+        internalFormatToSized(texture.internalFormat(), texture.dataType()),
+        texture.dataType(),
+        FilterMode(texture.filter()),
+        {
+            WrappingMode(texture.wrapping().s),
+            WrappingMode(texture.wrapping().t),
+            WrappingMode(texture.wrapping().r)
+
+        },
+        1,
+        texture.swizzleMask(),
+        texture.mipMapLevel(),
+        texture.borderColor()
+    )
+{}
+
+NewTexture::~NewTexture() {
+    makeUnresident();
+    glDeleteTextures(1, &_id);
+}
+
+//void NewTexture::resize(glm::uvec3 dimensions) {
+//    if (dimensions == _dimensions) {
+//        return;
+//    }
+//
+//
+//}
+
+void NewTexture::makeResident() {
+    glMakeTextureHandleResidentARB(_handle);
+}
+
+void NewTexture::makeUnresident() {
+    glMakeTextureHandleNonResidentARB(_handle);
+}
+
+bool NewTexture::isResident() const {
+    return glIsTextureHandleResidentARB(_handle) == GL_TRUE;
+}
+
+NewTexture::operator GLuint64() const {
+    return _handle;
+}
+
+NewTexture::operator GLuint() const {
+    return _id;
+}
+
+GLenum NewTexture::type() const {
+    return _type;
+}
+
+const glm::uvec3& NewTexture::dimensions() const {
+    return _dimensions;
+}
+
+NewTexture::Format NewTexture::format() const {
+    return _format;
+}
+
+GLenum NewTexture::internalFormat() const {
+    return _internalFormat;
+}
+
+NewTexture::FilterMode NewTexture::filter() const {
+    return _filter;
+}
+
+std::array<GLenum, 4> NewTexture::swizzleMask() const {
+    return _swizzleMask;
+}
+
+GLenum NewTexture::dataType() const {
+    return _dataType;
+}
+
+int NewTexture::numberOfChannels() const {
+    return numberOfChannels(_format);
+}
+
+GLubyte NewTexture::bytesPerPixel() const {
+    const size_t numChannels = numberOfChannels();
+    int szType = 0;
+    switch (_dataType) {
+        case GL_UNSIGNED_BYTE:
+        case GL_BYTE:
+        case GL_UNSIGNED_BYTE_3_3_2:
+        case GL_UNSIGNED_BYTE_2_3_3_REV:
+            szType = 1;
+            break;
+        case GL_UNSIGNED_SHORT:
+        case GL_SHORT:
+        case GL_UNSIGNED_SHORT_5_6_5:
+        case GL_UNSIGNED_SHORT_5_6_5_REV:
+        case GL_UNSIGNED_SHORT_4_4_4_4:
+        case GL_UNSIGNED_SHORT_4_4_4_4_REV:
+        case GL_UNSIGNED_SHORT_5_5_5_1:
+        case GL_UNSIGNED_SHORT_1_5_5_5_REV:
+            szType = 2;
+            break;
+        case GL_UNSIGNED_INT:
+        case GL_INT:
+        case GL_FLOAT:
+        case GL_UNSIGNED_INT_8_8_8_8:
+        case GL_UNSIGNED_INT_8_8_8_8_REV:
+        case GL_UNSIGNED_INT_10_10_10_2:
+        case GL_UNSIGNED_INT_2_10_10_10_REV:
+            szType = 4;
+            break;
+        default:
+            throw MissingCaseException();
+    }
+
+    return static_cast<GLubyte>(szType * numChannels);
+}
+
+NewTexture::WrappingModes NewTexture::wrapping() const {
+    return _wrapping;
+}
+
+void NewTexture::uploadDataToTexture(const void* pixelData, int pixelAlignment) const {
+    glPixelStorei(GL_UNPACK_ALIGNMENT, pixelAlignment);
+
+    switch (_type) {
+        case GL_TEXTURE_1D:
+            glTextureSubImage1D(_id, 0, 0, _dimensions.x, GLenum(_format), _dataType, pixelData);
+            break;
+        case GL_TEXTURE_2D:
+            glTextureSubImage2D(_id, 0, 0, 0, _dimensions.x, _dimensions.y, GLenum(_format), _dataType, pixelData);
+            break;
+        case GL_TEXTURE_3D:
+            glTextureSubImage3D(_id, 0, 0, 0, 0, _dimensions.x, _dimensions.y, _dimensions.z, GLenum(_format), _dataType, pixelData);
+            break;
+        default:
+            throw MissingCaseException();
+    }
 }
 
 } // namespace ghoul::opengl

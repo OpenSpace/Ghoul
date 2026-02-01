@@ -41,6 +41,8 @@
 
 namespace ghoul::opengl {
 
+class NewTexture;
+
 /**
  * This class is a wrapper for an OpenGL program object storing an array of OpenGL
  * shaders. The usual restrictions for shader objects as described in the OpenGL and GLSL
@@ -1287,6 +1289,19 @@ public:
         Transpose transpose = Transpose::No) const;
 
     /**
+     * Locates and sets the uniform(s) \p name with the passed value \p value. Returns
+     * `true` if the initial uniform could be found; `false` otherwise. Will call the
+     * OpenGL function `glProgramUniformHandleui64ARB`.
+     *
+     * \param name The name of the uniform in the ShaderObject%s
+     * \param value The value the uniform should be set to
+     * \return `true` if the initial uniform was successfully located, `false` otherwise
+     *
+     * \pre \p name must not be empty
+     */
+    bool setUniform(const std::string& name, const NewTexture& value) const;
+
+    /**
      * Sets the uniform located at \p location with the passed \p value. Will call the
      * OpenGL function `glProgramUniform1ui`.
      *
@@ -2076,6 +2091,18 @@ public:
     void setUniform(GLint location, const glm::dmat4x4& value,
         Transpose transpose = Transpose::No) const;
 
+    /**
+     * Sets the uniform(s) located at \p location with the passed value \p value. Returns
+     * `true` if the initial uniform could be found; `false` otherwise. Will call the
+     * OpenGL function `glProgramUniformHandleui64ARB`.
+     *
+     * \param location The location of the uniform retrieved from #uniformLocation
+     * \param value The value the uniform should be set to
+     *
+     * \pre \p location must not be `-1`
+     */
+    void setUniform(GLint location, const NewTexture& value) const;
+    
 
     //////////////////////////////////////////////////////////////////////////////////////
     ////// SSBO Bindings
