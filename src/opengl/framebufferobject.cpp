@@ -92,42 +92,15 @@ void FramebufferObject::attachTexture(Texture* texture, GLenum attachment, int m
 {
     switch (texture->type()) {
         case GL_TEXTURE_1D:
-            glFramebufferTexture1D(
-                GL_FRAMEBUFFER,
-                attachment,
-                GL_TEXTURE_1D,
-                *texture,
-                mipLevel
-            );
-            break;
         case GL_TEXTURE_2D:
         case GL_TEXTURE_RECTANGLE:
-            glFramebufferTexture2D(
-                GL_FRAMEBUFFER,
-                attachment,
-                texture->type(),
-                *texture,
-                mipLevel
-            );
+            glNamedFramebufferTexture(_id, attachment, *texture, mipLevel);
             break;
         case GL_TEXTURE_3D:
-            glFramebufferTexture3D(
-                GL_FRAMEBUFFER,
-                attachment,
-                GL_TEXTURE_3D,
-                *texture,
-                mipLevel,
-                zSlice
-            );
+            glNamedFramebufferTextureLayer(_id, attachment, *texture, mipLevel, zSlice);
             break;
         case GL_TEXTURE_2D_ARRAY:
-            glFramebufferTextureLayer(
-                GL_FRAMEBUFFER,
-                attachment,
-                *texture,
-                mipLevel,
-                zSlice
-            );
+            glNamedFramebufferTextureLayer(_id, attachment, *texture, mipLevel, zSlice);
             break;
         default:
             LERROR("Unknown texture type");
@@ -145,7 +118,7 @@ void FramebufferObject::detachTexture(GLenum attachment) {
         LWARNING("Trying to detach unknown texture");
     }
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);
+    glNamedFramebufferTexture(_id, attachment, 0, 0);
 }
 
 void FramebufferObject::detachAll() {
@@ -166,7 +139,7 @@ GLuint FramebufferObject::getActiveObject() {
 }
 
 GLuint FramebufferObject::generateId() {
-    glGenFramebuffers(1, &_id);
+    glCreateFramebuffers(1, &_id);
     return _id;
 }
 
