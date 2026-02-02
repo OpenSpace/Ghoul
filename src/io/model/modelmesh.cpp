@@ -282,11 +282,11 @@ void ModelMesh::initialize() {
 
     // Set vertex attributes pointers
     // Vertex position
-    glEnableVertexAttribArray(0);
+    glEnableVertexArrayAttrib(_vaoID, 0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
 
     // Vertex texture coordinates
-    glEnableVertexAttribArray(1);
+    glEnableVertexArrayAttrib(_vaoID, 1);
     glVertexAttribPointer(
         1,
         2,
@@ -297,7 +297,7 @@ void ModelMesh::initialize() {
     );
 
     // Vertex normals
-    glEnableVertexAttribArray(2);
+    glEnableVertexArrayAttrib(_vaoID, 2);
     glVertexAttribPointer(
         2,
         3,
@@ -308,7 +308,7 @@ void ModelMesh::initialize() {
     );
 
     // Vertex tangent (for normal mapping)
-    glEnableVertexAttribArray(3);
+    glEnableVertexArrayAttrib(_vaoID, 3);
     glVertexAttribPointer(
         3,
         3,
@@ -319,7 +319,7 @@ void ModelMesh::initialize() {
     );
 
     // Vertex color
-    glEnableVertexAttribArray(4);
+    glEnableVertexArrayAttrib(_vaoID, 4);
     glVertexAttribPointer(
         4,
         3,

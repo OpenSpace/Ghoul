@@ -223,10 +223,10 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         float outlineT;
     };
 
-    glEnableVertexAttribArray(0);
+    glEnableVertexArrayAttrib(_orthogonal.vao, 0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(OrthogonalVertex), nullptr);
 
-    glEnableVertexAttribArray(1);
+    glEnableVertexArrayAttrib(_orthogonal.vao, 1);
     glVertexAttribPointer(
         1,
         2,
@@ -236,7 +236,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         reinterpret_cast<const void*>(offsetof(OrthogonalVertex, s))
     );
 
-    glEnableVertexAttribArray(2);
+    glEnableVertexArrayAttrib(_orthogonal.vao, 2);
     glVertexAttribPointer(
         2,
         2,
@@ -268,10 +268,10 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         float outlineT;
     };
 
-    glEnableVertexAttribArray(0);
+    glEnableVertexArrayAttrib(_perspective.vao, 0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PerspectiveVertex), nullptr);
 
-    glEnableVertexAttribArray(1);
+    glEnableVertexArrayAttrib(_perspective.vao, 1);
     glVertexAttribPointer(
         1,
         2,
@@ -281,7 +281,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         reinterpret_cast<const void*>(offsetof(PerspectiveVertex, s))
     );
 
-    glEnableVertexAttribArray(2);
+    glEnableVertexArrayAttrib(_perspective.vao, 2);
     glVertexAttribPointer(
         2,
         2,

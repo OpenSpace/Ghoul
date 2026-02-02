@@ -108,7 +108,7 @@ void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum ty
 {
     uint64_t o = offset;
     glBindVertexArray(_vaoID);
-    glEnableVertexAttribArray(index);
+    glEnableVertexArrayAttrib(_vaoID, index);
     glVertexAttribPointer(
         index,
         size,
