@@ -208,12 +208,6 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
 
     //
     // Configure the OpenGL objects for the orthogonal font rendering
-    glCreateVertexArrays(1, &_orthogonal.vao);
-    glBindVertexArray(_orthogonal.vao);
-
-    glCreateBuffers(1, &_orthogonal.vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, _orthogonal.vbo);
-
     struct OrthogonalVertex {
         float x;
         float y;
@@ -223,41 +217,48 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         float outlineT;
     };
 
+    glCreateBuffers(1, &_orthogonal.vbo);
+    glCreateBuffers(1, &_orthogonal.ibo);
+
+    glCreateVertexArrays(1, &_orthogonal.vao);
+    glVertexArrayVertexBuffer(
+        _orthogonal.vao,
+        0,
+        _orthogonal.vbo,
+        0,
+        sizeof(OrthogonalVertex)
+    );
+    glVertexArrayElementBuffer(_orthogonal.vao, _orthogonal.ibo);
+
     glEnableVertexArrayAttrib(_orthogonal.vao, 0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(OrthogonalVertex), nullptr);
+    glVertexArrayAttribFormat(_orthogonal.vao, 0, 2, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(_orthogonal.vao, 0, 0);
 
     glEnableVertexArrayAttrib(_orthogonal.vao, 1);
-    glVertexAttribPointer(
+    glVertexArrayAttribFormat(
+        _orthogonal.vao,
         1,
         2,
         GL_FLOAT,
         GL_FALSE,
-        sizeof(OrthogonalVertex),
-        reinterpret_cast<const void*>(offsetof(OrthogonalVertex, s))
+        offsetof(OrthogonalVertex, s)
     );
+    glVertexArrayAttribBinding(_orthogonal.vao, 1, 0);
 
     glEnableVertexArrayAttrib(_orthogonal.vao, 2);
-    glVertexAttribPointer(
+    glVertexArrayAttribFormat(
+        _orthogonal.vao,
         2,
         2,
         GL_FLOAT,
         GL_FALSE,
-        sizeof(OrthogonalVertex),
-        reinterpret_cast<const void*>(offsetof(OrthogonalVertex, outlineS))
+        offsetof(OrthogonalVertex, outlineS)
     );
-
-    glCreateBuffers(1, &_orthogonal.ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _orthogonal.ibo);
+    glVertexArrayAttribBinding(_orthogonal.vao, 2, 0);
 
 
     //
     // Configure the OpenGL objects for the projective font rendering
-    glCreateVertexArrays(1, &_perspective.vao);
-    glBindVertexArray(_perspective.vao);
-
-    glCreateBuffers(1, &_perspective.vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, _perspective.vbo);
-
     struct PerspectiveVertex {
         float x;
         float y;
@@ -268,32 +269,43 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         float outlineT;
     };
 
+    glCreateBuffers(1, &_perspective.vbo);
+    glCreateBuffers(1, &_perspective.ibo);
+    glCreateVertexArrays(1, &_perspective.vao);
+    glVertexArrayVertexBuffer(
+        _perspective.vao,
+        0,
+        _perspective.vbo,
+        0,
+        sizeof(PerspectiveVertex)
+    );
+    glVertexArrayElementBuffer(_perspective.vao, _perspective.ibo);
+
     glEnableVertexArrayAttrib(_perspective.vao, 0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PerspectiveVertex), nullptr);
+    glVertexArrayAttribFormat(_perspective.vao, 0, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(_perspective.vao, 0, 0);
 
     glEnableVertexArrayAttrib(_perspective.vao, 1);
-    glVertexAttribPointer(
+    glVertexArrayAttribFormat(
+        _perspective.vao,
         1,
         2,
         GL_FLOAT,
         GL_FALSE,
-        7 * sizeof(float),
-        reinterpret_cast<const void*>(offsetof(PerspectiveVertex, s))
+        offsetof(PerspectiveVertex, s)
     );
+    glVertexArrayAttribBinding(_perspective.vao, 1, 0);
 
     glEnableVertexArrayAttrib(_perspective.vao, 2);
-    glVertexAttribPointer(
+    glVertexArrayAttribFormat(
+        _perspective.vao,
         2,
         2,
         GL_FLOAT,
         GL_FALSE,
-        7 * sizeof(float),
-        reinterpret_cast<const void*>(offsetof(PerspectiveVertex, outlineS))
+        offsetof(PerspectiveVertex, outlineS)
     );
-
-    glCreateBuffers(1, &_perspective.ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _perspective.ibo);
-    glBindVertexArray(0);
+    glVertexArrayAttribBinding(_perspective.vao, 2, 0);
 
     _vertexBuffer.reserve(128 * 10);
     _indexBuffer.reserve(128 * 10);

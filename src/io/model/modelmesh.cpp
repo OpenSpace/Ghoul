@@ -258,11 +258,7 @@ void ModelMesh::initialize() {
         return;
     }
 
-    glCreateVertexArrays(1, &_vaoID);
-    glBindVertexArray(_vaoID);
-
     glCreateBuffers(1, &_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glNamedBufferData(
         _vbo,
         _vertices.size() * sizeof(Vertex),
@@ -271,7 +267,6 @@ void ModelMesh::initialize() {
     );
 
     glCreateBuffers(1, &_ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glNamedBufferData(
         _ibo,
         _indices.size() * sizeof(unsigned int),
@@ -279,57 +274,29 @@ void ModelMesh::initialize() {
         GL_STATIC_DRAW
     );
 
+    glCreateVertexArrays(1, &_vaoID);
+    glVertexArrayVertexBuffer(_vaoID, 0, _vbo, 0, sizeof(Vertex));
+    glVertexArrayElementBuffer(_vaoID, _ibo);
 
-    // Set vertex attributes pointers
-    // Vertex position
     glEnableVertexArrayAttrib(_vaoID, 0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
+    glVertexArrayAttribFormat(_vaoID, 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex));
+    glVertexArrayAttribBinding(_vaoID, 0, 0);
 
-    // Vertex texture coordinates
     glEnableVertexArrayAttrib(_vaoID, 1);
-    glVertexAttribPointer(
-        1,
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(Vertex),
-        reinterpret_cast<const GLvoid*>(offsetof(Vertex, tex))
-    );
+    glVertexArrayAttribFormat(_vaoID, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
+    glVertexArrayAttribBinding(_vaoID, 1, 0);
 
-    // Vertex normals
     glEnableVertexArrayAttrib(_vaoID, 2);
-    glVertexAttribPointer(
-        2,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(Vertex),
-        reinterpret_cast<const GLvoid*>(offsetof(Vertex, normal))
-    );
+    glVertexArrayAttribFormat(_vaoID, 2, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
+    glVertexArrayAttribBinding(_vaoID, 2, 0);
 
-    // Vertex tangent (for normal mapping)
     glEnableVertexArrayAttrib(_vaoID, 3);
-    glVertexAttribPointer(
-        3,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(Vertex),
-        reinterpret_cast<const GLvoid*>(offsetof(Vertex, tangent))
-    );
+    glVertexArrayAttribFormat(_vaoID, 3, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, tangent));
+    glVertexArrayAttribBinding(_vaoID, 3, 0);
 
-    // Vertex color
     glEnableVertexArrayAttrib(_vaoID, 4);
-    glVertexAttribPointer(
-        4,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(Vertex),
-        reinterpret_cast<const GLvoid*>(offsetof(Vertex, color))
-    );
-
-    glBindVertexArray(0);
+    glVertexArrayAttribFormat(_vaoID, 4, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, color));
+    glVertexArrayAttribBinding(_vaoID, 4, 0);
 
     // initialize textures
     // Also chack if there are several textures/colors of the same type for this mesh
