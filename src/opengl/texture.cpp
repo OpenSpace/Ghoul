@@ -236,28 +236,26 @@ std::array<GLenum, 4> Texture::swizzleMask() const {
 void Texture::applyFilter() {
     ZoneScoped;
 
-    bind();
-
     switch (_filter) {
         case FilterMode::Nearest:
-            glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             break;
         case FilterMode::Linear:
-            glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
         case FilterMode::LinearMipMap:
-            glGenerateMipmap(_type);
-            glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
+            glGenerateTextureMipmap(_id);
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
             break;
         case FilterMode::AnisotropicMipMap:
-            glGenerateMipmap(_type);
-            glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(_type, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
+            glGenerateTextureMipmap(_id);
+            glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTextureParameteri(_id, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
             if (std::equal_to<>()(_anisotropyLevel, -1.f)) {
                 GLfloat maxTextureAnisotropy = 1.0;
                 glGetFloatv(
@@ -266,8 +264,8 @@ void Texture::applyFilter() {
                 );
                 _anisotropyLevel = maxTextureAnisotropy;
             }
-            glTexParameterf(_type, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
-            glTexParameteri(_type, GL_TEXTURE_BASE_LEVEL, 0);
+            glTextureParameterf(_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, _anisotropyLevel);
+            glTextureParameteri(_id, GL_TEXTURE_BASE_LEVEL, 0);
             break;
     }
 }
@@ -374,17 +372,15 @@ int Texture::mipMapLevel() const {
 void Texture::applyWrapping() const {
     ZoneScoped;
 
-    bind();
-
     switch (_type) {
         case GL_TEXTURE_3D:
-            glTexParameteri(_type, GL_TEXTURE_WRAP_R, static_cast<GLint>(_wrapping.r));
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_R, static_cast<GLint>(_wrapping.r));
             [[fallthrough]];
         case GL_TEXTURE_2D:
-            glTexParameteri(_type, GL_TEXTURE_WRAP_T, static_cast<GLint>(_wrapping.t));
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_T, static_cast<GLint>(_wrapping.t));
             [[fallthrough]];
         case GL_TEXTURE_1D:
-            glTexParameteri(_type, GL_TEXTURE_WRAP_S, static_cast<GLint>(_wrapping.s));
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_S, static_cast<GLint>(_wrapping.s));
             break;
         default:
             throw MissingCaseException();
@@ -393,8 +389,7 @@ void Texture::applyWrapping() const {
 
 void Texture::applySwizzleMask() {
     if (_swizzleMaskChanged) {
-        bind();
-        glTexParameteriv(_type, GL_TEXTURE_SWIZZLE_RGBA, _swizzleMask.data());
+        glTextureParameteriv(_id, GL_TEXTURE_SWIZZLE_RGBA, _swizzleMask.data());
     }
 }
 
