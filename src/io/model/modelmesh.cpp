@@ -259,19 +259,19 @@ void ModelMesh::initialize() {
     }
 
     glCreateBuffers(1, &_vbo);
-    glNamedBufferData(
+    glNamedBufferStorage(
         _vbo,
         _vertices.size() * sizeof(Vertex),
         _vertices.data(),
-        GL_STATIC_DRAW
+        GL_NONE_BIT
     );
 
     glCreateBuffers(1, &_ibo);
-    glNamedBufferData(
+    glNamedBufferStorage(
         _ibo,
         _indices.size() * sizeof(unsigned int),
         _indices.data(),
-        GL_STATIC_DRAW
+        GL_NONE_BIT
     );
 
     glCreateVertexArrays(1, &_vaoID);

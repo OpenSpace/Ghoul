@@ -79,20 +79,20 @@ void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
 
     glCreateBuffers(1, &_vBufferID);
     glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
-    glNamedBufferData(
+    glNamedBufferStorage(
         _vBufferID,
         vertexArray.size() * sizeof(GLfloat),
         vertexArray.data(),
-        GL_STATIC_DRAW
+        GL_NONE_BIT
     );
 
     glCreateBuffers(1, &_iBufferID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
-    glNamedBufferData(
+    glNamedBufferStorage(
         _iBufferID,
         indexArray.size() * sizeof(GLint),
         indexArray.data(),
-        GL_STATIC_DRAW
+        GL_NONE_BIT
     );
 
     glBindVertexArray(0);
