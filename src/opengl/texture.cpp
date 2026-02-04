@@ -444,12 +444,10 @@ void Texture::uploadDataToTexture(void* pixelData) const {
 }
 
 void Texture::reUploadDataToTexture(void* pixelData) const {
-    bind();
-
     switch (_type) {
         case GL_TEXTURE_1D:
-            glTexSubImage1D(
-                _type,
+            glTextureSubImage1D(
+                _id,
                 0,
                 0,
                 GLsizei(_dimensions.x),
@@ -459,8 +457,8 @@ void Texture::reUploadDataToTexture(void* pixelData) const {
             );
             break;
         case GL_TEXTURE_2D:
-            glTexSubImage2D(
-                _type,
+            glTextureSubImage2D(
+                _id,
                 0,
                 0,
                 0,
@@ -472,8 +470,8 @@ void Texture::reUploadDataToTexture(void* pixelData) const {
             );
             break;
         case GL_TEXTURE_3D:
-            glTexSubImage3D(
-                _type,
+            glTextureSubImage3D(
+                _id,
                 0,
                 0,
                 0,
@@ -1374,9 +1372,7 @@ glm::vec4 Texture::texelAsFloat(const glm::uvec3& pos) const {
 
 void Texture::setBorderColor(glm::vec4 borderColor) {
     _borderColor = std::move(borderColor);
-
-    bind();
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(_borderColor));
+    glTextureParameterfv(_id, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(_borderColor));
 }
 
 glm::vec4 Texture::borderColor() const {
