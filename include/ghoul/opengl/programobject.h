@@ -242,6 +242,17 @@ public:
     void rebuildFromFile();
 
     /**
+     * Calls the OpenGL driver to validate the program object. This should only be done
+     * close to the actual draw call usage and with the same state. Any messages reported
+     * by the driver will be printed as informational messages. If the validation fails
+     * an error message will be raised.
+     *
+     * Note: This function should only be called when full performance is not needed, for
+     * example in Debug environments or during shaderd development
+     */
+    void validate() const;
+
+    /**
      * Returns whether this ProgramObject is dirty and needs to be recompiled and rebuilt
      * due to a change in the underlying file. A ProgramObject is automatically set to be
      * not dirty once it is linked correctly.

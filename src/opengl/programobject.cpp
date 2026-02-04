@@ -283,6 +283,36 @@ void ProgramObject::rebuildFromFile() {
     *this = std::move(p);
 }
 
+void ProgramObject::validate() const {
+    glValidateProgram(_id);
+
+    GLint success = 0;
+    glGetProgramiv(_id, GL_VALIDATE_STATUS, &success);
+
+    GLint logLength = 0;
+    glGetProgramiv(_id, GL_INFO_LOG_LENGTH, &logLength);
+
+    if (success == GL_TRUE) {
+        if (logLength > 0) {
+            std::vector<GLchar> rawLog(logLength);
+            glGetProgramInfoLog(_id, logLength, nullptr, rawLog.data());
+            const std::string log = std::string(rawLog.data());
+            LINFO(log);
+        }
+    }
+    else {
+        if (logLength > 0) {
+            std::vector<GLchar> rawLog(logLength);
+            glGetProgramInfoLog(_id, logLength, nullptr, rawLog.data());
+            const std::string log = std::string(rawLog.data());
+            LERROR(log);
+        }
+        else {
+            LERROR("Unknown error validating program");
+        }
+    }
+}
+
 bool ProgramObject::isDirty() const {
     return _programIsDirty;
 }
