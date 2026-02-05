@@ -507,12 +507,15 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             const GLushort idx3 = vertexIndex + 3;
             _indexBuffer.insert(_indexBuffer.end(), { idx, idx1, idx2, idx, idx2, idx3 });
             vertexIndex += 4;
-            _vertexBuffer.insert(_vertexBuffer.end(), {
-                x0, y0, s0, t0, outlineS0, outlineT0,
-                x0, y1, s0, t1, outlineS0, outlineT1,
-                x1, y1, s1, t1, outlineS1, outlineT1,
-                x1, y0, s1, t0, outlineS1, outlineT0
-            });
+            _vertexBuffer.insert(
+                _vertexBuffer.end(),
+                {
+                    x0, y0, s0, t0, outlineS0, outlineT0,
+                    x0, y1, s0, t1, outlineS0, outlineT1,
+                    x1, y1, s1, t1, outlineS1, outlineT1,
+                    x1, y0, s1, t0, outlineS1, outlineT0
+                }
+            );
             movingPos.x += glyph->horizontalAdvance;
 
             width += glyph->horizontalAdvance;
@@ -697,12 +700,15 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 }
             }
 
-            _vertexBuffer.insert(_vertexBuffer.end(), {
-                p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
-                p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
-                p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
-                p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
-            });
+            _vertexBuffer.insert(
+                _vertexBuffer.end(),
+                {
+                    p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
+                    p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
+                    p2.x, p2.y, p2.z, s1, t1, outlineS1, outlineT1,
+                    p3.x, p3.y, p3.z, s1, t0, outlineS1, outlineT0
+                }
+            );
 
             const unsigned short vi = vertexIndex;
             const unsigned short vi1 = vertexIndex + 1;
@@ -750,7 +756,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         _uniformCacheProjection.disableTransmittance,
         labelInfo.disableTransmittance
     );
-
 
     glNamedBufferData(
         _perspective.vbo,
