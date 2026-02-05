@@ -58,8 +58,8 @@ void VertexBufferObject::initialize(const std::vector<T>& vertexArray,
     );
 
     glCreateVertexArrays(1, &_vaoID);
-    glVertexArrayVertexBuffer(_vaoId, 0, _vBufferID, 0, 3 * sizeof(float));
-    glVertexArrayElementBuffer(_vaoId, _iBufferID);
+    glVertexArrayVertexBuffer(_vaoID, 0, _vBufferID, 0, 3 * sizeof(float));
+    glVertexArrayElementBuffer(_vaoID, _iBufferID);
 }
 
 } // namespace ghoul::opengl
