@@ -292,7 +292,7 @@ void ProgramObject::validate() const {
     GLint logLength = 0;
     glGetProgramiv(_id, GL_INFO_LOG_LENGTH, &logLength);
 
-    if (success == GL_TRUE) {
+    if (success) {
         if (logLength > 0) {
             std::vector<GLchar> rawLog(logLength);
             glGetProgramInfoLog(_id, logLength, nullptr, rawLog.data());
