@@ -109,7 +109,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                 // Use texture or color
                 if (texture.hasTexture) {
                     // Activate proper texture unit before binding
-                    textureUnits[textureUnitIndex].activate();
+                    textureUnits[textureUnitIndex].bind(*texture.texture);
 
                     // Specular special case
                     if (texture.type == TextureType::TextureSpecular) {
@@ -119,9 +119,6 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                     // Tell shader to use textures and set texture unit
                     program.setUniform("has_" + name, true);
                     program.setUniform(name, textureUnits[textureUnitIndex]);
-
-                    // And finally bind the texture
-                    texture.texture->bind();
 
                     // Advance the texture unit index
                     textureUnitIndex++;
@@ -153,14 +150,11 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                     // Use texture or color
                     if (texture.hasTexture) {
                         // Activate proper texture unit before binding
-                        textureUnits[textureUnitIndex].activate();
+                        textureUnits[textureUnitIndex].bind(*texture.texture);
 
                         // Tell shader to use textures and set texture unit
                         program.setUniform("has_texture_diffuse", true);
                         program.setUniform("baseTexture", textureUnits[textureUnitIndex]);
-
-                        // And finally bind the texture
-                        texture.texture->bind();
 
                         // Advance the texture unit index
                         textureUnitIndex++;
@@ -279,7 +273,7 @@ void ModelMesh::initialize() {
     glVertexArrayElementBuffer(_vaoID, _ibo);
 
     glEnableVertexArrayAttrib(_vaoID, 0);
-    glVertexArrayAttribFormat(_vaoID, 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex));
+    glVertexArrayAttribFormat(_vaoID, 0, 3, GL_FLOAT, GL_FALSE, 0);
     glVertexArrayAttribBinding(_vaoID, 0, 0);
 
     glEnableVertexArrayAttrib(_vaoID, 1);

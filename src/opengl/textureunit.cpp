@@ -25,6 +25,7 @@
 
 #include <ghoul/opengl/textureunit.h>
 
+#include <ghoul/opengl/texture.h>
 #include <ghoul/systemcapabilities/systemcapabilities.h>
 #include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 #include <utility>
@@ -47,17 +48,18 @@ TextureUnit::TextureUnit() {
 }
 
 TextureUnit::~TextureUnit() {
-    deactivate();
+    unassign();
 }
 
-void TextureUnit::activate() {
+void TextureUnit::bind(GLuint texture) {
     if (!_assigned) {
         assignUnit();
     }
-    glActiveTexture(_glEnum);
+
+    glBindTextureUnit(_number, texture);
 }
 
-void TextureUnit::deactivate() {
+void TextureUnit::unassign() {
     if (_assigned) {
         _assigned = false;
         _busyUnits.at(_number) = false;
@@ -67,30 +69,11 @@ void TextureUnit::deactivate() {
     }
 }
 
-GLenum TextureUnit::glEnum() {
-    if (!_assigned) {
-        assignUnit();
-    }
-    return _glEnum;
-}
-
-GLint TextureUnit::unitNumber() {
+TextureUnit::operator GLint() {
     if (!_assigned) {
         assignUnit();
     }
     return _number;
-}
-
-TextureUnit::operator GLint() {
-    return unitNumber();
-}
-
-void TextureUnit::setZeroUnit() {
-    glActiveTexture(GL_TEXTURE0);
-}
-
-int TextureUnit::numberActiveUnits() {
-    return _totalActive;
 }
 
 void TextureUnit::assignUnit() {
@@ -116,7 +99,8 @@ void TextureUnit::initialize() {
         _maxTexUnits = OpenGLCap.maxTextureUnits();
     }
     else {
-        _maxTexUnits = 8; // Reasonable default setting for OpenGL
+        // OpenGL requires at least 16 texture units to exist
+        _maxTexUnits = 16;
     }
     _busyUnits = std::vector<bool>(_maxTexUnits, false);
     _isInitialized = true;

@@ -61,45 +61,18 @@ public:
      */
     ~TextureUnit();
 
-    TextureUnit(const TextureUnit&) = default;
     TextureUnit(TextureUnit&&) noexcept = default;
 
     /**
-     * This method will activate the enum assigned to this TextureUnit. If this is the
-     * first call to either activate, #glEnum, or #unitNumber, a free unit number will be
-     * assigned to this object. This will call the OpenGL function
-     * `glActiveTexture` with the enum as a parameter.
-     *
-     * \throw TextureUnitError If the new unit number could not be assigned
+     * Activates and binds the provided texture to the TextureUnit. 
      */
-    void activate();
+    void bind(GLuint texture);
 
     /**
      * This method will deactivate the enum assigned to this TextureUnit and mark it as
      * free again.
      */
-    void deactivate();
-
-    /**
-     * This method returns the texture unit enum that was assigned to this TextureUnit. If
-     * this is the first call to either #activate, glEnum, or #unitNumber, a free unit
-     * enum will be assigned to this object. The returned enum is equivalent to
-     * `GL_TEXTURE0 + unitNumber()`.
-     *
-     * \return The unit enum that was assigned to this TextureUnit
-     */
-    GLenum glEnum();
-
-    /**
-     * This method returns the texture unit number that was assigned to this TextureUnit.
-     * If this is the first call to either #activate, #glEnum, or unitNumber, a free unit
-     * number will be assigned to this object.
-     *
-     * \return The texture unit number that was assigned to this TextureUnit
-     *
-     * \throw TextureUnitError If the new unit number could not be assigned
-     */
-    GLint unitNumber();
+    void unassign();
 
     /**
      * This operator returns the texture unit number that was assigned to this
@@ -112,22 +85,6 @@ public:
      * \throw TextureUnitError If the new unit number could not be assigned
      */
     operator GLint();
-
-    /**
-     * Sets the zero unit as the active texture unit. This call is equivalent to calling
-     * the OpenGL function `glActiveTexture(GL_TEXTURE0)`.
-     */
-    static void setZeroUnit();
-
-    /**
-     * This method returns the number texture units that have been marked as used by
-     * calling one of the methods #activate, #glEnum, or #unitNumber. The maximum number
-     * of supported texture units can be queried from the
-     * #ghoul::systemcapabilities::SystemCapabilities.
-     *
-     * \return The number of texture units in use
-     */
-    static int numberActiveUnits();
 
 private:
     /**

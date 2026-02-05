@@ -524,8 +524,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     size.y = lines * font.height();
 
     opengl::TextureUnit atlasUnit;
-    atlasUnit.activate();
-    font.atlasTexture().bind();
+    atlasUnit.bind(font.atlasTexture());
 
     _program->setUniform(_uniformCache.baseColor, color);
     _program->setUniform(_uniformCache.outlineColor, outlineColor);
@@ -732,8 +731,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     _program->activate();
 
     opengl::TextureUnit atlasUnit;
-    atlasUnit.activate();
-    font.atlasTexture().bind();
+    atlasUnit.bind(font.atlasTexture());
 
     _program->setUniform(_uniformCacheProjection.baseColor, color);
     _program->setUniform(_uniformCacheProjection.outlineColor, outlineColor);
