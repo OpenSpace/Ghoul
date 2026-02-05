@@ -152,10 +152,6 @@ void Texture::disable()  const {
     glDisable(_type);
 }
 
-void Texture::bind() const {
-    glBindTexture(_type, _id);
-}
-
 Texture::operator GLuint() const {
     return _id;
 }
@@ -394,8 +390,7 @@ void Texture::applySwizzleMask() {
 }
 
 void Texture::uploadDataToTexture(void* pixelData) const {
-    bind();
-
+    glBindTexture(_type, _id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, _pixelAlignment);
 
     switch (_type) {
@@ -516,11 +511,11 @@ void Texture::purgeFromRAM() {
 }
 
 void Texture::downloadTexture() {
-    bind();
     if (!_pixels) {
         allocateMemory();
     }
-    glGetTexImage(_type, 0, GLenum(_format), _dataType, _pixels);
+    const unsigned int arraySize = compMul(_dimensions) * _bpp;
+    glGetTextureImage(_id, 0, GLenum(_format), _dataType, arraySize, _pixels);
 }
 
 glm::vec4 Texture::texelAsFloat(unsigned int x) const {

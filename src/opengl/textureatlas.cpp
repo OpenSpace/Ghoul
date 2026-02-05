@@ -119,7 +119,6 @@ int TextureAtlas::spaceUsed() const {
 
 void TextureAtlas::upload() {
     _texture->setPixelData(_data.data(), Texture::TakeOwnership::No);
-    _texture->bind();
     _texture->uploadTexture();
 }
 

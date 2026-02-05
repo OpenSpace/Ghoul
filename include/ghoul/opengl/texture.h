@@ -211,11 +211,6 @@ public:
     void disable() const;
 
     /**
-     * Binds this texture to the texture type by calling `glBindTexture`.
-     */
-    void bind() const;
-
-    /**
      * Returns the OpenGL name of this texture.
      */
     operator GLuint() const;
