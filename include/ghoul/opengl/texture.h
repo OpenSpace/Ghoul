@@ -1009,8 +1009,9 @@ public:
     NewTexture(glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
         FilterMode filter = FilterMode::Linear,
-        WrappingModes wrapping = { WrappingMode::Repeat },
-        std::array<GLenum, 4> swizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA },
+        WrappingModes wrapping = {
+            WrappingMode::Repeat, WrappingMode::Repeat, WrappingMode::Repeat
+        }, std::array<GLenum, 4> swizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA },
         int mipMapLevel = 8, glm::vec4 borderColor = glm::vec4(0.f, 0.f, 0.f, 1.f));
 
     /**
@@ -1048,7 +1049,9 @@ public:
     NewTexture(const void* data, glm::uvec3 dimensions, GLenum type, Format format = Format::RGBA,
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
         FilterMode filter = FilterMode::Linear,
-        WrappingModes wrapping = { WrappingMode::Repeat }, int pixelAlignment = 1,
+        WrappingModes wrapping = {
+            WrappingMode::Repeat, WrappingMode::Repeat, WrappingMode::Repeat
+        }, int pixelAlignment = 1,
         std::array<GLenum, 4> swizzleMask = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA },
         int mipMapLevel = 8, glm::vec4 borderColor = glm::vec4(0.f, 0.f, 0.f, 1.f));
 
@@ -1173,8 +1176,7 @@ public:
      * data has a different size, undefined behavior will occur. This Texture will take
      * ownership of the data array.
      *
-     * \param pixels The pointer to the new data array that should be used.
-     * \param takeOwnership Should this Texture take ownership of the data and delete it?
+     * \param pixelData The pointer to the new data array that should be used.
      * \param pixelAlignment The byte-alignment for each of the pixels in the provided
      *        \p pixels array
      */
