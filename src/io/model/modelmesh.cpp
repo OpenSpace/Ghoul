@@ -179,7 +179,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
     program.setUniform("meshNormalTransform", glm::mat4(normalTransform));
 
     // Render the mesh object
-    glBindVertexArray(_vaoID);
+    glBindVertexArray(_vao);
     glDrawElements(
         GL_TRIANGLES,
         static_cast<GLsizei>(_indices.size()),
@@ -268,29 +268,29 @@ void ModelMesh::initialize() {
         GL_NONE_BIT
     );
 
-    glCreateVertexArrays(1, &_vaoID);
-    glVertexArrayVertexBuffer(_vaoID, 0, _vbo, 0, sizeof(Vertex));
-    glVertexArrayElementBuffer(_vaoID, _ibo);
+    glCreateVertexArrays(1, &_vao);
+    glVertexArrayVertexBuffer(_vao, 0, _vbo, 0, sizeof(Vertex));
+    glVertexArrayElementBuffer(_vao, _ibo);
 
-    glEnableVertexArrayAttrib(_vaoID, 0);
-    glVertexArrayAttribFormat(_vaoID, 0, 3, GL_FLOAT, GL_FALSE, 0);
-    glVertexArrayAttribBinding(_vaoID, 0, 0);
+    glEnableVertexArrayAttrib(_vao, 0);
+    glVertexArrayAttribFormat(_vao, 0, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(_vao, 0, 0);
 
-    glEnableVertexArrayAttrib(_vaoID, 1);
-    glVertexArrayAttribFormat(_vaoID, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
-    glVertexArrayAttribBinding(_vaoID, 1, 0);
+    glEnableVertexArrayAttrib(_vao, 1);
+    glVertexArrayAttribFormat(_vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
+    glVertexArrayAttribBinding(_vao, 1, 0);
 
-    glEnableVertexArrayAttrib(_vaoID, 2);
-    glVertexArrayAttribFormat(_vaoID, 2, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
-    glVertexArrayAttribBinding(_vaoID, 2, 0);
+    glEnableVertexArrayAttrib(_vao, 2);
+    glVertexArrayAttribFormat(_vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
+    glVertexArrayAttribBinding(_vao, 2, 0);
 
-    glEnableVertexArrayAttrib(_vaoID, 3);
-    glVertexArrayAttribFormat(_vaoID, 3, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, tangent));
-    glVertexArrayAttribBinding(_vaoID, 3, 0);
+    glEnableVertexArrayAttrib(_vao, 3);
+    glVertexArrayAttribFormat(_vao, 3, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, tangent));
+    glVertexArrayAttribBinding(_vao, 3, 0);
 
-    glEnableVertexArrayAttrib(_vaoID, 4);
-    glVertexArrayAttribFormat(_vaoID, 4, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, color));
-    glVertexArrayAttribBinding(_vaoID, 4, 0);
+    glEnableVertexArrayAttrib(_vao, 4);
+    glVertexArrayAttribFormat(_vao, 4, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, color));
+    glVertexArrayAttribBinding(_vao, 4, 0);
 
     // initialize textures
     // Also chack if there are several textures/colors of the same type for this mesh
@@ -330,11 +330,8 @@ void ModelMesh::initialize() {
 
 void ModelMesh::deinitialize() {
     glDeleteBuffers(1, &_vbo);
-    _vbo = 0;
-    glDeleteVertexArrays(1, &_vaoID);
-    _vaoID = 0;
+    glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_ibo);
-    _ibo = 0;
 }
 
 } // namespace ghoul::io

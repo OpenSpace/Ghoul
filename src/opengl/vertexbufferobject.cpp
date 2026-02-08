@@ -28,41 +28,41 @@
 namespace ghoul::opengl {
 
 VertexBufferObject::VertexBufferObject(VertexBufferObject&& other) noexcept
-    : _vaoID(other._vaoID)
-    , _vBufferID(other._vBufferID)
-    , _iBufferID(other._iBufferID)
+    : _vao(other._vao)
+    , _vbo(other._vbo)
+    , _ibo(other._ibo)
     , _iSize(other._iSize)
 {
 
-    other._vaoID = 0;
-    other._vBufferID = 0;
-    other._iBufferID = 0;
+    other._vao = 0;
+    other._vbo = 0;
+    other._ibo = 0;
     other._iSize = 0;
 }
 
 VertexBufferObject& VertexBufferObject::operator=(VertexBufferObject&& other) noexcept {
     if (this != &other) {
-        _vaoID = other._vaoID;
-        _vBufferID = other._vBufferID;
-        _iBufferID = other._iBufferID;
+        _vao = other._vao;
+        _vbo = other._vbo;
+        _ibo = other._ibo;
         _iSize = other._iSize;
 
-        other._vaoID = 0;
-        other._vBufferID = 0;
-        other._iBufferID = 0;
+        other._vao = 0;
+        other._vbo = 0;
+        other._ibo = 0;
         other._iSize = 0;
     }
     return *this;
 }
 
 VertexBufferObject::~VertexBufferObject() {
-    glDeleteBuffers(1, &_vBufferID);
-    glDeleteBuffers(1, &_iBufferID);
-    glDeleteVertexArrays(1, &_vaoID);
+    glDeleteBuffers(1, &_vbo);
+    glDeleteBuffers(1, &_ibo);
+    glDeleteVertexArrays(1, &_vao);
 }
 
 bool VertexBufferObject::isInitialized() const {
-    return (_vaoID != 0) && (_vBufferID != 0) && (_iBufferID != 0) && (_iSize > 0);
+    return (_vao != 0) && (_vbo != 0) && (_ibo != 0) && (_iSize > 0);
 }
 
 void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
@@ -72,24 +72,24 @@ void VertexBufferObject::initialize(const std::vector<GLfloat>& vertexArray,
     ghoul_assert(!vertexArray.empty(), "Vertex array must not be empty");
     ghoul_assert(!indexArray.empty(), "Index array must not be empty");
 
-    glCreateVertexArrays(1, &_vaoID);
-    glBindVertexArray(_vaoID);
+    glCreateVertexArrays(1, &_vao);
+    glBindVertexArray(_vao);
 
     _iSize = static_cast<unsigned int>(indexArray.size());
 
-    glCreateBuffers(1, &_vBufferID);
-    glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
+    glCreateBuffers(1, &_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glNamedBufferStorage(
-        _vBufferID,
+        _vbo,
         vertexArray.size() * sizeof(GLfloat),
         vertexArray.data(),
         GL_NONE_BIT
     );
 
-    glCreateBuffers(1, &_iBufferID);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
+    glCreateBuffers(1, &_ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glNamedBufferStorage(
-        _iBufferID,
+        _ibo,
         indexArray.size() * sizeof(GLint),
         indexArray.data(),
         GL_NONE_BIT
@@ -107,8 +107,8 @@ void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum ty
                                              GLboolean normalized) const
 {
     uint64_t o = offset;
-    glBindVertexArray(_vaoID);
-    glEnableVertexArrayAttrib(_vaoID, index);
+    glBindVertexArray(_vao);
+    glEnableVertexArrayAttrib(_vao, index);
     glVertexAttribPointer(
         index,
         size,
@@ -121,7 +121,7 @@ void VertexBufferObject::vertexAttribPointer(GLuint index, GLint size, GLenum ty
 }
 
 void VertexBufferObject::bind() const {
-    glBindVertexArray(_vaoID);
+    glBindVertexArray(_vao);
 }
 
 void VertexBufferObject::unbind() const {
@@ -129,7 +129,7 @@ void VertexBufferObject::unbind() const {
 }
 
 void VertexBufferObject::render() const {
-    glBindVertexArray(_vaoID);
+    glBindVertexArray(_vao);
     glDrawElements(_mode, _iSize, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }

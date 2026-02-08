@@ -41,25 +41,25 @@ void VertexBufferObject::initialize(const std::vector<T>& vertexArray,
 
     _iSize = static_cast<unsigned int>(indexArray.size());
 
-    glCreateBuffers(1, &_vBufferID);
+    glCreateBuffers(1, &_vbo);
     glNamedBufferStorage(
-        _vBufferID,
+        _vbo,
         vertexArray.size() * sizeof(T),
         vertexArray.data(),
         GL_NONE_BIT
     );
 
-    glCreateBuffers(1, &_iBufferID);
+    glCreateBuffers(1, &_ibo);
     glNamedBufferStorage(
-        _iBufferID,
+        _ibo,
         indexArray.size() * sizeof(GLint),
         indexArray.data(),
         GL_NONE_BIT
     );
 
-    glCreateVertexArrays(1, &_vaoID);
-    glVertexArrayVertexBuffer(_vaoID, 0, _vBufferID, 0, 3 * sizeof(float));
-    glVertexArrayElementBuffer(_vaoID, _iBufferID);
+    glCreateVertexArrays(1, &_vao);
+    glVertexArrayVertexBuffer(_vao, 0, _vbo, 0, 3 * sizeof(float));
+    glVertexArrayElementBuffer(_vao, _ibo);
 }
 
 } // namespace ghoul::opengl

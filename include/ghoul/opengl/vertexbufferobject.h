@@ -141,13 +141,13 @@ public:
 
 private:
     /// The vertex array object that stores the created VertexBufferObject
-    GLuint _vaoID = 0;
+    GLuint _vao = 0;
 
     /// The vertex buffer object
-    GLuint _vBufferID = 0;
+    GLuint _vbo = 0;
 
     /// The index buffer obejct
-    GLuint _iBufferID = 0;
+    GLuint _ibo = 0;
 
     /// The size of the index buffer, determining how many vertices are drawn
     unsigned int _iSize = 0;

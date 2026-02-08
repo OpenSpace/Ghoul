@@ -95,7 +95,7 @@ private:
     bool _isInvisible = false;
     bool _hasVertexColors = false;
 
-    GLuint _vaoID = 0;
+    GLuint _vao = 0;
     GLuint _vbo = 0;
     GLuint _ibo = 0;
 };
