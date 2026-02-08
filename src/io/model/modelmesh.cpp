@@ -329,8 +329,8 @@ void ModelMesh::initialize() {
 }
 
 void ModelMesh::deinitialize() {
-    glDeleteBuffers(1, &_vbo);
     glDeleteVertexArrays(1, &_vao);
+    glDeleteBuffers(1, &_vbo);
     glDeleteBuffers(1, &_ibo);
 }
 
