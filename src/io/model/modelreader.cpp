@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,7 +26,6 @@
 #include <ghoul/io/model/modelreader.h>
 
 #include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/format.h>
 #include <ghoul/io/model/modelreaderbase.h>
@@ -36,7 +35,9 @@
 #include <ghoul/misc/profiling.h>
 #include <ghoul/misc/stringhelper.h>
 #include <algorithm>
-#include <filesystem>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelReader";

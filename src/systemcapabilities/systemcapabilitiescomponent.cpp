@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,13 +27,15 @@
 
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/stringconversion.h>
-#include <map>
+#include <type_traits>
+#include <utility>
 
 #ifdef WIN32
-#include <wbemidl.h>
+#include <Windows.h>
 #include <comdef.h>
+#include <comutil.h>
+#include <WbemCli.h>
+#include <wbemidl.h>
 #endif // WIN32
 
 namespace {

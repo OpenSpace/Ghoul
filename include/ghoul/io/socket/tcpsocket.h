@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,12 +31,10 @@
 #include <ghoul/io/socket/sockettype.h>
 #include <ghoul/misc/exception.h>
 #include <array>
-#include <atomic>
 #include <condition_variable>
 #include <deque>
 #include <mutex>
 #include <thread>
-#include <unordered_map>
 #include <functional>
 
 struct addrinfo;
@@ -55,7 +53,7 @@ public:
 
     TcpSocket(std::string address, int port);
     TcpSocket(std::string address, int port, _SOCKET socket);
-    virtual ~TcpSocket() override;
+    ~TcpSocket() override;
     void connect();
     void startStreams() override;
     void disconnect(int reason = 0) override;

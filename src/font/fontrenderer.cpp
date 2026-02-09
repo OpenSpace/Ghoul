@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -33,13 +33,16 @@
 #include <ghoul/misc/profiling.h>
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/programobject.h>
+#include <ghoul/opengl/shaderobject.h>
 #include <ghoul/opengl/texture.h>
-#include <ghoul/opengl/textureatlas.h>
 #include <ghoul/opengl/textureunit.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <algorithm>
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <numeric>
+#include <utility>
 
 namespace {
     constexpr std::string_view _loggerCat = "FontRenderer";

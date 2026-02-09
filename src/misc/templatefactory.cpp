@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,7 +25,8 @@
 
 #include <ghoul/misc/templatefactory.h>
 
-#include <ghoul/misc/dictionary.h>
+#include <ghoul/format.h>
+#include <utility>
 
 namespace ghoul {
 
@@ -34,7 +35,7 @@ TemplateFactoryError::TemplateFactoryError(std::string msg)
 {}
 
 TemplateClassNotFoundError::TemplateClassNotFoundError(std::string name)
-    : TemplateFactoryError("Could not find class '" + name + "'")
+    : TemplateFactoryError(std::format("Could not find class '{}", name))
     , className(std::move(name))
 {}
 

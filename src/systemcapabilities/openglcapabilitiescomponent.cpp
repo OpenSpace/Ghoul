@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,24 +23,25 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "ghoul/systemcapabilities/openglcapabilitiescomponent.h"
+#include <ghoul/systemcapabilities/openglcapabilitiescomponent.h>
 
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/stringconversion.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <algorithm>
 #include <sstream>
+#include <utility>
 
 #ifdef WIN32
 #include <Windows.h>
-#include <tchar.h>
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "Kernel32.lib")
 typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
-#else
+#else // ^^^ WIN32 | !WIN32 vvv
 #include <sys/utsname.h>
-#endif
+#endif // WIN32
 
 namespace {
     constexpr std::string_view _loggerCat = "OpenGLCapabilities";
@@ -49,7 +50,7 @@ namespace {
 namespace ghoul::systemcapabilities {
 
 OpenGLCapabilitiesComponent::OpenGLCapabilitiesComponentError::
-    OpenGLCapabilitiesComponentError(std::string msg)
+OpenGLCapabilitiesComponentError(std::string msg)
     : RuntimeError(std::move(msg), "OpenGLCapabilitiesComponent")
 {}
 

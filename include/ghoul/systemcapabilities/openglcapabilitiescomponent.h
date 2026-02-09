@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,11 +28,8 @@
 
 #include <ghoul/systemcapabilities/systemcapabilitiescomponent.h>
 
-#include <ghoul/misc/exception.h>
 #include <ghoul/systemcapabilities/systemcapabilities.h>
 #include <ghoul/systemcapabilities/version.h>
-#include <string>
-#include <vector>
 
 namespace ghoul::systemcapabilities {
 

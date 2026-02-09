@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -34,16 +34,14 @@
 namespace ghoul {
 
 namespace detail {
-
-template <typename T>
-struct placement_delete {
-    void operator()(T* ptr) {
-        if (ptr) {
-            ptr->~T();
+    template <typename T>
+    struct placement_delete {
+        void operator()(T* ptr) {
+            if (ptr) {
+                ptr->~T();
+            }
         }
-    }
-};
-
+    };
 } // namespace detail
 
 template <typename T>

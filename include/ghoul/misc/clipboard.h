@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,26 +27,44 @@
 #define __GHOUL___CLIPBOARD___H__
 
 #include <string>
+#include <string_view>
 
 namespace ghoul {
+
+/**
+ * Determines the selection area to which a clipboard action is applied to. Note that this
+ * value only has an effect when running on a Linux system. On Windows, there is only a
+ * single selection area exposed to applications.
+ */
+enum class SelectionArea {
+    Clipboard,
+    Primary,
+    Secondary
+};
 
 /**
  * This function retrieves the contents of the system-wide clipboard and returns the
  * textual representation. If the clipboard does not contain anything, or if there was an
  * error accessing the clipboard, an empty string is returned.
  *
+ * \param selectionArea The selection area from which to return the contents of. This
+ *        parameter is only used on Linux and is ignored on other operating systems
+ *
  * \return The contents of the system-wide clipboard
  */
-std::string clipboardText();
+std::string clipboardText(SelectionArea selectionArea = SelectionArea::Clipboard);
 
 /**
  * Writes a passed text into the system-wide clipboard, overwriting its previous content.
  *
  * \param text The text that is to be written into the clipboard
+ * \param selectionArea The selection area into which the text should be copied. This
+ *        parameter is only used on Linux and is ignored on other operating systems
  *
  * \throw RuntimeError If there was an error writing the text to the clipboard
  */
-void setClipboardText(const std::string& text);
+void setClipboardText(std::string_view text,
+    SelectionArea selectionArea = SelectionArea::Clipboard);
 
 } // namespace ghoul
 

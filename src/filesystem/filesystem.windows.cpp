@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,17 @@
 
 #ifdef WIN32
 
+#include <ghoul/format.h>
+#include <ghoul/filesystem/file.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/exception.h>
+#include <cstdlib>
+#include <filesystem>
+#include <string>
+#include <string_view>
+#include <vector>
+#include <utility>
 #include <Windows.h>
 
 namespace {
@@ -141,7 +150,7 @@ void readStarter(DirectoryHandle* directoryHandle) {
     FileSys.beginRead(directoryHandle);
 }
 
-void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
+static void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) {
     DirectoryHandle* handle = static_cast<DirectoryHandle*>(lpOverlapped->hEvent);
 
     const unsigned char currentBuffer = handle->_activeBuffer;

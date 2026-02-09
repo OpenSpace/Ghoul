@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,7 +27,6 @@
 #define __GHOUL___SHAREDMEMORY___H__
 
 #include <ghoul/misc/exception.h>
-
 #include <map>
 #include <string>
 
@@ -219,15 +218,16 @@ private:
      * specific name otherwise.
      */
     static std::map<const std::string, void*> _createdSections;
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     /// The full allocated size of the shared memory block
     size_t _size = 0;
+
     /**
      * The handle to the virtual file backing this SharedMemory object. Only a virtual
      * file is used, so there is no disk IO necessary.
      */
     int _sharedMemoryHandle;
-#endif
+#endif // !WIN32
 };
 
 } // namespace ghoul

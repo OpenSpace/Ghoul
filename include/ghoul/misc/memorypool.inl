@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,17 +23,12 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/profiling.h>
 #include <algorithm>
+#include <cstring>
 #include <numeric>
-
-#if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
-#include <experimental/memory_resource>
-namespace pmr = std::experimental::pmr;
-#else
-#include <memory_resource>
-namespace pmr = std::pmr;
-#endif
+#include <stdexcept>
 
 namespace {
     constexpr int DebugByte = 0x0F;

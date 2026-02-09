@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,10 +25,13 @@
 
 #include <ghoul/io/texture/texturewriterstb.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/opengl/texture.h>
-#include <stb_image.h>
 #include <stb_image_write.h>
+#include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <string_view>
 
@@ -111,7 +114,7 @@ std::vector<std::string> TextureWriterSTB::supportedExtensions() const {
         "jpeg", "jpg",
         "png",
         "bmp",
-        //"hdr",
+        // "hdr",
         "tga"
     };
 }

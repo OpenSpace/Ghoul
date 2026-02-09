@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -21,40 +21,42 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF  *
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE  *
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
-****************************************************************************************/
+ ****************************************************************************************/
 
-#ifndef __GHOUL___CONSTMAP___H__
-#define __GHOUL___CONSTMAP___H__
+#ifndef __GHOUL___MAP___H__
+#define __GHOUL___MAP___H__
 
-#include <optional>
+#include <functional>
+#include <string>
+#include <string_view>
 
-template <typename Key, typename Value, int Size>
-struct Map {
-    std::array<std::pair<Key, Value>, Size> data;
+// The contents of this file define `transparent_string_hash` which is a type that can be
+// used for unordered containers to make them capable of heterogeneous lookup. This
+// follows the implementatoin of P0917 and P1690 that hvae been added into C++20.
+//
+// To use this, you would defined a container like such:
+//
+// std::unordered_map<std::string, int, transparent_string_hash, std::equal_to<>> map;
+//
+// and it allows the lookup of string_view and char* in the map without the memory
+// allocation otherwise required
 
-    [[nodiscard]] constexpr std::optional<Value> at(const Key& key) const {
-        // @CPP20
-        // manual constexpr std::find_if implementation until C++20 is available
-        for (const std::pair<const Key, Value>& d : data) {
-            if (d.first == key) {
-                return d.second;
-            }
-        }
+template <typename... Bases>
+struct overload : Bases ... {
+    using is_transparent = void;
+    using Bases::operator() ...;
+};
 
-        return std::nullopt;
-    }
-
-    [[nodiscard]] constexpr bool contains(const Key& key) const {
-        // @CPP20
-        // manual implementation of std::contains implementation until C++20 is available
-        for (const std::pair<const Key, Value>& d : data) {
-            if (d.first == key) {
-                return true;
-            }
-        }
-        return false;
+struct char_pointer_hash {
+    auto operator()(const char* ptr) const noexcept {
+        return std::hash<std::string_view>{}(ptr);
     }
 };
 
+using transparent_string_hash = overload<
+    std::hash<std::string>,
+    std::hash<std::string_view>,
+    char_pointer_hash
+>;
 
-#endif // __GHOUL___CONSTMAP___H__
+#endif // __GHOUL___MAP___H__

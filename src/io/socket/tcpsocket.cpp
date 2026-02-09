@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,10 +29,13 @@
 #include <ghoul/logging/logmanager.h>
 #include <algorithm>
 #include <cstring>
+#include <string_view>
+#include <utility>
 
 #ifdef WIN32
 #include <Windows.h>
 #include <winsock2.h>
+#include <ws2def.h>
 #include <ws2tcpip.h>
 #ifndef _ERRNO
 #define _ERRNO WSAGetLastError()

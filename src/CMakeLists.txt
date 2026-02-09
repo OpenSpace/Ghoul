@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2025                                                                #
+# Copyright (c) 2012-2026                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -73,7 +73,6 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/boolean.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/clipboard.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constexpr.h
-    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/constmap.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/crc32.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/csvreader.h
@@ -89,6 +88,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/map.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.inl

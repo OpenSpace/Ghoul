@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,8 +27,14 @@
 
 #include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
+#include <ghoul/misc/exception.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/misc/profiling.h>
+#include <algorithm>
+#include <string_view>
+#include <utility>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -245,7 +251,6 @@ void FileSystem::triggerFilesystemEvents() {
 #endif
 }
 
-
 #ifdef WIN32
 std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     IShellLink* psl = nullptr;
@@ -326,6 +331,13 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
             if (recursive) {
                 for (fs::directory_entry e : fs::recursive_directory_iterator(path)) {
                     if (filter(e)) {
+                        if (containsNonAscii(e)) {
+                            LWARNING(std::format(
+                                "'{}' contains non-ASCII characters, skipping",
+                                toAsciiSafePathString(e.path())
+                            ));
+                            continue;
+                        }
                         result.push_back(e.path());
                     }
                 }
@@ -333,6 +345,13 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
             else {
                 for (fs::directory_entry e : fs::directory_iterator(path)) {
                     if (filter(e)) {
+                        if (containsNonAscii(e)) {
+                            LWARNING(std::format(
+                                "'{}' contains non-ASCII characters, skipping",
+                                toAsciiSafePathString(e.path())
+                            ));
+                            continue;
+                        }
                         result.push_back(e.path());
                     }
                 }

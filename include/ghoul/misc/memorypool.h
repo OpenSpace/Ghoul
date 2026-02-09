@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,10 +26,8 @@
 #ifndef __GHOUL___MEMORYPOOL___H__
 #define __GHOUL___MEMORYPOOL___H__
 
-#include <ghoul/misc/assert.h>
 #include <array>
 #include <cstddef>
-#include <cstring>
 #include <memory>
 
 #if defined(__APPLE__) || (defined(__linux__) && defined(__clang__))
@@ -66,7 +64,7 @@ public:
      *
      * \param nBuckets the number of buckets that should be created at creation time
      */
-    MemoryPool(int nBuckets = 1);
+    explicit MemoryPool(int nBuckets = 1);
 
     /**
      * Frees the memory that was allocated during the existence of this MemoryPool.
@@ -91,9 +89,9 @@ public:
     template <typename T, class... Types>
     T* alloc(Types&&... args);
 
-    virtual void* do_allocate(size_t bytes, size_t alignment) final;
-    virtual void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
-    virtual bool do_is_equal(const pmr::memory_resource& other) const noexcept final;
+    void* do_allocate(size_t bytes, size_t alignment) final;
+    void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
+    bool do_is_equal(const pmr::memory_resource& other) const noexcept final;
 
     /// Returns the number of buckets that have been allocated
     int nBuckets() const;
@@ -143,7 +141,7 @@ public:
      *
      * \param nBuckets the number of buckets that should be created at creation time
      */
-    ReusableTypedMemoryPool(int nBuckets = 1);
+    explicit ReusableTypedMemoryPool(int nBuckets = 1);
 
     /**
      * Frees the memory that was allocated during the existence of this MemoryPool or the

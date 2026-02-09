@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,12 +26,14 @@
 #ifndef __GHOUL___MODELGEOMETRY___H__
 #define __GHOUL___MODELGEOMETRY___H__
 
+#include <ghoul/misc/exception.h>
 #include <ghoul/io/model/modelanimation.h>
-#include <ghoul/io/model/modelmesh.h>
 #include <ghoul/io/model/modelnode.h>
-#include <ghoul/opengl/ghoul_gl.h>
+#include <ghoul/opengl/texture.h>
 #include <filesystem>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace ghoul::opengl { class ProgramObject; }
 

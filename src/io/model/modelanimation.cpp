@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,8 @@
 #include <ghoul/io/model/modelanimation.h>
 
 #include <glm/gtx/quaternion.hpp>
+#include <limits>
+#include <utility>
 
 namespace ghoul::io {
 
@@ -52,9 +54,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
     _wasActive = true;
 
     // Find keyframes
-    for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
-        _nodeAnimations)
-    {
+    for (const io::ModelAnimation::NodeAnimation& nodeAnimation : _nodeAnimations) {
         // Position
         glm::vec3 currPos = glm::vec3(0.f);
         if (nodeAnimation.positions.size() > 1) {

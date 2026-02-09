@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -30,10 +30,9 @@
 #include <ghoul/misc/boolean.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <array>
-#include <glm/gtx/std_based_type.hpp>
 #include <string>
 
-//#define Debugging_Ghoul_Textures_Indices
+// #define Debugging_Ghoul_Textures_Indices
 
 namespace ghoul::opengl {
 
@@ -151,13 +150,11 @@ public:
      * contain enough bytes to fill `dimensions * bytesPerPixel` (which is in
      * turn dependent on the dataType) pixel. The Texture can be 1D, 2D, or 3D depending
      * on how many components are equal to `1`.
-     * \param data The data from which to generate the Texture. The data must be in a
-     * linear format and (in 2D and 3D cases) aligned so that it can be accessed using the
-     * following equations: `(y * dimensions.x) + x` in the 2D case and
-     * `(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x` in the 3D case. This
-     * Texture will take ownership of the data array and will delete it once this object
-     * is destroyed.
      *
+     * \param data The data from which to generate the Texture. The data must be in a
+     *        linear format and (in 2D and 3D cases) aligned so that it can be accessed
+     *        using the following equations: `(y * dimensions.x) + x` in the 2D case and
+     *        `(z * dimensions.x * dimensions.y) + (y * dimensions.x) + x` in the 3D case.
      * \param dimensions The dimensions of the texture. A 3D texture will be created if
      *        all components are bigger than `1`, a 2D texture will be created if the `z`
      *        component is equal to `1`, while a 1D texture is created if the `y` and `z`
@@ -177,6 +174,8 @@ public:
      *        texels
      * \param wrapping The Texture::WrappingMode that will be used to generate values on
      *        the border of the texture
+     * \param takeOwnership Sets whether or not the Texture object should take ownership
+     *        of the passed data allocated
      * \param pixelAlignment The byte-alignment for each of the pixels in the provided
      *        \p data array
      */
@@ -184,13 +183,22 @@ public:
         GLenum internalFormat = GL_RGBA, GLenum dataType = GL_UNSIGNED_BYTE,
         FilterMode filter = FilterMode::Linear,
         WrappingMode wrapping = WrappingMode::Repeat,
-        int pixelAlignment = 1);
+        TakeOwnership takeOwnership = TakeOwnership::Yes, int pixelAlignment = 1);
 
     /**
      * Unloads the Texture from GPU memory and destroys the id. The destructor will also
      * remove the data associated with this texture.
      */
     ~Texture();
+
+    /**
+     * Resizes the textures to the new size. If the new size is different from the
+     * previous size, the contents of the texture are erased and if the Texture class
+     * owned the RAM pixel data, it is erased.
+     *
+     * \param dimensions The new size of the texture
+     */
+    void resize(glm::uvec3 dimensions);
 
     /**
      * Enables this texture type by calling `glEnable`.
@@ -605,7 +613,7 @@ public:
      * \pre \p x must be smaller than the width of the Texture
      * \pre \p y must be smaller than the height of the Texture
      */
-    template<class T>
+    template <class T>
     const T& texel(unsigned int x, unsigned int y) const;
 
     /**
@@ -644,7 +652,7 @@ public:
      * \pre `position.x` must be smaller than the width of the Texture
      * \pre `position.y` must be smaller than the height of the Texture
      */
-    template<class T>
+    template <class T>
     const T& texel(const glm::uvec2& position) const;
 
     /**
@@ -689,7 +697,7 @@ public:
      * \pre \p y must be smaller than the height of the Texture
      * \pre \p z must be smaller than the depth of the Texture
      */
-    template<class T>
+    template <class T>
     const T& texel(unsigned int x, unsigned int y, unsigned int z) const;
 
     /**
@@ -729,7 +737,7 @@ public:
      * \pre `position.y` must be smaller than the height of the Texture
      * \pre `position.z` must be smaller than the height of the Texture
      */
-    template<class T>
+    template <class T>
     const T& texel(const glm::uvec3& position) const;
 
     /**
@@ -855,7 +863,7 @@ protected:
      * Bind the Texture and apply the changes to the OpenGL state according to the current
      * wrapping mode.
      */
-    void applyWrapping();
+    void applyWrapping() const;
 
     void applySwizzleMask();
 
@@ -869,12 +877,12 @@ protected:
     /**
      * Upload the passed data pointer to graphics memory by calling glTexImage.
      */
-    void uploadDataToTexture(void* pixelData);
+    void uploadDataToTexture(void* pixelData) const;
 
     /**
      * Re-upload the passed data pointer to graphics memory by calling glTexSubImage.
      */
-    void reUploadDataToTexture(void* pixelData);
+    void reUploadDataToTexture(void* pixelData) const;
 
 private:
     const std::array<GLenum, 4> DefaultSwizzleMask = {

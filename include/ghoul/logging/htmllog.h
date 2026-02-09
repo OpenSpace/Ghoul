@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,7 +28,6 @@
 
 #include <ghoul/logging/textlog.h>
 
-#include <filesystem>
 #include <vector>
 
 namespace ghoul::logging {
@@ -89,7 +88,7 @@ public:
     /**
      * Destructor that closes and finalizes the HTML file
      */
-    virtual ~HTMLLog() override;
+    ~HTMLLog() override;
 
     /**
      * Method that logs a message with a given \p level and \p category to the text file.

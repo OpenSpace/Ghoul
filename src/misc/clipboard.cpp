@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,8 +27,8 @@
 
 #include <ghoul/misc/exception.h>
 #include <ghoul/format.h>
-#include <algorithm>
-#include <sstream>
+#include <cstring>
+#include <memory>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -59,7 +59,7 @@ namespace {
 
 namespace ghoul {
 
-std::string clipboardText() {
+std::string clipboardText([[maybe_unused]] SelectionArea selectionArea) {
 #ifdef WIN32
     // Try opening the clipboard
     if (!OpenClipboard(nullptr)) {
@@ -96,9 +96,19 @@ std::string clipboardText() {
     }
     return "";
 #else
+    std::string_view s = [](SelectionArea selection) {
+        switch (selection) {
+            case SelectionArea::Clipboard: return "clipboard";
+            case SelectionArea::Primary:   return "primary";
+            case SelectionArea::Secondary: return "secondary";
+            default:                       throw ghoul::MissingCaseException();
+        }
+    }(selectionArea);
+
     std::string text;
     // Try UTF8_STRING first
-    if (exec("xclip -o -selection clipboard -target UTF8_STRING", text)) {
+    std::string cmd = std::format("xclip -o -selection {} -target UTF8_STRING", s);
+    if (exec(cmd.c_str(), text)) {
         if (!text.empty() && text.back() == '\n') {
             text.pop_back();
         }
@@ -106,7 +116,8 @@ std::string clipboardText() {
     }
 
     // Fallback: try text/plain;charset=utf-8
-    if (exec("xclip -o -selection clipboard -target text/plain;charset=utf-8", text)) {
+    cmd = std::format("xclip -o -selection {} -target text/plain;charset=utf-8", s);
+    if (exec(cmd.c_str(), text)) {
         if (!text.empty() && text.back() == '\n') {
             text.pop_back();
         }
@@ -114,7 +125,8 @@ std::string clipboardText() {
     }
 
     // Final fallback: default text/plain
-    if (exec("xclip -o -selection clipboard -target text/plain", text)) {
+    cmd = std::format("xclip -o -selection {} -target text/plain", s);
+    if (exec(cmd.c_str(), text)) {
         if (!text.empty() && text.back() == '\n') {
             text.pop_back();
         }
@@ -126,7 +138,8 @@ std::string clipboardText() {
 #endif
 }
 
-void setClipboardText(const std::string& text) {
+void setClipboardText(std::string_view text, [[maybe_unused]] SelectionArea selectionArea)
+{
 #ifdef WIN32
     HANDLE hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.length() + 1);
     if (!hData) {
@@ -138,7 +151,8 @@ void setClipboardText(const std::string& text) {
         GlobalFree(hData);
         throw RuntimeError("Error acquiring lock", "Clipboard");
     }
-    std::memcpy(ptrData, text.c_str(), text.length() + 1);
+    std::memset(ptrData, 0, text.length() + 1);
+    std::memcpy(ptrData, text.data(), text.length());
 
     GlobalUnlock(hData);
 
@@ -159,8 +173,18 @@ void setClipboardText(const std::string& text) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }
 #else
+    std::string_view s = [](SelectionArea selection) {
+        switch (selection) {
+            case SelectionArea::Clipboard: return "clipboard";
+            case SelectionArea::Primary:   return "primary";
+            case SelectionArea::Secondary: return "secondary";
+            default:                       throw ghoul::MissingCaseException();
+        }
+    }(selectionArea);
+
+    std::string cmd = std::format("echo \"{}\" | xclip -i -selection {} -f", text, s);
     std::string buf;
-    const bool success = exec(std::format("echo \"{}\" | xclip -i -sel c -f", text), buf);
+    const bool success = exec(cmd.c_str(), buf);
     if (!success) {
         throw RuntimeError("Error setting text to clipboard", "Clipboard");
     }

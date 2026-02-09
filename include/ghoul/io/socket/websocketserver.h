@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -36,6 +36,7 @@
 #endif // WIN32
 
 #include <websocketpp/config/core.hpp>
+#include <websocketpp/roles/server_endpoint.hpp>
 #include <websocketpp/server.hpp>
 
 #ifdef WIN32
@@ -44,12 +45,13 @@
 
 namespace ghoul::io {
 
+class Socket;
 class WebSocket;
 
 class WebSocketServer : public SocketServer {
 public:
     WebSocketServer();
-    virtual ~WebSocketServer() override = default;
+    ~WebSocketServer() override = default;
 
     int port() const override;
     void close() override;

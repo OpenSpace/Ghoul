@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,12 +31,13 @@
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/invariants.h>
 #include <algorithm>
+#include <array>
 #include <charconv>
-#include <filesystem>
-#include <format>
 #include <optional>
+#include <string_view>
 #include <type_traits>
 #include <variant>
+#include <vector>
 
 namespace ghoul::lua {
 

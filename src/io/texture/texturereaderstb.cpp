@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,11 +27,10 @@
 
 #include <ghoul/format.h>
 #include <ghoul/glm.h>
-#include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/texture.h>
-#include <algorithm>
 #include <stb_image.h>
-#include <iostream>
+#include <algorithm>
+#include <cstring>
 
 namespace {
     std::unique_ptr<ghoul::opengl::Texture> load(unsigned char* data, int x, int y,
@@ -144,7 +143,16 @@ std::unique_ptr<opengl::Texture> TextureReaderSTB::loadTexture(void* memory, siz
     );
 
     return load(data, x, y, n, "Memory", this, nDimensions);
+}
 
+glm::ivec2 TextureReaderSTB::imageSize(const std::filesystem::path& filename) const {
+    const std::string f = filename.string();
+    int x = 0;
+    int y = 0;
+    int n = 0;
+    stbi_load(f.c_str(), &x, &y, &n, 0);
+
+    return glm::ivec2(x, y);
 }
 
 std::vector<std::string> TextureReaderSTB::supportedExtensions() const {

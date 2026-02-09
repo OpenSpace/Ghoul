@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,20 +25,19 @@
 
 #include <ghoul/opengl/debugcontext.h>
 
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/exception.h>
-#include <map>
-#include <type_traits>
+#include <utility>
 
 namespace ghoul::opengl::debug {
 
 namespace {
-void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
-                      const GLchar* message, const GLvoid* userParam)
-{
-    const CallbackFunction& cb = *reinterpret_cast<const CallbackFunction*>(userParam);
-    cb(Source(source), Type(type), Severity(severity), id, std::string(message));
-}
+
+    void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
+                          const GLchar* message, const GLvoid* userParam)
+    {
+        const CallbackFunction& f = *reinterpret_cast<const CallbackFunction*>(userParam);
+        f(Source(source), Type(type), Severity(severity), id, std::string(message));
+    }
+
 } // namespace
 
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {

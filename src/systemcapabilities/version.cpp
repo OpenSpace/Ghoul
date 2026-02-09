@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,10 @@
 
 #include <ghoul/systemcapabilities/version.h>
 
+#include <ghoul/format.h>
+
 namespace {
-    unsigned int packVersion(int major, int minor, int release) {
+    constexpr unsigned int packVersion(int major, int minor, int release) {
         // safe since: 2^8 * 1000 * 1000 < 2^32
         return major * 1000 * 1000  +  minor * 1000  +  release;
     }

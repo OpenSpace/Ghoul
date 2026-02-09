@@ -3,13 +3,13 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
  * without restriction, including without limitation the rights to use, copy, modify,    *
  * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to    *
- * permit persons to whom the Software is furnished to do so, subject to the following   *
+ * permit persons to whom the Software is furnished to do so, subject to the llowing   *
  * conditions:                                                                           *
  *                                                                                       *
  * The above copyright notice and this permission notice shall be included in all copies *
@@ -25,9 +25,17 @@
 
 #include <ghoul/io/model/modelreaderbinary.h>
 
-#include <ghoul/filesystem/filesystem.h>
+#include <ghoul/io/model/modelgeometry.h>
+#include <ghoul/io/model/modelmesh.h>
+#include <ghoul/io/model/modelanimation.h>
+#include <ghoul/io/model/modelnode.h>
 #include <ghoul/logging/logmanager.h>
+#include <ghoul/opengl/ghoul_gl.h>
+#include <ghoul/opengl/texture.h>
+#include <cstdint>
 #include <fstream>
+#include <string_view>
+#include <cstddef>
 
 namespace {
     constexpr std::string_view _loggerCat = "ModelReaderBinary";

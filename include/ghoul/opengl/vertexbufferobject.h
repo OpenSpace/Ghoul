@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -27,7 +27,6 @@
 #define __GHOUL___VERTEXBUFFEROBJECT___H__
 
 #include <ghoul/opengl/ghoul_gl.h>
-
 #include <vector>
 
 namespace ghoul::opengl {
@@ -96,7 +95,7 @@ public:
      *
      * \pre VertexBufferObject must not have been initialized before
      */
-    template<typename T>
+    template <typename T>
     void initialize(const std::vector<T>& vertexArray,
         const std::vector<GLint>& indexArray);
 
@@ -138,7 +137,7 @@ public:
     /**
      * Render the VBO using the provided mode through VertexBufferObject::setRenderMode.
      */
-    void render();
+    void render() const;
 
 private:
     /**

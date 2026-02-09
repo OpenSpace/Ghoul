@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -31,20 +31,18 @@
 
 #include <ghoul/misc/crc32.h>
 
-#include <ghoul/misc/assert.h>
 #include <fstream>
 #include <vector>
 
 namespace ghoul {
 
 unsigned int hashCRC32File(const std::string& file) {
-    std::fstream f(file);
+    std::fstream f = std::fstream(file);
     f.seekg(0, std::ios::end);
     const unsigned int length = static_cast<int>(f.tellg());
     f.seekg(0, std::ios::beg);
-    std::vector<char> buffer(length);
+    std::vector<char> buffer = std::vector<char>(length);
     f.read(buffer.data(), length);
-    f.close();
 
     return hashCRC32(buffer.data(), length);
 }

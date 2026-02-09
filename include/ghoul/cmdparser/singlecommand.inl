@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -24,6 +24,8 @@
  ****************************************************************************************/
 
 #include <ghoul/misc/stringhelper.h>
+#include <type_traits>
+#include <utility>
 
 namespace ghoul::cmdparser {
 
@@ -46,7 +48,7 @@ SingleCommand<T>::SingleCommand(std::optional<T>& ptr1, std::string name,
     }
 }
 
-template<typename T>
+template <typename T>
 void SingleCommand<T>::execute(const std::vector<std::string>& parameters) {
     if constexpr (std::is_same_v<T, std::string>) {
         // If we have a string the parameter set might contain an arbitrary number of
@@ -61,7 +63,7 @@ void SingleCommand<T>::execute(const std::vector<std::string>& parameters) {
     }
 }
 
-template<typename T>
+template <typename T>
 void SingleCommand<T>::checkParameters(const std::vector<std::string>& parameters) const {
     CommandlineCommand::checkParameters(parameters);
 
@@ -86,13 +88,13 @@ SingleCommand<T, U>::SingleCommand(std::optional<T>& ptr1, std::optional<U>& ptr
     , _ptr2(ptr2)
 {}
 
-template<typename T, typename U>
+template <typename T, typename U>
 void SingleCommand<T, U>::execute(const std::vector<std::string>& parameters) {
     _ptr1 = cast<T>(parameters[0]);
     _ptr2 = cast<U>(parameters[1]);
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 void SingleCommand<T, U>::checkParameters(
                                          const std::vector<std::string>& parameters) const
 {
@@ -121,14 +123,14 @@ SingleCommand<T, U, V>::SingleCommand(std::optional<T>& ptr1, std::optional<U>& 
     , _ptr3(ptr3)
 {}
 
-template<typename T, typename U, typename V>
+template <typename T, typename U, typename V>
 void SingleCommand<T, U, V>::execute(const std::vector<std::string>& parameters) {
     _ptr1 = cast<T>(parameters[0]);
     _ptr2 = cast<U>(parameters[1]);
     _ptr3 = cast<V>(parameters[2]);
 }
 
-template<typename T, typename U, typename V>
+template <typename T, typename U, typename V>
 void SingleCommand<T, U, V>::checkParameters(
                                          const std::vector<std::string>& parameters) const
 {
@@ -158,7 +160,7 @@ SingleCommand<T, U, V, W>::SingleCommand(std::optional<T>& ptr1, std::optional<U
     , _ptr4(ptr4)
 {}
 
-template<typename T, typename U, typename V, typename W>
+template <typename T, typename U, typename V, typename W>
 void SingleCommand<T, U, V, W>::execute(const std::vector<std::string>& parameters) {
     _ptr1 = cast<T>(parameters[0]);
     _ptr2 = cast<U>(parameters[1]);
@@ -166,7 +168,7 @@ void SingleCommand<T, U, V, W>::execute(const std::vector<std::string>& paramete
     _ptr4 = cast<W>(parameters[3]);
 }
 
-template<typename T, typename U, typename V, typename W>
+template <typename T, typename U, typename V, typename W>
 void SingleCommand<T, U, V, W>::checkParameters(
                                          const std::vector<std::string>& parameters) const
 {

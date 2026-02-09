@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,8 +26,9 @@
 #ifndef __GHOUL___EXCEPTION___H__
 #define __GHOUL___EXCEPTION___H__
 
-#include <filesystem>
 #include <stdexcept>
+
+#include <filesystem>
 #include <string>
 
 namespace ghoul {
@@ -48,7 +49,7 @@ struct RuntimeError : public std::runtime_error {
      */
     explicit RuntimeError(std::string msg, std::string comp = "");
 
-    virtual ~RuntimeError() override = default;
+    ~RuntimeError() override = default;
 
     /// The main message describing the exception
     const std::string message;

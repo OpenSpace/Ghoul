@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,13 +25,10 @@
 
 #include <ghoul/opengl/shaderobject.h>
 
-#include <ghoul/filesystem/filesystem.h>
 #include <ghoul/filesystem/cachemanager.h>
-#include <ghoul/misc/crc32.h>
-#include <algorithm>
-#include <filesystem>
+#include <ghoul/filesystem/filesystem.h>
 #include <fstream>
-#include <functional>
+#include <utility>
 
 namespace ghoul::opengl {
 

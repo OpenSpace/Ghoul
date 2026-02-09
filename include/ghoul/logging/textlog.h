@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -28,7 +28,6 @@
 
 #include <ghoul/logging/log.h>
 
-#include <ghoul/misc/boolean.h>
 #include <filesystem>
 #include <fstream>
 #include <mutex>
@@ -93,7 +92,7 @@ public:
     /**
      * Destructor closing and releasing the file handle.
      */
-    virtual ~TextLog() override;
+    ~TextLog() override;
 
     /**
      * Method that logs a `message` with a given `level` and `category` to the text file.

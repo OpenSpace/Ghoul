@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,9 +25,11 @@
 
 #include <ghoul/misc/base64.h>
 
+#include <array>
+
 namespace ghoul {
 
-std::vector<uint8_t> decodeBase64(const std::string_view base64) {
+std::vector<uint8_t> decodeBase64(std::string_view base64) {
     // Implementation of this function based on:
     // 1. https://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base
     //    64-with-cpp/

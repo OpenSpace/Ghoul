@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -58,7 +58,7 @@ HTMLLog::HTMLLog(const std::filesystem::path& filename, int nLogRotation,
     const std::back_insert_iterator<std::string> backInserter(output);
 
     for (const std::filesystem::path& c : cssIncludes) {
-        std::ifstream cssInput(c);
+        std::ifstream cssInput = std::ifstream(c);
         std::copy(
             std::istreambuf_iterator<char>{cssInput},
             std::istreambuf_iterator<char>(),
@@ -69,7 +69,7 @@ HTMLLog::HTMLLog(const std::filesystem::path& filename, int nLogRotation,
     output += "\t\t</style>\n\t\t<script>\n";
 
     for (const std::filesystem::path& j : jsIncludes) {
-        std::ifstream jsInput(j);
+        std::ifstream jsInput = std::ifstream(j);
         std::copy(
             std::istreambuf_iterator<char>{jsInput},
             std::istreambuf_iterator<char>(),

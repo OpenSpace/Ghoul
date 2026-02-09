@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -29,15 +29,14 @@
 #include <ghoul/opengl/ghoul_gl.h>
 #include <array>
 #include <limits>
-#include <string>
 #include <vector>
 
 namespace ghoul::opengl {
 
 /**
- * This class works as cache for the OpenGL most common properties defining the
- * current GL's state. Be aware that not all OpenGL states are available for caching at
- * this moment. New states caching should be added as needed.
+ * This class works as cache for the OpenGL most common properties defining the current
+ * GL's state. Be aware that not all OpenGL states are available for caching at this
+ * moment. New states caching should be added as needed.
  */
 class OpenGLStateCache {
 public:

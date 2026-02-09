@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -43,7 +43,7 @@ class SingleCommand : public CommandlineCommand {};
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T>
+template <typename T>
 class SingleCommand<T> : public CommandlineCommand {
 public:
     /**
@@ -97,7 +97,7 @@ protected:
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T, typename U>
+template <typename T, typename U>
 class SingleCommand<T, U> : public CommandlineCommand {
 public:
     /**
@@ -156,7 +156,7 @@ protected:
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T, typename U, typename V>
+template <typename T, typename U, typename V>
 class SingleCommand<T, U, V> : public CommandlineCommand {
 public:
     /**
@@ -220,7 +220,7 @@ protected:
  *
  * \see SingleCommandZeroArguments
  */
-template<typename T, typename U, typename V, typename W>
+template <typename T, typename U, typename V, typename W>
 class SingleCommand<T, U, V, W> : public CommandlineCommand {
 public:
     /**
@@ -302,7 +302,7 @@ public:
     /**
      * Sets the `bool` value passed in the constructor to `true`
      */
-    virtual void execute(const std::vector<std::string>& /*parameters*/) override;
+    void execute(const std::vector<std::string>& /*parameters*/) override;
 
 protected:
     std::optional<bool>& _ptr;

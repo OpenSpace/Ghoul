@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -26,6 +26,7 @@
 #ifndef __GHOUL___BASE64___H__
 #define __GHOUL___BASE64___H__
 
+#include <cstdint>
 #include <string_view>
 #include <vector>
 
@@ -38,7 +39,7 @@ namespace ghoul {
  * \param base64 The Base64-encoded input string.
  * \return A vector containing the decoded bytes.
  */
-std::vector<uint8_t> decodeBase64(const std::string_view base64);
+std::vector<uint8_t> decodeBase64(std::string_view base64);
 
 } // namespace ghoul
 

@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -25,8 +25,8 @@
 
 #include <ghoul/opengl/renderdoc.h>
 
+#include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <format>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -50,22 +50,24 @@ void loadRenderDoc() {
     }
 #endif // WIN32
 
-    if (getApi) {
-        const int ret = getApi(
-            eRENDERDOC_API_Version_1_6_0,
-            reinterpret_cast<void**>(&renderdocApi)
-        );
-        if (!ret) {
-            LERRORC("RenderDoc", "Error loading API");
-            return;
-        }
-
-        int major = 0;
-        int minor = 0;
-        int patch = 0;
-        renderdocApi->GetAPIVersion(&major, &minor, &patch);
-        LINFOC("RenderDoc", std::format("Loaded API {}.{}.{}", major, minor, patch));
+    if (!getApi) {
+        return;
     }
+
+    const int ret = getApi(
+        eRENDERDOC_API_Version_1_6_0,
+        reinterpret_cast<void**>(&renderdocApi)
+    );
+    if (!ret) {
+        LERRORC("RenderDoc", "Error loading API");
+        return;
+    }
+
+    int major = 0;
+    int minor = 0;
+    int patch = 0;
+    renderdocApi->GetAPIVersion(&major, &minor, &patch);
+    LINFOC("RenderDoc", std::format("Loaded API {}.{}.{}", major, minor, patch));
 }
 
 } // namespace ghoul::opengl

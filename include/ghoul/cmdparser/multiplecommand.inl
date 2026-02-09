@@ -3,7 +3,7 @@
  * GHOUL                                                                                 *
  * General Helpful Open Utility Library                                                  *
  *                                                                                       *
- * Copyright (c) 2012-2025                                                               *
+ * Copyright (c) 2012-2026                                                               *
  *                                                                                       *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this  *
  * software and associated documentation files (the "Software"), to deal in the Software *
@@ -23,9 +23,11 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
+#include <utility>
+
 namespace ghoul::cmdparser {
 
-template<class T>
+template <class T>
 MultipleCommand<T>::MultipleCommand(std::vector<T>& ptr1, std::string name,
                                     std::string shortName, std::string infoText,
                                     std::string parameterList)
@@ -40,12 +42,12 @@ MultipleCommand<T>::MultipleCommand(std::vector<T>& ptr1, std::string name,
     , _ptr1(ptr1)
 {}
 
-template<class T>
+template <class T>
 void MultipleCommand<T>::execute(const std::vector<std::string>& parameters) {
     _ptr1.push_back(cast<T>(parameters[0]));
 }
 
-template<class T>
+template <class T>
 void MultipleCommand<T>::checkParameters(
                                          const std::vector<std::string>& parameters) const
 {
@@ -56,7 +58,7 @@ void MultipleCommand<T>::checkParameters(
     }
 }
 
-template<class T, class U>
+template <class T, class U>
 MultipleCommand<T, U>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& ptr2,
                                        std::string name, std::string shortName,
                                        std::string infoText, std::string parameterList)
@@ -72,13 +74,13 @@ MultipleCommand<T, U>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& ptr
     , _ptr2(ptr2)
 {}
 
-template<class T, class U>
+template <class T, class U>
 void MultipleCommand<T, U>::execute(const std::vector<std::string>& parameters) {
     _ptr1.push_back(cast<T>(parameters[0]));
     _ptr2.push_back(cast<U>(parameters[1]));
 }
 
-template<class T, class U>
+template <class T, class U>
 void MultipleCommand<T, U>::checkParameters(
                                          const std::vector<std::string>& parameters) const
 {
@@ -89,7 +91,7 @@ void MultipleCommand<T, U>::checkParameters(
     }
 }
 
-template<class T, class U, class V>
+template <class T, class U, class V>
 MultipleCommand<T, U, V>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& ptr2,
                                           std::vector<V>& ptr3, std::string name,
                                           std::string shortName, std::string infoText,
@@ -107,14 +109,14 @@ MultipleCommand<T, U, V>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& 
     , _ptr3(ptr3)
 {}
 
-template<class T, class U, class V>
+template <class T, class U, class V>
 void MultipleCommand<T, U, V>::execute(const std::vector<std::string>& parameters) {
     _ptr1.push_back(cast<T>(parameters[0]));
     _ptr2.push_back(cast<U>(parameters[1]));
     _ptr3.push_back(cast<V>(parameters[2]));
 }
 
-template<class T, class U, class V>
+template <class T, class U, class V>
 void MultipleCommand<T, U, V>::checkParameters(
                                          const std::vector<std::string>& parameters) const
 {
@@ -125,7 +127,7 @@ void MultipleCommand<T, U, V>::checkParameters(
     }
 }
 
-template<class T, class U, class V, class W>
+template <class T, class U, class V, class W>
 MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& ptr2,
                                           std::vector<V>& ptr3, std::vector<W>& ptr4,
                                           std::string name, std::string shortName,
@@ -144,7 +146,7 @@ MultipleCommand<T,U,V,W>::MultipleCommand(std::vector<T>& ptr1, std::vector<U>& 
     , _ptr4(ptr4)
 {}
 
-template<class T, class U, class V, class W>
+template <class T, class U, class V, class W>
 void MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameters) {
     _ptr1.push_back(cast<T>(parameters[0]));
     _ptr2.push_back(cast<U>(parameters[1]));
@@ -152,7 +154,7 @@ void MultipleCommand<T,U,V,W>::execute(const std::vector<std::string>& parameter
     _ptr4.push_back(cast<W>(parameters[3]));
 }
 
-template<class T, class U, class V, class W>
+template <class T, class U, class V, class W>
 void MultipleCommand<T,U,V,W>::checkParameters(
                                          const std::vector<std::string>& parameters) const
 {
