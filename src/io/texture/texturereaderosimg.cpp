@@ -139,7 +139,7 @@ std::unique_ptr<opengl::Texture> TextureReaderOsImg::loadTexture(
 
     return std::make_unique<opengl::Texture>(
         values,
-        glm::size3_t(width, height, 1),
+        glm::uvec3(width, height, 1),
         GL_TEXTURE_2D,
         format,
         internalFormat,
@@ -151,6 +151,53 @@ std::unique_ptr<opengl::Texture> TextureReaderOsImg::loadTexture(void*, size_t, 
 {
     ghoul_assert(false, "Implementation missing");
     return nullptr;
+}
+
+glm::ivec2 TextureReaderOsImg::imageSize(const std::filesystem::path& filename) const {
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+
+    std::ifstream fileStream(filename, std::ifstream::binary);
+    if (!fileStream.good()) {
+        throw TextureLoadException(
+            filename,
+            "Could not open OS image file",
+            this
+        );
+    }
+
+    // First read the header
+    // Check the file format version
+    int8_t majorVersion = 0;
+    int8_t minorVersion = 0;
+    fileStream.read(reinterpret_cast<char*>(&majorVersion), sizeof(uint8_t));
+    fileStream.read(reinterpret_cast<char*>(&minorVersion), sizeof(uint8_t));
+    if (majorVersion != CurrentMajorVersion || minorVersion != CurrentMinorVersion)
+    {
+        std::string message = std::format(
+            "OS img format {}.{} is not supported", majorVersion, minorVersion
+        );
+        throw TextureLoadException(
+            filename,
+            message,
+            this
+        );
+    }
+
+    // Resolution
+    int width = 0;
+    fileStream.read(reinterpret_cast<char*>(&width), sizeof(uint32_t));
+    int height = 0;
+    fileStream.read(reinterpret_cast<char*>(&height), sizeof(uint32_t));
+
+    // Check for errors
+    if (!fileStream.good()) {
+        throw TextureLoadException(filename, "Could not read image file", this);
+    }
+    else if (width <= 0 || height <= 0) {
+        throw TextureLoadException(filename, "Could not find image resolution", this);
+    }
+
+    return glm::ivec2(width, height);
 }
 
 std::vector<std::string> TextureReaderOsImg::supportedExtensions() const {
