@@ -67,11 +67,12 @@ using namespace gl;
 
 namespace ghoul {
 
+template <int ID = 0>
 struct GLDebugGroup {
     explicit GLDebugGroup(std::string_view name) {
         glPushDebugGroup(
             GL_DEBUG_SOURCE_APPLICATION,
-            0,
+            ID,
             static_cast<GLsizei>(name.length()),
             name.data()
         );
