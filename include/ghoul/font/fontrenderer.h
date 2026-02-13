@@ -301,9 +301,6 @@ private:
     GpuData _orthogonal;
     GpuData _perspective;
 
-    mutable std::vector<float> _vertexBuffer;
-    mutable std::vector<GLushort> _indexBuffer;
-
     UniformCache(baseColor, outlineColor, tex, hasOutline, projection) _uniformCache;
     UniformCache(baseColor, outlineColor, tex, hasOutline, modelViewTransform,
         enableFalseDepth, disableTransmittance) _uniformCacheProjection;

@@ -306,9 +306,6 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         offsetof(PerspectiveVertex, outlineS)
     );
     glVertexArrayAttribBinding(_perspective.vao, 2, 0);
-
-    _vertexBuffer.reserve(128 * 10);
-    _indexBuffer.reserve(128 * 10);
 }
 
 FontRenderer::~FontRenderer() {
@@ -460,8 +457,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     _program->activate();
 
-    _vertexBuffer.clear();
-    _indexBuffer.clear();
+    std::vector<float> vertexBuffer;
+    vertexBuffer.reserve(128 * 10);
+    std::vector<GLushort> indexBuffer;
+    indexBuffer.reserve(128 * 10);
 
     GLushort vertexIndex = 0;
     glm::vec2 size = glm::vec2(0.f);
@@ -505,10 +504,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             const GLushort idx1 = vertexIndex + 1;
             const GLushort idx2 = vertexIndex + 2;
             const GLushort idx3 = vertexIndex + 3;
-            _indexBuffer.insert(_indexBuffer.end(), { idx, idx1, idx2, idx, idx2, idx3 });
+            indexBuffer.insert(indexBuffer.end(), { idx, idx1, idx2, idx, idx2, idx3 });
             vertexIndex += 4;
-            _vertexBuffer.insert(
-                _vertexBuffer.end(),
+            vertexBuffer.insert(
+                vertexBuffer.end(),
                 {
                     x0, y0, s0, t0, outlineS0, outlineT0,
                     x0, y1, s0, t1, outlineS0, outlineT1,
@@ -540,22 +539,22 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     glNamedBufferData(
         _orthogonal.vbo,
-        _vertexBuffer.size() * sizeof(float),
-        _vertexBuffer.data(),
+        vertexBuffer.size() * sizeof(float),
+        vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glNamedBufferData(
         _orthogonal.ibo,
-        _indexBuffer.size() * sizeof(GLushort),
-        _indexBuffer.data(),
+        indexBuffer.size() * sizeof(GLushort),
+        indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glBindVertexArray(_orthogonal.vao);
     glDrawElements(
         GL_TRIANGLES,
-        static_cast<GLsizei>(_indexBuffer.size()),
+        static_cast<GLsizei>(indexBuffer.size()),
         GL_UNSIGNED_SHORT,
         nullptr
     );
@@ -576,8 +575,10 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 {
     const float h = font.height();
 
-    _vertexBuffer.clear();
-    _indexBuffer.clear();
+    std::vector<float> vertexBuffer;
+    vertexBuffer.reserve(128 * 10);
+    std::vector<GLushort> indexBuffer;
+    indexBuffer.reserve(128 * 10);
 
     const size_t lines = std::count(text.begin(), text.end(), '\n') + 1;
 
@@ -700,8 +701,8 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 }
             }
 
-            _vertexBuffer.insert(
-                _vertexBuffer.end(),
+            vertexBuffer.insert(
+                vertexBuffer.end(),
                 {
                     p0.x, p0.y, p0.z, s0, t0, outlineS0, outlineT0,
                     p1.x, p1.y, p1.z, s0, t1, outlineS0, outlineT1,
@@ -714,7 +715,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
             const unsigned short vi1 = vertexIndex + 1;
             const unsigned short vi2 = vertexIndex + 2;
             const unsigned short vi3 = vertexIndex + 3;
-            _indexBuffer.insert(_indexBuffer.end(), { vi, vi1, vi2, vi, vi2, vi3 });
+            indexBuffer.insert(indexBuffer.end(), { vi, vi1, vi2, vi, vi2, vi3 });
             vertexIndex += 4;
 
             movingPos.x += glyph->horizontalAdvance;
@@ -759,22 +760,22 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
     glNamedBufferData(
         _perspective.vbo,
-        _vertexBuffer.size() * sizeof(float),
-        _vertexBuffer.data(),
+        vertexBuffer.size() * sizeof(float),
+        vertexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glNamedBufferData(
         _perspective.ibo,
-        _indexBuffer.size() * sizeof(GLushort),
-        _indexBuffer.data(),
+        indexBuffer.size() * sizeof(GLushort),
+        indexBuffer.data(),
         GL_DYNAMIC_DRAW
     );
 
     glBindVertexArray(_perspective.vao);
     glDrawElements(
         GL_TRIANGLES,
-        static_cast<GLsizei>(_indexBuffer.size()),
+        static_cast<GLsizei>(indexBuffer.size()),
         GL_UNSIGNED_SHORT,
         nullptr
     );
