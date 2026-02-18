@@ -59,6 +59,28 @@ ModelReader& ModelReader::ref() {
     return modelReader;
 }
 
+void ModelReader::loadCameraPath(const std::filesystem::path& filename) {
+    ZoneScoped;
+
+    ghoul_assert(!_readers.empty(), "No readers were registered before");
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+
+    std::string extension = filename.extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
+    ghoul_assert(!extension.empty(), "Filename must have an extension");
+
+    ModelReaderBase* reader = readerForExtension(extension);
+
+    if (!reader) {
+        throw MissingReaderException(extension, filename);
+    }
+
+    reader->loadCameraPath(filename);
+
+}
+
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReader::loadModel(
                                                     const std::filesystem::path& filename,
                                                 ForceRenderInvisible forceRenderInvisible,
