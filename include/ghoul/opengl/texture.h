@@ -175,7 +175,7 @@ public:
      *        by the caller. This object will make a local copy of the data. If it is `No`
      *        it will not be stored after passing the data to the GPU.
      */
-    explicit Texture(FormatInit format, SamplerInit sampler = {},
+    explicit Texture(FormatInit format, SamplerInit sampler = SamplerInit{},
         const std::byte* data = nullptr, int pixelAlignment = 1,
         KeepMemory keepMemory = KeepMemory::No);
 
