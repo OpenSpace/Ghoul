@@ -155,6 +155,9 @@ public:
 
         /// Changes the general swizzle mask of the texture.
         std::optional<std::array<GLenum, 4>> swizzleMask = std::nullopt;
+
+        /// Needed for GCC and other strict compilers
+        SamplerInit() = default;
     };
 
     /**
