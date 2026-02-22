@@ -155,9 +155,6 @@ public:
 
         /// Changes the general swizzle mask of the texture.
         std::optional<std::array<GLenum, 4>> swizzleMask = std::nullopt;
-
-        /// Needed for GCC and other strict compilers
-        SamplerInit() = default;
     };
 
     /**
@@ -175,7 +172,12 @@ public:
      *        by the caller. This object will make a local copy of the data. If it is `No`
      *        it will not be stored after passing the data to the GPU.
      */
-    explicit Texture(FormatInit format, SamplerInit sampler = SamplerInit{},
+    // GCC doesn't allow default member initializers involving complex types (like std::optional, std::variant) 
+    // to be used in a default argument of a function within the same class definition
+    explicit Texture(FormatInit format, const std::byte* data = nullptr,
+        int pixelAlignment = 1, KeepMemory keepMemory = KeepMemory::No);
+    
+    explicit Texture(FormatInit format, SamplerInit sampler,
         const std::byte* data = nullptr, int pixelAlignment = 1,
         KeepMemory keepMemory = KeepMemory::No);
 
