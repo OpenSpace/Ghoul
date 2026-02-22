@@ -223,6 +223,11 @@ namespace {
 } // namespace
 
 namespace ghoul::opengl {
+// add delegating overload for GCC etc
+Texture::Texture(FormatInit format, const std::byte* data, int pixelAlignment,
+                 KeepMemory keepMemory)
+    : Texture(std::move(format), SamplerInit{}, data, pixelAlignment, keepMemory)
+{}
 
 Texture::Texture(FormatInit format, SamplerInit sampler, const std::byte* data,
                  int pixelAlignment, KeepMemory keepMemory)
