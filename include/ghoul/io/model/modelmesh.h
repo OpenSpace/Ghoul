@@ -47,10 +47,10 @@ public:
     };
 
     struct Vertex {
-        GLfloat position[3];
-        GLfloat tex[2];
-        GLfloat normal[3];
-        GLfloat tangent[3];
+        GLfloat position[3] = { 0.f, 0.f, 0.f };
+        GLfloat tex[2] = { 0.f, 0.f };
+        GLfloat normal[3] = { 0.f, 0.f, 0.f };
+        GLfloat tangent[3] = { 0.f, 0.f, 0.f };
         GLfloat color[3] = { 0.f, 0.f, 0.f };
     };
 
