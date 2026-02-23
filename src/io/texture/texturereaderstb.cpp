@@ -69,14 +69,14 @@ namespace {
             std::memcpy(data + (y - i - 1) * x * n, buffer.data(), x * n);
         }
 
-        const opengl::Texture::Format format = [](int n) {
-            switch (n) {
+        const opengl::Texture::Format format = [](int nDim) {
+            switch (nDim) {
                 case 1: return opengl::Texture::Format::Red;
                 case 2: return opengl::Texture::Format::RG;
                 case 3: return opengl::Texture::Format::RGB;
                 case 4: return opengl::Texture::Format::RGBA;
                 default:
-                    throw RuntimeError(std::format("Unknown dimension '{}'", n));
+                    throw RuntimeError(std::format("Unknown dimension '{}'", nDim));
             }
         }(n);
         const GLenum type = [](int d) {
