@@ -2779,7 +2779,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         ));
         return false;
     }
-#endif
+#endif // GHL_DEBUG
     glUniformSubroutinesuiv(
         static_cast<GLenum>(shaderType),
         static_cast<GLsizei>(indices.size()),

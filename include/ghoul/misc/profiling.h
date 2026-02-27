@@ -45,7 +45,7 @@
 #pragma warning(pop)
 #endif // WIN32
 
-#else
+#else // ^^^^ TRACY_ENABLE // !TRACY_ENABLE vvvv
 
 // Just a dump of defines to prevent needing to include the header files even if we don't
 // use Tracy

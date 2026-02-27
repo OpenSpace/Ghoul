@@ -34,9 +34,9 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #include <unistd.h>
-#endif
+#endif // WIN32
 
 TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
     using ghoul::filesystem::File;
@@ -87,14 +87,14 @@ TEST_CASE("FileSystem: OnChangeCallback", "[filesystem]") {
         Sleep(10);
         count++;
     }
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     int count = 0;
     while ((!b1 || !b2) && count < 10000 * seconds) {
         usleep(100);
         FileSys.triggerFilesystemEvents();
         count++;
     }
-#endif
+#endif // WIN32
     REQUIRE(b1);
     REQUIRE(b2);
 

@@ -60,7 +60,7 @@
 #ifndef _ERRNO
 #define _ERRNO errno
 #endif // _ERRNO
-#endif // !WIN32
+#endif // WIN32
 
 namespace {
     void closeSocket(_SOCKET socket) {

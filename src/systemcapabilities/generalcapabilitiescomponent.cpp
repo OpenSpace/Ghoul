@@ -463,7 +463,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     SYSTEM_INFO systemInfo;
     GetNativeSystemInfo(&systemInfo);
     _cores = systemInfo.dwNumberOfProcessors;
-#else // // ^^^^ WIN32 // _M_ARM64 vvvv
+#else // ^^^^ WIN32 // _M_ARM64 vvvv
     _cpu = "arm64";
 
     SYSTEM_INFO systemInfo;

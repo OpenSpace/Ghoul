@@ -39,7 +39,7 @@
 #pragma comment(lib, "Kernel32.lib")
 typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
-#else // ^^^ WIN32 | !WIN32 vvv
+#else // ^^^^ WIN32 | !WIN32 vvvv
 #include <sys/utsname.h>
 #endif // WIN32
 

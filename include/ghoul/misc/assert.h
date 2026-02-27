@@ -68,9 +68,9 @@ void internal_assert(std::string expression, std::string message, std::string fi
 
 #if defined(__GNUC__) || defined(__clang__)
 #  define GHL_ASSERT_FUNCTION __PRETTY_FUNCTION__
-#else
+#else // ^^^^ GNUC || __clang__ // !(GNUC || __clang__) vvvv
 #  define GHL_ASSERT_FUNCTION __FUNCTION__
-#endif
+#endif // defined(__GNUC__) || defined(__clang__)
 
 /**
  * This macro asserts on the `__condition__` and prints the optional `__message__`. In
@@ -92,7 +92,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
             );                                                                           \
         }                                                                                \
     } while (false)
-#else
+#else // ^^^^ GHL_THROW_ON_ASSERT // !GHL_THROW_ON_ASSERT vvvv
 #define ghoul_assert(__condition__, __message__)                                         \
     do {                                                                                 \
         if (!(__condition__)) {                                                          \
@@ -106,10 +106,10 @@ void internal_assert(std::string expression, std::string message, std::string fi
         }                                                                                \
     } while (false)
 
-#endif
-#else
+#endif // GHL_THROW_ON_ASSERT
+#else // ^^^^ NDEBUG || DEBUG || GHOUL_ASSERT // !(NDEBUG || DEBUG || GHOUL_ASSERT) vvvv
 #define ghoul_assert(__condition__, __message__) {}
-#endif // NDEBUG
+#endif // NDEBUG || DEBUG || GHOUL_ASSERT
 
 /** @}  */
 

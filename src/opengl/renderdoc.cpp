@@ -30,7 +30,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#else // ^^^ WIN32 | !WIN32 vvv
+#else // ^^^^ WIN32 | !WIN32 vvvv
 #include <dlfcn.h>
 #endif // WIN32
 
@@ -44,7 +44,7 @@ void loadRenderDoc() {
             GetProcAddress(mod, "RENDERDOC_GetAPI")
         );
     }
-#else // ^^^ WIN32 ||| !WIN32 vvv
+#else // ^^^^ WIN32 ||| !WIN32 vvvv
     if (void* mod = dlopen("librenderdoc.so", RTLD_NOW | RTLD_NOLOAD);  mod) {
         getApi = reinterpret_cast<pRENDERDOC_GetAPI>(dlsym(mod, "RENDERDOC_GetAPI"));
     }

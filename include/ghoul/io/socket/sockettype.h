@@ -30,7 +30,7 @@
 #ifdef WIN32
 using _SOCKET = size_t;
 using _SOCKLEN = int;
-#else //linux & macOS
+#else // ^^^^ WIN32 // !WIN32 vvvv
 
 #include <limits>
 #include <sys/socket.h>

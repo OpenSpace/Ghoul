@@ -85,14 +85,14 @@ namespace {
             case ThreadPriorityClass::High:   return SCHED_RR;
             default:                          throw MissingCaseException();
         }
-    #else
+    #else // WIN32
         switch (c) {
             case ThreadPriorityClass::Idle:   return SCHED_IDLE;
             case ThreadPriorityClass::Normal: return SCHED_OTHER;
             case ThreadPriorityClass::High:   return SCHED_RR;
             default:                          throw MissingCaseException();
     }
-    #endif
+    #endif // WIN32
     }
 } // namespace
 
