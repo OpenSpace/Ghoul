@@ -138,7 +138,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     width += 1;
     height += 1;
 
-    glm::ivec4 region(0, 0, width, height);
+    glm::ivec4 region = glm::ivec4(0, 0, width, height);
 
     int bestHeight = std::numeric_limits<int>::max();
     int bestWidth = std::numeric_limits<int>::max();

@@ -54,7 +54,7 @@ namespace {
         pclose(pipe);
         return true;
     }
-#endif
+#endif // WIN32
 } // namespace
 
 namespace ghoul {

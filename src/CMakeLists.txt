@@ -234,8 +234,6 @@ if (GHOUL_MODULE_OPENGL)
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/uniformcache.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.inl
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h
@@ -255,7 +253,6 @@ if (GHOUL_MODULE_OPENGL)
       opengl/textureatlas.cpp
       opengl/texturemanager.cpp
       opengl/textureunit.cpp
-      opengl/vertexbufferobject.cpp
       io/texture/texturereader.cpp
       io/texture/texturereaderbase.cpp
       io/texture/texturereadercmap.cpp

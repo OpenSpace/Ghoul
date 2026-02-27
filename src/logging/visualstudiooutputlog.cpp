@@ -50,7 +50,7 @@ void VisualStudioOutputLog::log([[maybe_unused]] LogLevel level,
 
     std::string fullMessage = createFullMessageString(level, category, message) + '\n';
     OutputDebugString(fullMessage.c_str());
-#endif
+#endif // WIN32
 }
 
 } // namespace ghoul::logging

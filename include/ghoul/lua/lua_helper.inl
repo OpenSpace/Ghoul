@@ -528,8 +528,7 @@ std::string Name() {
     else if constexpr (std::is_same_v<T, Dictionary> ||
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
-                       internal::is_array<T>::value ||
-                       internal::is_tuple<T>::value ||
+                       internal::is_array<T>::value || internal::is_tuple<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
                        std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
                        std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
@@ -545,14 +544,10 @@ std::string Name() {
                        std::is_same_v<T, glm::dmat4x2> ||
                        std::is_same_v<T, glm::dmat4x3> ||
                        std::is_same_v<T, glm::dmat4x4> ||
-                       std::is_same_v<T, glm::mat2x2> ||
-                       std::is_same_v<T, glm::mat2x3> ||
-                       std::is_same_v<T, glm::mat2x4> ||
-                       std::is_same_v<T, glm::mat3x2> ||
-                       std::is_same_v<T, glm::mat3x3> ||
-                       std::is_same_v<T, glm::mat3x4> ||
-                       std::is_same_v<T, glm::mat4x2> ||
-                       std::is_same_v<T, glm::mat4x3> ||
+                       std::is_same_v<T, glm::mat2x2> || std::is_same_v<T, glm::mat2x3> ||
+                       std::is_same_v<T, glm::mat2x4> || std::is_same_v<T, glm::mat3x2> ||
+                       std::is_same_v<T, glm::mat3x3> || std::is_same_v<T, glm::mat3x4> ||
+                       std::is_same_v<T, glm::mat4x2> || std::is_same_v<T, glm::mat4x3> ||
                        std::is_same_v<T, glm::mat4x4>)
     {
         return "Table";
@@ -606,8 +601,7 @@ T valueInner(lua_State* L, int location) {
     else if constexpr (std::is_floating_point_v<T>) {
         return static_cast<T>(lua_tonumber(L, location));
     }
-    else if constexpr (std::is_same_v<T, const char*> ||
-                       std::is_same_v<T, std::string> ||
+    else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string> ||
                        std::is_same_v<T, std::filesystem::path> ||
                        std::is_same_v<T, std::string_view>)
     {
@@ -624,16 +618,14 @@ T valueInner(lua_State* L, int location) {
         return d;
     }
     else if constexpr (std::is_same_v<T, glm::dvec2> || std::is_same_v<T, glm::dvec3> ||
-                       std::is_same_v<T, glm::dvec4> ||
-                       std::is_same_v<T, glm::dmat2x2> ||
+                       std::is_same_v<T, glm::dvec4> || std::is_same_v<T, glm::dmat2x2> ||
                        std::is_same_v<T, glm::dmat2x3> ||
                        std::is_same_v<T, glm::dmat2x4> ||
                        std::is_same_v<T, glm::dmat3x2> ||
                        std::is_same_v<T, glm::dmat3x3> ||
                        std::is_same_v<T, glm::dmat3x4> ||
                        std::is_same_v<T, glm::dmat4x2> ||
-                       std::is_same_v<T, glm::dmat4x3> ||
-                       std::is_same_v<T, glm::dmat4x4>)
+                       std::is_same_v<T, glm::dmat4x3> || std::is_same_v<T, glm::dmat4x4>)
     {
         lua_pushvalue(L, location);
         defer { lua_pop(L, 1); };
@@ -949,8 +941,7 @@ bool hasValue(lua_State* L, int location) {
     else if constexpr (std::is_same_v<T, Dictionary> ||
                        internal::is_string_map<T>::value ||
                        internal::is_vector<T>::value ||
-                       internal::is_array<T>::value ||
-                       internal::is_tuple<T>::value ||
+                       internal::is_array<T>::value || internal::is_tuple<T>::value ||
                        std::is_same_v<T, glm::ivec2> || std::is_same_v<T, glm::ivec3> ||
                        std::is_same_v<T, glm::ivec4> || std::is_same_v<T, glm::uvec2> ||
                        std::is_same_v<T, glm::uvec3> || std::is_same_v<T, glm::uvec4> ||
@@ -966,14 +957,10 @@ bool hasValue(lua_State* L, int location) {
                        std::is_same_v<T, glm::dmat4x2> ||
                        std::is_same_v<T, glm::dmat4x3> ||
                        std::is_same_v<T, glm::dmat4x4> ||
-                       std::is_same_v<T, glm::mat2x2> ||
-                       std::is_same_v<T, glm::mat2x3> ||
-                       std::is_same_v<T, glm::mat2x4> ||
-                       std::is_same_v<T, glm::mat3x2> ||
-                       std::is_same_v<T, glm::mat3x3> ||
-                       std::is_same_v<T, glm::mat3x4> ||
-                       std::is_same_v<T, glm::mat4x2> ||
-                       std::is_same_v<T, glm::mat4x3> ||
+                       std::is_same_v<T, glm::mat2x2> || std::is_same_v<T, glm::mat2x3> ||
+                       std::is_same_v<T, glm::mat2x4> || std::is_same_v<T, glm::mat3x2> ||
+                       std::is_same_v<T, glm::mat3x3> || std::is_same_v<T, glm::mat3x4> ||
+                       std::is_same_v<T, glm::mat4x2> || std::is_same_v<T, glm::mat4x3> ||
                        std::is_same_v<T, glm::mat4x4>)
     {
         return lua_istable(L, location) == 1;

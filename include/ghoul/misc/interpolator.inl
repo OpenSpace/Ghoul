@@ -31,7 +31,7 @@ namespace {
 
     template <typename T, typename V>
     T internalCubicBezier(V t, const T& p0, const T& p1, const T& p2, const T& p3) {
-        V a = V(1.0) - t;
+        const V a = V(1.0) - t;
         return p0 * a * a * a
             + p1 * t * a * a * V(3.0)
             + p2 * t * t * a * V(3.0)

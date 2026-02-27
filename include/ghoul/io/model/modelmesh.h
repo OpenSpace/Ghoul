@@ -73,7 +73,7 @@ public:
     ~ModelMesh() noexcept = default;
 
     void initialize();
-    void deinitialize();
+    void deinitialize() const;
     void render(opengl::ProgramObject& program, const glm::mat4& meshTransform,
         bool isFullyTexturedModel = true, bool isProjection = false) const;
     float calculateBoundingRadius(glm::mat4& transform) const;

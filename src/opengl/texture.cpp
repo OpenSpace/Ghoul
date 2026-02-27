@@ -56,94 +56,66 @@ namespace {
         switch (frmt.format) {
             case Texture::Format::Red:
                 switch (frmt.dataType) {
-                    case GL_UNSIGNED_BYTE:
-                    case GL_BYTE:
-                        return GL_R8;
-                    case GL_UNSIGNED_SHORT:
-                    case GL_SHORT:
-                        return GL_R16;
-                    case GL_FLOAT:
-                        return GL_R32F;
-                    default:
-                        throw FormatError(frmt.format, frmt.dataType);
+                    case GL_UNSIGNED_BYTE:  return GL_R8;
+                    case GL_BYTE:           return GL_R8;
+                    case GL_UNSIGNED_SHORT: return GL_R16;
+                    case GL_SHORT:          return GL_R16;
+                    case GL_FLOAT:          return GL_R32F;
+                    default:                throw FormatError(frmt.format, frmt.dataType);
                 }
             case Texture::Format::RG:
                 switch (frmt.dataType) {
-                    case GL_UNSIGNED_BYTE:
-                    case GL_BYTE:
-                        return GL_RG8;
-                    case GL_UNSIGNED_SHORT:
-                    case GL_SHORT:
-                        return GL_RG16;
-                    case GL_FLOAT:
-                        return GL_RG32F;
-                    default:
-                        throw FormatError(frmt.format, frmt.dataType);
+                    case GL_UNSIGNED_BYTE:  return GL_RG8;
+                    case GL_BYTE:           return GL_RG8;
+                    case GL_UNSIGNED_SHORT: return GL_RG16;
+                    case GL_SHORT:          return GL_RG16;
+                    case GL_FLOAT:          return GL_RG32F;
+                    default:                throw FormatError(frmt.format, frmt.dataType);
                 }
             case Texture::Format::RGB:
                 switch (frmt.dataType) {
-                    case GL_UNSIGNED_BYTE:
-                    case GL_BYTE:
-                        return GL_RGB8;
-                    case GL_UNSIGNED_SHORT:
-                    case GL_SHORT:
-                        return GL_RGB16;
-                    case GL_FLOAT:
-                        return GL_RGB32F;
-                    default:
-                        throw FormatError(frmt.format, frmt.dataType);
+                    case GL_UNSIGNED_BYTE:  return GL_RGB8;
+                    case GL_BYTE:           return GL_RGB8;
+                    case GL_UNSIGNED_SHORT: return GL_RGB16;
+                    case GL_SHORT:          return GL_RGB16;
+                    case GL_FLOAT:          return GL_RGB32F;
+                    default:                throw FormatError(frmt.format, frmt.dataType);
                 }
             case Texture::Format::BGR:
                 switch (frmt.dataType) {
-                    case GL_UNSIGNED_BYTE:
-                    case GL_BYTE:
-                        return GL_RGB8;
-                    case GL_UNSIGNED_SHORT:
-                    case GL_SHORT:
-                        return GL_RGB16;
-                    case GL_FLOAT:
-                        return GL_RGB32F;
-                    default:
-                        throw FormatError(frmt.format, frmt.dataType);
+                    case GL_UNSIGNED_BYTE:  return GL_RGB8;
+                    case GL_BYTE:           return GL_RGB8;
+                    case GL_UNSIGNED_SHORT: return GL_RGB16;
+                    case GL_SHORT:          return GL_RGB16;
+                    case GL_FLOAT:          return GL_RGB32F;
+                    default:                throw FormatError(frmt.format, frmt.dataType);
                 }
             case Texture::Format::RGBA:
                 switch (frmt.dataType) {
-                    case GL_UNSIGNED_BYTE:
-                    case GL_BYTE:
-                        return GL_RGBA8;
-                    case GL_UNSIGNED_SHORT:
-                    case GL_SHORT:
-                        return GL_RGBA16;
-                    case GL_FLOAT:
-                        return GL_RGBA32F;
-                    default:
-                        throw FormatError(frmt.format, frmt.dataType);
+                    case GL_UNSIGNED_BYTE:  return GL_RGBA8;
+                    case GL_BYTE:           return GL_RGBA8;
+                    case GL_UNSIGNED_SHORT: return GL_RGBA16;
+                    case GL_SHORT:          return GL_RGBA16;
+                    case GL_FLOAT:          return GL_RGBA32F;
+                    default:                throw FormatError(frmt.format, frmt.dataType);
                 }
             case Texture::Format::BGRA:
                 switch (frmt.dataType) {
-                    case GL_UNSIGNED_BYTE:
-                    case GL_BYTE:
-                        return GL_RGBA8;
-                    case GL_UNSIGNED_SHORT:
-                    case GL_SHORT:
-                        return GL_RGBA16;
-                    case GL_FLOAT:
-                        return GL_RGBA32F;
-                    default:
-                        throw FormatError(frmt.format, frmt.dataType);
+                    case GL_UNSIGNED_BYTE:  return GL_RGBA8;
+                    case GL_BYTE:           return GL_RGBA8;
+                    case GL_UNSIGNED_SHORT: return GL_RGBA16;
+                    case GL_SHORT:          return GL_RGBA16;
+                    case GL_FLOAT:          return GL_RGBA32F;
+                    default:                throw FormatError(frmt.format, frmt.dataType);
                 }
             case Texture::Format::DepthComponent:
                 switch (frmt.dataType) {
-                    case GL_UNSIGNED_SHORT:
-                    case GL_SHORT:
-                        return GL_DEPTH_COMPONENT16;
-                    case GL_UNSIGNED_INT:
-                    case GL_INT:
-                        return GL_DEPTH_COMPONENT32;
-                    case GL_FLOAT:
-                        return GL_DEPTH_COMPONENT32F;
-                    default:
-                        throw FormatError(frmt.format, frmt.dataType);
+                    case GL_UNSIGNED_SHORT: return GL_DEPTH_COMPONENT16;
+                    case GL_SHORT:          return GL_DEPTH_COMPONENT16;
+                    case GL_UNSIGNED_INT:   return GL_DEPTH_COMPONENT32;
+                    case GL_INT:            return GL_DEPTH_COMPONENT32;
+                    case GL_FLOAT:          return GL_DEPTH_COMPONENT32F;
+                    default:                throw FormatError(frmt.format, frmt.dataType);
                 }
             default:
                 throw MissingCaseException();
@@ -169,17 +141,13 @@ namespace {
 
     constexpr int nChannels(Texture::Format format) {
         switch (format) {
-            case Texture::Format::Red:
-            case Texture::Format::DepthComponent:
-                return 1;
-            case Texture::Format::RG:
-                return 2;
-            case Texture::Format::RGB:
-            case Texture::Format::BGR:
-                return 3;
-            case Texture::Format::RGBA:
-            case Texture::Format::BGRA:
-                return 4;
+            case Texture::Format::Red:            return 1;
+            case Texture::Format::DepthComponent: return 1;
+            case Texture::Format::RG:             return 2;
+            case Texture::Format::RGB:            return 3;
+            case Texture::Format::BGR:            return 3;
+            case Texture::Format::RGBA:           return 4;
+            case Texture::Format::BGRA:           return 4;
         }
         return 0;
     }
@@ -187,38 +155,28 @@ namespace {
     constexpr GLubyte bytesPerPixel(Texture::Format format, GLenum dataType) {
         const int n = nChannels(format);
 
-        int szType = 0;
         switch (dataType) {
-            case GL_UNSIGNED_BYTE:
-            case GL_BYTE:
-            case GL_UNSIGNED_BYTE_3_3_2:
-            case GL_UNSIGNED_BYTE_2_3_3_REV:
-                szType = 1;
-                break;
-            case GL_UNSIGNED_SHORT:
-            case GL_SHORT:
-            case GL_UNSIGNED_SHORT_5_6_5:
-            case GL_UNSIGNED_SHORT_5_6_5_REV:
-            case GL_UNSIGNED_SHORT_4_4_4_4:
-            case GL_UNSIGNED_SHORT_4_4_4_4_REV:
-            case GL_UNSIGNED_SHORT_5_5_5_1:
-            case GL_UNSIGNED_SHORT_1_5_5_5_REV:
-                szType = 2;
-                break;
-            case GL_UNSIGNED_INT:
-            case GL_INT:
-            case GL_FLOAT:
-            case GL_UNSIGNED_INT_8_8_8_8:
-            case GL_UNSIGNED_INT_8_8_8_8_REV:
-            case GL_UNSIGNED_INT_10_10_10_2:
-            case GL_UNSIGNED_INT_2_10_10_10_REV:
-                szType = 4;
-                break;
-            default:
-                throw MissingCaseException();
+            case GL_UNSIGNED_BYTE:               return static_cast<GLubyte>(1 * n);
+            case GL_BYTE:                        return static_cast<GLubyte>(1 * n);
+            case GL_UNSIGNED_BYTE_3_3_2:         return static_cast<GLubyte>(1 * n);
+            case GL_UNSIGNED_BYTE_2_3_3_REV:     return static_cast<GLubyte>(1 * n);
+            case GL_UNSIGNED_SHORT:              return static_cast<GLubyte>(2 * n);
+            case GL_SHORT:                       return static_cast<GLubyte>(2 * n);
+            case GL_UNSIGNED_SHORT_5_6_5:        return static_cast<GLubyte>(2 * n);
+            case GL_UNSIGNED_SHORT_5_6_5_REV:    return static_cast<GLubyte>(2 * n);
+            case GL_UNSIGNED_SHORT_4_4_4_4:      return static_cast<GLubyte>(2 * n);
+            case GL_UNSIGNED_SHORT_4_4_4_4_REV:  return static_cast<GLubyte>(2 * n);
+            case GL_UNSIGNED_SHORT_5_5_5_1:      return static_cast<GLubyte>(2 * n);
+            case GL_UNSIGNED_SHORT_1_5_5_5_REV:  return static_cast<GLubyte>(2 * n);
+            case GL_UNSIGNED_INT:                return static_cast<GLubyte>(4 * n);
+            case GL_INT:                         return static_cast<GLubyte>(4 * n);
+            case GL_FLOAT:                       return static_cast<GLubyte>(4 * n);
+            case GL_UNSIGNED_INT_8_8_8_8:        return static_cast<GLubyte>(4 * n);
+            case GL_UNSIGNED_INT_8_8_8_8_REV:    return static_cast<GLubyte>(4 * n);
+            case GL_UNSIGNED_INT_10_10_10_2:     return static_cast<GLubyte>(4 * n);
+            case GL_UNSIGNED_INT_2_10_10_10_REV: return static_cast<GLubyte>(4 * n);
+            default:                             throw MissingCaseException();
         }
-
-        return static_cast<GLubyte>(szType * n);
     }
 } // namespace
 
@@ -305,14 +263,17 @@ void Texture::initialize(const std::byte* data) {
     // Set the wrapping mode
     //
     switch (_type) {
-        case GL_TEXTURE_3D:
-            glTextureParameteri(_id, GL_TEXTURE_WRAP_R, static_cast<GLint>(_wrapping.r));
-            [[fallthrough]];
-        case GL_TEXTURE_2D:
-            glTextureParameteri(_id, GL_TEXTURE_WRAP_T, static_cast<GLint>(_wrapping.t));
-            [[fallthrough]];
         case GL_TEXTURE_1D:
             glTextureParameteri(_id, GL_TEXTURE_WRAP_S, static_cast<GLint>(_wrapping.s));
+            break;
+        case GL_TEXTURE_2D:
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_S, static_cast<GLint>(_wrapping.s));
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_T, static_cast<GLint>(_wrapping.t));
+            break;
+        case GL_TEXTURE_3D:
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_S, static_cast<GLint>(_wrapping.s));
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_T, static_cast<GLint>(_wrapping.t));
+            glTextureParameteri(_id, GL_TEXTURE_WRAP_R, static_cast<GLint>(_wrapping.r));
             break;
         default:
             throw MissingCaseException();

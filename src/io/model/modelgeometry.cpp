@@ -248,7 +248,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 
         // Texture
         // dimensions
-        std::array<int32_t, 3> dimensionStorage;
+        std::array<int32_t, 3> dimensionStorage = {};
         fileStream.read(
             reinterpret_cast<char*>(dimensionStorage.data()),
             3 * sizeof(int32_t)
@@ -463,13 +463,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // Transform
-        GLfloat rawTransform[16];
-        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
+        float rawTransform[16];
+        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(float));
         glm::mat4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
-        GLfloat rawAnimTransform[16];
-        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
+        float rawAnimTransform[16];
+        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(float));
         const glm::mat4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
@@ -656,16 +656,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 }
 
 bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) const {
-    std::ofstream fileStream(cachedFile, std::ofstream::binary);
+    std::ofstream fileStream = std::ofstream(cachedFile, std::ofstream::binary);
     if (!fileStream.good()) {
         throw ModelCacheException(cachedFile, "Could not open file to save cache");
     }
 
     // Write which version of caching that is used
-    fileStream.write(
-        reinterpret_cast<const char*>(&CurrentCacheVersion),
-        sizeof(int8_t)
-    );
+    fileStream.write(reinterpret_cast<const char*>(&CurrentCacheVersion), sizeof(int8_t));
 
     // First cache the textureStorage
     int32_t nTextureEntries = static_cast<int32_t>(_textureStorage.size());
@@ -676,9 +673,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
     for (int32_t te = 0; te < nTextureEntries; te++) {
         // Name
-        int32_t nameSize = static_cast<int32_t>(
-            _textureStorage[te].name.size() * sizeof(char)
-        );
+        int32_t nameSize = static_cast<int32_t>(_textureStorage[te].name.size());
         if (nameSize == 0) {
             throw ModelCacheException(
                 cachedFile,
@@ -728,10 +723,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
     // Write how many nodes are to be written
     int32_t nNodes = static_cast<int32_t>(_nodes.size());
     if (nNodes == 0) {
-        throw ModelCacheException(
-            cachedFile,
-            "No nodes were found while saving cache"
-        );
+        throw ModelCacheException(cachedFile, "No nodes were found while saving cache");
     }
     fileStream.write(reinterpret_cast<const char*>(&nNodes), sizeof(int32_t));
 
@@ -823,19 +815,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                 // color
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.textures()[t].color.r),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&mesh.textures()[t].color.g),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&mesh.textures()[t].color.b),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&mesh.textures()[t].color.a),
-                    sizeof(float)
+                     4 * sizeof(float)
                 );
 
                 // isTransparent
@@ -958,16 +938,8 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             {
                 // Position
                 fileStream.write(
-                    reinterpret_cast<const char*>(&posKeyframe.position.x),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&posKeyframe.position.y),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&posKeyframe.position.z),
-                    sizeof(float)
+                    reinterpret_cast<const char*>(glm::value_ptr(posKeyframe.position)),
+                    3 * sizeof(float)
                 );
 
                 // Time
@@ -996,15 +968,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                 );
                 fileStream.write(
                     reinterpret_cast<const char*>(&rotKeyframe.rotation.x),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&rotKeyframe.rotation.y),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&rotKeyframe.rotation.z),
-                    sizeof(float)
+                    3 * sizeof(float)
                 );
 
                 // Time
@@ -1028,16 +992,8 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             {
                 // Scale
                 fileStream.write(
-                    reinterpret_cast<const char*>(&scaleKeyframe.scale.x),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&scaleKeyframe.scale.y),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&scaleKeyframe.scale.z),
-                    sizeof(float)
+                    reinterpret_cast<const char*>(glm::value_ptr(scaleKeyframe.scale)),
+                    3 * sizeof(float)
                 );
 
                 // Time

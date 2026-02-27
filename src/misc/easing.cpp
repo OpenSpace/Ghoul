@@ -31,7 +31,7 @@
 #include <type_traits>
 
 namespace {
-    const std::array<std::string_view, 28> EaseFuncNames = {
+    constexpr std::array<std::string_view, 28> EaseFuncNames = {
         "Linear",
         "QuadraticEaseIn",   "QuadraticEaseOut",   "QuadraticEaseInOut",
         "CubicEaseIn",       "CubicEaseOut",       "CubicEaseInOut",

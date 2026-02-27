@@ -29,6 +29,7 @@
 #include <ghoul/io/model/modelmesh.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <ghoul/glm.h>
+#include <array>
 #include <vector>
 
 namespace ghoul::io {
@@ -57,13 +58,13 @@ public:
 private:
     // glm::mat4 is not noexcept move constructable, use an array instead for transform
     // Array is column major
-    GLfloat _transform[16] = {
+    std::array<GLfloat, 16> _transform = {
         1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f
     };
-    GLfloat _animationTransform[16] = {
+    std::array<GLfloat, 16> _animationTransform = {
         1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
         0.f, 0.f, 1.f, 0.f,

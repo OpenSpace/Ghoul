@@ -82,7 +82,7 @@ namespace {
             }
         }
 
-        return "\"" + jsonString + "\"";
+        return std::format("\"{}\"", jsonString);
     }
 
     template <typename T>
@@ -220,7 +220,7 @@ std::string formatJson(const Dictionary& dictionary) {
                 return std::format("{},{}", a, convert(key, dictionary));
             }
         );
-        return "{" + json + "}";
+        return std::format("{{{}}}", json);
     }
 }
 

@@ -51,9 +51,7 @@ namespace {
     constexpr int CacheVersion = 2;
 
     struct CacheError final : public RuntimeError {
-        explicit CacheError(std::string msg)
-            : RuntimeError(std::move(msg), "Cache")
-        {}
+        explicit CacheError(std::string msg) : RuntimeError(std::move(msg), "Cache") {}
     };
 
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;

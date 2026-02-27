@@ -79,14 +79,16 @@ void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::housekeeping() {
     // Remove all 0-sized empty pairs that have already been reused
     _emptyList.erase(
         std::remove_if(
-            _emptyList.begin(), _emptyList.end(),
+            _emptyList.begin(),
+            _emptyList.end(),
             [](const EmptyPair& ep) { return ep.size == 0; }
         ),
         _emptyList.end()
     );
 
     std::sort(
-        _emptyList.begin(), _emptyList.end(),
+        _emptyList.begin(),
+        _emptyList.end(),
         [](const EmptyPair& lhs, const EmptyPair& rhs) { return lhs.size < rhs.size; }
     );
     for (size_t i = 0; i < _emptyList.size() - 1; i++) {
@@ -216,7 +218,8 @@ std::vector<int> MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::occupanci
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
 int MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::totalOccupancy() const {
     return std::accumulate(
-        _buckets.begin(), _buckets.end(),
+        _buckets.begin(),
+        _buckets.end(),
         0,
         [](int v, const std::unique_ptr<Bucket>& b) {
             return v + static_cast<int>(b->usage);

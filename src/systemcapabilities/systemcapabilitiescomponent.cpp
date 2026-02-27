@@ -202,7 +202,8 @@ void SystemCapabilitiesComponent::initializeWMI() {
         _iwbemLocator = nullptr;
         CoUninitialize();
         throw WMIError(
-            "WMI initialization failed. Failed to create IWbemLocator object", hRes
+            "WMI initialization failed. Failed to create IWbemLocator object",
+            hRes
         );
     }
 
@@ -224,7 +225,8 @@ void SystemCapabilitiesComponent::initializeWMI() {
         CoUninitialize();
         _iwbemServices = nullptr;
         throw WMIError(
-            "WMI initialization failed. Failed to connect to WMI server", hRes
+            "WMI initialization failed. Failed to connect to WMI server",
+            hRes
         );
     }
 

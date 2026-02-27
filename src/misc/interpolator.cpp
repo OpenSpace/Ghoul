@@ -67,10 +67,7 @@ glm::dvec3 interpolateCatmullRom(double t, const glm::dvec3& p0, const glm::dvec
     const glm::dvec3& c = m1;
     const glm::dvec3& d = p1;
 
-    return a * t * t * t
-        + b * t * t
-        + c * t
-        + d;
+    return a * t * t * t + b * t * t + c * t + d;
 }
 
 } // namespace ghoul

@@ -67,14 +67,14 @@ namespace {
         }
 
         const std::string_view before = key.substr(0, dotPos);
-        if (dictionary.hasKey(before)) {
-            const Dictionary d = dictionary.value<Dictionary>(before);
-            const std::string_view after = key.substr(dotPos + 1);
-            return hasKeyRecursive(d, after);
-        }
-        else {
+        if (!dictionary.hasKey(before)) {
             return false;
         }
+
+
+        const Dictionary d = dictionary.value<Dictionary>(before);
+        const std::string_view after = key.substr(dotPos + 1);
+        return hasKeyRecursive(d, after);
     }
 
     template <typename T>
@@ -85,14 +85,13 @@ namespace {
         }
 
         const std::string_view before = key.substr(0, dotPos);
-        if (dictionary.hasValue<Dictionary>(before)) {
-            const Dictionary d = dictionary.value<Dictionary>(before);
-            const std::string_view after = key.substr(dotPos + 1);
-            return hasValueRecursive<T>(d, after);
-        }
-        else {
+        if (!dictionary.hasValue<Dictionary>(before)) {
             return false;
         }
+
+        const Dictionary d = dictionary.value<Dictionary>(before);
+        const std::string_view after = key.substr(dotPos + 1);
+        return hasValueRecursive<T>(d, after);
     }
 
     template <typename T>

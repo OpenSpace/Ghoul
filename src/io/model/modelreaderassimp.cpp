@@ -404,10 +404,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorDiffuse;
-                    texture.color.r = color4.r;
-                    texture.color.g = color4.g;
-                    texture.color.b = color4.b;
-                    texture.color.a = color4.a;
+                    texture.color = glm::vec4(color4.r, color4.g, color4.b, color4.a);
                     texture.isTransparent = texture.color.a < 1.f;
                     textureArray.push_back(std::move(texture));
                 }
@@ -419,10 +416,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorDiffuse;
-                    texture.color.r = color3.r;
-                    texture.color.g = color3.g;
-                    texture.color.b = color3.b;
-                    texture.color.a = 1.f;
+                    texture.color = glm::vec4(color3.r, color3.g, color3.b, 1.f);
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -463,10 +457,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorSpecular;
-                    texture.color.r = color4.r;
-                    texture.color.g = color4.g;
-                    texture.color.b = color4.b;
-                    texture.color.a = 1.f;
+                    texture.color = glm::vec4(color4.r, color4.g, color4.b, 1.f);
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -477,10 +468,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorSpecular;
-                    texture.color.r = color3.r;
-                    texture.color.g = color3.g;
-                    texture.color.b = color3.b;
-                    texture.color.a = 1.f;
+                    texture.color = glm::vec4(color3.r, color3.g, color3.b, 1.f);
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -616,67 +604,69 @@ namespace {
                 for (unsigned int c = 0; c < animation->mNumChannels; c++) {
                     aiNodeAnim* nodeAnim = animation->mChannels[c];
 
-                    if (nodeAnim->mNodeName == node.mName) {
-                        ModelAnimation::NodeAnimation nodeAnimation;
-                        nodeAnimation.node = newNode;
-
-                        for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; p++) {
-                            const aiVectorKey posKey = nodeAnim->mPositionKeys[p];
-
-                            ModelAnimation::PositionKeyframe positionKf;
-                            positionKf.time =
-                                std::abs(animation->mTicksPerSecond) <
-                                std::numeric_limits<double>::epsilon() ? posKey.mTime :
-                                posKey.mTime / animation->mTicksPerSecond;
-                            positionKf.position = glm::vec3(
-                                posKey.mValue.x,
-                                posKey.mValue.y,
-                                posKey.mValue.z
-                            );
-
-                            nodeAnimation.positions.push_back(std::move(positionKf));
-                        }
-
-                        for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++) {
-                            const aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
-
-                            ModelAnimation::RotationKeyframe rotationKf;
-                            rotationKf.time =
-                                std::abs(animation->mTicksPerSecond) <
-                                std::numeric_limits<double>::epsilon() ? rotKey.mTime :
-                                rotKey.mTime / animation->mTicksPerSecond;
-                            rotationKf.rotation = glm::quat(
-                                rotKey.mValue.w,
-                                rotKey.mValue.x,
-                                rotKey.mValue.y,
-                                rotKey.mValue.z
-                            );
-
-                            nodeAnimation.rotations.push_back(std::move(rotationKf));
-                        }
-
-                        for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++) {
-                            const aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
-
-                            ModelAnimation::ScaleKeyframe scaleKeyframe;
-                            scaleKeyframe.time =
-                                std::abs(animation->mTicksPerSecond) <
-                                std::numeric_limits<double>::epsilon() ? scaleKey.mTime :
-                                scaleKey.mTime / animation->mTicksPerSecond;
-                            scaleKeyframe.scale = glm::vec3(
-                                scaleKey.mValue.x,
-                                scaleKey.mValue.y,
-                                scaleKey.mValue.z
-                            );
-
-                            nodeAnimation.scales.push_back(std::move(scaleKeyframe));
-                        }
-
-                        modelAnimation->nodeAnimations().push_back(
-                            std::move(nodeAnimation)
-                        );
-                        break;
+                    if (nodeAnim->mNodeName != node.mName) {
+                        continue;
                     }
+
+                    ModelAnimation::NodeAnimation nodeAnimation;
+                    nodeAnimation.node = newNode;
+
+                    for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; p++) {
+                        const aiVectorKey posKey = nodeAnim->mPositionKeys[p];
+
+                        ModelAnimation::PositionKeyframe positionKf;
+                        positionKf.time =
+                            std::abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? posKey.mTime :
+                            posKey.mTime / animation->mTicksPerSecond;
+                        positionKf.position = glm::vec3(
+                            posKey.mValue.x,
+                            posKey.mValue.y,
+                            posKey.mValue.z
+                        );
+
+                        nodeAnimation.positions.push_back(std::move(positionKf));
+                    }
+
+                    for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++) {
+                        const aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
+
+                        ModelAnimation::RotationKeyframe rotationKf;
+                        rotationKf.time =
+                            std::abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? rotKey.mTime :
+                            rotKey.mTime / animation->mTicksPerSecond;
+                        rotationKf.rotation = glm::quat(
+                            rotKey.mValue.w,
+                            rotKey.mValue.x,
+                            rotKey.mValue.y,
+                            rotKey.mValue.z
+                        );
+
+                        nodeAnimation.rotations.push_back(std::move(rotationKf));
+                    }
+
+                    for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++) {
+                        const aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
+
+                        ModelAnimation::ScaleKeyframe scaleKeyframe;
+                        scaleKeyframe.time =
+                            std::abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? scaleKey.mTime :
+                            scaleKey.mTime / animation->mTicksPerSecond;
+                        scaleKeyframe.scale = glm::vec3(
+                            scaleKey.mValue.x,
+                            scaleKey.mValue.y,
+                            scaleKey.mValue.z
+                        );
+
+                        nodeAnimation.scales.push_back(std::move(scaleKeyframe));
+                    }
+
+                    modelAnimation->nodeAnimations().push_back(
+                        std::move(nodeAnimation)
+                    );
+                    break;
                 }
             }
         }
@@ -782,7 +772,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         std::move(modelAnimation)
     );
 }
-
 
 bool ModelReaderAssimp::needsCache() const {
     return true;

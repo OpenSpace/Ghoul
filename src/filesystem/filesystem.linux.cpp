@@ -46,7 +46,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "FileSystem";
-    const uint32_t mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
+    constexpr uint32_t Mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
                           IN_UNMOUNT | IN_ISDIR;
     constexpr int EventSize = sizeof(struct inotify_event);
     constexpr int BufferLength = 1024 * (EventSize + 16);
@@ -75,15 +75,16 @@ int FileSystem::addFileListener(std::filesystem::path path,
 {
 
     const std::string filename = path.string();
-    const int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), mask);
+    const int wd = inotify_add_watch(_inotifyHandle, filename.c_str(), Mask);
 
     const int idx = FileChangeInfo::NextIdentifier;
 
-    FileChangeInfo info;
-    info.identifier = idx;
-    info.inotifyHandle = wd;
-    info.path = std::move(path);
-    info.callback = std::move(callback);
+    FileChangeInfo info = {
+        .identifier = idx,
+        .inotifyHandle = wd,
+        .path = std::move(path),
+        .callback = std::move(callback)
+    };
     _trackedFiles.push_back(std::move(info));
 
     FileChangeInfo::NextIdentifier += 1;
@@ -151,7 +152,7 @@ void FileSystem::inotifyWatcher() {
                         info.inotifyHandle = inotify_add_watch(
                             fd,
                             info.path.string().c_str(),
-                            mask
+                            Mask
                         );
                     }
                     break;

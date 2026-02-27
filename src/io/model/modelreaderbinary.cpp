@@ -86,7 +86,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    std::ifstream fileStream(filename, std::ifstream::binary);
+    std::ifstream fileStream = std::ifstream(filename, std::ifstream::binary);
     if (!fileStream.good()) {
         throw ModelLoadException(filename, "Could not open binary model file", this);
     }
@@ -96,10 +96,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
     if (version != CurrentModelVersion &&
         // Backward compatible versions are ok
-        version != AnimationUpdateVersion &&
-        version != OpacityUpdateVersion &&
-        version != VertexColorUpdateVersion &&
-        version != SkipMarkerUpdateVersion
+        version != AnimationUpdateVersion && version != OpacityUpdateVersion &&
+        version != VertexColorUpdateVersion && version != SkipMarkerUpdateVersion
        )
     {
         throw ModelLoadException(
@@ -117,8 +115,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     }
     else if (nTextureEntries < 0) {
         std::string message = std::format(
-            "Model cannot have negative number of texture entries while loading "
-            "binary model: {}", nTextureEntries
+            "Model cannot have negative number of texture entries while loading binary "
+            "model: {}", nTextureEntries
         );
         throw ModelLoadException(filename, message, this);
     }
@@ -499,8 +497,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                float rot[4];
-                fileStream.read(reinterpret_cast<char*>(rot), 4 * sizeof(float));
+                std::array<float, 4> rot = {};
+                fileStream.read(reinterpret_cast<char*>(rot.data()), 4 * sizeof(float));
                 rotKeyframe.rotation = glm::quat(rot[0], rot[1], rot[2], rot[3]);
 
                 // Time

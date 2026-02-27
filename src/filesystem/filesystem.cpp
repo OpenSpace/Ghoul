@@ -243,7 +243,7 @@ void FileSystem::triggerFilesystemEvents() {
 #ifdef WIN32
     // Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls
     SleepEx(0, TRUE);
-#endif
+#endif // WIN32
 }
 
 #ifdef WIN32

@@ -164,25 +164,25 @@ void ConsoleLog::setColorForLevel(LogLevel level) {
 #else // ^^^^ WIN32 // !WIN32 vvvv
     switch (level) {
         case LogLevel::Trace:
-            std::cout << "\033[0;37m";    // grey
+            std::cout << "\033[0;37m";     // grey
             break;
         case LogLevel::Debug:
-            std::cout << "\033[22;32m";   // green
+            std::cout << "\033[22;32m";    // green
             break;
         case LogLevel::Info:
-            std::cout << "\033[0m";       // white
+            std::cout << "\033[0m";        // white
             break;
         case LogLevel::Warning:
-            std::cout << "\033[01;40;33m";// yellow on black
+            std::cout << "\033[01;40;33m"; // yellow on black
             break;
         case LogLevel::Error:
-            std::cout << "\033[22;31m";   // red
+            std::cout << "\033[22;31m";    // red
             break;
         case LogLevel::Fatal:
-            std::cout << "\033[22;35m";   // blue
+            std::cout << "\033[22;35m";    // blue
             break;
         case LogLevel::NoLogging:
-            std::cout << "\033[0m";       // white
+            std::cout << "\033[0m";        // white
             break;
         case LogLevel::AllLogging:
             break;
