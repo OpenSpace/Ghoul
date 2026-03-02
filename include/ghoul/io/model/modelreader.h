@@ -86,9 +86,6 @@ public:
         ForceRenderInvisible forceRenderInvisible = ForceRenderInvisible::No,
         NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes);
 
-
-
-
     /**
      * Returns a list of all the extensions that are supported by registered readers. If
      * a file with an extension included in this list is passed to the loadModel method
