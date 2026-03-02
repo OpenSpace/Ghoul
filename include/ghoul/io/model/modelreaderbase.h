@@ -75,8 +75,6 @@ public:
         const std::filesystem::path& filename, bool forceRenderInvisible = false,
         bool notifyInvisibleDropped = true) const = 0;
 
-    virtual void loadCameraPath(const std::filesystem::path& path) const = 0;
-
     /**
      * Returns if this reader needs a cache file or not.
      *

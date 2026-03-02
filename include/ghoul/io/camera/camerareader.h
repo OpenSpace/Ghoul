@@ -23,51 +23,19 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___MODELREADERBINARY___H__
-#define __GHOUL___MODELREADERBINARY___H__
+#ifndef __GHOUL___CAMERAREADER___H__
+#define __GHOUL___CAMERAREADER___H__
 
-#include <ghoul/io/model/modelreaderbase.h>
-
-namespace ghoul::modelgeometry { class ModelGeometry; }
+#include <filesystem>
 
 namespace ghoul::io {
 
-/**
- * This model reader loads a custom OpenSpace model from the provided file.
- */
-class ModelReaderBinary : public ModelReaderBase {
+class CameraReader {
 public:
-    /**
-     * Loads the 3D OpenSpace model file pointed to by \p filename and returns a
-     * constructed ModelGeometry from it.
-     *
-     * \param filename The geometric model file to be loaded
-     * \param forceRenderInvisible Force invisible meshes to render or not
-     * \param notifyInvisibleDropped Notify in log if invisible meshses were dropped
-     * \return The ModelGeometry containing the model
-     *
-     * \throw ModelLoadException If there was an error loading the model from \p filename
-     * \pre \p filename must not be empty
-     */
-    std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
-        const std::filesystem::path& filename, bool forceRenderInvisible = false,
-        bool notifyInvisibleDropped = true) const override;
+    static void loadCameraPath(const std::filesystem::path& filename);
 
-    /**
-     * Returns if this reader needs a cache file or not.
-     *
-     * \return A boolean for if this reader needs a cache file or not
-     */
-    bool needsCache() const override;
-
-    /**
-     * Returns a list of all extensions that this ModelReaderBinary supports.
-     *
-     * \return A list of all extensions that this ModelReaderBinary supports
-     */
-    std::vector<std::string> supportedExtensions() const override;
 };
 
 } // namespace ghoul::io
 
-#endif // __GHOUL___MODELREADERBINARY___H__
+#endif // !__GHOUL___CAMERAREADER___H__

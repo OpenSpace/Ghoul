@@ -87,7 +87,7 @@ public:
         NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes);
 
 
-    void loadCameraPath(const std::filesystem::path& filename);
+
 
     /**
      * Returns a list of all the extensions that are supported by registered readers. If

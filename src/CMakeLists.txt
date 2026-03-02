@@ -41,6 +41,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/cachemanager.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/file.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/filesystem/filesystem.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/camera/camerareader.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelanimation.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelgeometry.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelmesh.h
@@ -113,6 +114,7 @@ target_sources(
     filesystem/filesystem.cpp
     filesystem/filesystem.linux.cpp
     filesystem/filesystem.windows.cpp
+    io/camera/camerareader.cpp
     io/model/modelanimation.cpp
     io/model/modelgeometry.cpp
     io/model/modelmesh.cpp

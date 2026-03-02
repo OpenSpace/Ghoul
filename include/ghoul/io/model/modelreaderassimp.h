@@ -63,8 +63,6 @@ public:
         const std::filesystem::path& filename, bool forceRenderInvisible = false,
         bool notifyInvisibleDropped = true) const override;
 
-    void loadCameraPath(const std::filesystem::path& filename) const override;
-
     /**
      * Returns if this reader needs a cache file or not.
      *

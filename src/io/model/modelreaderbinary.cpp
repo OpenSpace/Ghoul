@@ -76,9 +76,6 @@ namespace {
 
 namespace ghoul::io {
 
-void ModelReaderBinary::loadCameraPath(const std::filesystem::path& path) const {
-}
-
 std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                                                     const std::filesystem::path& filename,
                                                                 bool forceRenderInvisible,
