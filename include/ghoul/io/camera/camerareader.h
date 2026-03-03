@@ -29,11 +29,13 @@
 #include <filesystem>
 
 namespace ghoul::io {
+class ModelNode;
+class ModelAnimation;
 
 class CameraReader {
 public:
-    static void loadCameraPath(const std::filesystem::path& filename);
-
+static std::pair<std::vector<ModelNode>, std::unique_ptr<ModelAnimation>>loadCameraPath(
+    const std::filesystem::path& filename);
 };
 
 } // namespace ghoul::io

@@ -26,6 +26,7 @@
 #include <ghoul/io/camera/camerareader.h>
 
 #include <ghoul/io/model/modelanimation.h>
+#include <ghoul/io/model/modelnode.h>
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/misc/profiling.h>
 #include <ghoul/logging/logmanager.h>
@@ -39,9 +40,9 @@ namespace {
     constexpr std::string_view _loggerCat = "CameraReader";
 
     void processCameraNodes(const aiNode& node, const aiScene& scene,
-        std::vector<ghoul::io::ModelNode>& nodes, int parent,
-        std::unique_ptr<ghoul::io::ModelAnimation>& modelAnimation,
-        std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry>& textureStorage) {
+                            std::vector<ghoul::io::ModelNode>& nodes, int parent,
+                            std::unique_ptr<ghoul::io::ModelAnimation>& modelAnimation)
+    {
         using namespace ghoul::io;
 
         // Convert transform matrix of the node
@@ -60,47 +61,7 @@ namespace {
             node.mTransformation.c4, node.mTransformation.d4
         );
 
-        // @TODO (anden88 2026-02-16): I don't think we're interested in the meshes
-        // Process each mesh for the current node
-        std::vector<ModelMesh> meshArray;
-        meshArray.reserve(node.mNumMeshes);
-        for (unsigned int i = 0; i < node.mNumMeshes; i++) {
-            // The node object only contains indices to the actual objects in the scene
-            // The scene contains all the data, node is just to keep stuff organized
-            // (like relations between nodes)
-            aiMesh* mesh = scene.mMeshes[node.mMeshes[i]];
-
-            if (mesh->HasBones()) {
-                LWARNING(
-                    "Detected unsupported animation type: 'Bones', currently only "
-                    "keyframe animations are supported"
-                );
-            }
-            if (mesh->mNumAnimMeshes > 0) {
-                LWARNING(
-                    "Detected unsupported animation type: 'Mesh', currently only "
-                    "keyframe animations are supported"
-                );
-            }
-
-            /*ModelMesh loadedMesh = processMesh(
-                *mesh,
-                scene,
-                textureStorage,
-                modelDirectory,
-                forceRenderInvisible,
-                notifyInvisibleDropped
-            );*/
-
-            // Don't render invisible meshes
-           /* if (loadedMesh.textures().empty()) {
-                loadedMesh.setInvisible(true);
-            }*/
-
-            //meshArray.push_back(std::move(loadedMesh));
-        }
-
-        ModelNode modelNode(nodeTransform, std::move(meshArray));
+        ModelNode modelNode(nodeTransform, std::vector<ModelMesh>());
         modelNode.setParent(parent);
         nodes.push_back(std::move(modelNode));
         const int newNode = static_cast<int>(nodes.size() - 1);
@@ -192,8 +153,7 @@ namespace {
                 scene,
                 nodes,
                 newNode,
-                modelAnimation,
-                textureStorage
+                modelAnimation
             );
         }
     };
@@ -201,7 +161,9 @@ namespace {
 
 namespace ghoul::io {
 
-void CameraReader::loadCameraPath(const std::filesystem::path& filename) {
+std::pair<std::vector<ModelNode>, std::unique_ptr<ModelAnimation>>
+CameraReader::loadCameraPath(const std::filesystem::path& filename)
+{
     ZoneScoped;
 
     ghoul_assert(!filename.empty(), "Filename must not be empty");
@@ -219,7 +181,8 @@ void CameraReader::loadCameraPath(const std::filesystem::path& filename) {
     );
 
     // The mFlags is set when no mesh is loaded,
-    // https://github.com/assimp/assimp/blob/7e5a0acc48efc54d7aa7900c36cd63db1fbeec9b/code/Blender/BlenderLoader.cpp#L411-L417
+    // https://github.com/assimp/assimp/blob/7e5a0acc48efc54d7aa7900c36cd63db1fbeec9b/
+    // code/Blender/BlenderLoader.cpp#L411-L417
     if (!scene /* scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE */) {
         throw ghoul::RuntimeError(std::format(
             "Error loading camera path '{}', '{}'",
@@ -266,21 +229,18 @@ void CameraReader::loadCameraPath(const std::filesystem::path& filename) {
 
     // Get info from all models in the scene
     std::vector<ModelNode> nodeArray;
-    std::vector<modelgeometry::ModelGeometry::TextureEntry> textureStorage;
-    textureStorage.reserve(scene->mNumTextures);
 
     processCameraNodes(
         *(scene->mRootNode),
         *scene,
         nodeArray,
         -1,
-        modelAnimation,
-        textureStorage
+        modelAnimation
     );
 
     Assimp::DefaultLogger::kill();
 
-    //return { nodeArray, modelAnimation, textureStorage);
+    return std::make_pair(std::move(nodeArray), std::move(modelAnimation));
 }
 
 } // namespace ghoul::io
