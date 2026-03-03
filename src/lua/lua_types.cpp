@@ -50,4 +50,4 @@ bool typeMatch(LuaTypes lhs, LuaTypes rhs) noexcept {
     return (lhs & rhs) != 0;
 }
 
-}  // namespace ghoul::lua
+} // namespace ghoul::lua

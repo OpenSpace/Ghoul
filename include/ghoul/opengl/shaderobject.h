@@ -127,20 +127,6 @@ public:
         std::string name = "", Dictionary dictionary = Dictionary());
 
     /**
-     * A copy constructor that will copy all of the internal state, and the shader source,
-     * but it will generate a new OpenGL name for the copied object. In addition, if the
-     * content of the specified file has changed between creating the `cpy`, the copied
-     * Shader will use the changed file. That means a ShaderObject will not cache the
-     * contents of the file inside.
-     *
-     * \param cpy The original object that will be copied
-     *
-     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     *        generated
-     */
-    ShaderObject(const ShaderObject& cpy);
-
-    /**
      * A move constructor that will move all of the internal state, and the shader source,
      * but it will leave the other object in an invalid state
      */
@@ -158,35 +144,6 @@ public:
      * functions and it returns the OpenGL name.
      */
     operator GLuint() const;
-
-    /**
-     * The assignment operator that will copy all of the internal state, and the shader
-     * source, but it will generate a new OpenGL name for the assigned object. In
-     * addition, if the content of the specified file has changed between creating the
-     * `rhs`, the assigned Shader will use the changed file. That is, a ShaderObject will
-     * not cache the contents of the file inside.
-     *
-     * \param rhs The original right hand side that will be used to set this object
-     * \return A reference to `this`
-     *
-     * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
-     *        generated
-     */
-    ShaderObject& operator=(const ShaderObject& rhs);
-
-    /**
-     * A move assignment that will move all of the internal state, and the shader source,
-     * but it will leave the other object in an invalid state.
-     */
-    ShaderObject& operator=(ShaderObject&& rhs) noexcept;
-
-    /**
-     * Sets the internal name of this ShaderObject that changes the logging category by
-     * incorporating the name and (if available) set the object label.
-     *
-     * \param name The new internal name that will be used for this ShaderObject
-     */
-    void setName(std::string name);
 
     /**
      * Returns the internal name of this ShaderObject.
@@ -260,16 +217,16 @@ public:
 
 private:
     /// The OpenGL name of this ShaderObject
-    GLuint _id = 0;
+    const GLuint _id = 0;
 
     /// The type of this ShaderObject
-    ShaderType _type;
+    const ShaderType _type;
 
     /// The internal name of this ShaderObject; initialized to empty
-    std::string _shaderName;
+    const std::string _shaderName;
 
     /// The logger category that will be used for logging of ShaderObject methods
-    std::string _loggerCat;
+    const std::string _loggerCat;
 
     /// The callback function if any of the tracked files are changed
     ShaderObjectCallback _onChangeCallback = nullptr;

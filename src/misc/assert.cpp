@@ -133,11 +133,11 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 );
             }
             else if (inputLine[0] == 's') {
-                std::vector<std::string> stackTrace = ghoul::stackTrace();
+                std::vector<std::string> st = stackTrace();
 
                 std::cerr << '\n';
-                for (size_t i = 0; i < stackTrace.size(); i++) {
-                    std::cerr << i << ": " << stackTrace[i] << '\n';
+                for (size_t i = 0; i < st.size(); i++) {
+                    std::cerr << i << ": " << st[i] << '\n';
                 }
                 std::cerr << '\n';
 

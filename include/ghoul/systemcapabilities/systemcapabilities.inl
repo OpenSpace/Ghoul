@@ -29,18 +29,14 @@ namespace ghoul::systemcapabilities {
 
 template <typename T>
 T& SystemCapabilities::component() {
-    static_assert(
-        !std::is_pointer<T>::value,
-        "Template parameter must not be a pointer"
-    );
+    static_assert(!std::is_pointer<T>::value, "Template parameter must not be a pointer");
     static_assert(
         std::is_base_of<SystemCapabilitiesComponent, T>::value,
         "Template parameter must be a subclass of SystemCapabilitiesComponent"
     );
 
     for (std::unique_ptr<SystemCapabilitiesComponent>& c : _components) {
-        T* r = dynamic_cast<T*>(c.get());
-        if (r) {
+        if (T* r = dynamic_cast<T*>(c.get());  r) {
             return *r;
         }
     }

@@ -44,14 +44,14 @@
 #endif // WIN32
 
 namespace {
+    using namespace ghoul;
+
     constexpr std::string_view _loggerCat = "CacheManager";
     const std::filesystem::path CacheFile = "cache";
     constexpr int CacheVersion = 2;
 
-    struct CacheError final : public ghoul::RuntimeError {
-        explicit CacheError(std::string msg)
-            : ghoul::RuntimeError(std::move(msg), "Cache")
-        {}
+    struct CacheError final : public RuntimeError {
+        explicit CacheError(std::string msg) : RuntimeError(std::move(msg), "Cache") {}
     };
 
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;
@@ -61,7 +61,7 @@ namespace {
         constexpr char HashDelimiter = '|';
 
         const std::string s = std::format("{}{}{}", file, HashDelimiter, info);
-        const unsigned int hash = ghoul::hashCRC32(s);
+        const unsigned int hash = hashCRC32(s);
         return hash;
     }
 
@@ -177,7 +177,7 @@ CacheManager::CacheManager(std::filesystem::path directory)
     std::ifstream file = std::ifstream(cacheFile);
     if (file.good()) {
         std::string line;
-        ghoul::getline(file, line);
+        getline(file, line);
         if (line != std::to_string(CacheVersion)) {
             LINFO(std::format(
                 "Cache version has changed. Current: {}; New: {}", line, CacheVersion
@@ -196,7 +196,7 @@ CacheManager::CacheManager(std::filesystem::path directory)
     try {
         _files = cacheInfoFromDirectory(_directory);
     }
-    catch (const ghoul::RuntimeError& err) {
+    catch (const RuntimeError& err) {
         LERRORC(err.component, err.message);
         LINFO("Deleting catch folder");
         file.close();

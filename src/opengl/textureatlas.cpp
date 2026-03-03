@@ -53,7 +53,7 @@ TextureAtlas::TextureAtlas(glm::ivec3 size)
 
     _nodes.emplace_back(1, 1, _size.x - 2);
     _data.resize(_size.x * _size.y * _size.z);
-    std::fill(_data.begin(), _data.end(), static_cast<unsigned char>(0));
+    std::fill(_data.begin(), _data.end(), static_cast<std::byte>(0));
 }
 
 TextureAtlas::TextureAtlas(TextureAtlas&& rhs) noexcept
@@ -84,19 +84,21 @@ void TextureAtlas::initialize() {
             case 2: return Texture::Format::RG;
             case 3: return Texture::Format::RGB;
             case 4: return Texture::Format::RGBA;
-            default: throw ghoul::RuntimeError("Wrong texture depth", "TextureAtlas");
+            default: throw RuntimeError("Wrong texture depth", "TextureAtlas");
         }
     }(_size.z);
-    const GLenum internalFormat = GLenum(format);
     const GLenum dataType = GL_UNSIGNED_BYTE;
 
     _texture = std::make_unique<Texture>(
-        glm::uvec3(glm::ivec2(_size), 1),
-        GL_TEXTURE_2D,
-        format,
-        internalFormat,
-        dataType,
-        Texture::FilterMode::Nearest
+        Texture::FormatInit{
+            .dimensions = glm::uvec3(glm::ivec2(_size), 1),
+            .type = GL_TEXTURE_2D,
+            .format = format,
+            .dataType = dataType
+        },
+        Texture::SamplerInit{
+            .filter = Texture::FilterMode::Nearest
+        }
     );
     ghoul_assert(_texture != nullptr, "Error creating Texture");
 }
@@ -118,8 +120,7 @@ int TextureAtlas::spaceUsed() const {
 }
 
 void TextureAtlas::upload() {
-    _texture->setPixelData(_data.data(), Texture::TakeOwnership::No);
-    _texture->uploadTexture();
+    _texture->setPixelData(_data.data());
 }
 
 void TextureAtlas::clear() {
@@ -127,7 +128,7 @@ void TextureAtlas::clear() {
     _nodes.emplace_back(1, 1 , _size.x - 2);
 
     _nUsed = 0;
-    std::fill(_data.begin(), _data.end(), static_cast<unsigned char>(0));
+    std::fill(_data.begin(), _data.end(), static_cast<std::byte>(0));
 }
 
 TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
@@ -137,7 +138,7 @@ TextureAtlas::RegionHandle TextureAtlas::newRegion(int width, int height) {
     width += 1;
     height += 1;
 
-    glm::ivec4 region(0, 0, width, height);
+    glm::ivec4 region = glm::ivec4(0, 0, width, height);
 
     int bestHeight = std::numeric_limits<int>::max();
     int bestWidth = std::numeric_limits<int>::max();

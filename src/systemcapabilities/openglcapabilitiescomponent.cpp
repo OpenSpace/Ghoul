@@ -39,7 +39,7 @@
 #pragma comment(lib, "Kernel32.lib")
 typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, DWORD);
-#else // ^^^ WIN32 | !WIN32 vvv
+#else // ^^^^ WIN32 | !WIN32 vvvv
 #include <sys/utsname.h>
 #endif // WIN32
 
@@ -147,7 +147,7 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
     _adapterRAM = (_adapterRAM / 1024) / 1024;
 
     queryWMI("Win32_VideoController", "Name", _adapterName);
-#endif
+#endif // WIN32
 }
 
 void OpenGLCapabilitiesComponent::clearCapabilities() {
@@ -167,46 +167,35 @@ void OpenGLCapabilitiesComponent::clearCapabilities() {
     _driverDate.clear();
     _adapterRAM = 0;
     _adapterName.clear();
-#endif
+#endif // WIN32
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
 OpenGLCapabilitiesComponent::capabilities() const
 {
-    std::vector<SystemCapabilitiesComponent::CapabilityInformation> result;
-    result.push_back(
-        { "OpenGL Version", ghoul::to_string(_glVersion), Verbosity::Minimal }
-    );
-    result.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
-    result.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
-    result.push_back(
-        { "GPU Vendor", std::string(gpuVendorString()), Verbosity::Minimal }
-    );
-    result.push_back({
-        "GLEW Version",
-        ghoul::to_string(_glewVersion),Verbosity::Minimal
-    });
+    std::vector<SystemCapabilitiesComponent::CapabilityInformation> res;
+    res.push_back({ "OpenGL Version", to_string(_glVersion), Verbosity::Minimal });
+    res.push_back({ "OpenGL Compiler", _glslCompiler, Verbosity::Minimal });
+    res.push_back({ "OpenGL Renderer", _glRenderer, Verbosity::Minimal });
+    res.push_back({ "GPU Vendor", std::string(gpuVendorString()), Verbosity::Minimal });
+    res.push_back({"GLEW Version", to_string(_glewVersion),Verbosity::Minimal});
 #ifdef WIN32
-    result.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
-    result.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
-    result.push_back({ "GPU Driver Date", _driverDate, Verbosity::Minimal });
-    result.push_back({
-        "GPU RAM", ghoul::to_string(_adapterRAM) + " MB",Verbosity::Minimal }
-    );
-#endif
+    res.push_back({ "GPU Name", _adapterName, Verbosity::Minimal });
+    res.push_back({ "GPU Driver Version", _driverVersion, Verbosity::Minimal });
+    res.push_back({ "GPU Driver Date", _driverDate, Verbosity::Minimal });
+    res.push_back({ "GPU RAM", to_string(_adapterRAM) + " MB",Verbosity::Minimal });
+#endif // WIN32
 
-    result.push_back({
-        "Max Texture Size", ghoul::to_string(_maxTextureSize), Verbosity::Default }
+    res.push_back({ "Max Texture Size", to_string(_maxTextureSize), Verbosity::Default });
+    res.push_back({
+        "Max 3D Texture Size", to_string(_maxTextureSize3D), Verbosity::Default }
     );
-    result.push_back({
-        "Max 3D Texture Size", ghoul::to_string(_maxTextureSize3D), Verbosity::Default }
+    res.push_back({
+        "Num of Texture Units", to_string(_nTextureUnits), Verbosity::Default }
     );
-    result.push_back({
-        "Num of Texture Units", ghoul::to_string(_nTextureUnits), Verbosity::Default }
-    );
-    result.push_back({
+    res.push_back({
         "FBO Color Attachments",
-        ghoul::to_string(_maxFramebufferColorAttachments),
+        to_string(_maxFramebufferColorAttachments),
         Verbosity::Default
     });
 
@@ -217,8 +206,8 @@ OpenGLCapabilitiesComponent::capabilities() const
         }
         s << _extensions[_extensions.size() - 1] << "\n";
     }
-    result.push_back({ "Extensions", s.str(), Verbosity::Full });
-    return result;
+    res.push_back({ "Extensions", s.str(), Verbosity::Full });
+    return res;
 }
 
 Version OpenGLCapabilitiesComponent::openGLVersion() const {

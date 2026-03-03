@@ -36,11 +36,11 @@
 #include <ws2tcpip.h>
 #ifndef _ERRNO
 #define _ERRNO WSAGetLastError()
-#endif
+#endif // _ERRNO
 #else // ^^^^ WIN32 // !WIN32 vvvv
 #ifdef _XCODE
 #include <unistd.h>
-#endif
+#endif // _XCODE
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -51,20 +51,16 @@
 #include <cerrno>
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
-#endif
+#endif // SOCKET_ERROR
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET (_SOCKET)(~0)
-#endif
-
-// #ifndef NO_ERROR
-// #define NO_ERROR 0L
-// #endif
+#endif // INVALID_SOCKET
 
 #ifndef _ERRNO
 #define _ERRNO errno
-#endif
-#endif // !WIN32
+#endif // _ERRNO
+#endif // WIN32
 
 namespace {
     void closeSocket(_SOCKET socket) {
@@ -114,7 +110,7 @@ void TcpSocketServer::close() {
     const std::lock_guard settingsLock(_settingsMutex);
     _listening = false;
 
-    // Notify all threads waiting for connections.
+    // Notify all threads waiting for connections
     _connectionNotifier.notify_all();
     const _SOCKET serverSocket = _serverSocket;
     _serverSocket = INVALID_SOCKET;
@@ -232,7 +228,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::awaitPendingTcpSocket() {
     std::unique_lock lock(_connectionNotificationMutex);
 
     // Block execution until there is a pending connection or until the server stops
-    // listening.
+    // listening
     _connectionNotifier.wait(
         lock,
         [this]() { return hasPendingSockets() || !_listening; }

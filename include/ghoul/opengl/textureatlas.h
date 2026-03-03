@@ -238,7 +238,7 @@ private:
     std::unique_ptr<Texture> _texture;
 
     /// Backend data storage for the texture
-    std::vector<unsigned char> _data;
+    std::vector<std::byte> _data;
 };
 
 } // namespace ghoul::opengl

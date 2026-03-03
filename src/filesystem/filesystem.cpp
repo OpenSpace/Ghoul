@@ -243,7 +243,7 @@ void FileSystem::triggerFilesystemEvents() {
 #ifdef WIN32
     // Sleeping for 0 milliseconds will trigger any pending asynchronous procedure calls
     SleepEx(0, TRUE);
-#endif
+#endif // WIN32
 }
 
 #ifdef WIN32
@@ -257,7 +257,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
         reinterpret_cast<LPVOID*>(&psl)
     );
     if (FAILED(hres)) {
-        throw ghoul::RuntimeError(std::format(
+        throw RuntimeError(std::format(
             "Failed initializing ShellLink when resolving path '{}' with error: {}",
             path, hres
         ));
@@ -267,7 +267,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     IPersistFile* ppf = nullptr;
     hres = psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void**>(&ppf));
     if (FAILED(hres)) {
-        throw ghoul::RuntimeError(std::format(
+        throw RuntimeError(std::format(
             "Failed querying interface when resolving path '{}' with error: {}",
             path, hres
         ));
@@ -279,21 +279,21 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     int res = MultiByteToWideChar(CP_ACP, 0, p.c_str(), -1, wsz, MAX_PATH);
     if (res == 0) {
         DWORD error = GetLastError();
-        throw ghoul::RuntimeError(std::format(
+        throw RuntimeError(std::format(
             "Failed converting path '{}' with error: {}", path, error
         ));
     }
 
     hres = ppf->Load(wsz, STGM_READ);
     if (FAILED(hres)) {
-        throw ghoul::RuntimeError(std::format(
+        throw RuntimeError(std::format(
             "Failed loading ShellLink file at path '{}' with error: {}", path, hres
         ));
     }
 
     hres = psl->Resolve(nullptr, 0);
     if (FAILED(hres)) {
-        throw ghoul::RuntimeError(std::format(
+        throw RuntimeError(std::format(
             "Failed to resolve ShellLink at path '{}' with error: {}", path, hres
         ));
     }
@@ -302,7 +302,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
     WIN32_FIND_DATA wfd;
     hres = psl->GetPath(szGotPath, MAX_PATH, &wfd, SLGP_SHORTPATH);
     if (FAILED(hres)) {
-        throw ghoul::RuntimeError(std::format(
+        throw RuntimeError(std::format(
             "Failed to get path of ShellLink at path '{}' with error: {}", path, hres
         ));
     }

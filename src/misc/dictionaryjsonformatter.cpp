@@ -39,9 +39,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace ghoul {
-
 namespace {
+    using namespace ghoul;
+
     std::string formatNumber(double d) {
         // std::format will represent infinite values with 'inf' and NaNs with 'nan'.
         // These are not valid in JSON, so use 'null' instead
@@ -82,7 +82,7 @@ namespace {
             }
         }
 
-        return "\"" + jsonString + "\"";
+        return std::format("\"{}\"", jsonString);
     }
 
     template <typename T>
@@ -168,6 +168,7 @@ namespace {
     }
 } // namespace
 
+namespace ghoul {
 
 JsonFormattingError::JsonFormattingError(std::string msg)
     : RuntimeError(std::move(msg), "Dictionary")
@@ -194,7 +195,7 @@ std::string formatJson(const Dictionary& dictionary) {
     std::vector<int> seqRef = std::vector<int>(keys.size());
     std::iota(seqRef.begin(), seqRef.end(), 1);
     if (intKeys == seqRef) {
-        auto convert = [](const std::string& key, const ghoul::Dictionary& d) {
+        auto convert = [](const std::string& key, const Dictionary& d) {
             return formatValue(d, key);
         };
         const std::string json = std::accumulate(
@@ -208,7 +209,7 @@ std::string formatJson(const Dictionary& dictionary) {
         return "[" + json + "]";
     }
     else {
-        auto convert = [](const std::string& key, const ghoul::Dictionary& d) {
+        auto convert = [](const std::string& key, const Dictionary& d) {
             return "\"" + key + "\":" + formatValue(d, key);
         };
         const std::string json = std::accumulate(
@@ -219,8 +220,8 @@ std::string formatJson(const Dictionary& dictionary) {
                 return std::format("{},{}", a, convert(key, dictionary));
             }
         );
-        return "{" + json + "}";
+        return std::format("{{{}}}", json);
     }
 }
 
-}  // namespace ghoul
+} // namespace ghoul

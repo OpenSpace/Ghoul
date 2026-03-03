@@ -102,6 +102,6 @@ protected:
     bool _isTransparent = false;
 };
 
-}  // namespace ghoul::modelgeometry
+} // namespace ghoul::modelgeometry
 
 #endif // __GHOUL___MODELGEOMETRY___H__

@@ -129,8 +129,7 @@ public:
      *        constructor, but a Dictionary was used.
      */
     using FactoryFunction = std::function<
-        BaseClass* (bool useDictionary, const ghoul::Dictionary& dict,
-                    pmr::memory_resource* pool)
+        BaseClass*(bool useDictionary, const Dictionary& dict, pmr::memory_resource* pool)
     >;
 
     /**
@@ -215,8 +214,9 @@ public:
      * \pre \p factoryFunction must not be `nullptr`
      */
     void registerClass(std::string className,
-        std::function<BaseClass*(bool, const ghoul::Dictionary&,
-                                 pmr::memory_resource* pool)> factoryFunction);
+        std::function<
+            BaseClass*(bool, const Dictionary&, pmr::memory_resource* pool)
+        > factoryFunction);
 
     /**
      * Checks if any class has been registered under the provided \p className As any

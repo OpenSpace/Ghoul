@@ -138,7 +138,7 @@ private:
     FontManager& operator=(FontManager&& rhs) = delete;
 
     /// The TextureAtlas that is used to store all glyphs for all registered Font objects
-    ghoul::opengl::TextureAtlas _textureAtlas;
+    opengl::TextureAtlas _textureAtlas;
 
     /// The map that is used to retrieve previously created Font objects.
     std::multimap<unsigned int, std::shared_ptr<Font>> _fonts;

@@ -24,34 +24,32 @@
  ****************************************************************************************/
 
 namespace {
+    template <typename T, typename V>
+    T internalLinear(V t, const T& p0, const T& p1) {
+        return t * p1 + (V(1.0) - t) * p0;
+    }
 
-template <typename T, typename V>
-T internalLinear(V t, const T& p0, const T& p1) {
-    return t * p1 + (V(1.0) - t) * p0;
-}
+    template <typename T, typename V>
+    T internalCubicBezier(V t, const T& p0, const T& p1, const T& p2, const T& p3) {
+        const V a = V(1.0) - t;
+        return p0 * a * a * a
+            + p1 * t * a * a * V(3.0)
+            + p2 * t * t * a * V(3.0)
+            + p3 * t * t * t;
+    }
 
-template <typename T, typename V>
-T internalCubicBezier(V t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    V a = V(1.0) - t;
-    return p0 * a * a * a
-        + p1 * t * a * a * V(3.0)
-        + p2 * t * t * a * V(3.0)
-        + p3 * t * t * t;
-}
+    template <typename T, typename V>
+    T internalCatmullRom(V t, const T& p0, const T& p1, const T& p2, const T& p3) {
+        const V t2 = t * t;
+        const V t3 = t2 * t;
 
-template <typename T, typename V>
-T internalCatmullRom(V t, const T& p0, const T& p1, const T& p2, const T& p3) {
-    const V t2 = t * t;
-    const V t3 = t2 * t;
-
-    return V(0.5) * (
-        V(2.0) * p1 +
-        t * (p2 - p0) +
-        t2 * (V(2.0) * p0 - V(5.0) * p1 + V(4.0) * p2 - p3) +
-        t3 * (V(3.0) * p1 - p0 - V(3.0) * p2 + p3)
-    );
-}
-
+        return V(0.5) * (
+            V(2.0) * p1 +
+            t * (p2 - p0) +
+            t2 * (V(2.0) * p0 - V(5.0) * p1 + V(4.0) * p2 - p3) +
+            t3 * (V(3.0) * p1 - p0 - V(3.0) * p2 + p3)
+        );
+    }
 } // namespace
 
 namespace ghoul {

@@ -35,89 +35,90 @@
 #include <vector>
 
 namespace {
+    using namespace ghoul::lua;
 
-lua_State* _state = nullptr;
-constexpr int KeyTableIndex = -2;
-constexpr int ValueTableIndex = -1;
+    lua_State* _state = nullptr;
+    constexpr int KeyTableIndex = -2;
+    constexpr int ValueTableIndex = -1;
 
-int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
-    if (relativeLocation >= 0) {
-        return relativeLocation;
+    int luaAbsoluteLocation(lua_State* state, int relativeLocation) {
+        if (relativeLocation >= 0) {
+            return relativeLocation;
+        }
+        // Negative indices implies indexing the stack from top.
+        // -1 is the topmost item. +1 is the first item.
+        const int nItems = lua_gettop(state);
+        return nItems + relativeLocation + 1;
     }
-    // Negative indices implies indexing the stack from top.
-    // -1 is the topmost item. +1 is the first item.
-    const int nItems = lua_gettop(state);
-    return nItems + relativeLocation + 1;
-}
 
-lua_State* staticLuaState() {
-    if (!_state) {
-        _state = ghoul::lua::createNewLuaState();
+    lua_State* staticLuaState() {
+        if (!_state) {
+            _state = createNewLuaState();
+        }
+        return _state;
     }
-    return _state;
-}
 
-// Code snippet that causes the Lua State to strict by making it that the lookup in the
-// meta table for an unknown key causes a panic
-// Code taken originally from the Lua webpage and used under the Lua license
-constexpr std::string_view StrictStateSource = R"(
---[[ strict.lua
-checks uses of undeclared global variables
-All global variables must be 'declared' through a regular assignment (even assigning nil
-will do) in a main chunk before being used anywhere or assigned to inside a function.
-distributed under the Lua license: http://www.lua.org/license.html
-]]--
+    // Code snippet that causes the Lua State to strict by making it that the lookup in
+    // the meta table for an unknown key causes a panic
+    // Code taken originally from the Lua webpage and used under the Lua license
+    constexpr std::string_view StrictStateSource = R"(
+    --[[ strict.lua
+    checks uses of undeclared global variables
+    All global variables must be 'declared' through a regular assignment (even assigning
+    nil will do) in a main chunk before being used anywhere or assigned to inside a
+    function.
+    distributed under the Lua license: http://www.lua.org/license.html
+    ]]--
 
-local getinfo, error, rawset, rawget = debug.getinfo, error, rawset, rawget
+    local getinfo, error, rawset, rawget = debug.getinfo, error, rawset, rawget
 
-local mt = getmetatable(_G)
-if mt == nil then
-  mt = {}
-  setmetatable(_G, mt)
-end
-
-mt.__declared = {}
-
-local function what ()
-  local d = getinfo(3, "S")
-  return d and d.what or "C"
-end
-
-mt.__newindex = function (t, n, v)
-  if not mt.__declared[n] then
-    local w = what()
-    if w ~= "main" and w ~= "C" then
-      error("assign to undeclared variable '" .. n .. "'", 2)
+    local mt = getmetatable(_G)
+    if mt == nil then
+      mt = {}
+      setmetatable(_G, mt)
     end
-    mt.__declared[n] = true
-  end
-  rawset(t, n, v)
-end
 
-mt.__index = function (t, n)
-  if not mt.__declared[n] and what() ~= "C" then
-    error("variable '" .. n .. "' is not declared", 2)
-  end
-  return rawget(t, n)
-end
+    mt.__declared = {}
 
-is_declared = function(a)
-  return mt.__declared[a] and what() ~= "C";
-end)";
+    local function what ()
+      local d = getinfo(3, "S")
+      return d and d.what or "C"
+    end
 
-// Code snippet that sandboxes the state by removing ways to directly affect the outside
-// world
-constexpr std::string_view SandboxedStateSourceBase = R"(
--- Remove the function that can be used to load additional modules
-require = nil
-)";
+    mt.__newindex = function (t, n, v)
+      if not mt.__declared[n] then
+        local w = what()
+        if w ~= "main" and w ~= "C" then
+          error("assign to undeclared variable '" .. n .. "'", 2)
+        end
+        mt.__declared[n] = true
+      end
+      rawset(t, n, v)
+    end
 
-constexpr std::string_view SandboxedStateSourceLibrary = R"(
-io = nil
-os = nil
-package = nil
-)";
+    mt.__index = function (t, n)
+      if not mt.__declared[n] and what() ~= "C" then
+        error("variable '" .. n .. "' is not declared", 2)
+      end
+      return rawget(t, n)
+    end
 
+    is_declared = function(a)
+      return mt.__declared[a] and what() ~= "C";
+    end)";
+
+    // Code snippet that sandboxes the state by removing ways to directly affect the
+    // outside world
+    constexpr std::string_view SandboxedStateSourceBase = R"(
+    -- Remove the function that can be used to load additional modules
+    require = nil
+    )";
+
+    constexpr std::string_view SandboxedStateSourceLibrary = R"(
+    io = nil
+    os = nil
+    package = nil
+    )";
 } // namespace
 
 namespace ghoul::lua {
@@ -171,7 +172,7 @@ std::string luaValueToString(lua_State* state, int location) {
         case LUA_TNUMBER:  return std::format("{}", lua_tonumber(state, location));
         case LUA_TSTRING:  return std::format("\"{}\"", lua_tostring(state, location));
         case LUA_TTABLE:   return luaTableToString(state, location);
-        default:           return std::string(ghoul::lua::luaTypeToString(type));
+        default:           return std::string(luaTypeToString(type));
     }
 }
 
@@ -182,21 +183,19 @@ std::string luaTableToString(lua_State* state, int tableLocation) {
     lua_pushvalue(state, tableLocation);
     lua_pushnil(state);
 
-    auto getKey = [](lua_State* L) {
+    auto key = [](lua_State* L) {
         const int keyType = lua_type(L, KeyTableIndex);
         switch (keyType) {
             case LUA_TNUMBER: return std::format("[{}]", lua_tonumber(L, KeyTableIndex));
             case LUA_TSTRING: return std::string(lua_tostring(L, KeyTableIndex));
-            default:          return std::string(ghoul::lua::luaTypeToString(keyType));
+            default:          return std::string(luaTypeToString(keyType));
         }
     };
 
     std::vector<std::string> values;
     while (lua_next(state, -2) != 0) {
         values.push_back(std::format(
-            "{} = {}",
-            getKey(state),
-            luaValueToString(state, ValueTableIndex)
+            "{} = {}", key(state), luaValueToString(state, ValueTableIndex)
         ));
         lua_pop(state, 1);
     }
@@ -249,8 +248,8 @@ std::string stackInformation(lua_State* state) {
     return result;
 }
 
-void loadDictionaryFromFile(const std::filesystem::path& filename,
-                            ghoul::Dictionary& dictionary, lua_State* state)
+void loadDictionaryFromFile(const std::filesystem::path& filename, Dictionary& dictionary,
+                            lua_State* state)
 {
     ghoul_assert(!filename.empty(), "filename must not be empty");
     ghoul_assert(
@@ -287,10 +286,9 @@ void loadDictionaryFromFile(const std::filesystem::path& filename,
     lua_settop(state, 0);
 }
 
-ghoul::Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
-                                         lua_State* state)
+Dictionary loadDictionaryFromFile(const std::filesystem::path& filename, lua_State* state)
 {
-    ghoul::Dictionary result;
+    Dictionary result;
     loadDictionaryFromFile(filename, result, state);
     return result;
 }
@@ -391,7 +389,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
     const int topType = lua_type(state, size);
     if (topType == LUA_TNIL) {
         // There was no able specified, so we can return an empty Dictionary to the caller
-        dictionary = ghoul::Dictionary();
+        dictionary = Dictionary();
         return;
     }
     if (topType != LUA_TTABLE) {
@@ -492,8 +490,8 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
     //ghoul_assert(lua_gettop(state) == 0, "Incorrect number of items left on stack");
 }
 
-ghoul::Dictionary luaDictionaryFromState(lua_State* state, int location) {
-    ghoul::Dictionary res;
+Dictionary luaDictionaryFromState(lua_State* state, int location) {
+    Dictionary res;
     luaDictionaryFromState(state, res, location);
     return res;
 }

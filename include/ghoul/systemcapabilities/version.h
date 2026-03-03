@@ -51,7 +51,7 @@ struct Version {
 namespace ghoul {
 
 template <>
-std::string to_string(const ghoul::systemcapabilities::Version& v);
+std::string to_string(const systemcapabilities::Version& v);
 
 } // namespace ghoul
 

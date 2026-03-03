@@ -46,6 +46,14 @@ void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
+    if (texture.dimensions().z > 1) {
+        LERROR(std::format(
+            "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
+            filename
+        ));
+        return;
+    }
+
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
         // Remove the leading . of the extension
@@ -60,31 +68,22 @@ void TextureWriterSTB::saveTexture(const opengl::Texture& texture,
         [](unsigned char c) { return std::tolower(c); }
     );
 
-    int w = texture.width();
-    int h = texture.height();
 
-    int nComponents = texture.numberOfChannels();
-    const void* data = texture.pixelData();
-
-    if (texture.dimensions().z > 1) {
-        LERROR(std::format(
-            "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
-            filename
-        ));
-        return;
-    }
-
+    const int w = texture.dimensions().x;
+    const int h = texture.dimensions().y;
+    const int nComponents = texture.numberOfChannels();
+    std::vector<std::byte> pixels = texture.pixelData();
     if (extension == "jpeg" || extension == "jpg") {
-        stbi_write_jpg(filename.c_str(), w, h, nComponents, data, 0);
+        stbi_write_jpg(filename.c_str(), w, h, nComponents, pixels.data(), 0);
     }
     else if (extension == "png") {
-        stbi_write_png(filename.c_str(), w, h, nComponents, data, 0);
+        stbi_write_png(filename.c_str(), w, h, nComponents, pixels.data(), 0);
     }
     else if (extension == "bmp") {
-        stbi_write_bmp(filename.c_str(), w, h, nComponents, data);
+        stbi_write_bmp(filename.c_str(), w, h, nComponents, pixels.data());
     }
     else if (extension == "tga") {
-        stbi_write_tga(filename.c_str(), w, h, nComponents, data);
+        stbi_write_tga(filename.c_str(), w, h, nComponents, pixels.data());
     }
     // @TODO (2023-10-06, emmbr26) Fix implementation. This does not generate correct
     // colors. Prabably the data format is currently not correct, as the other formats

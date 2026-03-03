@@ -54,7 +54,7 @@ namespace {
         pclose(pipe);
         return true;
     }
-#endif
+#endif // WIN32
 } // namespace
 
 namespace ghoul {
@@ -95,7 +95,7 @@ std::string clipboardText([[maybe_unused]] SelectionArea selectionArea) {
             case SelectionArea::Clipboard: return "clipboard";
             case SelectionArea::Primary:   return "primary";
             case SelectionArea::Secondary: return "secondary";
-            default:                       throw ghoul::MissingCaseException();
+            default:                       throw MissingCaseException();
         }
     }(selectionArea);
 
@@ -166,7 +166,7 @@ void setClipboardText(std::string_view text, [[maybe_unused]] SelectionArea sele
             case SelectionArea::Clipboard: return "clipboard";
             case SelectionArea::Primary:   return "primary";
             case SelectionArea::Secondary: return "secondary";
-            default:                       throw ghoul::MissingCaseException();
+            default:                       throw MissingCaseException();
         }
     }(selectionArea);
 

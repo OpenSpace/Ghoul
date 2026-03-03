@@ -53,6 +53,6 @@
     #pragma GCC push_options                                                             \
     #pragma GCC optimize("O0")
 #define RESTORE_OPTIMIZATION #pragma GCC pop_options
-#endif
+#endif // DISABLE_OPTIMIZATION
 
 #endif // __GHOUL___SUPPORTMACROS___H__

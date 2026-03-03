@@ -31,7 +31,7 @@
 #include <fstream>
 
 namespace {
-    constexpr uint8_t CURRENT_VERSION = 1;
+    constexpr uint8_t CurrentVersion = 1;
 
     struct Header {
         /**
@@ -42,9 +42,9 @@ namespace {
         uint8_t version;
 
         /**
-         * This atomic is set to `true` if some process is currently writing to
-         * the log, otherwise it is `false`. It is not guaranteed that this
-         * value is usable when the buffer is written to disk in its entirety.
+         * This atomic is set to `true` if some process is currently writing to the log,
+         * otherwise it is `false`. It is not guaranteed that this value is usable when
+         * the buffer is written to disk in its entirety.
          */
         std::atomic_flag mutex;
 
@@ -124,7 +124,7 @@ BufferLog::BufferLog(void* address, size_t bufferSize, MemoryExhaustedCallback c
 
 void BufferLog::initializeBuffer() {
     Header& h = header(_buffer);
-    h.version = CURRENT_VERSION;
+    h.version = CurrentVersion;
     h.attributes = 0;
     h.firstEmptyByte = 0;
 }
@@ -190,7 +190,7 @@ void BufferLog::log(unsigned long long timestamp, const std::string& message) {
         }
     }
     // Copy the values of the timestamp
-    memcpy(
+    std::memcpy(
         firstEmptyMemory(_buffer),
         reinterpret_cast<void*>(&timestamp),
         sizeof(unsigned long long)

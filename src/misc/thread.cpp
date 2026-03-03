@@ -33,69 +33,70 @@
 #include <pthread.h>
 #endif // WIN32
 
-namespace ghoul::thread {
-
 namespace {
+    using namespace ghoul;
+    using namespace ghoul::thread;
 
-int convertThreadPriorityLevel([[maybe_unused]] ThreadPriorityClass c,
-                               ThreadPriorityLevel p) {
-#ifdef WIN32
-    switch (p) {
-        case ThreadPriorityLevel::Lowest:      return THREAD_PRIORITY_LOWEST;
-        case ThreadPriorityLevel::BelowNormal: return THREAD_PRIORITY_BELOW_NORMAL;
-        case ThreadPriorityLevel::Normal:      return THREAD_PRIORITY_NORMAL;
-        case ThreadPriorityLevel::AboveNormal: return THREAD_PRIORITY_ABOVE_NORMAL;
-        case ThreadPriorityLevel::Highest:     return THREAD_PRIORITY_HIGHEST;
-        default:                               throw MissingCaseException();
+    int convertThreadPriorityLevel([[maybe_unused]] ThreadPriorityClass c,
+                                   ThreadPriorityLevel p) {
+    #ifdef WIN32
+        switch (p) {
+            case ThreadPriorityLevel::Lowest:      return THREAD_PRIORITY_LOWEST;
+            case ThreadPriorityLevel::BelowNormal: return THREAD_PRIORITY_BELOW_NORMAL;
+            case ThreadPriorityLevel::Normal:      return THREAD_PRIORITY_NORMAL;
+            case ThreadPriorityLevel::AboveNormal: return THREAD_PRIORITY_ABOVE_NORMAL;
+            case ThreadPriorityLevel::Highest:     return THREAD_PRIORITY_HIGHEST;
+            default:                               throw MissingCaseException();
+        }
+    #else // ^^^^ WIN32 // !WIN32 vvvv
+        switch (c) {
+            case ThreadPriorityClass::Idle:
+            case ThreadPriorityClass::Normal:
+                return 0;
+            case ThreadPriorityClass::High:
+                switch (p) {
+                    // min-max values come from the man page of getschedparam
+                    // normal value was measured on macOS to be the default value
+                    // below/above normal values are halfway between other values
+                    case ThreadPriorityLevel::Lowest:      return 1;
+                    case ThreadPriorityLevel::BelowNormal: return 16;
+                    case ThreadPriorityLevel::Normal:      return 32;
+                    case ThreadPriorityLevel::AboveNormal: return 66;
+                    case ThreadPriorityLevel::Highest:     return 99;
+                    default:                               throw MissingCaseException();
+                }
+        }
+        return 0;
+    #endif // WIN32
     }
-#else // ^^^^ WIN32 // !WIN32 vvvv
-    switch (c) {
-        case ThreadPriorityClass::Idle:
-        case ThreadPriorityClass::Normal:
-            return 0;
-        case ThreadPriorityClass::High:
-            switch (p) {
-                // min-max values come from the man page of getschedparam
-                // normal value was measured on macOS to be the default value
-                // below/above normal values are halfway between other values
-                case ThreadPriorityLevel::Lowest:      return 1;
-                case ThreadPriorityLevel::BelowNormal: return 16;
-                case ThreadPriorityLevel::Normal:      return 32;
-                case ThreadPriorityLevel::AboveNormal: return 66;
-                case ThreadPriorityLevel::Highest:     return 99;
-                default:                               throw MissingCaseException();
-            }
-    }
-    return 0;
-#endif // WIN32
-}
 
-[[maybe_unused]] int convertThreadPriorityClass(ThreadPriorityClass c) {
-#if defined WIN32
-    switch (c) {
-        case ThreadPriorityClass::Idle:   return IDLE_PRIORITY_CLASS;
-        case ThreadPriorityClass::Normal: return NORMAL_PRIORITY_CLASS;
-        case ThreadPriorityClass::High:   return HIGH_PRIORITY_CLASS;
-        default:                          throw MissingCaseException();
+    [[maybe_unused]] int convertThreadPriorityClass(ThreadPriorityClass c) {
+    #if defined WIN32
+        switch (c) {
+            case ThreadPriorityClass::Idle:   return IDLE_PRIORITY_CLASS;
+            case ThreadPriorityClass::Normal: return NORMAL_PRIORITY_CLASS;
+            case ThreadPriorityClass::High:   return HIGH_PRIORITY_CLASS;
+            default:                          throw MissingCaseException();
+        }
+    #elif defined __FreeBSD__
+        switch (c) {
+            case ThreadPriorityClass::Idle:   return SCHED_OTHER;
+            case ThreadPriorityClass::Normal: return SCHED_OTHER;
+            case ThreadPriorityClass::High:   return SCHED_RR;
+            default:                          throw MissingCaseException();
+        }
+    #else // WIN32
+        switch (c) {
+            case ThreadPriorityClass::Idle:   return SCHED_IDLE;
+            case ThreadPriorityClass::Normal: return SCHED_OTHER;
+            case ThreadPriorityClass::High:   return SCHED_RR;
+            default:                          throw MissingCaseException();
     }
-#elif defined __FreeBSD__
-    switch (c) {
-        case ThreadPriorityClass::Idle:   return SCHED_OTHER;
-        case ThreadPriorityClass::Normal: return SCHED_OTHER;
-        case ThreadPriorityClass::High:   return SCHED_RR;
-        default:                          throw MissingCaseException();
+    #endif // WIN32
     }
-#else
-    switch (c) {
-        case ThreadPriorityClass::Idle:   return SCHED_IDLE;
-        case ThreadPriorityClass::Normal: return SCHED_OTHER;
-        case ThreadPriorityClass::High:   return SCHED_RR;
-        default:                          throw MissingCaseException();
-}
-#endif
-}
-
 } // namespace
+
+namespace ghoul::thread {
 
 void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
                  ThreadPriorityLevel priorityLevel)
@@ -110,7 +111,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
     struct sched_param param;
     int res = pthread_getschedparam(t.native_handle(), &policy, &param);
     if (res != 0) {
-        throw ghoul::RuntimeError(
+        throw RuntimeError(
             "Error accessing scheduling parameters with error " + std::to_string(res),
             "Thread"
         );
@@ -123,7 +124,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
         &param
     );
     if (res != 0) {
-        throw ghoul::RuntimeError(
+        throw RuntimeError(
             "Error setting scheduling parameters with error " + std::to_string(res),
             "Thread"
         );

@@ -85,6 +85,6 @@ private:
     lua_State* _state = nullptr;
 };
 
-}  // namespace ghoul::lua
+} // namespace ghoul::lua
 
 #endif // __GHOUL___LUASTATE___H__

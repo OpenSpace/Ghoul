@@ -32,9 +32,9 @@
 #include <type_traits>
 #include <vector>
 
-namespace ghoul {
-
 namespace {
+    using namespace ghoul;
+
     std::string formatValue(const Dictionary& dictionary, const std::string& key,
                             PrettyPrint prettyPrint, const std::string& indentation,
                             int indentationSteps);
@@ -172,7 +172,9 @@ namespace {
             "Key '{}' has invalid type for formatting dictionary as Lua", key
         ));
     }
-}  // namespace
+} // namespace
+
+namespace ghoul {
 
 LuaFormattingError::LuaFormattingError(const std::string& msg)
     : RuntimeError(msg, "Dictionary")
@@ -184,4 +186,4 @@ std::string formatLua(const Dictionary& dictionary, PrettyPrint prettyPrint,
     return format(dictionary, prettyPrint, indentation, 0);
 }
 
-}  // namespace ghoul
+} // namespace ghoul

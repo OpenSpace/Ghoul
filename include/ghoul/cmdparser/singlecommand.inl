@@ -53,10 +53,7 @@ void SingleCommand<T>::execute(const std::vector<std::string>& parameters) {
     if constexpr (std::is_same_v<T, std::string>) {
         // If we have a string the parameter set might contain an arbitrary number of
         // parameters that we have to concatenate first
-        _ptr1 = ghoul::join(
-            std::vector<std::string>(parameters.begin(), parameters.end()),
-            " "
-        );
+        _ptr1 = join(std::vector<std::string>(parameters.begin(), parameters.end()), " ");
     }
     else {
         _ptr1 = cast<T>(parameters[0]);

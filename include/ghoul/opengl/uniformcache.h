@@ -548,7 +548,7 @@ namespace ghoul::opengl {
  * \tparam N The number of uniform values that should be specified
  */
 template <typename T, size_t N> // @CONCEPTS
-void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& uniformCache,
+void updateUniformLocations(const ProgramObject& program, T& uniformCache,
                             const std::array<const char*, N>& uniformNames)
 {
     static_assert(std::is_base_of_v<UniformCacheBase, T>);
@@ -572,8 +572,7 @@ void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& unif
  * \tparam T A type that was created through the UniformCache command
  */
 template <typename T> // @CONCEPTS
-void updateUniformLocations(const ghoul::opengl::ProgramObject& program, T& uniformCache)
-{
+void updateUniformLocations(const ProgramObject& program, T& uniformCache) {
     static_assert(std::is_base_of_v<UniformCacheBase, T>);
 
     int* uniformLocations = reinterpret_cast<int*>(&uniformCache);

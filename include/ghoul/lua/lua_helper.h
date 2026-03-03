@@ -167,8 +167,8 @@ int luaError(lua_State* state, const std::string& message);
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
  */
-void loadDictionaryFromFile(const std::filesystem::path& filename,
-    ghoul::Dictionary& dictionary, lua_State* state = nullptr);
+void loadDictionaryFromFile(const std::filesystem::path& filename, Dictionary& dictionary,
+    lua_State* state = nullptr);
 
 /**
  * Loads a Lua script and returns it as a #ghoul::Dictionary. The script contained in the
@@ -193,7 +193,7 @@ void loadDictionaryFromFile(const std::filesystem::path& filename,
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
  */
-ghoul::Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
+Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
     lua_State* state = nullptr);
 
 /**
@@ -218,7 +218,7 @@ ghoul::Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
  */
-void loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dictionary,
+void loadDictionaryFromString(const std::string& script, Dictionary& dictionary,
     lua_State* state = nullptr);
 
 /**
@@ -241,8 +241,8 @@ void loadDictionaryFromString(const std::string& script, ghoul::Dictionary& dict
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
  */
-void loadArrayDictionaryFromString(const std::string& script,
-    ghoul::Dictionary& dictionary, lua_State* state = nullptr);
+void loadArrayDictionaryFromString(const std::string& script, Dictionary& dictionary,
+    lua_State* state = nullptr);
 
 /**
  * Loads a Lua script and returns it as a #ghoul::Dictionary. The script contained in the
@@ -263,7 +263,7 @@ void loadArrayDictionaryFromString(const std::string& script,
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
  */
-ghoul::Dictionary loadDictionaryFromString(const std::string& script,
+Dictionary loadDictionaryFromString(const std::string& script,
     lua_State* state = nullptr);
 
 /**
@@ -282,7 +282,7 @@ ghoul::Dictionary loadDictionaryFromString(const std::string& script,
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
  */
-ghoul::Dictionary loadArrayDictionaryFromString(const std::string& script,
+Dictionary loadArrayDictionaryFromString(const std::string& script,
     lua_State* state = nullptr);
 
 /**
@@ -303,7 +303,7 @@ ghoul::Dictionary loadArrayDictionaryFromString(const std::string& script,
  * \pre \p state must not be nullptr
  * \post \p state%'s stack is unchanged
  */
-void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary,
+void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
     int relativeLocation = -1);
 
 /**
@@ -321,7 +321,7 @@ void luaDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary,
  * \pre \p state must not be nullptr
  * \post \p state%'s stack is unchanged
  */
-ghoul::Dictionary luaDictionaryFromState(lua_State* state, int location = -1);
+Dictionary luaDictionaryFromState(lua_State* state, int location = -1);
 
 /**
  * Uses the Lua \p state to populate the provided ghoul::Dictionary%, extending the passed
@@ -336,7 +336,7 @@ ghoul::Dictionary luaDictionaryFromState(lua_State* state, int location = -1);
  * \pre \p state must not be nullptr
  * \post \p state%'s stack is unchanged
  */
-void luaArrayDictionaryFromState(lua_State* state, ghoul::Dictionary& dictionary);
+void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary);
 
 
 /**

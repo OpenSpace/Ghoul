@@ -48,8 +48,8 @@ namespace {
      * std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
      */
 
-    constexpr int DEFAULT_CONSTRUCTOR = 1;
-    constexpr int DICTIONARY_CONSTRUCTOR = 2;
+    constexpr int DefaultConstructor = 1;
+    constexpr int DictionaryConstructor = 2;
 
     /// Create Class using only the default constructor
     template <typename BaseClass, typename Class>
@@ -125,15 +125,15 @@ namespace {
 
     template <typename BaseClass, typename Class, int Constructor>
     struct CreateHelper {
-        using FactoryFuncPtr = BaseClass * (*)(
+        using FactoryFuncPtr = BaseClass* (*)(
             bool useDictionary, const ghoul::Dictionary& dict, pmr::memory_resource* pool
         );
         FactoryFuncPtr createFunction();
     };
 
     template <typename BaseClass, typename Class>
-    struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR | DICTIONARY_CONSTRUCTOR> {
-        using FactoryFuncPtr = BaseClass * (*)(
+    struct CreateHelper<BaseClass, Class, DefaultConstructor | DictionaryConstructor> {
+        using FactoryFuncPtr = BaseClass* (*)(
             bool useDictionary, const ghoul::Dictionary& dict, pmr::memory_resource* pool
         );
         FactoryFuncPtr createFunction() {
@@ -142,8 +142,8 @@ namespace {
     };
 
     template <typename BaseClass, typename Class>
-    struct CreateHelper<BaseClass, Class, DEFAULT_CONSTRUCTOR> {
-        using FactoryFuncPtr = BaseClass * (*)(
+    struct CreateHelper<BaseClass, Class, DefaultConstructor> {
+        using FactoryFuncPtr = BaseClass* (*)(
             bool useDictionary, const ghoul::Dictionary& dict, pmr::memory_resource* pool
         );
         FactoryFuncPtr createFunction() {
@@ -152,15 +152,14 @@ namespace {
     };
 
     template <typename BaseClass, typename Class>
-    struct CreateHelper<BaseClass, Class, DICTIONARY_CONSTRUCTOR> {
-        using FactoryFuncPtr = BaseClass * (*)(
+    struct CreateHelper<BaseClass, Class, DictionaryConstructor> {
+        using FactoryFuncPtr = BaseClass* (*)(
             bool useDictionary, const ghoul::Dictionary& dict, pmr::memory_resource* pool
         );
         FactoryFuncPtr createFunction() {
             return &createDictionary<BaseClass, Class>;
         }
     };
-
 } // namespace
 
 namespace ghoul {
@@ -175,12 +174,11 @@ BaseClass* TemplateFactory<BaseClass>::create(std::string_view className,
     if (it == _map.cend()) {
         throw TemplateClassNotFoundError(std::string(className));
     }
-    else {
-        // If 'className' is a valid name, we can use the stored function pointer to
-        // create the class using the 'createType' method
-        BaseClass* res = it->second(false, {}, pool);
-        return res;
-    }
+
+    // If 'className' is a valid name, we can use the stored function pointer to create
+    // the class using the 'createType' method
+    BaseClass* res = it->second(false, {}, pool);
+    return res;
 }
 
 template <typename BaseClass>
@@ -194,28 +192,24 @@ BaseClass* TemplateFactory<BaseClass>::create(std::string_view className,
     if (it == _map.end()) {
         throw TemplateClassNotFoundError(std::string(className));
     }
-    else {
-        // If 'className' is a valid name, we can use the stored function pointer to
-        // create the class using the 'createType' method
-        BaseClass* res = it->second(true, dictionary, pool);
-        return res;
-    }
+
+    // If 'className' is a valid name, we can use the stored function pointer to create
+    // the class using the 'createType' method
+    BaseClass* res = it->second(true, dictionary, pool);
+    return res;
 }
 
 template <typename BaseClass>
 template <typename Class>
 void TemplateFactory<BaseClass>::registerClass(std::string className) {
-    static_assert(
-        !std::is_abstract<Class>::value,
-        "Class must not be an abstract class"
-    );
+    static_assert(!std::is_abstract<Class>::value, "Class must not be an abstract class");
     static_assert(
         std::is_base_of<BaseClass, Class>::value,
         "BaseClass must be the base class of Class"
     );
     static_assert(
         std::is_default_constructible<Class>::value |
-        std::is_constructible<Class, const ghoul::Dictionary&>::value,
+        std::is_constructible<Class, const Dictionary&>::value,
         "Class needs a public default or Dictionary constructor"
     );
 
@@ -224,10 +218,11 @@ void TemplateFactory<BaseClass>::registerClass(std::string className) {
     // Use the correct CreateHelper struct to create a function pointer that we can store
     // for later usage. std::is_constructible<>::value returns a boolean that checks at
     // run-time if there is a proper constructor for it)
-    FactoryFunction&& function = CreateHelper<BaseClass, Class,
-        (std::is_default_constructible<Class>::value * DEFAULT_CONSTRUCTOR) |
-        (std::is_constructible<Class, const ghoul::Dictionary&>::value *
-        DICTIONARY_CONSTRUCTOR)
+    FactoryFunction&& function = CreateHelper<
+        BaseClass,
+        Class,
+        (std::is_default_constructible<Class>::value * DefaultConstructor) |
+        (std::is_constructible<Class, const Dictionary&>::value * DictionaryConstructor)
     >().createFunction();
 
     registerClass(std::move(className), FactoryFunction(function));
@@ -241,19 +236,18 @@ void TemplateFactory<BaseClass>::registerClass(std::string className,
     ghoul_assert(factoryFunction, "Factory function must not be nullptr");
 
     if (_map.find(className) != _map.end()) {
-        throw TemplateFactoryError(
-            std::format("Class '{}' was registered before", className)
-        );
+        throw TemplateFactoryError(std::format(
+            "Class '{}' was registered before", className
+        ));
     }
-    else {
-        _map.emplace(std::move(className), std::move(factoryFunction));
-    }
+
+    _map.emplace(std::move(className), std::move(factoryFunction));
 }
 
 template <typename BaseClass>
 bool TemplateFactory<BaseClass>::hasClass(const std::string& className) const {
     ghoul_assert(!className.empty(), "Classname must not be empty");
-    return (_map.find(className) != _map.end());
+    return _map.find(className) != _map.end();
 }
 
 template <typename BaseClass>

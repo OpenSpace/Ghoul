@@ -60,7 +60,7 @@ T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
         double weight;   // wi
     };
 
-    static constexpr GaussLegendreCoefficient coefficients[] = {
+    static constexpr GaussLegendreCoefficient Coefficients[] = {
         { .abscissa = 0.0, .weight = 0.5688889 },
         { .abscissa = -0.5384693, .weight = 0.47862867 },
         { .abscissa = 0.5384693, .weight = 0.47862867 },
@@ -71,7 +71,7 @@ T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
     const double a = t0;
     const double b = t1;
     T sum = 0.0;
-    for (const GaussLegendreCoefficient& coefficient : coefficients) {
+    for (const GaussLegendreCoefficient& coefficient : Coefficients) {
         // change of interval from [-1, 1]  to [a, b] (also 0.5 * (b - a) below)
         double const t = 0.5 * ((b - a) * coefficient.abscissa + (b + a));
         sum += f(t) * coefficient.weight;

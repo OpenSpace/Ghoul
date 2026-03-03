@@ -73,115 +73,12 @@ ProgramObject::ProgramObject(std::string name)
     );
 }
 
-ProgramObject::ProgramObject(const ProgramObject& cpy)
-    : _id(glCreateProgram())
-    , _programName(cpy._programName)
-    , _loggerCat(cpy._loggerCat)
-    , _ignoreUniformLocationError(cpy._ignoreUniformLocationError)
-    , _ignoreAttributeLocationError(cpy._ignoreAttributeLocationError)
-    , _ignoreSubroutineLocationError(cpy._ignoreSubroutineLocationError)
-    , _ignoreSubroutineUniformLocationError(cpy._ignoreSubroutineUniformLocationError)
-{
-    if (_id == 0) {
-        throw ProgramObjectError("glCreateProgram returned 0");
-    }
-
-    glObjectLabel(
-        GL_PROGRAM,
-        _id,
-        static_cast<GLsizei>(_programName.length() + 1),
-        _programName.c_str()
-    );
-
-    for (const std::shared_ptr<ShaderObject>& obj : cpy._shaderObjects) {
-        auto shaderCopy = std::make_shared<ShaderObject>(*obj);
-        glAttachShader(_id, *shaderCopy);
-        _shaderObjects.push_back(shaderCopy);
-    }
-}
-
 ProgramObject::~ProgramObject() {
     glDeleteProgram(_id);
 }
 
 ProgramObject::operator GLuint() const {
     return _id;
-}
-
-ProgramObject& ProgramObject::operator=(const ProgramObject& rhs) {
-    if (this != &rhs) {
-        _programName = rhs._programName;
-
-        glObjectLabel(
-            GL_PROGRAM,
-            _id,
-            static_cast<GLsizei>(rhs._programName.length() + 1),
-            rhs._programName.c_str()
-        );
-        _loggerCat = rhs._loggerCat;
-        _ignoreUniformLocationError = rhs._ignoreUniformLocationError;
-        _ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
-        _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
-        _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
-        _programIsDirty = rhs._programIsDirty;
-
-        glDeleteProgram(_id);
-
-        _id = glCreateProgram();
-        if (_id == 0) {
-            throw ProgramObjectError("glCreateProgram returned 0");
-        }
-        glObjectLabel(
-            GL_PROGRAM,
-            _id,
-            static_cast<GLsizei>(_programName.length() + 1),
-            _programName.c_str()
-        );
-
-        for (const std::shared_ptr<ShaderObject>& obj : rhs._shaderObjects) {
-            auto shaderCopy = std::make_shared<ShaderObject>(*obj);
-            glAttachShader(_id, *shaderCopy);
-            _shaderObjects.push_back(shaderCopy);
-        }
-    }
-    return *this;
-}
-
-ProgramObject& ProgramObject::operator=(ProgramObject&& rhs) noexcept {
-    if (this != &rhs) {
-        glDeleteProgram(_id);
-        _id = rhs._id;
-        rhs._id = 0;
-
-        _programName = std::move(rhs._programName);
-        glObjectLabel(
-            GL_PROGRAM,
-            _id,
-            static_cast<GLsizei>(_programName.length() + 1),
-            _programName.c_str()
-        );
-        _loggerCat = std::move(rhs._loggerCat);
-        _ignoreUniformLocationError = rhs._ignoreUniformLocationError;
-        _ignoreAttributeLocationError = rhs._ignoreAttributeLocationError;
-        _ignoreSubroutineLocationError = rhs._ignoreSubroutineLocationError;
-        _ignoreSubroutineUniformLocationError = rhs._ignoreSubroutineUniformLocationError;
-        _programIsDirty = rhs._programIsDirty;
-
-        _shaderObjects.clear();
-        _shaderObjects = std::move(rhs._shaderObjects);
-    }
-    return *this;
-}
-
-void ProgramObject::setName(std::string name) {
-    _programName = std::move(name);
-    _loggerCat = std::format("ProgramObject['{}']", _programName);
-    glObjectLabel(
-        GL_PROGRAM,
-        _id,
-        static_cast<GLsizei>(_programName.length() + 1),
-        _programName.c_str()
-    );
 }
 
 const std::string& ProgramObject::name() const{
@@ -271,16 +168,14 @@ void ProgramObject::linkProgramObject() {
 }
 
 void ProgramObject::rebuildFromFile() {
-    // The copy constructor of ShaderObject (called by the copy constructor of
-    // ProgramObject) will take care of the reloading from file
-    ProgramObject p(*this);
+    for (std::shared_ptr<ShaderObject>& shader : _shaderObjects) {
+        shader->rebuildFromFile();
+    }
 
-    p.compileShaderObjects();
-    p.linkProgramObject();
+    compileShaderObjects();
+    linkProgramObject();
 
     LINFO("Successfully rebuilt ProgramObject");
-
-    *this = std::move(p);
 }
 
 void ProgramObject::validate() const {
@@ -2884,7 +2779,7 @@ bool ProgramObject::setUniformSubroutines(ShaderObject::ShaderType shaderType,
         ));
         return false;
     }
-#endif
+#endif // GHL_DEBUG
     glUniformSubroutinesuiv(
         static_cast<GLenum>(shaderType),
         static_cast<GLsizei>(indices.size()),

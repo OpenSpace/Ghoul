@@ -38,6 +38,8 @@
 #include <cstddef>
 
 namespace {
+    using namespace ghoul;
+
     constexpr std::string_view _loggerCat = "ModelReaderBinary";
     constexpr int8_t CurrentModelVersion = 10;
     constexpr int FormatStringSize = 4;
@@ -49,8 +51,9 @@ namespace {
     constexpr int8_t VertexColorUpdateVersion = 9;
     constexpr int8_t SkipMarkerUpdateVersion = 10;
 
-    ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
-        using Format = ghoul::opengl::Texture::Format;
+    opengl::Texture::Format stringToFormat(std::string_view format) {
+        using Format = opengl::Texture::Format;
+
         if (format == "Red ") { return Format::Red; }
         else if (format == "RG  ") { return Format::RG; }
         else if (format == "RGB ") { return Format::RGB; }
@@ -58,7 +61,7 @@ namespace {
         else if (format == "RGBA") { return Format::RGBA; }
         else if (format == "BGRA") { return Format::BGRA; }
         else if (format == "Dept") { return Format::DepthComponent; }
-        else { throw ghoul::MissingCaseException(); }
+        else { throw MissingCaseException(); }
     }
 
     GLenum stringToDataType(std::string_view dataType) {
@@ -70,7 +73,7 @@ namespace {
         else if (dataType == "uint") { return GL_UNSIGNED_INT; }
         else if (dataType == "floa") { return GL_FLOAT; }
         else if (dataType == "doub") { return GL_DOUBLE; }
-        else { throw ghoul::MissingCaseException(); }
+        else { throw MissingCaseException(); }
     }
 } // namespace
 
@@ -83,7 +86,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
-    std::ifstream fileStream(filename, std::ifstream::binary);
+    std::ifstream fileStream = std::ifstream(filename, std::ifstream::binary);
     if (!fileStream.good()) {
         throw ModelLoadException(filename, "Could not open binary model file", this);
     }
@@ -93,10 +96,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
     if (version != CurrentModelVersion &&
         // Backward compatible versions are ok
-        version != AnimationUpdateVersion &&
-        version != OpacityUpdateVersion &&
-        version != VertexColorUpdateVersion &&
-        version != SkipMarkerUpdateVersion
+        version != AnimationUpdateVersion && version != OpacityUpdateVersion &&
+        version != VertexColorUpdateVersion && version != SkipMarkerUpdateVersion
        )
     {
         throw ModelLoadException(
@@ -114,8 +115,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     }
     else if (nTextureEntries < 0) {
         std::string message = std::format(
-            "Model cannot have negative number of texture entries while loading "
-            "binary model: {}", nTextureEntries
+            "Model cannot have negative number of texture entries while loading binary "
+            "model: {}", nTextureEntries
         );
         throw ModelLoadException(filename, message, this);
     }
@@ -178,22 +179,20 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 this
             );
         }
-        std::byte* data = new std::byte[textureSize];
-        fileStream.read(reinterpret_cast<char*>(data), textureSize);
+        std::vector<std::byte> data = std::vector<std::byte>(textureSize);
+        fileStream.read(reinterpret_cast<char*>(data.data()), textureSize);
 
         textureEntry.texture = std::make_unique<opengl::Texture>(
-            dimensions,
-            GL_TEXTURE_2D,
-            format,
-            internalFormat,
-            dataType,
-            opengl::Texture::FilterMode::Linear,
-            opengl::Texture::WrappingMode::Repeat,
-            opengl::Texture::AllocateData::No,
-            opengl::Texture::TakeOwnership::Yes
+            opengl::Texture::FormatInit{
+                .dimensions = dimensions,
+                .type = GL_TEXTURE_2D,
+                .format = format,
+                .dataType = dataType,
+                .internalFormat = internalFormat
+            },
+            opengl::Texture::SamplerInit{},
+            data.data()
         );
-
-        textureEntry.texture->setPixelData(data, opengl::Texture::TakeOwnership::Yes);
         textureStorageArray.push_back(std::move(textureEntry));
     }
 
@@ -384,7 +383,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         // Transform
         GLfloat rawTransform[16];
         fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
-        const glm::mat4 transform = glm::make_mat4(rawTransform);
+        glm::mat4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
         GLfloat rawAnimTransform[16];
@@ -498,8 +497,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 io::ModelAnimation::RotationKeyframe rotKeyframe;
 
                 // Rotation
-                float rot[4];
-                fileStream.read(reinterpret_cast<char*>(rot), 4 * sizeof(float));
+                std::array<float, 4> rot = {};
+                fileStream.read(reinterpret_cast<char*>(rot.data()), 4 * sizeof(float));
                 rotKeyframe.rotation = glm::quat(rot[0], rot[1], rot[2], rot[3]);
 
                 // Time

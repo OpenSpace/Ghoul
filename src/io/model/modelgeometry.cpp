@@ -42,14 +42,17 @@
 #include <utility>
 
 namespace {
+    using namespace ghoul;
+
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 10;
+    constexpr int8_t CurrentCacheVersion = 11;
     constexpr int FormatStringSize = 4;
     constexpr int8_t ShouldSkipMarker = -1;
     constexpr int8_t NoSkipMarker = 1;
 
-    ghoul::opengl::Texture::Format stringToFormat(std::string_view format) {
-        using Format = ghoul::opengl::Texture::Format;
+    opengl::Texture::Format stringToFormat(std::string_view format) {
+        using Format = opengl::Texture::Format;
+
         if (format == "Red ") { return Format::Red; }
         else if (format == "RG  ") { return Format::RG; }
         else if (format == "RGB ") { return Format::RGB; }
@@ -57,19 +60,21 @@ namespace {
         else if (format == "RGBA") { return Format::RGBA; }
         else if (format == "BGRA") { return Format::BGRA; }
         else if (format == "Dept") { return Format::DepthComponent; }
-        else                       { throw ghoul::MissingCaseException(); }
+        else                       { throw MissingCaseException(); }
     }
 
-    std::string formatToString(ghoul::opengl::Texture::Format format) {
+    std::string formatToString(opengl::Texture::Format format) {
+        using Format = opengl::Texture::Format;
+
         switch (format) {
-            case ghoul::opengl::Texture::Format::Red:            return "Red ";
-            case ghoul::opengl::Texture::Format::RG:             return "RG  ";
-            case ghoul::opengl::Texture::Format::RGB:            return "RGB ";
-            case ghoul::opengl::Texture::Format::BGR:            return "BGR ";
-            case ghoul::opengl::Texture::Format::RGBA:           return "RGBA";
-            case ghoul::opengl::Texture::Format::BGRA:           return "BGRA";
-            case ghoul::opengl::Texture::Format::DepthComponent: return "Dept";
-            default:                                  throw ghoul::MissingCaseException();
+            case Format::Red:            return "Red ";
+            case Format::RG:             return "RG  ";
+            case Format::RGB:            return "RGB ";
+            case Format::BGR:            return "BGR ";
+            case Format::RGBA:           return "RGBA";
+            case Format::BGRA:           return "BGRA";
+            case Format::DepthComponent: return "Dept";
+            default:                     throw MissingCaseException();
         }
     }
 
@@ -82,7 +87,7 @@ namespace {
         else if (dataType == "uint") { return GL_UNSIGNED_INT; }
         else if (dataType == "floa") { return GL_FLOAT; }
         else if (dataType == "doub") { return GL_DOUBLE; }
-        else                         { throw ghoul::MissingCaseException(); }
+        else                         { throw MissingCaseException(); }
     }
 
     std::string dataTypeToString(GLenum dataType) {
@@ -95,12 +100,12 @@ namespace {
             case GL_UNSIGNED_INT:   return "uint";
             case GL_FLOAT:          return "floa";
             case GL_DOUBLE:         return "doub";
-            default:                throw ghoul::MissingCaseException();
+            default:                throw MissingCaseException();
         }
     }
 
-    void calculateBoundingRadiusRecursive(const std::vector<ghoul::io::ModelNode>& nodes,
-                                          const ghoul::io::ModelNode* node,
+    void calculateBoundingRadiusRecursive(const std::vector<io::ModelNode>& nodes,
+                                          const io::ModelNode* node,
                                           const glm::mat4& parentTransform,
                                           float& maximumDistanceSquared)
     {
@@ -112,7 +117,7 @@ namespace {
         // NOTE: The bounding radius will not change along with an animation
         glm::mat4 globalTransform = parentTransform * node->transform();
 
-        for (const ghoul::io::ModelMesh& mesh : node->meshes()) {
+        for (const io::ModelMesh& mesh : node->meshes()) {
             const float d = mesh.calculateBoundingRadius(globalTransform);
             maximumDistanceSquared = std::max(d, maximumDistanceSquared);
         }
@@ -127,9 +132,8 @@ namespace {
         }
     }
 
-    void renderRecursive(const std::vector<ghoul::io::ModelNode>& nodes,
-                         const ghoul::io::ModelNode* node,
-                         ghoul::opengl::ProgramObject& program,
+    void renderRecursive(const std::vector<io::ModelNode>& nodes,
+                         const io::ModelNode* node, opengl::ProgramObject& program,
                          const glm::mat4& parentTransform, bool isFullyTexturedModel,
                          bool isProjection)
     {
@@ -148,7 +152,7 @@ namespace {
             globalTransform = parentTransform * node->transform();
         }
 
-        for (const ghoul::io::ModelMesh& mesh : node->meshes()) {
+        for (const io::ModelMesh& mesh : node->meshes()) {
             mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
         }
 
@@ -244,7 +248,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 
         // Texture
         // dimensions
-        std::array<int32_t, 3> dimensionStorage;
+        std::array<int32_t, 3> dimensionStorage = {};
         fileStream.read(
             reinterpret_cast<char*>(dimensionStorage.data()),
             3 * sizeof(int32_t)
@@ -285,18 +289,19 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         fileStream.read(reinterpret_cast<char*>(data), textureSize);
 
         textureEntry.texture = std::make_unique<opengl::Texture>(
-            dimensions,
-            GL_TEXTURE_2D,
-            format,
-            internalFormat,
-            dataType,
-            opengl::Texture::FilterMode::Linear,
-            opengl::Texture::WrappingMode::Repeat,
-            opengl::Texture::AllocateData::No,
-            opengl::Texture::TakeOwnership::Yes
+            opengl::Texture::FormatInit{
+                .dimensions = dimensions,
+                .type = GL_TEXTURE_2D,
+                .format = format,
+                .dataType = dataType,
+                .internalFormat = internalFormat
+            },
+            opengl::Texture::SamplerInit{
+                .filter = opengl::Texture::FilterMode::AnisotropicMipMap
+            },
+            data
         );
 
-        textureEntry.texture->setPixelData(data, opengl::Texture::TakeOwnership::Yes);
         textureStorageArray.push_back(std::move(textureEntry));
     }
 
@@ -458,13 +463,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
 
         // Transform
-        GLfloat rawTransform[16];
-        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(GLfloat));
+        float rawTransform[16];
+        fileStream.read(reinterpret_cast<char*>(rawTransform), 16 * sizeof(float));
         glm::mat4 transform = glm::make_mat4(rawTransform);
 
         // AnimationTransform
-        GLfloat rawAnimTransform[16];
-        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(GLfloat));
+        float rawAnimTransform[16];
+        fileStream.read(reinterpret_cast<char*>(&rawAnimTransform), 16 * sizeof(float));
         const glm::mat4 animationTransform = glm::make_mat4(rawAnimTransform);
 
         // Parent
@@ -651,16 +656,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
 }
 
 bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) const {
-    std::ofstream fileStream(cachedFile, std::ofstream::binary);
+    std::ofstream fileStream = std::ofstream(cachedFile, std::ofstream::binary);
     if (!fileStream.good()) {
         throw ModelCacheException(cachedFile, "Could not open file to save cache");
     }
 
     // Write which version of caching that is used
-    fileStream.write(
-        reinterpret_cast<const char*>(&CurrentCacheVersion),
-        sizeof(int8_t)
-    );
+    fileStream.write(reinterpret_cast<const char*>(&CurrentCacheVersion), sizeof(int8_t));
 
     // First cache the textureStorage
     int32_t nTextureEntries = static_cast<int32_t>(_textureStorage.size());
@@ -671,9 +673,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
 
     for (int32_t te = 0; te < nTextureEntries; te++) {
         // Name
-        int32_t nameSize = static_cast<int32_t>(
-            _textureStorage[te].name.size() * sizeof(char)
-        );
+        int32_t nameSize = static_cast<int32_t>(_textureStorage[te].name.size());
         if (nameSize == 0) {
             throw ModelCacheException(
                 cachedFile,
@@ -714,27 +714,16 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         fileStream.write(dataType.data(), FormatStringSize * sizeof(char));
 
         // data
-        _textureStorage[te].texture->downloadTexture();
-        int32_t pixelSize = _textureStorage[te].texture->expectedPixelDataSize();
-        if (pixelSize <= 0) {
-            throw ModelCacheException(
-                cachedFile,
-                "No texture size was found while saving cache"
-            );
-        }
-        fileStream.write(reinterpret_cast<const char*>(&pixelSize), sizeof(int32_t));
-
-        const void* data = _textureStorage[te].texture->pixelData();
-        fileStream.write(reinterpret_cast<const char*>(data), pixelSize);
+        std::vector<std::byte> pixels = _textureStorage[te].texture->pixelData();
+        int32_t nPixels = static_cast<int32_t>(pixels.size());
+        fileStream.write(reinterpret_cast<const char*>(&nPixels), sizeof(int32_t));
+        fileStream.write(reinterpret_cast<const char*>(pixels.data()), nPixels);
     }
 
     // Write how many nodes are to be written
     int32_t nNodes = static_cast<int32_t>(_nodes.size());
     if (nNodes == 0) {
-        throw ModelCacheException(
-            cachedFile,
-            "No nodes were found while saving cache"
-        );
+        throw ModelCacheException(cachedFile, "No nodes were found while saving cache");
     }
     fileStream.write(reinterpret_cast<const char*>(&nNodes), sizeof(int32_t));
 
@@ -826,19 +815,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                 // color
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.textures()[t].color.r),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&mesh.textures()[t].color.g),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&mesh.textures()[t].color.b),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&mesh.textures()[t].color.a),
-                    sizeof(float)
+                     4 * sizeof(float)
                 );
 
                 // isTransparent
@@ -961,16 +938,8 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             {
                 // Position
                 fileStream.write(
-                    reinterpret_cast<const char*>(&posKeyframe.position.x),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&posKeyframe.position.y),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&posKeyframe.position.z),
-                    sizeof(float)
+                    reinterpret_cast<const char*>(glm::value_ptr(posKeyframe.position)),
+                    3 * sizeof(float)
                 );
 
                 // Time
@@ -999,15 +968,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                 );
                 fileStream.write(
                     reinterpret_cast<const char*>(&rotKeyframe.rotation.x),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&rotKeyframe.rotation.y),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&rotKeyframe.rotation.z),
-                    sizeof(float)
+                    3 * sizeof(float)
                 );
 
                 // Time
@@ -1031,16 +992,8 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             {
                 // Scale
                 fileStream.write(
-                    reinterpret_cast<const char*>(&scaleKeyframe.scale.x),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&scaleKeyframe.scale.y),
-                    sizeof(float)
-                );
-                fileStream.write(
-                    reinterpret_cast<const char*>(&scaleKeyframe.scale.z),
-                    sizeof(float)
+                    reinterpret_cast<const char*>(glm::value_ptr(scaleKeyframe.scale)),
+                    3 * sizeof(float)
                 );
 
                 // Time
@@ -1221,4 +1174,4 @@ void ModelGeometry::deinitialize() {
     }
 }
 
-}  // namespace ghoul::modelgeometry
+} // namespace ghoul::modelgeometry

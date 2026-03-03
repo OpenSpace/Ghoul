@@ -39,11 +39,11 @@
 #include <ws2tcpip.h>
 #ifndef _ERRNO
 #define _ERRNO WSAGetLastError()
-#endif
-#else //Use BSD sockets
+#endif // _ERRNO
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #ifdef _XCODE
 #include <unistd.h>
-#endif
+#endif // _XCODE
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -56,16 +56,12 @@
 
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
-#endif
-
-// #ifndef NO_ERROR
-// #define NO_ERROR 0L
-// #endif
+#endif // SOCKET_ERROR
 
 #ifndef _ERRNO
 #define _ERRNO errno
-#endif
-#endif // !WIN32
+#endif // _ERRNO
+#endif // WIN32
 
 namespace {
     constexpr std::string_view _loggerCat = "TcpSocket";
@@ -164,10 +160,10 @@ void TcpSocket::closeSocket() {
 #ifdef WIN32
     shutdown(_socket, SD_BOTH);
     closesocket(_socket);
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     shutdown(_socket, SHUT_RDWR);
     close(_socket);
-#endif
+#endif // WIN32
     _socket = INVALID_SOCKET;
 
     _isConnected = false;
@@ -284,7 +280,7 @@ void TcpSocket::streamInput() {
 #ifdef WIN32
         int nReadBytes = 0;
         auto failed = [](int nBytes) { return nBytes <= 0; };
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
         ssize_t nReadBytes = 0;
         auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
 #endif // WIN32

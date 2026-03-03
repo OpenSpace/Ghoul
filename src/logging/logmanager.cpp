@@ -34,9 +34,11 @@
 #include <utility>
 
 namespace {
+    using namespace ghoul::logging;
+
     // The always-present console log. Definining it here as we'd other need to include
     // the ConsoleLog in every file that wants to use the LogManager
-    ghoul::logging::ConsoleLog consoleLog;
+    ConsoleLog consoleLog;
 } // namespace
 
 namespace ghoul::logging {
@@ -101,7 +103,7 @@ void LogManager::logMessage(LogLevel level, std::string_view category,
         return;
     }
 
-    if (!ghoul::logging::LogManager::isInitialized()) {
+    if (!LogManager::isInitialized()) {
         consoleLog.log(level, category, message);
         return;
     }

@@ -35,15 +35,17 @@
 #include <utility>
 
 namespace {
-    std::string textureTypeToString(const ghoul::io::ModelMesh::TextureType& type) {
-        using TextureType = ghoul::io::ModelMesh::TextureType;
+    using namespace ghoul;
+    using namespace ghoul::io;
+
+    std::string textureTypeToString(const ModelMesh::TextureType& type) {
         switch (type) {
-            case TextureType::TextureDiffuse:  return "texture_diffuse";
-            case TextureType::TextureNormal:   return "texture_normal";
-            case TextureType::TextureSpecular: return "texture_specular";
-            case TextureType::ColorDiffuse:    return "color_diffuse";
-            case TextureType::ColorSpecular:   return "color_specular";
-            default:                           throw ghoul::MissingCaseException();
+            case ModelMesh::TextureType::TextureDiffuse:  return "texture_diffuse";
+            case ModelMesh::TextureType::TextureNormal:   return "texture_normal";
+            case ModelMesh::TextureType::TextureSpecular: return "texture_specular";
+            case ModelMesh::TextureType::ColorDiffuse:    return "color_diffuse";
+            case ModelMesh::TextureType::ColorSpecular:   return "color_specular";
+            default:                                      throw MissingCaseException();
         }
     }
 } // namespace
@@ -78,7 +80,7 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
         }
     }
 
-    std::vector<ghoul::opengl::TextureUnit> textureUnits(counter);
+    std::vector<opengl::TextureUnit> textureUnits(counter);
     int textureUnitIndex = 0;
 
     if (!isProjection) {
@@ -292,7 +294,7 @@ void ModelMesh::initialize() {
     glVertexArrayAttribBinding(_vao, 4, 0);
 
     // initialize textures
-    // Also chack if there are several textures/colors of the same type for this mesh
+    // Also check if there are several textures/colors of the same type for this mesh
     unsigned int nDiffuse = 0;
     unsigned int nSpecular = 0;
     unsigned int nNormal = 0;
@@ -310,12 +312,6 @@ void ModelMesh::initialize() {
                 nNormal++;
                 break;
         }
-
-        if (texture.hasTexture) {
-            texture.texture->uploadTexture();
-            texture.texture->setFilter(opengl::Texture::FilterMode::AnisotropicMipMap);
-            texture.texture->purgeFromRAM();
-        }
     }
 
     if (nDiffuse > 1 || nSpecular > 1 || nNormal > 1) {
@@ -327,7 +323,7 @@ void ModelMesh::initialize() {
     }
 }
 
-void ModelMesh::deinitialize() {
+void ModelMesh::deinitialize() const {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
     glDeleteBuffers(1, &_ibo);

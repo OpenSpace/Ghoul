@@ -112,17 +112,6 @@ public:
     explicit ProgramObject(std::string name);
 
     /**
-     * Copy constructor that will perform a deep copy of all the attached ShaderObject%s
-     * and copies the state of the location errors and internal (and debug) name. The
-     * copied ShaderObject%s' ownership will belong to the newly created ProgramObject
-     * while the original`s ownership will be unchanged.
-     *
-     * \throw ProgramObjectError If there was an error creating the OpenGL program object
-     *        name
-     */
-    ProgramObject(const ProgramObject& cpy);
-
-    /**
      * Destructor that will delete the OpenGL name that is attached to the ProgramObject.
      * Please note, while the lifetime of the ProgramObject ends after the destructor
      * finishes, the OpenGL name might still be in use and is only deleted if the last
@@ -139,30 +128,6 @@ public:
      * \return The OpenGL name of this ProgramObject
      */
     operator GLuint() const;
-
-    /**
-     * Assignment operator that will copy all the internal state of the right hand side's
-     * ProgramObject and will perform a deep copy of all the attached ShaderObject%s.
-     *
-     * \param rhs The assignment source
-     */
-    ProgramObject& operator=(const ProgramObject& rhs);
-
-    /**
-     * Assignment operator that will move all the internal state of the right hand side's
-     * ProgramObject and will invalidate the right hand side's object.
-     *
-     * \param rhs The assignment source
-     */
-    ProgramObject& operator=(ProgramObject&& rhs) noexcept;
-
-    /**
-     * Sets the human readable name used for logging and (if available) the object label
-     * for this ProgramObject. Besides this, the name is not used internally.
-     *
-     * \param name The human readable name of this ProgramObject
-     */
-    void setName(std::string name);
 
     /**
      * Returns the human readable name for this ProgramObject.
@@ -3540,13 +3505,13 @@ public:
 
 private:
     /// The OpenGL name of this program object
-    GLuint _id = 0;
+    const GLuint _id = 0;
 
     /// The internal name of this program name, used for the object label and logging
-    std::string _programName;
+    const std::string _programName;
 
     /// The logger category that will be used, if a name has been specified
-    std::string _loggerCat = "ProgramObject";
+    const std::string _loggerCat = "ProgramObject";
 
     /// `true` if uniform location errors should be ignored
     bool _ignoreUniformLocationError = false;

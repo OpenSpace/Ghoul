@@ -40,7 +40,7 @@ public:
     using ShaderChangedCallback = std::function<void()>;
 
     explicit ShaderPreprocessor(std::filesystem::path shaderPath,
-        Dictionary dictionary = ghoul::Dictionary());
+        Dictionary dictionary = Dictionary());
 
     const std::filesystem::path& filename() const;
     const Dictionary& dictionary() const;

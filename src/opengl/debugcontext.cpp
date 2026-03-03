@@ -27,9 +27,9 @@
 
 #include <utility>
 
-namespace ghoul::opengl::debug {
-
 namespace {
+    using namespace ghoul;
+    using namespace ghoul::opengl;
 
     void internalCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei,
                           const GLchar* message, const GLvoid* userParam)
@@ -37,8 +37,9 @@ namespace {
         const CallbackFunction& f = *reinterpret_cast<const CallbackFunction*>(userParam);
         f(Source(source), Type(type), Severity(severity), id, std::string(message));
     }
-
 } // namespace
+
+namespace ghoul::opengl {
 
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous) {
     if (debug) {
@@ -99,4 +100,4 @@ void setDebugCallback(CallbackFunction callback) {
     glDebugMessageCallback(internalCallback, &storage);
 }
 
-} // namespace ghoul::opengl::debug
+} // namespace ghoul::opengl

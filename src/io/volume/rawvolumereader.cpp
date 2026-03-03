@@ -62,11 +62,11 @@ std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filena
     }
 
     const unsigned int s = glm::compMul(_hints._dimensions);
-    GLubyte* data = new GLubyte[s];
+    std::vector<std::byte> data = std::vector<std::byte>(s);
 
     std::ifstream fin = std::ifstream(filename, std::ios::in | std::ios::binary);
     if (fin.good()) {
-        fin.read(reinterpret_cast<char*>(data), sizeof(unsigned char) * s);
+        fin.read(reinterpret_cast<char*>(data.data()), s * sizeof(unsigned char));
         fin.close();
     }
     else {
@@ -74,14 +74,17 @@ std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filena
     }
 
     return std::make_unique<opengl::Texture>(
-        data,
-        glm::uvec3(_hints._dimensions),
-        GL_TEXTURE_3D,
-        _hints._format,
-        _hints._internalFormat,
-        GL_UNSIGNED_BYTE,
-        opengl::Texture::FilterMode::Linear,
-        opengl::Texture::WrappingMode::ClampToBorder
+        opengl::Texture::FormatInit{
+            .dimensions = glm::uvec3(_hints._dimensions),
+            .type = GL_TEXTURE_3D,
+            .format = _hints._format,
+            .dataType = GL_UNSIGNED_BYTE,
+            .internalFormat = _hints._internalFormat
+        },
+        opengl::Texture::SamplerInit{
+            .wrapping = opengl::Texture::WrappingMode::ClampToBorder
+        },
+        data.data()
     );
 }
 

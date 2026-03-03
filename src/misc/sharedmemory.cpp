@@ -39,12 +39,6 @@
 constexpr int IPC_R = 000400; // read permission
 constexpr int IPC_W = 000200; // write/alter permission
 constexpr int IPC_M = 010000; // permission to change control info
-#endif
-
-namespace ghoul {
-
-#ifdef WIN32
-std::map<const std::string, HANDLE> SharedMemory::_createdSections;
 #endif // WIN32
 
 namespace {
@@ -84,6 +78,12 @@ namespace {
     }
 #endif // WIN32
 } // namespace
+
+namespace ghoul {
+
+#ifdef WIN32
+std::map<const std::string, HANDLE> SharedMemory::_createdSections;
+#endif // WIN32
 
 SharedMemory::SharedMemoryError::SharedMemoryError(std::string msg)
     : RuntimeError(std::move(msg), "SharedMemory")
@@ -145,8 +145,8 @@ void SharedMemory::create(const std::string& name, size_t size) {
 
     memoryHeader->mutex.clear();
     shmdt(memory);
-#endif
-} // WIN32
+#endif // WIN32
+}
 
 void SharedMemory::remove(const std::string& name) {
 #ifdef WIN32

@@ -59,6 +59,6 @@ BooleanType(PrettyPrint);
 std::string formatLua(const Dictionary& dictionary,
     PrettyPrint prettyPrint = PrettyPrint::No, const std::string& indentation = "    ");
 
-}  // namespace ghoul
+} // namespace ghoul
 
 #endif // __GHOUL___DICTIONARYLUAFORMATTER___H__

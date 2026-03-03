@@ -29,14 +29,16 @@
 #include <string>
 
 namespace {
+    using namespace ghoul::lua;
+
     int luaPanicFunction(lua_State* L) {
         const int n = lua_gettop(L);
         if (n > 0) {
             // The top value is the error message
             std::string msg = lua_tostring(L, -1);
-            throw ghoul::lua::LuaRuntimeException(std::move(msg));
+            throw LuaRuntimeException(std::move(msg));
         }
-        throw ghoul::lua::LuaRuntimeException("empty stack");
+        throw LuaRuntimeException("empty stack");
     }
 } // namespace
 
@@ -44,7 +46,7 @@ namespace ghoul::lua {
 
 LuaState::LuaState(Sandboxed sandboxed, IncludeStandardLibrary include,
                    StrictState strict)
-    : _state(ghoul::lua::createNewLuaState(sandboxed, include, strict))
+    : _state(createNewLuaState(sandboxed, include, strict))
 {
     // Set a panic function to make sure that we always throw with a useful error message
     // if an exception occurs due to a luaError. This should never happen under normal
@@ -61,7 +63,7 @@ LuaState::LuaState(LuaState&& other) noexcept
 
 LuaState::~LuaState() {
     if (_state) {
-        ghoul::lua::destroyLuaState(_state);
+        destroyLuaState(_state);
     }
 }
 
@@ -78,4 +80,4 @@ LuaState::operator lua_State*() const {
     return _state;
 }
 
-}  // namespace ghoul::lua
+} // namespace ghoul::lua

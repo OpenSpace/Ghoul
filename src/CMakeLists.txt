@@ -89,6 +89,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/interpolator.inl
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/invariants.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/misc/levmarqsolver.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/map.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/managedmemoryuniqueptr.h
     ${PROJECT_SOURCE_DIR}/include/ghoul/misc/memorypool.h
@@ -147,6 +148,7 @@ target_sources(
     misc/easing.cpp
     misc/exception.cpp
     misc/interpolator.cpp
+    misc/levmarqsolver.cpp
     misc/sharedmemory.cpp
     misc/stacktrace.cpp
     misc/stringhelper.cpp
@@ -231,13 +233,9 @@ if (GHOUL_MODULE_OPENGL)
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureconversion.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.inl
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/uniformcache.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/vertexbufferobject.inl
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h
@@ -255,10 +253,8 @@ if (GHOUL_MODULE_OPENGL)
       opengl/shaderpreprocessor.cpp
       opengl/texture.cpp
       opengl/textureatlas.cpp
-      opengl/textureconversion.cpp
       opengl/texturemanager.cpp
       opengl/textureunit.cpp
-      opengl/vertexbufferobject.cpp
       io/texture/texturereader.cpp
       io/texture/texturereaderbase.cpp
       io/texture/texturereadercmap.cpp

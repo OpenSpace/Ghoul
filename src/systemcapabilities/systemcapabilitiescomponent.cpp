@@ -39,10 +39,12 @@
 #endif // WIN32
 
 namespace {
+    using namespace ghoul;
+
 #ifdef WIN32
     /// Exception that will be thrown if there was an error regarding Windows'
     /// Management Instrumentation
-    struct WMIError final : public ghoul::RuntimeError {
+    struct WMIError final : public RuntimeError {
         explicit WMIError(std::string msg, HRESULT code)
             : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
             , message(std::move(msg))
@@ -86,7 +88,6 @@ namespace {
         );
         return std::string(buf.begin(), buf.end());
     }
-
 
     VARIANT* query(IWbemServices* services, const std::string& wmiClass,
                    const std::string& attribute)
@@ -201,7 +202,8 @@ void SystemCapabilitiesComponent::initializeWMI() {
         _iwbemLocator = nullptr;
         CoUninitialize();
         throw WMIError(
-            "WMI initialization failed. Failed to create IWbemLocator object", hRes
+            "WMI initialization failed. Failed to create IWbemLocator object",
+            hRes
         );
     }
 
@@ -223,7 +225,8 @@ void SystemCapabilitiesComponent::initializeWMI() {
         CoUninitialize();
         _iwbemServices = nullptr;
         throw WMIError(
-            "WMI initialization failed. Failed to connect to WMI server", hRes
+            "WMI initialization failed. Failed to connect to WMI server",
+            hRes
         );
     }
 

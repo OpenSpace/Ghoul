@@ -54,7 +54,7 @@ template <>
 std::string to_string(
            const systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem& value)
 {
-    using OS = ghoul::systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
+    using OS = systemcapabilities::GeneralCapabilitiesComponent::OperatingSystem;
     switch (value) {
         case OS::Windows10or11:               return "Windows 10/11";
         case OS::WindowsServer2016:           return "Windows Server 2016";
@@ -84,7 +84,7 @@ std::string to_string(
         case OS::Unknown:
             return "";
         default:
-            throw ghoul::MissingCaseException();
+            throw MissingCaseException();
     }
 }
 } // namespace ghoul
@@ -139,7 +139,6 @@ void GeneralCapabilitiesComponent::detectOS() {
     SYSTEM_INFO systemInfo;
     std::memset(&systemInfo, 0, sizeof(SYSTEM_INFO));
 
-
 #pragma warning (push)
 #pragma warning (disable : 4996)
     BOOL osVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&osVersionInfo));
@@ -163,11 +162,13 @@ void GeneralCapabilitiesComponent::detectOS() {
             std::string errorMsg(errorBuffer);
             LocalFree(errorBuffer);
             throw OperatingSystemError(
-                "Retrieving OS version failed. 'GetVersionEx' returned 0", errorMsg
+                "Retrieving OS version failed. 'GetVersionEx' returned 0",
+                errorMsg
             );
         }
         throw OperatingSystemError(
-            "Retrieving OS version failed. 'GetVersionEx' returned 0", ""
+            "Retrieving OS version failed. 'GetVersionEx' returned 0",
+            ""
         );
     }
     HMODULE module = GetModuleHandle(TEXT("kernel32.dll"));
@@ -194,7 +195,8 @@ void GeneralCapabilitiesComponent::detectOS() {
             );
         }
         throw OperatingSystemError(
-            "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0", ""
+            "Kernel32.dll handle could not be found. 'GetModuleHandle' returned 0",
+            ""
         );
     }
     PGNSI procedureGetNativeSystemInfo = reinterpret_cast<PGNSI>(GetProcAddress(
@@ -318,9 +320,8 @@ void GeneralCapabilitiesComponent::detectOS() {
     }
 
     _operatingSystemExtra = resultStream.str();
-    _fullOperatingSystem =
-        ghoul::to_string(_operatingSystem) + ' ' + _operatingSystemExtra;
-#else
+    _fullOperatingSystem = to_string(_operatingSystem) + ' ' + _operatingSystemExtra;
+#else // ^^^^ WIN32 // !WIN32 vvvv
     utsname name;
     const int res = uname(&name);
     if (res != 0) {
@@ -334,7 +335,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         "{} {} {} {}", name.sysname, name.release, name.version, name.machine
     );
     _fullOperatingSystem = _operatingSystemExtra;
-#endif
+#endif // WIN32
 }
 
 void GeneralCapabilitiesComponent::detectMemory() {
@@ -462,7 +463,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     SYSTEM_INFO systemInfo;
     GetNativeSystemInfo(&systemInfo);
     _cores = systemInfo.dwNumberOfProcessors;
-#else // // ^^^^ WIN32 // _M_ARM64 vvvv
+#else // ^^^^ WIN32 // _M_ARM64 vvvv
     _cpu = "arm64";
 
     SYSTEM_INFO systemInfo;
@@ -515,7 +516,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
         }
         fclose(file);
     }
-#endif
+#endif // WIN32
 }
 
 std::vector<SystemCapabilitiesComponent::CapabilityInformation>
@@ -529,7 +530,11 @@ GeneralCapabilitiesComponent::capabilities() const
         { "L2 Associativity", std::to_string(_L2Associativity), Verbosity::Full },
         { "Cache size", std::to_string(_cacheSize) + " KB", Verbosity::Full },
         { "Extensions", _extensions,Verbosity::Full },
-        { "Main Memory", std::to_string(_installedMainMemory) + " MB", Verbosity::Default}
+        {
+            "Main Memory",
+            std::to_string(_installedMainMemory) + " MB",
+            Verbosity::Default
+        }
     };
 }
 
@@ -540,7 +545,7 @@ GeneralCapabilitiesComponent::operatingSystem() const
 }
 
 std::string GeneralCapabilitiesComponent::operatingSystemString() const {
-    return ghoul::to_string(_operatingSystem);
+    return to_string(_operatingSystem);
 }
 
 const std::string& GeneralCapabilitiesComponent::fullOperatingSystem() const {

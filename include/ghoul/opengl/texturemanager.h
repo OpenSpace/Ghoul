@@ -31,7 +31,7 @@
 
 namespace ghoul::opengl {
 
-class TextureManager : public ghoul::ObjectManager<Texture> {
+class TextureManager : public ObjectManager<Texture> {
 public:
     TextureManager();
 };

@@ -48,7 +48,8 @@ public:
      * \pre \p nDimensions must be 1, 2, or 3
      */
     std::unique_ptr<opengl::Texture> loadTexture(
-        const std::filesystem::path& filename, int nDimensions) const override;
+        const std::filesystem::path& filename, int nDimensions,
+        opengl::Texture::SamplerInit samplerSettings) const override;
 
     /**
      * Loads a Texture from the memory pointed at by \p memory using the STB library. The
@@ -64,7 +65,8 @@ public:
      * \pre \p nDimensions must be 1, 2, or 3
      */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory,
-        size_t size, int nDimensions) const override;
+        size_t size, int nDimensions,
+        opengl::Texture::SamplerInit samplerSettings) const override;
 
     /**
      * Returns the size of the image pointed to by \p filename.

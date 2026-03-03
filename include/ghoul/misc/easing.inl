@@ -64,7 +64,7 @@ EasingFunc<T> easingFunction(EasingFunction func) {
         case EasingFunction::BounceEaseIn:         return bounceEaseIn<T>;
         case EasingFunction::BounceEaseOut:        return bounceEaseOut<T>;
         case EasingFunction::BounceEaseInOut:      return bounceEaseInOut<T>;
-        default:                                   throw ghoul::MissingCaseException();
+        default:                                   throw MissingCaseException();
     }
 }
 

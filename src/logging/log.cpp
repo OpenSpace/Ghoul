@@ -31,7 +31,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#else // WIN32
+#else // ^^^^ WIN32 // !WIN32 vvvv
 #include <iomanip>
 #include <sstream>
 #include <sys/time.h>
@@ -93,7 +93,7 @@ std::string Log::timeString() {
     return std::format(
         "{:0>2}:{:0>2}:{:0>2}.{:0<3}", t.wHour, t.wMinute, t.wSecond, t.wMilliseconds
     );
-#else
+#else // ^^^^ WIN32 // !WIN32 vvvv
     struct timeval t;
     gettimeofday(&t, nullptr);
     tm* m = gmtime(&t.tv_sec);
@@ -101,7 +101,7 @@ std::string Log::timeString() {
     return std::format(
         "{:0>2}:{:0>2}:{:0>2}.{:0<3}", m->tm_hour, m->tm_min, m->tm_sec, t.tv_usec / 1000
     );
-#endif
+#endif // WIN32
 }
 
 std::string Log::dateString() {

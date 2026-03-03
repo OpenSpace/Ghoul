@@ -180,7 +180,7 @@ public:
      * \p dict The subset dictionary
      * \return `true` if the \p dict is a subset, `false` otherwise
      */
-    bool isSubset(const ghoul::Dictionary& dict) const;
+    bool isSubset(const Dictionary& dict) const;
 
 private:
     using StorageTypes = std::variant<

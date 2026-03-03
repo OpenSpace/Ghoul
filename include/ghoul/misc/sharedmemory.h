@@ -227,7 +227,7 @@ private:
      * file is used, so there is no disk IO necessary.
      */
     int _sharedMemoryHandle;
-#endif // !WIN32
+#endif // WIN32
 };
 
 } // namespace ghoul

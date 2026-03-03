@@ -330,9 +330,8 @@ enum class CrDirection {
  *        provided \p font has one
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-    std::string_view text, const glm::vec4& color, CrDirection direction,
-    const glm::vec4& outlineColor);
+glm::vec2 RenderFont(Font& font, glm::vec2& pos, std::string_view text,
+    const glm::vec4& color, CrDirection direction, const glm::vec4& outlineColor);
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
@@ -347,8 +346,8 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  *        provided \p font has one
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    std::string_view text, const glm::vec4& color, const glm::vec4& outlineColor);
+glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text,
+    const glm::vec4& color, const glm::vec4& outlineColor);
 
 /**
  * This helper method prints the passed arguments using the Font::render function of the
@@ -365,8 +364,38 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
  *        up and down by the number of lines times the height of the used font
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-    std::string_view text, const glm::vec4& color,
+glm::vec2 RenderFont(Font& font, glm::vec2& pos, std::string_view text,
+    const glm::vec4& color, CrDirection direction = CrDirection::None);
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
+ * default font. It is equivalent to calling defaultRenderer::render with the same
+ * arguments and discarding the second return value.
+ *
+ * \param font The Font that is used to render the provided text
+ * \param pos The screen-space position (in pixel coordinates) that to render the text
+ * \param text The text that is rendered to the screen using the default renderer
+ * \param color The color that is used to the render the text
+ * \return The bounding box of the text that was printed
+ */
+glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text,
+    const glm::vec4& color = glm::vec4(1.f));
+
+/**
+ * This helper method prints the passed arguments using the Font::render function of the
+ * default font. It is equivalent to calling defaultRenderer::render with the same
+ * arguments and discarding the second return value. This value moves the \p pos down by
+ * the computed distance.
+ *
+ * \param font The Font that is used to render the provided text
+ * \param pos The screen-space position (in pixel coordinates) that to render the text
+ * \param text The text that is rendered to the screen using the default renderer
+ * \param direction Determines whether the \p pos should be modified based on how many
+ *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
+ *        up and down by the number of lines times the height of the used font
+ * \return The bounding box of the text that was printed
+ */
+glm::vec2 RenderFont(Font& font, glm::vec2& pos, std::string_view text,
     CrDirection direction = CrDirection::None);
 
 /**
@@ -377,41 +406,9 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
  * \param font The Font that is used to render the provided text
  * \param pos The screen-space position (in pixel coordinates) that to render the text
  * \param text The text that is rendered to the screen using the default renderer
- * \param color The color that is used to the render the text
  * \return The bounding box of the text that was printed
  */
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    std::string_view text, const glm::vec4& color = glm::vec4(1.f));
-
-/**
- * This helper method prints the passed arguments using the Font::render function of the
- * default font. It is equivalent to calling defaultRenderer::render with the same
- * arguments and discarding the second return value. This value moves the \p pos down by
- * the computed distance.
- *
- * \param font The Font that is used to render the provided text
- * \param pos The screen-space position (in pixel coordinates) that to render the text
- * \param text The text that is rendered to the screen using the default renderer
- * \param direction Determines whether the \p pos should be modified based on how many
- *        lines were rendered. None leaves the \p pos unmodified, and Up and Down move it
- *        up and down by the number of lines times the height of the used font
- * \return The bounding box of the text that was printed
- */
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-    std::string_view text, CrDirection direction = CrDirection::None);
-
-/**
- * This helper method prints the passed arguments using the Font::render function of the
- * default font. It is equivalent to calling defaultRenderer::render with the same
- * arguments and discarding the second return value.
- *
- * \param font The Font that is used to render the provided text
- * \param pos The screen-space position (in pixel coordinates) that to render the text
- * \param text The text that is rendered to the screen using the default renderer
- * \return The bounding box of the text that was printed
- */
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-    std::string_view text);
+glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text);
 
 } // namespace ghoul::fontrendering
 

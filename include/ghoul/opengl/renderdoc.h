@@ -34,6 +34,6 @@ inline RENDERDOC_API_1_6_0* renderdocApi = nullptr;
 
 void loadRenderDoc();
 
-}  // namespace ghoul::opengl
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___RENDERDOC___H__

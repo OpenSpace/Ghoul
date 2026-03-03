@@ -37,7 +37,7 @@ namespace {
 namespace ghoul {
 
 template <>
-std::string to_string(const ghoul::systemcapabilities::Version& v) {
+std::string to_string(const systemcapabilities::Version& v) {
     if (v.release != 0) {
         return std::format("{}.{}.{}", v.major, v.minor, v.release);
     }

@@ -101,7 +101,7 @@ constexpr logging::LogLevel from_string(std::string_view string) {
     if (string == "Fatal") { return logging::LogLevel::Fatal; }
     if (string == "None") { return logging::LogLevel::NoLogging; }
 
-    throw ghoul::RuntimeError(std::format("Unknown log level '{}'", string));
+    throw RuntimeError(std::format("Unknown log level '{}'", string));
 }
 
 /**

@@ -23,33 +23,69 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#ifndef __GHOUL___DICTIONARYJSONFORMATTER___H__
-#define __GHOUL___DICTIONARYJSONFORMATTER___H__
+ /*****************************************************************************************
+  * Modified parts of the code from Ron Babich is used in the following code.             *
+  ****************************************************************************************/
 
-#include <ghoul/misc/exception.h>
+ /**
+  * levmarq.c, levmarq.h, and examples are provided under the MIT license.
+  *
+  * Copyright (c) 2008-2016 Ron Babich
+  *
+  * Permission is hereby granted, free of charge, to any person
+  * obtaining a copy of this software and associated documentation
+  * files (the "Software"), to deal in the Software without
+  * restriction, including without limitation the rights to use,
+  * copy, modify, merge, publish, distribute, sublicense, and/or sell
+  * copies of the Software, and to permit persons to whom the
+  * Software is furnished to do so, subject to the following
+  * conditions:
+  *
+  * The above copyright notice and this permission notice shall be
+  * included in all copies or substantial portions of the Software.
+  *
+  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  * OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+#include <glm/glm.hpp>
 #include <string>
+#include <vector>
 
 namespace ghoul {
 
-class Dictionary;
+typedef struct {
+    bool verbose;
+    std::string data;
+    std::vector<glm::dvec2> pos;
+    int maxIt;
+    double initLambda;
+    double upFactor;
+    double downFactor;
+    double targetDerr;
+    int finalIt;
+    double finalErr;
+    double finalDerr;
+} LMstat;
 
 /**
- * This exception is thrown if an unknown type is being converted.
+ * Initialize parameters to good values.
  */
-struct JsonFormattingError final : public RuntimeError {
-    explicit JsonFormattingError(std::string msg);
-};
+void initializeLevmarqStats(LMstat* lmstat);
 
 /**
- * Converts the passed \p dictionary into a JSON string representation.
- *
- * \param dictionary The Dictionary that should be converted
- * \return A JSON string representing the Dictionary
- *
- * \throw JsonFormattingError If the \p key points to a type that cannot be converted
+ * Main function call, finds appropriate values for par[nDOF] that manipulates the
+ * camera correctly to direct-manipulation.
  */
-std::string formatJson(const Dictionary& dictionary);
+bool levmarq(int npar, double* par, int ny, double* dysq,
+    double (*func)(double*, int, void*, LMstat*),
+    void (*grad)(double*, double*, int, void*, LMstat*),
+    void* fdata, LMstat* lmstat);
 
 } // namespace ghoul
-
-#endif // __GHOUL___DICTIONARYJSONFORMATTER___H__

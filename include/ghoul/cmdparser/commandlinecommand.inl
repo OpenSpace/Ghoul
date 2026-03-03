@@ -48,4 +48,4 @@ template <class T>
     return !iss.fail();
 }
 
-}  // namespace ghoul::cmdparser
+} // namespace ghoul::cmdparser

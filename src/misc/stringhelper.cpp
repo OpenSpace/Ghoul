@@ -60,17 +60,16 @@ std::vector<std::string> tokenizeString(const std::string& input, char separator
     if (separatorPos == std::string::npos) {
         return { input };
     }
-    else {
-        std::vector<std::string> result;
-        size_t prevSeparator = 0;
-        while (separatorPos != std::string::npos) {
-            result.push_back(input.substr(prevSeparator, separatorPos - prevSeparator));
-            prevSeparator = separatorPos + 1;
-            separatorPos = input.find(separator, separatorPos + 1);
-        }
-        result.push_back(input.substr(prevSeparator));
-        return result;
+
+    std::vector<std::string> result;
+    size_t prevSeparator = 0;
+    while (separatorPos != std::string::npos) {
+        result.push_back(input.substr(prevSeparator, separatorPos - prevSeparator));
+        prevSeparator = separatorPos + 1;
+        separatorPos = input.find(separator, separatorPos + 1);
     }
+    result.push_back(input.substr(prevSeparator));
+    return result;
 }
 
 std::string join(std::vector<std::string> input, const std::string& separator) {
@@ -181,7 +180,7 @@ std::istream& getline(std::istream& inputStream, std::string& str) {
     if (!str.empty() && (str.back() == '\r')) {
         str.pop_back();
     }
-#endif //WIN32
+#endif // WIN32
     return inputStream;
 }
 
@@ -191,7 +190,7 @@ std::istream& getline(std::istream& inputStream, std::string& str, char delim) {
     if (!str.empty() && (str.back() == '\r')) {
         str.pop_back();
     }
-#endif //WIN32
+#endif // WIN32
     return inputStream;
 }
 

@@ -32,6 +32,8 @@
 #include <utility>
 
 namespace {
+    using namespace ghoul;
+
     // Boolean constant used to check whether a value T is part of a parameter pack Ts
     template <typename T, typename U> struct is_one_of;
     template <typename T, typename... Ts>
@@ -40,7 +42,7 @@ namespace {
     {};
 
     // List of types that are stored as-is in the Dictionary
-    using DirectTypes = std::variant<bool, double, int, std::string, ghoul::Dictionary,
+    using DirectTypes = std::variant<bool, double, int, std::string, Dictionary,
         void*, std::vector<int>, std::vector<double>, std::vector<std::string>>;
     template <typename T> using isDirectType = is_one_of<T, DirectTypes>;
 
@@ -52,7 +54,7 @@ namespace {
 
 
     /// Exception that is thrown if the Dictionary does not contain a provided key
-    struct KeyError final : public ghoul::RuntimeError {
+    struct KeyError final : public RuntimeError {
         explicit KeyError(std::string msg)
             : RuntimeError(std::move(msg), "Dictionary")
         {}
@@ -61,15 +63,14 @@ namespace {
     /// Exception thrown if there was an error with a value, either trying to access the
     /// wrong type for a known key or if trying to access a vector/matrix based type and
     /// the underlying std::vector did contain the wrong number of values
-    struct ValueError final : public ghoul::RuntimeError {
+    struct ValueError final : public RuntimeError {
         explicit ValueError(std::string key, std::string msg)
-            : ghoul::RuntimeError(
+            : RuntimeError(
                 std::format("Key '{}': {}", std::move(key), std::move(msg)),
                 "Dictionary"
             )
         {}
     };
-
 } // namespace
 
 namespace ghoul {
@@ -90,7 +91,7 @@ void Dictionary::setValue(std::string key, T value) {
     }
     else if constexpr (isGLMType<T>::value) {
         typename T::value_type* p = glm::value_ptr(value);
-        std::vector<typename T::value_type> vec(p, p + ghoul::glm_components<T>::value);
+        std::vector<typename T::value_type> vec(p, p + glm_components<T>::value);
         _storage.insert_or_assign(std::move(key), std::move(vec));
     }
     else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, const char[]>)
@@ -142,8 +143,8 @@ T Dictionary::value(std::string_view key) const {
         if (std::holds_alternative<VT>(it->second)) {
             vec = std::get<VT>(it->second);
         }
-        else if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+        else if (std::holds_alternative<Dictionary>(it->second)) {
+            const Dictionary d = std::get<Dictionary>(it->second);
             vec.resize(d._storage.size());
             for (const auto& kv : d._storage) {
                 // Lua is 1-based index, the rest of the world is 0-based
@@ -170,12 +171,12 @@ T Dictionary::value(std::string_view key) const {
             );
         }
 
-        if (vec.size() != ghoul::glm_components<T>::value) {
+        if (vec.size() != glm_components<T>::value) {
             throw ValueError(
                 std::string(key),
                 std::format(
                     "Contained wrong number of values. Expected {} got {}",
-                    ghoul::glm_components<T>::value, vec.size()
+                    glm_components<T>::value, vec.size()
                 )
             );
         }
@@ -216,15 +217,15 @@ bool Dictionary::hasValue(std::string_view key) const {
         return std::holds_alternative<T>(it->second);
     }
     else if constexpr (isGLMType<T>::value) {
-        if (std::holds_alternative<ghoul::Dictionary>(it->second)) {
-            const ghoul::Dictionary d = std::get<ghoul::Dictionary>(it->second);
+        if (std::holds_alternative<Dictionary>(it->second)) {
+            const Dictionary d = std::get<Dictionary>(it->second);
 
-            if (d.size() != ghoul::glm_components<T>::value) {
+            if (d.size() != glm_components<T>::value) {
                 return false;
             }
 
             // Check whether we have all keys and they are of the correct type
-            for (int i = 1; i <= ghoul::glm_components<T>::value; i++) {
+            for (int i = 1; i <= glm_components<T>::value; i++) {
                 if (!d.hasValue<typename T::value_type>(std::to_string(i))) {
                     return false;
                 }
@@ -236,7 +237,7 @@ bool Dictionary::hasValue(std::string_view key) const {
         else {
             using VT = std::vector<typename T::value_type>;
             return std::holds_alternative<VT>(it->second) &&
-                std::get<VT>(it->second).size() == ghoul::glm_components<T>::value;
+                std::get<VT>(it->second).size() == glm_components<T>::value;
         }
     }
     else if constexpr (std::is_same_v<T, const char*> ||
@@ -283,7 +284,7 @@ size_t Dictionary::size() const {
     return _storage.size();
 }
 
-bool Dictionary::isSubset(const ghoul::Dictionary& dict) const {
+bool Dictionary::isSubset(const Dictionary& dict) const {
     for (const std::pair<const std::string, StorageTypes>& kv : dict._storage) {
         auto it = _storage.find(kv.first);
         if (it == _storage.end() || it->second != kv.second) {

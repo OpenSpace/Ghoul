@@ -33,14 +33,14 @@
 #include <string_view>
 #include <utility>
 
-namespace {
-    constexpr std::string_view _loggerCat = "WebSocket";
-    constexpr std::chrono::milliseconds MaxWaitDuration(1000);
-} // namespace
-
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
+
+namespace {
+    constexpr std::string_view _loggerCat = "WebSocket";
+    constexpr std::chrono::milliseconds MaxWaitDuration = std::chrono::milliseconds(1000);
+} // namespace
 
 namespace ghoul::io {
 
@@ -154,4 +154,4 @@ void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
     _inputNotifier.notify_one();
 }
 
-}  // namespace ghoul::io
+} // namespace ghoul::io

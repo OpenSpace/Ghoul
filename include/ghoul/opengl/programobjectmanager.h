@@ -31,11 +31,11 @@
 
 namespace ghoul::opengl {
 
-class ProgramObjectManager : public ghoul::ObjectManager<ProgramObject> {
+class ProgramObjectManager : public ObjectManager<ProgramObject> {
 public:
     ProgramObjectManager();
 };
 
-}  // namespace ghoul::opengl
+} // namespace ghoul::opengl
 
 #endif // __GHOUL___PROGRAMOBJECTMANAGER___H__

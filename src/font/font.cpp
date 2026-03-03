@@ -41,14 +41,17 @@
 #include <utility>
 
 namespace {
+    using namespace ghoul;
+    using namespace ghoul::fontrendering;
+
     // Sizes in FT are given in 1/64th of pt
     constexpr float PointConversionFactor = 64.f;
     constexpr int DPI = 96;
 
-    void handleError(FT_Error error, FT_Library library, FT_Face face, FT_Stroker stroker,
+    void handleError(FT_Error err, FT_Library library, FT_Face face, FT_Stroker stroker,
                      const std::filesystem::path& name, float size)
     {
-        if (!error) {
+        if (!err) {
             return;
         }
 
@@ -61,8 +64,8 @@ namespace {
         if (library) {
             FT_Done_FreeType(library);
         }
-        ghoul::fontrendering::Error e = ghoul::fontrendering::error(error);
-        throw ghoul::RuntimeError(
+        Error e = error(err);
+        throw RuntimeError(
             std::format(
                 "Error loading font '{}' for size '{}': {} {}",
                 name, size, e.code, e.message

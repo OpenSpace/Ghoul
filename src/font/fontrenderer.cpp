@@ -63,40 +63,46 @@ namespace {
     layout (location = 1) in vec2 in_texCoords;
     layout (location = 2) in vec2 in_outlineTexCoords;
 
-    out vec2 texCoords;
-    out vec2 outlineTexCoords;
+    out Data {
+      vec2 texCoords;
+      vec2 outlineTexCoords;
+    } out_data;
 
     uniform mat4 projection;
 
+
     void main() {
-        texCoords = in_texCoords;
-        outlineTexCoords = in_outlineTexCoords;
-        gl_Position = projection * vec4(in_position, 0.0, 1.0);
+      out_data.texCoords = in_texCoords;
+      out_data.outlineTexCoords = in_outlineTexCoords;
+      gl_Position = projection * vec4(in_position, 0.0, 1.0);
     })";
 
     constexpr std::string_view DefaultFragmentShaderSource = R"(
     #version __CONTEXT__
 
-    in vec2 texCoords;
-    in vec2 outlineTexCoords;
+    in Data {
+      vec2 texCoords;
+      vec2 outlineTexCoords;
+    } in_data;
 
-    out vec4 FragColor;
+    out vec4 out_color;
 
     uniform sampler2D tex;
     uniform vec4 baseColor;
     uniform vec4 outlineColor;
     uniform bool hasOutline;
 
+
     void main() {
-        if (hasOutline) {
-            float inside = texture(tex, texCoords).r;
-            float outline = texture(tex, outlineTexCoords).r;
-            vec4 blend = mix(outlineColor, baseColor, inside);
-            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));
-        }
-        else {
-            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r);
-        }
+      if (hasOutline) {
+        float inside = texture(tex, in_data.texCoords).r;
+        float outline = texture(tex, in_data.outlineTexCoords).r;
+        vec4 blend = mix(outlineColor, baseColor, inside);
+        out_color = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));
+      }
+      else {
+        out_color = vec4(baseColor.rgb, baseColor.a * texture(tex, in_data.texCoords).r);
+      }
     })";
 
     constexpr std::string_view ProjectionVertexShaderSource = R"(
@@ -106,35 +112,40 @@ namespace {
     layout (location = 1) in vec2 in_texCoords;
     layout (location = 2) in vec2 in_outlineTexCoords;
 
-    out vec2 texCoords;
-    out vec2 outlineTexCoords;
+    out Data {
+      vec2 texCoords;
+      vec2 outlineTexCoords;
+      float depth;
+      vec3 vsPosition;
+    } out_data;
 
     uniform dmat4 mvpMatrix;
     uniform dmat4 modelViewTransform;
 
-    out float depth;
-    out vec3 vsPosition;
+
     void main() {
-        texCoords = in_texCoords;
-        outlineTexCoords = in_outlineTexCoords;
-        vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0));
-        depth = finalPos.w;
-        finalPos.z = 0.0;
-        vsPosition = vec3(modelViewTransform * dvec4(in_position.xyz, 1.0));
-        gl_Position = finalPos;
+      out_data.texCoords = in_texCoords;
+      out_data.outlineTexCoords = in_outlineTexCoords;
+      vec4 finalPos = vec4(mvpMatrix * dvec4(in_position.xyz, 1.0));
+      out_data.depth = finalPos.w;
+      finalPos.z = 0.0;
+      out_data.vsPosition = vec3(modelViewTransform * dvec4(in_position.xyz, 1.0));
+      gl_Position = finalPos;
     })";
 
     constexpr std::string_view ProjectionFragmentShaderSource = R"(
     #version __CONTEXT__
 
-    in vec2 texCoords;
-    in vec2 outlineTexCoords;
-    in float depth;
-    in vec3 vsPosition;
+    in Data {
+      vec2 texCoords;
+      vec2 outlineTexCoords;
+      float depth;
+      vec3 vsPosition;
+    } in_data;
 
-    out vec4 FragColor;
-    out vec4 gPosition;
-    out vec4 gNormal;
+    out vec4 out_color;
+    out vec4 out_position;
+    out vec4 out_normal;
 
     uniform sampler2D tex;
     uniform vec4 baseColor;
@@ -144,37 +155,37 @@ namespace {
     uniform bool disableTransmittance;
 
     void main() {
-        if (hasOutline) {
-            float inside = texture(tex, texCoords).r;
-            float outline = texture(tex, outlineTexCoords).r;
-            vec4 blend = mix(outlineColor, baseColor, inside);
-            FragColor = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));
+      if (hasOutline) {
+        float inside = texture(tex, in_data.texCoords).r;
+        float outline = texture(tex, in_data.outlineTexCoords).r;
+        vec4 blend = mix(outlineColor, baseColor, inside);
+        out_color = blend * vec4(1.0, 1.0, 1.0, max(inside, outline));
+      }
+      else {
+        out_color = vec4(baseColor.rgb, baseColor.a * texture(tex, in_data.texCoords).r);
+      }
+      if (out_color.a < 0.1) {
+        discard;
+      }
+      if (enableFalseDepth) {
+        gl_FragDepth = 0.0;
+      }
+      else {
+        if (depth > 1.0) {
+          gl_FragDepth = in_data.depth / pow(10, 30);
         }
         else {
-            FragColor = vec4(baseColor.rgb, baseColor.a * texture(tex, texCoords).r);
+          gl_FragDepth = in_data.depth - 1.0;
         }
-        if (FragColor.a < 0.1) {
-            discard;
-        }
-        if (enableFalseDepth) {
-            gl_FragDepth = 0.0;
-        }
-        else {
-            if (depth > 1.0) {
-                gl_FragDepth = depth / pow(10, 30);
-            }
-            else {
-                gl_FragDepth = depth - 1.0;
-            }
-        }
-        if (disableTransmittance) {
-            gPosition = vec4(0.0, 0.0, -1.0, 1.0);
-        }
-        else {
-            gPosition = vec4(vsPosition, 1.0);
-        }
-        // 4th coord of the gNormal is the water reflectance
-        gNormal = vec4(0.0, 0.0, 1.0, 0.0);
+      }
+      if (disableTransmittance) {
+        out_position = vec4(0.0, 0.0, -1.0, 1.0);
+      }
+      else {
+        out_position = vec4(in_data.vsPosition, 1.0);
+      }
+      // 4th coord of the gNormal is the water reflectance
+      out_normal = vec4(0.0, 0.0, 1.0, 0.0);
     })";
 
     // Extracts the next line from the string view and returns it, the passed string_view
@@ -209,12 +220,9 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
     //
     // Configure the OpenGL objects for the orthogonal font rendering
     struct OrthogonalVertex {
-        float x;
-        float y;
-        float s;
-        float t;
-        float outlineS;
-        float outlineT;
+        glm::vec2 pos;
+        glm::vec2 texCoords;
+        glm::vec2 texCoordsOutline;
     };
 
     glCreateBuffers(1, &_orthogonal.vbo);
@@ -241,7 +249,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         2,
         GL_FLOAT,
         GL_FALSE,
-        offsetof(OrthogonalVertex, s)
+        offsetof(OrthogonalVertex, texCoords)
     );
     glVertexArrayAttribBinding(_orthogonal.vao, 1, 0);
 
@@ -252,7 +260,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         2,
         GL_FLOAT,
         GL_FALSE,
-        offsetof(OrthogonalVertex, outlineS)
+        offsetof(OrthogonalVertex, texCoordsOutline)
     );
     glVertexArrayAttribBinding(_orthogonal.vao, 2, 0);
 
@@ -260,13 +268,9 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
     //
     // Configure the OpenGL objects for the projective font rendering
     struct PerspectiveVertex {
-        float x;
-        float y;
-        float z;
-        float s;
-        float t;
-        float outlineS;
-        float outlineT;
+        glm::vec3 position;
+        glm::vec2 texCoords;
+        glm::vec2 texCoordsOutline;
     };
 
     glCreateBuffers(1, &_perspective.vbo);
@@ -292,7 +296,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         2,
         GL_FLOAT,
         GL_FALSE,
-        offsetof(PerspectiveVertex, s)
+        offsetof(PerspectiveVertex, texCoords)
     );
     glVertexArrayAttribBinding(_perspective.vao, 1, 0);
 
@@ -303,7 +307,7 @@ FontRenderer::FontRenderer(std::unique_ptr<opengl::ProgramObject> program,
         2,
         GL_FLOAT,
         GL_FALSE,
-        offsetof(PerspectiveVertex, outlineS)
+        offsetof(PerspectiveVertex, texCoordsOutline)
     );
     glVertexArrayAttribBinding(_perspective.vao, 2, 0);
 }
@@ -319,6 +323,8 @@ FontRenderer::~FontRenderer() {
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
+    using namespace opengl;
+
     std::filesystem::path vsPath = absPath(DefaultVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
         LDEBUG(std::format("Skipping creation of existing vertex shader '{}'", vsPath));
@@ -338,7 +344,6 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
         std::ofstream file(fsPath);
         file << DefaultFragmentShaderSource;
     }
-    using namespace opengl;
     auto program = std::make_unique<ProgramObject>("Font");
     program->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
@@ -354,11 +359,13 @@ std::unique_ptr<FontRenderer> FontRenderer::createDefault() {
     program->linkProgramObject();
 
     auto fr = std::make_unique<FontRenderer>(std::move(program), glm::vec2(0.f));
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCache);
+    updateUniformLocations(*fr->_program, fr->_uniformCache);
     return fr;
 }
 
 std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
+    using namespace opengl;
+
     std::filesystem::path vsPath = absPath(ProjectionVertexShaderPath);
     if (std::filesystem::is_regular_file(vsPath)) {
         LDEBUG(std::format("Skipping creation of existing vertex shader '{}'", vsPath));
@@ -378,7 +385,6 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
         std::ofstream file(fsPath);
         file << ProjectionFragmentShaderSource;
     }
-    using namespace opengl;
     auto pg = std::make_unique<ProgramObject>("ProjectionFont");
     pg->attachObject(
         std::make_unique<ShaderObject>(ShaderObject::ShaderType::Vertex, vsPath)
@@ -395,7 +401,7 @@ std::unique_ptr<FontRenderer> FontRenderer::createProjectionSubjectText() {
 
     // Can't create a unique_ptr directly here as the FontRenderer is not private
     auto fr = std::make_unique<FontRenderer>(std::move(pg), glm::vec2(0.f));
-    ghoul::opengl::updateUniformLocations(*fr->_program, fr->_uniformCacheProjection);
+    updateUniformLocations(*fr->_program, fr->_uniformCacheProjection);
     fr->_uniformMvp = fr->_program->uniformLocation("mvpMatrix");
     return fr;
 }
@@ -589,8 +595,6 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
     float heightInPixels = 0.f;
     do {
         const std::string_view line = extractLine(text);
-        //movingPos.x = 0.f;
-        //movingPos.x = pos.x;
         float width = 0.f;
         float height = 0.f;
         for (size_t j = 0; j < line.size(); j++) {
@@ -654,11 +658,11 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 glm::vec4(labelInfo.mvpMatrix * glm::dvec4(p1, 1.0))
             };
             glm::vec4 topLeft =
-                (((projPos[0] / projPos[0].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
-                glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+                (((projPos[0] / projPos[0].w) + glm::vec4(1.f)) / glm::vec4(2.f)) *
+                glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.f, 1.f);
             glm::vec4 bottomLeft =
-                (((projPos[1] / projPos[1].w) + glm::vec4(1.0)) / glm::vec4(2.0)) *
-                glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.0, 1.0);
+                (((projPos[1] / projPos[1].w) + glm::vec4(1.f)) / glm::vec4(2.f)) *
+                glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.f, 1.f);
 
             // The billboard is bigger than the maximum size allowed:
             heightInPixels =
@@ -817,8 +821,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
                      std::string_view text, const glm::vec4& color, CrDirection direction,
                      const glm::vec4& outlineColor)
 {
-    using FR = ghoul::fontrendering::FontRenderer;
-    const FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+    const FontRenderer::BoundingBoxInformation r = FontRenderer::defaultRenderer().render(
         font,
         pos,
         text,
@@ -828,47 +831,44 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
 
     switch (direction) {
         case CrDirection::Up:
-            pos.y += res.numberOfLines * font.height();
+            pos.y += r.numberOfLines * font.height();
             break;
         case CrDirection::None:
             break;
         case CrDirection::Down:
-            pos.y -= res.numberOfLines * font.height();
+            pos.y -= r.numberOfLines * font.height();
             break;
     }
-    return res.boundingBox;
+    return r.boundingBox;
 }
 
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-                     std::string_view text, const glm::vec4& color,
-                     const glm::vec4& outlineColor)
+glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text,
+                     const glm::vec4& color, const glm::vec4& outlineColor)
 {
-    using FR = ghoul::fontrendering::FontRenderer;
-    const FR::BoundingBoxInformation res = FR::defaultRenderer().render(
+    const FontRenderer::BoundingBoxInformation r = FontRenderer::defaultRenderer().render(
         font,
         pos,
         text,
         color,
         outlineColor
     );
-    return res.boundingBox;
+    return r.boundingBox;
 }
 
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-                     std::string_view text, const glm::vec4& color,
-                     CrDirection direction)
+glm::vec2 RenderFont(Font& font, glm::vec2& pos, std::string_view text,
+                     const glm::vec4& color, CrDirection direction)
 {
     return RenderFont(font, pos, text, color, direction, { 0.f, 0.f, 0.f, color.a });
 }
 
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-                     std::string_view text, const glm::vec4& color)
+glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text,
+                     const glm::vec4& color)
 {
     return RenderFont(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
 }
 
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
-                     std::string_view text, CrDirection direction)
+glm::vec2 RenderFont(Font& font, glm::vec2& pos, std::string_view text,
+                     CrDirection direction)
 {
     return RenderFont(
         font,
@@ -880,9 +880,7 @@ glm::vec2 RenderFont(ghoul::fontrendering::Font& font, glm::vec2& pos,
     );
 }
 
-glm::vec2 RenderFont(ghoul::fontrendering::Font& font, const glm::vec2& pos,
-                     std::string_view text)
-{
+glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text) {
     return RenderFont(font, pos, text, { 1.f, 1.f, 1.f, 1.f }, { 0.f, 0.f, 0.f, 1.f });
 }
 

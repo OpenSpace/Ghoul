@@ -45,7 +45,7 @@ std::vector<std::string> stackTrace() {
     std::vector<std::string> stackFrames;
 
 #ifdef __unix__
-    const int MaxCallStackDepth = 128;
+    constexpr int MaxCallStackDepth = 128;
 
     int callstack[MaxCallStackDepth] = {};
 

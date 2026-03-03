@@ -35,15 +35,15 @@ namespace ghoul {
 void initialize() {
     ZoneScoped;
 
-    ghoul::filesystem::FileSystem::initialize();
-    ghoul::opengl::loadRenderDoc();
+    filesystem::FileSystem::initialize();
+    opengl::loadRenderDoc();
 }
 
 void deinitialize() {
     ZoneScoped;
 
-    ghoul::lua::internal::deinitializeGlobalState();
-    ghoul::filesystem::FileSystem::deinitialize();
+    lua::internal::deinitializeGlobalState();
+    filesystem::FileSystem::deinitialize();
 }
 
 std::string licenseText() {

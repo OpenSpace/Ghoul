@@ -37,12 +37,13 @@ namespace ghoul::io {
 
 std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
                                                     const std::filesystem::path& filename,
-                                                                    int nDimensions) const
+                                                                          int nDimensions,
+                                       opengl::Texture::SamplerInit samplerSettings) const
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     if (nDimensions != 1) {
-        throw ghoul::RuntimeError(std::format(
+        throw RuntimeError(std::format(
             "The number of dimensions for '{}' must be 1, but was {}",
             filename, nDimensions
         ));
@@ -54,11 +55,11 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     file.exceptions(std::ifstream::goodbit);
 
     int width = 0;
-    uint8_t* values = nullptr;
+    std::vector<std::byte> values;
 
     std::string line;
     int i = 0;
-    while (ghoul::getline(file, line)) {
+    while (getline(file, line)) {
         // Skip empty lines
         if (line.empty() || line == "\r") {
             continue;
@@ -69,13 +70,13 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         }
 
         std::stringstream s = std::stringstream(line);
-        if (!values) {
+        if (values.empty()) {
             s >> width;
-            values = new uint8_t[width * 4];
+            values.resize(width * 4);
             continue;
         }
 
-        if (!values) {
+        if (values.empty()) {
             throw TextureLoadException(
                 filename,
                 "The first non-comment, non-empty line must contain the image width",
@@ -90,7 +91,6 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
         s >> color.a;
 
         if (i > (width * 4)) {
-            delete[] values;
             throw TextureLoadException(
                 filename,
                 std::format("Header assured '{}' values but more were found", width),
@@ -98,14 +98,13 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
             );
         }
 
-        values[i++] = static_cast<uint8_t>(color.r * 255);
-        values[i++] = static_cast<uint8_t>(color.g * 255);
-        values[i++] = static_cast<uint8_t>(color.b * 255);
-        values[i++] = static_cast<uint8_t>(color.a * 255);
+        values[i++] = static_cast<std::byte>(color.r * 255);
+        values[i++] = static_cast<std::byte>(color.g * 255);
+        values[i++] = static_cast<std::byte>(color.b * 255);
+        values[i++] = static_cast<std::byte>(color.a * 255);
     }
 
     if ((width * 4) != i) {
-        delete[] values;
         throw TextureLoadException(
             filename,
             std::format("Header assured '{}' values but '{}' were found", width, i / 4.f),
@@ -114,14 +113,19 @@ std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(
     }
 
     return std::make_unique<opengl::Texture>(
-        values,
-        glm::uvec3(width, 1, 1),
-        GL_TEXTURE_1D,
-        opengl::Texture::Format::RGBA
+        ghoul::opengl::Texture::FormatInit{
+            .dimensions = glm::uvec3(width, 1, 1),
+            .type = GL_TEXTURE_1D,
+            .format = opengl::Texture::Format::RGBA,
+            .dataType = GL_UNSIGNED_BYTE
+        },
+        samplerSettings,
+        values.data()
     );
 }
 
-std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void*, size_t, int) const
+std::unique_ptr<opengl::Texture> TextureReaderCMAP::loadTexture(void*, size_t, int,
+                                                       opengl::Texture::SamplerInit) const
 {
     ghoul_assert(false, "Implementation missing");
     return nullptr;
@@ -136,7 +140,7 @@ glm::ivec2 TextureReaderCMAP::imageSize(const std::filesystem::path& filename) c
     int width = 0;
 
     std::string line;
-    while (ghoul::getline(file, line)) {
+    while (getline(file, line)) {
         // Skip empty lines
         if (line.empty() || line == "\r") {
             continue;

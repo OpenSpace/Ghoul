@@ -146,7 +146,7 @@ private:
     const std::string _loggerCat;
 };
 
-}  // namespace ghoul
+} // namespace ghoul
 
 #include "objectmanager.inl"
 

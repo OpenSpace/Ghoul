@@ -51,7 +51,8 @@ ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
 
 ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& filename,
                            std::string name, Dictionary dictionary)
-    : _type(shaderType)
+    : _id(glCreateShader(static_cast<GLenum>(shaderType)))
+    , _type(shaderType)
     , _shaderName(std::move(name))
     , _loggerCat(
         _shaderName.empty() ?
@@ -60,9 +61,6 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
     )
     , _preprocessor(filename, std::move(dictionary))
 {
-    const bool hasFilename = !filename.empty();
-
-    _id = glCreateShader(static_cast<GLenum>(_type));
     if (_id == 0) {
         throw ShaderObjectError("glCreateShader returned 0");
     }
@@ -76,32 +74,10 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
         );
     }
 
+    const bool hasFilename = !filename.empty();
     if (hasFilename) {
         rebuildFromFile();
     }
-}
-
-ShaderObject::ShaderObject(const ShaderObject& cpy)
-    : _type(cpy._type)
-    , _shaderName(cpy._shaderName)
-    , _loggerCat(cpy._loggerCat)
-    , _onChangeCallback(cpy._onChangeCallback)
-    , _preprocessor(cpy._preprocessor)
-{
-    _id = glCreateShader(static_cast<GLenum>(_type));
-    if (_id == 0) {
-        throw ShaderObjectError("glCreateShader returned 0");
-    }
-    if (!_shaderName.empty()) {
-        glObjectLabel(
-            GL_SHADER,
-            _id,
-            GLsizei(_shaderName.length() + 1),
-            _shaderName.c_str()
-        );
-    }
-    setShaderObjectCallback(_onChangeCallback);
-    rebuildFromFile();
 }
 
 ShaderObject::ShaderObject(ShaderObject&& rhs) noexcept
@@ -117,64 +93,10 @@ ShaderObject::ShaderObject(ShaderObject&& rhs) noexcept
 
 ShaderObject::~ShaderObject() {
     glDeleteShader(_id);
-    _id = 0;
 }
 
 ShaderObject::operator GLuint() const {
     return _id;
-}
-
-ShaderObject& ShaderObject::operator=(const ShaderObject& rhs) {
-    if (this != &rhs) {
-        _type = rhs._type;
-        _shaderName = rhs._shaderName;
-        _loggerCat = rhs._loggerCat;
-        _onChangeCallback = rhs._onChangeCallback;
-        _preprocessor = rhs._preprocessor;
-        setShaderObjectCallback(rhs._onChangeCallback);
-
-        glDeleteShader(_id);
-        _id = glCreateShader(static_cast<GLenum>(_type));
-        if (_id == 0) {
-            throw ShaderObjectError("glCreateShader returned 0");
-        }
-        if (!_shaderName.empty()) {
-            glObjectLabel(
-                GL_SHADER,
-                _id,
-                GLsizei(_shaderName.length() + 1),
-                _shaderName.c_str()
-            );
-        }
-        rebuildFromFile();
-    }
-    return *this;
-}
-
-ShaderObject& ShaderObject::operator=(ShaderObject&& rhs) noexcept {
-    if (this != &rhs) {
-        _id = rhs._id;
-        _type = rhs._type;
-        _shaderName = std::move(rhs._shaderName);
-        _loggerCat = std::move(rhs._loggerCat);
-        _onChangeCallback = std::move(rhs._onChangeCallback);
-        _preprocessor = std::move(rhs._preprocessor);
-        // Take ownership of the moved preprocessor
-        setShaderObjectCallback(_onChangeCallback);
-
-    }
-    return *this;
-}
-
-void ShaderObject::setName(std::string name) {
-    _shaderName = std::move(name);
-    _loggerCat = std::format("ShaderObject['{}']", _shaderName);
-    glObjectLabel(
-        GL_SHADER,
-        _id,
-        GLsizei(_shaderName.length() + 1),
-        _shaderName.c_str()
-    );
 }
 
 const std::string& ShaderObject::name() const {
@@ -238,7 +160,6 @@ void ShaderObject::rebuildFromFile() {
 
 void ShaderObject::deleteShader() {
     glDeleteShader(_id);
-    _id = 0;
 }
 
 void ShaderObject::compile() {

@@ -54,7 +54,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
     _wasActive = true;
 
     // Find keyframes
-    for (const io::ModelAnimation::NodeAnimation& nodeAnimation : _nodeAnimations) {
+    for (const ModelAnimation::NodeAnimation& nodeAnimation : _nodeAnimations) {
         // Position
         glm::vec3 currPos = glm::vec3(0.f);
         if (nodeAnimation.positions.size() > 1) {
@@ -64,8 +64,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             glm::vec3 nextPos = glm::vec3(0.f);
             bool interpolate = true;
 
-            for (const io::ModelAnimation::PositionKeyframe& kf : nodeAnimation.positions)
-            {
+            for (const ModelAnimation::PositionKeyframe& kf : nodeAnimation.positions) {
                 const double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
@@ -94,7 +93,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             currPos = nodeAnimation.positions[0].position;
         }
         else {
-            currPos = glm::vec3(0.0);
+            currPos = glm::vec3(0.f);
         }
 
         // Rotation
@@ -106,8 +105,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             glm::quat nextRot = glm::quat(1.f, 0.f, 0.f, 0.f);
             bool interpolate = true;
 
-            for (const io::ModelAnimation::RotationKeyframe& kf : nodeAnimation.rotations)
-            {
+            for (const ModelAnimation::RotationKeyframe& kf : nodeAnimation.rotations) {
                 const double diff = (kf.time * _timeScale) - now;
 
                 // Exact on a keyframe
@@ -148,7 +146,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             glm::vec3 nextScale = glm::vec3(0.f);
             bool interpolate = true;
 
-            for (const io::ModelAnimation::ScaleKeyframe& scale : nodeAnimation.scales) {
+            for (const ModelAnimation::ScaleKeyframe& scale : nodeAnimation.scales) {
                 const double diff = (scale.time * _timeScale) - now;
 
                 // Exact on a keyframe
@@ -178,12 +176,12 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
             currScale = nodeAnimation.scales[0].scale;
         }
         else {
-            currScale = glm::vec3(1.0);
+            currScale = glm::vec3(1.f);
         }
 
         glm::mat4 animationTransform = glm::mat4(1.f);
         animationTransform =
-            glm::translate(glm::mat4(1.0), currPos) *
+            glm::translate(glm::mat4(1.f), currPos) *
             glm::toMat4(currRot) *
             glm::scale(animationTransform, currScale);
 
@@ -192,9 +190,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
 }
 
 void ModelAnimation::reset(std::vector<ModelNode>& nodes) {
-    for (const io::ModelAnimation::NodeAnimation& nodeAnimation :
-        _nodeAnimations)
-    {
+    for (const ModelAnimation::NodeAnimation& nodeAnimation : _nodeAnimations) {
         nodes[nodeAnimation.node].setAnimation(nodes[nodeAnimation.node].transform());
     }
 }

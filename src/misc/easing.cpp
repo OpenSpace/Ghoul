@@ -31,20 +31,18 @@
 #include <type_traits>
 
 namespace {
-
-const std::array<std::string_view, 28> EaseFuncNames = {
-    "Linear",
-    "QuadraticEaseIn",   "QuadraticEaseOut",   "QuadraticEaseInOut",
-    "CubicEaseIn",       "CubicEaseOut",       "CubicEaseInOut",
-    "QuarticEaseIn",     "QuarticEaseOut",     "QuarticEaseInOut",
-    "QuinticEaseIn",     "QuinticEaseOut",     "QuinticEaseInOut",
-    "SineEaseIn",        "SineEaseOut",        "SineEaseInOut",
-    "CircularEaseIn",    "CircularEaseOut",    "CircularEaseInOut",
-    "ExponentialEaseIn", "ExponentialEaseOut", "ExponentialEaseInOut",
-    "ElasticEaseIn",     "ElasticEaseOut",     "ElasticEaseInOut",
-    "BounceEaseIn",      "BounceEaseOut",      "BounceEaseInOut"
-};
-
+    constexpr std::array<std::string_view, 28> EaseFuncNames = {
+        "Linear",
+        "QuadraticEaseIn",   "QuadraticEaseOut",   "QuadraticEaseInOut",
+        "CubicEaseIn",       "CubicEaseOut",       "CubicEaseInOut",
+        "QuarticEaseIn",     "QuarticEaseOut",     "QuarticEaseInOut",
+        "QuinticEaseIn",     "QuinticEaseOut",     "QuinticEaseInOut",
+        "SineEaseIn",        "SineEaseOut",        "SineEaseInOut",
+        "CircularEaseIn",    "CircularEaseOut",    "CircularEaseInOut",
+        "ExponentialEaseIn", "ExponentialEaseOut", "ExponentialEaseInOut",
+        "ElasticEaseIn",     "ElasticEaseOut",     "ElasticEaseInOut",
+        "BounceEaseIn",      "BounceEaseOut",      "BounceEaseInOut"
+    };
 } // namespace
 
 namespace ghoul {

@@ -114,7 +114,7 @@ private:
     std::mutex _inputMessageQueueMutex;
     std::condition_variable _inputNotifier;
 
-    std::unique_ptr<ghoul::io::TcpSocket> _tcpSocket;
+    std::unique_ptr<TcpSocket> _tcpSocket;
 };
 
 } // namespace ghoul::io

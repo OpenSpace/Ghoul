@@ -49,12 +49,7 @@ HTMLLog::HTMLLog(const std::filesystem::path& filename, int nLogRotation,
     )
     , _useCustomStyling(cssIncludes.size() > 1 || jsIncludes.size() > 1)
 {
-    std::string output = \
-        "<html>\n\
-        \t<head>\n\
-        \t\t<title>Log File</title>\
-        \t\t<style>\n";
-
+    std::string output = "<html>\n\t<head>\n\t\t<title>Log File</title>\n\t\t<style>\n";
     const std::back_insert_iterator<std::string> backInserter(output);
 
     for (const std::filesystem::path& c : cssIncludes) {
@@ -77,13 +72,7 @@ HTMLLog::HTMLLog(const std::filesystem::path& filename, int nLogRotation,
         );
     }
 
-    output += \
-        "\t\t</script>\n\
-        \t</head>\n\
-        \t<body>\n\n\
-        \t<table>\n\n\
-        \t\t<thead>\n\
-        \t\t\t<tr>\n";
+    output += "\t\t</script>\n\t</head>\n\t<body>\n\t<table>\n\t\t<thead>\n\t\t\t<tr>\n";
     if (isDateStamping()) {
         output += "\t\t\t\t<th class=\"log-date\">Date</th>\n";
     }
@@ -96,9 +85,8 @@ HTMLLog::HTMLLog(const std::filesystem::path& filename, int nLogRotation,
     if (isLogLevelStamping()) {
         output += "\t\t\t\t<th class=\"log-level\">Level</th>\n";
     }
-    output += "\t\t\t\t<th class=\"log-message\">Message</th>\n\
-              \t\t\t</tr>\n\
-              \t\t<tbody>\n";
+    output +=
+        "\t\t\t\t<th class=\"log-message\">Message</th>\n\t\t\t</tr>\n\t\t<tbody>\n";
     writeLine(output);
 }
 

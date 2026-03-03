@@ -28,12 +28,11 @@
 
 #include <ghoul/glm.h>
 #include <ghoul/misc/exception.h>
+#include <ghoul/opengl/texture.h>
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
-
-namespace ghoul::opengl { class Texture; }
 
 namespace ghoul::io {
 
@@ -93,7 +92,7 @@ public:
      *      before (addReader)
      */
     std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
-        int nDimensions);
+        int nDimensions, opengl::Texture::SamplerInit samplerSettings = {});
 
     /**
      * Loads a Texture from the memory pointed at by \p memory. The memory block must
@@ -122,7 +121,8 @@ public:
      * \pre \p nDimensions The number of texture dimension must be 1, 2, or 3
      */
     std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
-        int nDimensions, const std::string& format = "");
+        int nDimensions, opengl::Texture::SamplerInit samplerSettings = {},
+        const std::string& format = "");
 
     /**
      * Returns the size of the image pointed to by \p filename.

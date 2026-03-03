@@ -37,6 +37,7 @@
 #include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/defer.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <assimp/anim.h>
 #include <assimp/color4.h>
@@ -54,19 +55,25 @@
 #include <utility>
 
 namespace {
+    using namespace ghoul;
+    using namespace ghoul::io;
+
     constexpr std::string_view _loggerCat = "ModelReaderAssimp";
 
-    bool isTextureTransparent(const ghoul::io::ModelMesh::Texture& texture) {
+    bool isTextureTransparent(const ModelMesh::Texture& texture) {
         const int nChannels = texture.texture->numberOfChannels();
 
         if (nChannels < 4) {
             return false;
         }
 
+        texture.texture->downloadTexture();
+        defer { texture.texture->clearDownloadedTexture(); };
+
         // Check if there is at least one pixel that is somewhat transparent
         for (unsigned int j = 0; j < texture.texture->dimensions().x; j++) {
             for (unsigned int k = 0; k < texture.texture->dimensions().y; k++) {
-                const float alpha = texture.texture->texelAsFloat({ j, k }).a;
+                const float alpha = texture.texture->texelAsFloat({ j, k, 0 }).a;
                 if (alpha < 1.f) {
                     return true;
                 }
@@ -77,14 +84,11 @@ namespace {
 
     bool loadMaterialTextures(const aiScene& scene, const aiMaterial& material,
                               const aiTextureType& type,
-                              const ghoul::io::ModelMesh::TextureType& enumType,
-                                 std::vector<ghoul::io::ModelMesh::Texture>& textureArray,
-           std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                              const ModelMesh::TextureType& enumType,
+                              std::vector<ModelMesh::Texture>& textureArray,
+                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                                                     std::filesystem::path& modelDirectory)
     {
-        using namespace ghoul::io;
-        using namespace ghoul::modelgeometry;
-
         for (unsigned int i = 0; i < material.GetTextureCount(type); i++) {
             ModelMesh::Texture meshTexture;
             meshTexture.type = enumType;
@@ -109,11 +113,10 @@ namespace {
             }
 
             // Check if texture has already been loaded by other meshes
-            for (const ModelGeometry::TextureEntry& texture : textureStorage) {
-                if (texture.texture->name() == std::string_view(path.C_Str())) {
+            for (const modelgeometry::ModelGeometry::TextureEntry& tex : textureStorage) {
+                if (tex.texture->name() == std::string_view(path.C_Str())) {
                     // Texture has already been loaded. Point to that texture instead
-                    meshTexture.texture = texture.texture.get();
-                    meshTexture.texture->setName(path.C_Str());
+                    meshTexture.texture = tex.texture.get();
                     meshTexture.hasTexture = true;
                     textureArray.push_back(meshTexture);
                     shouldSkip = true;
@@ -128,7 +131,7 @@ namespace {
 
             // Load texture
             const aiTexture* texture = scene.GetEmbeddedTexture(path.C_Str());
-            ModelGeometry::TextureEntry textureEntry;
+            modelgeometry::ModelGeometry::TextureEntry textureEntry;
             textureEntry.name = path.C_Str();
             // Check if the texture is an embedded texture or a local texture
             if (texture) {
@@ -140,10 +143,11 @@ namespace {
                             static_cast<void*>(texture->pcData),
                             texture->mWidth,
                             2,
+                            {},
                             texture->achFormatHint
                         );
+                        textureEntry.texture->setName(path.C_Str());
                         meshTexture.texture = textureEntry.texture.get();
-                        meshTexture.texture->setName(path.C_Str());
                     }
                     catch (const TextureReader::InvalidLoadException& e) {
                         LWARNING(std::format(
@@ -186,8 +190,8 @@ namespace {
                         absPath(absolutePath),
                         2
                     );
+                    textureEntry.texture->setName(path.C_Str());
                     meshTexture.texture = textureEntry.texture.get();
-                    meshTexture.texture->setName(path.C_Str());
                 }
                 catch (const TextureReader::MissingReaderException& e) {
                     LWARNING(std::format(
@@ -209,6 +213,8 @@ namespace {
                 }
             }
 
+            meshTexture.texture->downloadTexture();
+
             // Check if the entire texture is transparent
             bool isOpaque = false;
             for (unsigned int j = 0; j < meshTexture.texture->dimensions().x; j++) {
@@ -217,13 +223,15 @@ namespace {
                 }
 
                 for (unsigned int k = 0; k < meshTexture.texture->dimensions().y; k++) {
-                    const float alpha = meshTexture.texture->texelAsFloat({ j, k }).a;
+                    const float alpha = meshTexture.texture->texelAsFloat({ j, k, 0 }).a;
                     if (alpha > 0.f) {
                         isOpaque = true;
                         break;
                     }
                 }
             }
+
+            meshTexture.texture->clearDownloadedTexture();
 
             // If entire texture is transparent, do not add it
             if (!isOpaque) {
@@ -244,14 +252,12 @@ namespace {
     }
 
 
-    ghoul::io::ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
-           std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+    ModelMesh processMesh(const aiMesh& mesh, const aiScene& scene,
+                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                                                     std::filesystem::path& modelDirectory,
                                                                 bool forceRenderInvisible,
                                                               bool notifyInvisibleDropped)
     {
-        using namespace ghoul::io;
-
         std::vector<ModelMesh::Vertex> vertexArray;
         std::vector<unsigned int> indexArray;
         std::vector<ModelMesh::Texture> textureArray;
@@ -398,10 +404,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorDiffuse;
-                    texture.color.r = color4.r;
-                    texture.color.g = color4.g;
-                    texture.color.b = color4.b;
-                    texture.color.a = color4.a;
+                    texture.color = glm::vec4(color4.r, color4.g, color4.b, color4.a);
                     texture.isTransparent = texture.color.a < 1.f;
                     textureArray.push_back(std::move(texture));
                 }
@@ -413,10 +416,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorDiffuse;
-                    texture.color.r = color3.r;
-                    texture.color.g = color3.g;
-                    texture.color.b = color3.b;
-                    texture.color.a = 1.f;
+                    texture.color = glm::vec4(color3.r, color3.g, color3.b, 1.f);
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -457,10 +457,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorSpecular;
-                    texture.color.r = color4.r;
-                    texture.color.g = color4.g;
-                    texture.color.b = color4.b;
-                    texture.color.a = 1.f;
+                    texture.color = glm::vec4(color4.r, color4.g, color4.b, 1.f);
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -471,10 +468,7 @@ namespace {
                     ModelMesh::Texture texture;
                     texture.hasTexture = false;
                     texture.type = ModelMesh::TextureType::ColorSpecular;
-                    texture.color.r = color3.r;
-                    texture.color.g = color3.g;
-                    texture.color.b = color3.b;
-                    texture.color.a = 1.f;
+                    texture.color = glm::vec4(color3.r, color3.g, color3.b, 1.f);
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -529,15 +523,13 @@ namespace {
     // Process a node in a recursive fashion. Process each individual mesh located
     // at the node and repeats this process on its children nodes (if any)
     void processNode(const aiNode& node, const aiScene& scene,
-                     std::vector<ghoul::io::ModelNode>& nodes, int parent,
-                     std::unique_ptr<ghoul::io::ModelAnimation>& modelAnimation,
-           std::vector<ghoul::modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
+                     std::vector<ModelNode>& nodes, int parent,
+                     std::unique_ptr<ModelAnimation>& modelAnimation,
+                  std::vector<modelgeometry::ModelGeometry::TextureEntry>& textureStorage,
                                                                 bool forceRenderInvisible,
                                                               bool notifyInvisibleDropped,
                                                     std::filesystem::path& modelDirectory)
     {
-        using namespace ghoul::io;
-
         // Convert transform matrix of the node
         // Assimp stores matrixes in row major and glm stores matrixes in column major
         const glm::mat4 nodeTransform = glm::mat4(
@@ -612,67 +604,69 @@ namespace {
                 for (unsigned int c = 0; c < animation->mNumChannels; c++) {
                     aiNodeAnim* nodeAnim = animation->mChannels[c];
 
-                    if (nodeAnim->mNodeName == node.mName) {
-                        ModelAnimation::NodeAnimation nodeAnimation;
-                        nodeAnimation.node = newNode;
-
-                        for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; p++) {
-                            const aiVectorKey posKey = nodeAnim->mPositionKeys[p];
-
-                            ModelAnimation::PositionKeyframe positionKf;
-                            positionKf.time =
-                                std::abs(animation->mTicksPerSecond) <
-                                std::numeric_limits<double>::epsilon() ? posKey.mTime :
-                                posKey.mTime / animation->mTicksPerSecond;
-                            positionKf.position = glm::vec3(
-                                posKey.mValue.x,
-                                posKey.mValue.y,
-                                posKey.mValue.z
-                            );
-
-                            nodeAnimation.positions.push_back(std::move(positionKf));
-                        }
-
-                        for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++) {
-                            const aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
-
-                            ModelAnimation::RotationKeyframe rotationKf;
-                            rotationKf.time =
-                                std::abs(animation->mTicksPerSecond) <
-                                std::numeric_limits<double>::epsilon() ? rotKey.mTime :
-                                rotKey.mTime / animation->mTicksPerSecond;
-                            rotationKf.rotation = glm::quat(
-                                rotKey.mValue.w,
-                                rotKey.mValue.x,
-                                rotKey.mValue.y,
-                                rotKey.mValue.z
-                            );
-
-                            nodeAnimation.rotations.push_back(std::move(rotationKf));
-                        }
-
-                        for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++) {
-                            const aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
-
-                            ModelAnimation::ScaleKeyframe scaleKeyframe;
-                            scaleKeyframe.time =
-                                std::abs(animation->mTicksPerSecond) <
-                                std::numeric_limits<double>::epsilon() ? scaleKey.mTime :
-                                scaleKey.mTime / animation->mTicksPerSecond;
-                            scaleKeyframe.scale = glm::vec3(
-                                scaleKey.mValue.x,
-                                scaleKey.mValue.y,
-                                scaleKey.mValue.z
-                            );
-
-                            nodeAnimation.scales.push_back(std::move(scaleKeyframe));
-                        }
-
-                        modelAnimation->nodeAnimations().push_back(
-                            std::move(nodeAnimation)
-                        );
-                        break;
+                    if (nodeAnim->mNodeName != node.mName) {
+                        continue;
                     }
+
+                    ModelAnimation::NodeAnimation nodeAnimation;
+                    nodeAnimation.node = newNode;
+
+                    for (unsigned int p = 0; p < nodeAnim->mNumPositionKeys; p++) {
+                        const aiVectorKey posKey = nodeAnim->mPositionKeys[p];
+
+                        ModelAnimation::PositionKeyframe positionKf;
+                        positionKf.time =
+                            std::abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? posKey.mTime :
+                            posKey.mTime / animation->mTicksPerSecond;
+                        positionKf.position = glm::vec3(
+                            posKey.mValue.x,
+                            posKey.mValue.y,
+                            posKey.mValue.z
+                        );
+
+                        nodeAnimation.positions.push_back(std::move(positionKf));
+                    }
+
+                    for (unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++) {
+                        const aiQuatKey rotKey = nodeAnim->mRotationKeys[r];
+
+                        ModelAnimation::RotationKeyframe rotationKf;
+                        rotationKf.time =
+                            std::abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? rotKey.mTime :
+                            rotKey.mTime / animation->mTicksPerSecond;
+                        rotationKf.rotation = glm::quat(
+                            rotKey.mValue.w,
+                            rotKey.mValue.x,
+                            rotKey.mValue.y,
+                            rotKey.mValue.z
+                        );
+
+                        nodeAnimation.rotations.push_back(std::move(rotationKf));
+                    }
+
+                    for (unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++) {
+                        const aiVectorKey scaleKey = nodeAnim->mScalingKeys[s];
+
+                        ModelAnimation::ScaleKeyframe scaleKeyframe;
+                        scaleKeyframe.time =
+                            std::abs(animation->mTicksPerSecond) <
+                            std::numeric_limits<double>::epsilon() ? scaleKey.mTime :
+                            scaleKey.mTime / animation->mTicksPerSecond;
+                        scaleKeyframe.scale = glm::vec3(
+                            scaleKey.mValue.x,
+                            scaleKey.mValue.y,
+                            scaleKey.mValue.z
+                        );
+
+                        nodeAnimation.scales.push_back(std::move(scaleKeyframe));
+                    }
+
+                    modelAnimation->nodeAnimations().push_back(
+                        std::move(nodeAnimation)
+                    );
+                    break;
                 }
             }
         }
@@ -693,7 +687,6 @@ namespace {
             );
         }
     }
-
 } // namespace
 
 namespace ghoul::io {
@@ -779,7 +772,6 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         std::move(modelAnimation)
     );
 }
-
 
 bool ModelReaderAssimp::needsCache() const {
     return true;

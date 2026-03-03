@@ -215,7 +215,7 @@ protected:
     const MultipleCalls _allowsMultipleCalls;
 };
 
-}  // namespace ghoul::cmdparser
+} // namespace ghoul::cmdparser
 
 #include "commandlinecommand.inl"
 
