@@ -266,10 +266,7 @@ void ThreadPool::activateWorker(Worker& worker) {
                 // there is more work. This shouldn't be necessary in normal cases, but is
                 // more of a last resort protection
                 std::unique_lock lock(*mutex);
-                cv->wait_for(
-                    lock,
-                    WaitTime
-                );
+                cv->wait_for(lock, WaitTime);
 
                 // We woke up, so either there is work to be done
                 std::tie(task, hasTask) = taskQueue->pop();
@@ -314,7 +311,7 @@ void ThreadPool::activateWorker(Worker& worker) {
 }
 
 std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
-    const std::lock_guard lock(_queueMutex);
+    const std::unique_lock lock(_queueMutex);
     if (_queue.empty()) {
         // No work to be done, the default constructed Task is never read
         return std::make_tuple(Task(), false);
@@ -330,17 +327,17 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
 }
 
 void ThreadPool::TaskQueue::push(const ThreadPool::Task& task) {
-    const std::lock_guard lock(_queueMutex);
+    const std::unique_lock lock(_queueMutex);
     _queue.push(task);
 }
 
 bool ThreadPool::TaskQueue::isEmpty() const {
-    const std::lock_guard lock(_queueMutex);
+    const std::unique_lock lock(_queueMutex);
     return _queue.empty();
 }
 
 int ThreadPool::TaskQueue::size() const {
-    const std::lock_guard lock(_queueMutex);
+    const std::unique_lock lock(_queueMutex);
     return static_cast<int>(_queue.size());
 }
 

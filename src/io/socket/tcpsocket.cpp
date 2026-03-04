@@ -203,7 +203,7 @@ bool TcpSocket::getMessage(std::string& message) {
     if (delimiterIndex == 0) {
         return false;
     }
-    const std::lock_guard inputLock(_inputQueueMutex);
+    const std::unique_lock lock(_inputQueueMutex);
     message.assign(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
     if (static_cast<int>(_inputQueue.size()) >= delimiterIndex + 1) {
         _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
@@ -300,13 +300,13 @@ void TcpSocket::streamInput() {
             return;
         }
 
-        const std::lock_guard lock(_inputInterceptionMutex);
+        const std::unique_lock lock(_inputInterceptionMutex);
 
         if (_inputInterceptor) {
             _inputInterceptor(_inputBuffer.data(), nReadBytes);
         }
         else {
-            const std::lock_guard inputGuard(_inputQueueMutex);
+            const std::unique_lock inputLock(_inputQueueMutex);
             _inputQueue.insert(
                 _inputQueue.end(),
                 _inputBuffer.begin(),
@@ -322,7 +322,7 @@ void TcpSocket::streamOutput() {
         waitForOutput(1);
 
         size_t nBytesToSend = 0;
-        const std::lock_guard outputGuard(_outputQueueMutex);
+        const std::unique_lock lock(_outputQueueMutex);
         while ((nBytesToSend = std::min(_outputQueue.size(), _outputBuffer.size())) > 0) {
             std::copy_n(_outputQueue.begin(), nBytesToSend, _outputBuffer.begin());
 
@@ -362,7 +362,7 @@ void TcpSocket::waitForInput(size_t nBytes) {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        const std::lock_guard queueMutex(_inputQueueMutex);
+        const std::unique_lock lock(_inputQueueMutex);
         return _inputQueue.size() >= nBytes;
     };
 
@@ -381,7 +381,7 @@ int TcpSocket::waitForDelimiter() {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        const std::lock_guard queueMutex(_inputQueueMutex);
+        const std::unique_lock lock(_inputQueueMutex);
         auto it = std::find(_inputQueue.begin() + currentIndex, _inputQueue.end(), d);
         currentIndex = it - _inputQueue.begin();
         return it != _inputQueue.end();
@@ -404,7 +404,7 @@ void TcpSocket::waitForOutput(size_t nBytes) {
         if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
             return true;
         }
-        const std::lock_guard queueMutex(_outputQueueMutex);
+        const std::unique_lock lock(_outputQueueMutex);
         return _outputQueue.size() >= nBytes;
     };
 
@@ -436,12 +436,12 @@ bool TcpSocket::initializedNetworkApi() {
 }
 
 void TcpSocket::interceptInput(InputInterceptor interceptor) {
-    const std::lock_guard lock(_inputInterceptionMutex);
+    const std::unique_lock lock(_inputInterceptionMutex);
     _inputInterceptor = std::move(interceptor);
 }
 
 void TcpSocket::uninterceptInput() {
-    const std::lock_guard lock(_inputInterceptionMutex);
+    const std::unique_lock lock(_inputInterceptionMutex);
     _inputInterceptor = nullptr;
 }
 
@@ -450,7 +450,7 @@ bool TcpSocket::getBytes(char* buffer, size_t nItems) {
     if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
-    const std::lock_guard inputLock(_inputQueueMutex);
+    const std::unique_lock lock(_inputQueueMutex);
     std::copy_n(_inputQueue.begin(), nItems, buffer);
     _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nItems);
     return true;
@@ -461,7 +461,7 @@ bool TcpSocket::peekBytes(char* buffer, size_t nItems) {
     if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
-    const std::lock_guard inputLock(_inputQueueMutex);
+    const std::unique_lock lock(_inputQueueMutex);
     std::copy_n(_inputQueue.begin(), nItems, buffer);
     return true;
 }
@@ -471,7 +471,7 @@ bool TcpSocket::skipBytes(size_t nItems) {
     if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
         return false;
     }
-    const std::lock_guard inputLock(_inputQueueMutex);
+    const std::unique_lock lock(_inputQueueMutex);
     _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + nItems);
     return true;
 }
@@ -480,7 +480,7 @@ bool TcpSocket::putBytes(const char* buffer, size_t size) {
     if (_shouldStopThreads) {
         return false;
     }
-    const std::lock_guard outputLock(_outputQueueMutex);
+    const std::unique_lock lock(_outputQueueMutex);
     _outputQueue.insert(_outputQueue.end(), buffer, buffer + size);
     _outputNotifier.notify_one();
     return _isConnected || _isConnecting;

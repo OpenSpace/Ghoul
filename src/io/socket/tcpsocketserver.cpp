@@ -102,12 +102,12 @@ TcpSocketServer::~TcpSocketServer() {
 }
 
 int TcpSocketServer::port() const {
-    const std::lock_guard settingsLock(_settingsMutex);
+    const std::unique_lock lock(_settingsMutex);
     return _port;
 }
 
 void TcpSocketServer::close() {
-    const std::lock_guard settingsLock(_settingsMutex);
+    const std::unique_lock lock(_settingsMutex);
     _listening = false;
 
     // Notify all threads waiting for connections
@@ -126,7 +126,7 @@ void TcpSocketServer::listen(int port) {
         TcpSocket::initializeNetworkApi();
     }
 
-    const std::lock_guard settingsLock(_settingsMutex);
+    const std::unique_lock lock(_settingsMutex);
     _port = port;
 
     struct addrinfo* result = nullptr;
@@ -192,7 +192,7 @@ void TcpSocketServer::listen(int port) {
 }
 
 bool TcpSocketServer::isListening() const {
-    const std::lock_guard settingsLock(_settingsMutex);
+    const std::unique_lock lock(_settingsMutex);
     return _listening;
 }
 
@@ -200,7 +200,7 @@ bool TcpSocketServer::hasPendingSockets() const {
     if (!_listening) {
         return false;
     }
-    const std::lock_guard connectionLock(_connectionMutex);
+    const std::unique_lock lock(_connectionMutex);
     return !_pendingConnections.empty();
 }
 
@@ -208,7 +208,7 @@ std::unique_ptr<TcpSocket> TcpSocketServer::nextPendingTcpSocket() {
     if (!_listening) {
         return nullptr;
     }
-    const std::lock_guard connectionLock(_connectionMutex);
+    const std::unique_lock lock(_connectionMutex);
     if (!_pendingConnections.empty()) {
         std::unique_ptr<TcpSocket> connection = std::move(_pendingConnections.front());
         _pendingConnections.pop_front();
@@ -273,7 +273,7 @@ void TcpSocketServer::waitForConnections() {
         //                  unique_ptr?
         auto socket = std::make_unique<TcpSocket>(address, port, socketHandle);
 
-        const std::lock_guard lock(_connectionMutex);
+        const std::unique_lock lock(_connectionMutex);
         _pendingConnections.push_back(std::move(socket));
 
         // Notify `awaitPendingConnection` to return the acquired connection.

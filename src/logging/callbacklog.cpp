@@ -43,7 +43,7 @@ void CallbackLog::log(LogLevel level, std::string_view category, std::string_vie
 
     std::string msg = createFullMessageString(level, category, message);
     {
-        const std::lock_guard lock(_mutex);
+        const std::unique_lock lock(_mutex);
         _callbackFunction(std::move(msg));
     }
 }

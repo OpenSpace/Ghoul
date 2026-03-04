@@ -100,12 +100,12 @@ void TextLog::log(LogLevel level, std::string_view category, std::string_view me
 }
 
 void TextLog::flush() {
-    std::lock_guard g(_fileMutex);
+    const std::unique_lock lock(_fileMutex);
     _file.flush();
 }
 
 void TextLog::writeLine(const std::string& line) {
-    std::lock_guard g(_fileMutex);
+    const std::unique_lock lock(_fileMutex);
     _file << line;
 }
 
