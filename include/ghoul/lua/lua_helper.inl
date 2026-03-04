@@ -162,8 +162,8 @@ constexpr bool hasVariantValue(lua_State* L, int location) {
         return hasVariantValue<I+1, Variant>(L, location);
     }
     else {
-        // We have reached the end of the variant list and haven't found the type in
-        // here, so we're done
+        // We have reached the end of the variant list and haven't found the type in here,
+        // so we're done
         return false;
     }
 }
@@ -181,8 +181,8 @@ constexpr Variant variantValue(lua_State* L, int location) {
         return variantValue<I+1, Variant>(L, location);
     }
     else {
-        // We have reached the end of the variant list and haven't found the type in
-        // here, so we're done
+        // We have reached the end of the variant list and haven't found the type in here,
+        // so we're done
         throw LuaFormatException(std::format(
             "Unable to extract requested value '{}' out of the variant with type '{}' at "
             "parameter {}", typeid(T).name(), typeid(Variant).name(), location
@@ -361,9 +361,9 @@ std::vector<T> dictionaryToVector(const Dictionary& d) {
 template <typename T>
 void push(lua_State* L, T value) {
     // We have to handle the floating point types first in this as floats are able to be
-    // converted to ints, which would remove their fractional part
-    // Same goes for the const char* check before the std::is_pointer, since we want to
-    // handle the specialized case first
+    // converted to ints, which would remove their fractional part. Same goes for the
+    // const char* check before the std::is_pointer, since we want to handle the
+    // specialized case first
     if constexpr (std::is_same_v<T, bool>) {
         lua_pushboolean(L, value ? 1 : 0);
     }

@@ -33,7 +33,7 @@
 #include <utility>
 
 namespace {
-    // The wait-out time for the condition_variable inside the worker threads
+    // The time-out time for the condition_variable inside the worker threads
     constexpr std::chrono::seconds WaitTime(1);
 } // namespace
 
@@ -194,13 +194,13 @@ void ThreadPool::clearRemainingTasks() {
 }
 
 void ThreadPool::activateWorker(Worker& worker) {
-    // a copy of the shared ptr to the flag
+    // A copy of the shared ptr to the flag
     auto shouldTerminate = std::make_shared<std::atomic_bool>(false);
 
     // We create local copies of the important variables so that we are guaranteed that
-    // they continue to exist when we pass them to the 'workerLoop' lamdba. Otherwise,
-    // the ThreadPool might be destructed before the workers have finished (for example
-    // when they are detached) and would then access already freed memory
+    // they continue to exist when we pass them to the 'workerLoop' lamdba. Otherwise, the
+    // ThreadPool might be destructed before the workers have finished (for example when
+    // they are detached) and would then access already freed memory
     const std::shared_ptr<std::atomic_bool>& threadPoolIsRunning = _isRunning;
     const std::shared_ptr<std::atomic_int>& nWaiting = _nWaiting;
     const std::shared_ptr<TaskQueue>& taskQueue = _taskQueue;
@@ -213,7 +213,7 @@ void ThreadPool::activateWorker(Worker& worker) {
 
     volatile bool finishedInitializing = false;
 
-    // capturing the shared_ptrs by value to maintain a copy
+    // Capturing the shared_ptrs by value to maintain a copy
     auto workerLoop = [
         shouldTerminate, threadPoolIsRunning, &finishedInitializing, nWaiting, taskQueue,
         mutex, cv, workerInitialization, workerDeinitialization
@@ -237,16 +237,15 @@ void ThreadPool::activateWorker(Worker& worker) {
                 // Do the task
                 task();
 
-                // We cannot check for shouldTerminate earlier as if hasTask is true,
-                // we have already retrieved that value from the stack and if we don't
-                // work on it, it would disappear
+                // We cannot check for shouldTerminate earlier as if hasTask is true, we
+                // have already retrieved that value from the stack and if we don't work
+                // on it, it would disappear
                 if (*shouldTerminate) {
                     return;
                 }
 
-                // If we shouldn't terminate, we can check if there is more work
-                // if there is, we stay in this inner loop until there is no more work to
-                // be done
+                // If we shouldn't terminate, we can check if there is more work if there
+                // is, we stay in this inner loop until there is no more work to be done
                 std::tie(task, hasTask) = taskQueue->pop();
             }
 
@@ -263,9 +262,9 @@ void ThreadPool::activateWorker(Worker& worker) {
             while (true) { // loop #3
                 finishedInitializing = true;
 
-                // We are doing this in an infinite loop, as we want to check regularly
-                // if there is more work. This shouldn't be necessary in normal cases, but
-                // is more of a last resort protection
+                // We are doing this in an infinite loop, as we want to check regularly if
+                // there is more work. This shouldn't be necessary in normal cases, but is
+                // more of a last resort protection
                 std::unique_lock lock(*mutex);
                 cv->wait_for(
                     lock,
@@ -323,9 +322,9 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
     else {
         // We have a task, so we move it out of the queue
         Task t = std::move(_queue.front());
-        // and remove the item
+        // And remove the item
         _queue.pop();
-        // and return the task together with a positive reply
+        // And return the task together with a positive reply
         return std::make_tuple(std::move(t), true);
     }
 }

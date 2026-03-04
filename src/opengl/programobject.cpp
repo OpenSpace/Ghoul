@@ -2719,9 +2719,9 @@ std::vector<std::string> ProgramObject::compatibleSubroutineNames(
         return std::vector<std::string>();
     }
 
-    std::vector<std::string> result(numCompatibleSubroutines);
-    std::vector<GLint> indices(numCompatibleSubroutines);
-    std::vector<char> buffer(maximumUniformNameLength);
+    std::vector<std::string> result = std::vector<std::string>(numCompatibleSubroutines);
+    std::vector<GLint> indices = std::vector<GLint>(numCompatibleSubroutines);
+    std::vector<char> buffer = std::vector<char>(maximumUniformNameLength);
     glGetActiveSubroutineUniformiv(
         _id,
         static_cast<GLenum>(shaderType),

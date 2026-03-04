@@ -36,8 +36,9 @@
 namespace {
     using namespace ghoul::logging;
 
-    // The always-present console log. Definining it here as we'd other need to include
-    // the ConsoleLog in every file that wants to use the LogManager
+    // The always-present console log. Definining it here as we'd otherwise need to
+    // include the ConsoleLog in every file that wants to use the LogManager. Its fine to
+    // do this as the ConsoleLog has a trivial-enough destructor
     ConsoleLog consoleLog;
 } // namespace
 

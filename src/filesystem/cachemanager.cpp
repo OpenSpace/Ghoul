@@ -73,6 +73,7 @@ namespace {
         }
 #ifdef WIN32
         WIN32_FILE_ATTRIBUTE_DATA infoData;
+        std::memset(&infoData, 0, sizeof(WIN32_FILE_ATTRIBUTE_DATA));
         const std::string p = path.string();
         const BOOL success = GetFileAttributesEx(
             p.c_str(),
@@ -81,7 +82,7 @@ namespace {
         );
         if (!success) {
             const DWORD error = GetLastError();
-            std::vector<char> buffer(1024, '\0');
+            std::vector<char> buffer = std::vector<char>(1024, '\0');
             FormatMessage(
                 FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                 nullptr,
@@ -91,7 +92,7 @@ namespace {
                 0,
                 nullptr
             );
-            std::string msg(buffer.data());
+            std::string msg = std::string(buffer.data());
             throw CacheError(std::format(
                 "Could not retrieve last-modified date for '{}': {}", path, msg
             ));
@@ -101,7 +102,7 @@ namespace {
             const BOOL success2 = FileTimeToSystemTime(&infoData.ftLastWriteTime, &time);
             if (!success2) {
                 const DWORD error = GetLastError();
-                std::vector<char> buffer(1024, '\0');
+                std::vector<char> buffer = std::vector<char>(1024, '\0');
                 FormatMessage(
                     FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                     nullptr,
@@ -111,7 +112,7 @@ namespace {
                     0,
                     nullptr
                 );
-                std::string msg(buffer.data());
+                std::string msg = std::string(buffer.data());
                 throw CacheError(std::format(
                     "'FileTimeToSystemTime' failed for '{}': {}", path, msg
                 ));
@@ -188,11 +189,10 @@ CacheManager::CacheManager(std::filesystem::path directory)
         }
     }
 
-    // In the cache state, we check our cache directory for all values, in a later step
-    // we remove all persistent values, so that only the non-persistent values remain
-    // Under normal operation, the resulting vector should be of size == 0, but if the
-    // last execution of the application crashed, the directory was not cleaned up
-    // properly
+    // In the cache state, we check our cache directory for all values, in a later step we
+    // remove all persistent values, so that only the non-persistent values remain. Under
+    // normal operation, the resulting vector should be of size == 0, but if the last
+    // execution of the application crashed, the directory was not cleaned up properly
     try {
         _files = cacheInfoFromDirectory(_directory);
     }
@@ -320,8 +320,8 @@ void CacheManager::removeCacheFile(const std::filesystem::path& file,
     );
     const auto it = _files.find(hash);
     if (it != _files.end()) {
-        // If we find the hash, it has been created before and we can just return the
-        // file name to the caller
+        // If we find the hash, it has been created before and we can just return the file
+        // name to the caller
         if (std::filesystem::is_regular_file(it->second)) {
             std::filesystem::remove(it->second);
         }

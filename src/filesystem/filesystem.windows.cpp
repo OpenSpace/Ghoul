@@ -102,10 +102,11 @@ int FileSystem::addFileListener(std::filesystem::path path,
 
     int idx = FileChangeInfo::NextIdentifier;
 
-    FileChangeInfo info;
-    info.identifier = idx;
-    info.path = std::move(path);
-    info.callback = std::move(callback);
+    FileChangeInfo info = {
+        .identifier = idx,
+        .path = std::move(path),
+        .callback = std::move(callback)
+    };
     _trackedFiles.push_back(std::move(info));
 
     FileChangeInfo::NextIdentifier += 1;
@@ -163,9 +164,9 @@ static void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) 
 
     BYTE* buf = handle->_changeBuffer[currentBuffer].data();
 
-    // data might have queued up, so we need to check all changes
+    // Data might have queued up, so we need to check all changes
     while (true) {
-        // extract the information which file has changed
+        // Extract the information which file has changed
         FILE_NOTIFY_INFORMATION& info = reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*buf);
 
         if (info.Action == FILE_ACTION_MODIFIED) {
@@ -181,18 +182,18 @@ static void CALLBACK completionHandler(DWORD, DWORD, LPOVERLAPPED lpOverlapped) 
                 info.FileNameLength
             );
             if (i > 0) {
-                // make sure the last char is string terminating
+                // Make sure the last char is string terminating
                 currentFilenameBuffer[i - 1] = '\0';
                 const std::string currentFilename(currentFilenameBuffer.data(), i - 1);
                 callbackHandler(handle, currentFilename);
             }
         }
         if (!info.NextEntryOffset) {
-            // we are done with all entries and didn't find our file
+            // We are done with all entries and didn't find our file
             break;
         }
         else {
-            // continue with the next entry
+            // Continue with the next entry
             buf += info.NextEntryOffset;
         }
     }

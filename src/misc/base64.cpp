@@ -35,7 +35,7 @@ std::vector<uint8_t> decodeBase64(std::string_view base64) {
     //    64-with-cpp/
     // 2. https://stackoverflow.com/a/180949
 
-    constexpr std::string_view base64Chars =
+    constexpr std::string_view Base64Chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
@@ -58,7 +58,7 @@ std::vector<uint8_t> decodeBase64(std::string_view base64) {
 
         if (i == 4) {
             for (i = 0; i < 4; i++) {
-                char4[i] = static_cast<unsigned char>(base64Chars.find(char4[i]));
+                char4[i] = static_cast<unsigned char>(Base64Chars.find(char4[i]));
             }
 
             char3[0] = static_cast<unsigned char>(
@@ -82,7 +82,7 @@ std::vector<uint8_t> decodeBase64(std::string_view base64) {
         }
 
         for (j = 0; j < 4; j++) {
-            char4[j] = static_cast<unsigned char>(base64Chars.find(char4[j]));
+            char4[j] = static_cast<unsigned char>(Base64Chars.find(char4[j]));
         }
 
         char3[0] = static_cast<unsigned char>((char4[0] << 2) + ((char4[1] & 0x30) >> 4));

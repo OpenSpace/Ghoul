@@ -46,7 +46,7 @@ namespace {
             return relativeLocation;
         }
         // Negative indices implies indexing the stack from top.
-        // -1 is the topmost item. +1 is the first item.
+        // -1 is the topmost item. +1 is the first item
         const int nItems = lua_gettop(state);
         return nItems + relativeLocation + 1;
     }
@@ -59,15 +59,16 @@ namespace {
     }
 
     // Code snippet that causes the Lua State to strict by making it that the lookup in
-    // the meta table for an unknown key causes a panic
+    // the meta table for an unknown key causes a panic.
     // Code taken originally from the Lua webpage and used under the Lua license
     constexpr std::string_view StrictStateSource = R"(
     --[[ strict.lua
-    checks uses of undeclared global variables
+    Checks uses of undeclared global variables
     All global variables must be 'declared' through a regular assignment (even assigning
     nil will do) in a main chunk before being used anywhere or assigned to inside a
     function.
-    distributed under the Lua license: http://www.lua.org/license.html
+
+    Distributed under the Lua license: http://www.lua.org/license.html
     ]]--
 
     local getinfo, error, rawset, rawget = debug.getinfo, error, rawset, rawget
@@ -336,7 +337,7 @@ void loadArrayDictionaryFromString(const std::string& script, Dictionary& dictio
     }
 
     // Clear the stack. This should not be necessary, but if the stack was left unclean,
-    // we want to avoid previous values to leak into the dictionary.
+    // we want to avoid previous values to leak into the dictionary
     lua_settop(state, 0);
 
     const int loadStatus = luaL_loadstring(state, script.c_str());
@@ -388,7 +389,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
     }
     const int topType = lua_type(state, size);
     if (topType == LUA_TNIL) {
-        // There was no able specified, so we can return an empty Dictionary to the caller
+        // There was no table specified, so we can return an empty Dictionary
         dictionary = Dictionary();
         return;
     }
@@ -480,7 +481,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
                 throw LuaFormatException("Unknown type: " + std::to_string(valueType));
         }
 
-        // get back up one level
+        // Get back up one level
         lua_pop(state, 1);
     }
 
@@ -708,14 +709,12 @@ bool isScriptBinary(std::string_view script) {
 }
 
 namespace internal {
-
-void deinitializeGlobalState() {
-    if (_state) {
-        lua_close(_state);
+    void deinitializeGlobalState() {
+        if (_state) {
+            lua_close(_state);
+        }
+        _state = nullptr;
     }
-    _state = nullptr;
-}
-
 } // namespace internal
 
 } // namespace ghoul::lua

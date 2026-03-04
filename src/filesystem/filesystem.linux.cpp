@@ -46,8 +46,8 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "FileSystem";
-    constexpr uint32_t Mask = IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW |
-                          IN_UNMOUNT | IN_ISDIR;
+    constexpr uint32_t Mask =
+        IN_ALL_EVENTS | IN_IGNORED | IN_Q_OVERFLOW | IN_UNMOUNT | IN_ISDIR;
     constexpr int EventSize = sizeof(struct inotify_event);
     constexpr int BufferLength = 1024 * (EventSize + 16);
 } // namespace
@@ -140,7 +140,7 @@ void FileSystem::inotifyWatcher() {
                 {
                     const int wd = e->wd;
 
-                    // remove tracking of the removed descriptor
+                    // Remove tracking of the removed descriptor
                     inotify_rm_watch(fd, wd);
 
                     for (FileChangeInfo& info : FileSys._trackedFiles) {
@@ -148,7 +148,7 @@ void FileSystem::inotifyWatcher() {
                             continue;
                         }
 
-                        // add new tracking
+                        // Add new tracking
                         info.inotifyHandle = inotify_add_watch(
                             fd,
                             info.path.string().c_str(),

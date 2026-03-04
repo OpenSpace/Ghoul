@@ -29,8 +29,9 @@ template <typename T>
 double integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f) {
     ghoul_assert(n >= 2, "Number of partitions, n, must be at least 2");
 
+    // n must be an even number
     if (n % 2 != 0) {
-        n += 1; // n must be an even number
+        n += 1;
     }
 
     const double h = (t1 - t0) / static_cast<double>(n);
@@ -72,7 +73,7 @@ T integrateGaussianQuadrature(double t0, double t1, Integrand<T> f) {
     const double b = t1;
     T sum = 0.0;
     for (const GaussLegendreCoefficient& coefficient : Coefficients) {
-        // change of interval from [-1, 1]  to [a, b] (also 0.5 * (b - a) below)
+        // Change of interval from [-1, 1]  to [a, b] (also 0.5 * (b - a) below)
         double const t = 0.5 * ((b - a) * coefficient.abscissa + (b + a));
         sum += f(t) * coefficient.weight;
     }

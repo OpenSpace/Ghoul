@@ -36,7 +36,7 @@
 
 namespace {
 #ifndef WIN32
-   // This is called with a specific input, but has the potential to be very dangerous
+    // This is called with a specific input, but has the potential to be very dangerous
     bool exec(const std::string& cmd, std::string& value) {
         FILE* pipe = popen(cmd.c_str(), "r");
         if (!pipe) {

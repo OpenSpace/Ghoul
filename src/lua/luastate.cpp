@@ -50,8 +50,8 @@ LuaState::LuaState(Sandboxed sandboxed, IncludeStandardLibrary include,
 {
     // Set a panic function to make sure that we always throw with a useful error message
     // if an exception occurs due to a luaError. This should never happen under normal
-    // circumstances when using the runScript method, but it can happen when we manage
-    // the state manually and start manipulating the Lua stack by hand
+    // circumstances when using the runScript method, but it can happen when we manage the
+    // state manually and start manipulating the Lua stack by hand
     lua_atpanic(_state, &luaPanicFunction);
 }
 

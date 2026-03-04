@@ -93,17 +93,13 @@ void OpenGLCapabilitiesComponent::detectGLSLVersion() {
 void OpenGLCapabilitiesComponent::detectGPUVendor() {
     _glslCompiler = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
 
-    if (_glslCompiler.find("NVIDIA") != std::string::npos) {
+    if (_glslCompiler.contains("NVIDIA")) {
         _vendor = Vendor::Nvidia;
     }
-    else if ((_glslCompiler.find("ATI") != std::string::npos) ||
-            (_glslCompiler.find("AMD") != std::string::npos))
-    {
+    else if (_glslCompiler.contains("ATI") || _glslCompiler.contains("AMD")) {
         _vendor = Vendor::AmdATI;
     }
-    else if ((_glslCompiler.find("INTEL") != std::string::npos) ||
-             (_glslCompiler.find("Intel") != std::string::npos))
-    {
+    else if (_glslCompiler.contains("INTEL") || _glslCompiler.contains("Intel")) {
         _vendor = Vendor::Intel;
     }
     else {

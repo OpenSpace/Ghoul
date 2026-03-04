@@ -239,7 +239,7 @@ void TcpSocket::establishConnection(addrinfo* info) {
     const char falseFlag = 0;
     int result = 0;
 
-    // Disable Nagle's algorithm.
+    // Disable Nagle's algorithm
     result = setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, &trueFlag, sizeof(trueFlag));
     if (result == SOCKET_ERROR) {
         LWARNING(std::format("Socket error: {}", _ERRNO));
@@ -366,7 +366,7 @@ void TcpSocket::waitForInput(size_t nBytes) {
         return _inputQueue.size() >= nBytes;
     };
 
-    // Block execution until enough data has come into the input queue.
+    // Block execution until enough data has come into the input queue
     if (!receivedRequestedInputOrDisconnected()) {
         std::unique_lock lock(_inputBufferMutex);
         _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
@@ -387,7 +387,7 @@ int TcpSocket::waitForDelimiter() {
         return it != _inputQueue.end();
     };
 
-    // Block execution until the delimiter character was found in the input queue.
+    // Block execution until the delimiter character was found in the input queue
     if (!receivedRequestedInputOrDisconnected()) {
         std::unique_lock lock(_inputBufferMutex);
         _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
@@ -408,7 +408,7 @@ void TcpSocket::waitForOutput(size_t nBytes) {
         return _outputQueue.size() >= nBytes;
     };
 
-    // Block execution until enough data has come into the output queue.
+    // Block execution until enough data has come into the output queue
     if (!receivedRequestedOutputOrDisconnected()) {
         std::unique_lock lock(_outputBufferMutex);
         _outputNotifier.wait(lock, receivedRequestedOutputOrDisconnected);
@@ -422,7 +422,7 @@ void TcpSocket::initializeNetworkApi() {
     const int error = WSAStartup(version, &wsaData);
 
     if (error != 0 || LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-        // incorrect WinSock version
+        // Incorrect WinSock version
         WSACleanup();
 
         throw std::runtime_error("Failed to initialize WinSock API");

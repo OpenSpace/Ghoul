@@ -212,8 +212,8 @@ bool FileSystem::hasRegisteredToken(const std::string& token) const {
 bool FileSystem::containsToken(const std::string& path) const {
     ghoul_assert(!path.empty(), "Path must not be empty");
 
-    const bool hasOpeningBrace = path.find("${") != std::string::npos;
-    const bool hasClosingBrace = path.find('}') != std::string::npos;
+    const bool hasOpeningBrace = path.contains("${");
+    const bool hasClosingBrace = path.contains('}');
     return hasOpeningBrace && hasClosingBrace;
 }
 
@@ -300,6 +300,7 @@ std::filesystem::path FileSystem::resolveShellLink(std::filesystem::path path) {
 
     CHAR szGotPath[MAX_PATH];
     WIN32_FIND_DATA wfd;
+    std::memset(&wfd, 0, sizeof(WIN32_FIND_DATA));
     hres = psl->GetPath(szGotPath, MAX_PATH, &wfd, SLGP_SHORTPATH);
     if (FAILED(hres)) {
         throw RuntimeError(std::format(
@@ -325,30 +326,36 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
         if (fs::is_directory(path)) {
             if (recursive) {
                 for (fs::directory_entry e : fs::recursive_directory_iterator(path)) {
-                    if (filter(e)) {
-                        if (containsNonAscii(e)) {
-                            LWARNING(std::format(
-                                "'{}' contains non-ASCII characters, skipping",
-                                toAsciiSafePathString(e.path())
-                            ));
-                            continue;
-                        }
-                        result.push_back(e.path());
+                    const bool isFilteredOut = !filter(e);
+                    if (isFilteredOut) {
+                        continue;
                     }
+
+                    if (containsNonAscii(e)) {
+                        LWARNING(std::format(
+                            "'{}' contains non-ASCII characters, skipping",
+                            toAsciiSafePathString(e.path())
+                        ));
+                        continue;
+                    }
+                    result.push_back(e.path());
                 }
             }
             else {
                 for (fs::directory_entry e : fs::directory_iterator(path)) {
-                    if (filter(e)) {
-                        if (containsNonAscii(e)) {
-                            LWARNING(std::format(
-                                "'{}' contains non-ASCII characters, skipping",
-                                toAsciiSafePathString(e.path())
-                            ));
-                            continue;
-                        }
-                        result.push_back(e.path());
+                    const bool isFilteredOut = !filter(e);
+                    if (isFilteredOut) {
+                        continue;
                     }
+
+                    if (containsNonAscii(e)) {
+                        LWARNING(std::format(
+                            "'{}' contains non-ASCII characters, skipping",
+                            toAsciiSafePathString(e.path())
+                        ));
+                        continue;
+                    }
+                    result.push_back(e.path());
                 }
             }
         }

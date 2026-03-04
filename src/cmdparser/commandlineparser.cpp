@@ -136,8 +136,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
         return DisplayHelpText::No;
     }
 
-    // There is only one argument and this is either "-h" or "--help"
-    // so display the help
+    // There is only one argument and this is either "-h" or "--help" so display the help
     if (hasOnlyHelpCommand()) {
         return DisplayHelpText::Yes;
     }
@@ -152,7 +151,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
         // In the beginning we assume that we just started the loop or finished reading
         // parameters for the last command
 
-        // Test if the next argument is a command or a parameter for a nameless argument
+        // Test if the next argument is a command or a parameter for a nameless argument.
         // The restriction for '-' is enforced in the #addCommand method
         if (_arguments[i][0] != '-') {
             // The rest of the commands until the next '-' are for the nameless command
@@ -167,7 +166,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
                 i += (number - 1);
             }
             else {
-                // if we do not have a command for nameless arguments, but we have a place
+                // If we do not have a command for nameless arguments, but we have a place
                 // to store them; we do not need to check if the nameless command is
                 // available as this is done later
                 if (_allowUnknownCommands) {
@@ -192,8 +191,8 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             // We have found a command
             CommandlineCommand* currentCmd = getCommand(_arguments[i]);
 
-            // currentCommand = nullptr, if there wasn't a command with that specific
-            // name or shortName
+            // currentCommand = nullptr, if there wasn't a command with that specific name
+            // or shortName
             if (!currentCmd) {
                 if (_allowUnknownCommands) {
                     // Extract the rest of the arguments
@@ -222,7 +221,7 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
             );
             i += (n + 1);
 
-            // don't insert if the command doesn't allow multiple calls and already is in
+            // Don't insert if the command doesn't allow multiple calls and already is in
             // the map
             if (!currentCmd->allowsMultipleCalls() &&
                 parameterMap.find(currentCmd) != parameterMap.end())

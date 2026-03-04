@@ -74,8 +74,10 @@ namespace {
         );
     }
 
-    // Initializes the passed 'library' and loads the font face specified by the 'name'
-    // and 'size' into the provided 'face'
+    /**
+     * Initializes the passed 'library' and loads the font face specified by the 'name'
+     * and 'size' into the provided 'face'.
+     */
     void loadFace(const std::filesystem::path& name, float size, FT_Library& library,
                   FT_Face& face)
     {
@@ -96,8 +98,10 @@ namespace {
         handleError(e4, library, face, nullptr, name, size);
     }
 
-    // Extracts the next line from the string view and returns it, the passed string_view
-    // is modified to remove the new line *and* the \n character
+    /**
+     * Extracts the next line from the string view and returns it, the passed string_view
+     * is modified to remove the new line *and* the \n character.
+     */
     std::string_view extractLine(std::string_view& view) {
         const std::string_view::size_type p = view.find('\n');
         if (p == std::string_view::npos) {
@@ -281,11 +285,11 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
     };
     loadFace(_name, _pointSize * HighResolutionFactor, libraryHighRes, faceHighRes);
 
-    // check for invalid glyph codes first
+    // Check for invalid glyph codes first
     for (wchar_t& charcode : characters) {
         const FT_UInt glyphIndex = FT_Get_Char_Index(face, charcode);
         if (glyphIndex == 0) {
-            // invalid glyph; replace with a space
+            // Invalid glyph; replace with a space
             LWARNINGC(
                 "Font",
                 std::format(
@@ -309,8 +313,8 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
             continue;
         }
 
-        // First generate the font without outline and store it in the font atlas
-        // only if an outline is request, repeat the process for the outline
+        // First generate the font without outline and store it in the font atlas only if
+        // an outline is request, repeat the process for the outline
 
         float leftBearing = 0.f;
         float topBearing = 0.f;

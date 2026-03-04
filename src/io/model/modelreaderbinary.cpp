@@ -25,9 +25,9 @@
 
 #include <ghoul/io/model/modelreaderbinary.h>
 
+#include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelgeometry.h>
 #include <ghoul/io/model/modelmesh.h>
-#include <ghoul/io/model/modelanimation.h>
 #include <ghoul/io/model/modelnode.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/opengl/ghoul_gl.h>
@@ -54,18 +54,18 @@ namespace {
     opengl::Texture::Format stringToFormat(std::string_view format) {
         using Format = opengl::Texture::Format;
 
-        if (format == "Red ") { return Format::Red; }
+        if (format == "Red ")      { return Format::Red; }
         else if (format == "RG  ") { return Format::RG; }
         else if (format == "RGB ") { return Format::RGB; }
         else if (format == "BGR ") { return Format::BGR; }
         else if (format == "RGBA") { return Format::RGBA; }
         else if (format == "BGRA") { return Format::BGRA; }
         else if (format == "Dept") { return Format::DepthComponent; }
-        else { throw MissingCaseException(); }
+        else                       { throw MissingCaseException(); }
     }
 
     GLenum stringToDataType(std::string_view dataType) {
-        if (dataType == "byte") { return GL_BYTE; }
+        if (dataType == "byte")      { return GL_BYTE; }
         else if (dataType == "ubyt") { return GL_UNSIGNED_BYTE; }
         else if (dataType == "shor") { return GL_SHORT; }
         else if (dataType == "usho") { return GL_UNSIGNED_SHORT; }
@@ -73,7 +73,7 @@ namespace {
         else if (dataType == "uint") { return GL_UNSIGNED_INT; }
         else if (dataType == "floa") { return GL_FLOAT; }
         else if (dataType == "doub") { return GL_DOUBLE; }
-        else { throw MissingCaseException(); }
+        else                         { throw MissingCaseException(); }
     }
 } // namespace
 
@@ -97,8 +97,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     if (version != CurrentModelVersion &&
         // Backward compatible versions are ok
         version != AnimationUpdateVersion && version != OpacityUpdateVersion &&
-        version != VertexColorUpdateVersion && version != SkipMarkerUpdateVersion
-       )
+        version != VertexColorUpdateVersion && version != SkipMarkerUpdateVersion)
     {
         throw ModelLoadException(
             filename,
@@ -140,7 +139,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         fileStream.read(textureEntry.name.data(), nameSize * sizeof(char));
 
         // Texture
-        // dimensions
+        // Dimensions
         std::array<int32_t, 3> dimensionStorage;
         fileStream.read(
             reinterpret_cast<char*>(dimensionStorage.data()),
@@ -152,24 +151,24 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
             static_cast<unsigned int>(dimensionStorage[2])
         );
 
-        // format
+        // Format
         std::string formatString;
         formatString.resize(FormatStringSize);
         fileStream.read(formatString.data(), FormatStringSize * sizeof(char));
         const opengl::Texture::Format format = stringToFormat(formatString);
 
-        // internal format
+        // Internal format
         uint32_t rawInternalFormat = 0;
         fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(uint32_t));
         const GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
-        // data type
+        // Data type
         std::string dataTypeString;
         dataTypeString.resize(FormatStringSize);
         fileStream.read(dataTypeString.data(), FormatStringSize * sizeof(char));
         const GLenum dataType = stringToDataType(dataTypeString);
 
-        // data
+        // Data
         int32_t textureSize = 0;
         fileStream.read(reinterpret_cast<char*>(&textureSize), sizeof(int32_t));
         if (textureSize <= 0) {
@@ -183,14 +182,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         fileStream.read(reinterpret_cast<char*>(data.data()), textureSize);
 
         textureEntry.texture = std::make_unique<opengl::Texture>(
-            opengl::Texture::FormatInit{
+            opengl::Texture::FormatInit {
                 .dimensions = dimensions,
                 .type = GL_TEXTURE_2D,
                 .format = format,
                 .dataType = dataType,
                 .internalFormat = internalFormat
             },
-            opengl::Texture::SamplerInit{},
+            opengl::Texture::SamplerInit {},
             data.data()
         );
         textureStorageArray.push_back(std::move(textureEntry));
@@ -254,8 +253,8 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 auto vertexSize = sizeof(io::ModelMesh::Vertex);
                 if (version < VertexColorUpdateVersion) {
                     // Three extra floats (rgb color) were added to the Vertex struct
-                    // since version VertexColorUpdateVersion, previous versions does
-                    // not have them
+                    // since version VertexColorUpdateVersion, previous versions does not
+                    // have them
                     vertexSize -= sizeof(GLfloat[3]);
                 }
 
@@ -310,15 +309,15 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                     }
                 }
 
-                // type
+                // Type
                 fileStream.read(reinterpret_cast<char*>(&texture.type), sizeof(uint8_t));
 
-                // hasTexture
+                // HasTexture
                 uint8_t h = 0;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
                 texture.hasTexture = (h == 1);
 
-                // color
+                // Color
                 fileStream.read(
                     reinterpret_cast<char*>(glm::value_ptr(texture.color)),
                     3 * sizeof(float)
@@ -329,13 +328,13 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                         sizeof(float)
                     );
 
-                    // isTransparent
+                    // IsTransparent
                     uint8_t isT = 0;
                     fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
                     texture.isTransparent = (isT == 1);
                 }
 
-                // texture
+                // Texture
                 if (texture.hasTexture) {
                     // Read which index in the textureStorageArray that this texture
                     // should point to
@@ -536,12 +535,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         bool isTransparent = false;
         bool hasCalcTransparency = false;
         if (version >= OpacityUpdateVersion) {
-            // _isTransparent
+            // IsTransparent
             uint8_t isT = 0;
             fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
             isTransparent = (isT == 1);
 
-            // _hasCalcTransparency
+            // HasCalcTransparency
             uint8_t hasCalcT = 0;
             fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
             hasCalcTransparency = (hasCalcT == 1);
@@ -560,12 +559,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         bool isTransparent = false;
         bool hasCalcTransparency = false;
         if (version >= OpacityUpdateVersion) {
-            // _isTransparent
+            // IsTransparent
             uint8_t isT = 0;
             fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
             isTransparent = (isT == 1);
 
-            // _hasCalcTransparency
+            // HasCalcTransparency
             uint8_t hasCalcT = 0;
             fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
             hasCalcTransparency = (hasCalcT == 1);

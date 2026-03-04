@@ -60,9 +60,11 @@ namespace {
         {}
     };
 
-    /// Exception thrown if there was an error with a value, either trying to access the
-    /// wrong type for a known key or if trying to access a vector/matrix based type and
-    /// the underlying std::vector did contain the wrong number of values
+    /**
+     * Exception thrown if there was an error with a value, either trying to access the
+     * wrong type for a known key or if trying to access a vector/matrix based type and
+     * the underlying std::vector did contain the wrong number of values.
+     */
     struct ValueError final : public RuntimeError {
         explicit ValueError(std::string key, std::string msg)
             : RuntimeError(

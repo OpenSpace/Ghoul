@@ -94,7 +94,7 @@ SharedMemory::SharedMemoryNotFoundError::SharedMemoryNotFoundError()
 {}
 
 void SharedMemory::create(const std::string& name, size_t size) {
-    // adjust for the header size
+    // Adjust for the header size
     size += sizeof(Header);
 #ifdef WIN32
     HANDLE handle = CreateFileMapping(
@@ -181,13 +181,13 @@ bool SharedMemory::exists(const std::string& name) {
 #ifdef WIN32
     HANDLE handle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, name.c_str());
     if (handle) {
-        // the file exists, so we have to close it immediately to not leak the handle
+        // The file exists, so we have to close it immediately to not leak the handle
         CloseHandle(handle);
         return true;
     }
 
-    // The handle doesn't exist, which can mean two things: the memory mapped file
-    // doesn't exist or it exists but there was an error accessing it
+    // The handle doesn't exist, which can mean two things: the memory mapped file doesn't
+    // exist or it exists but there was an error accessing it
     const DWORD error = GetLastError();
     if (error == ERROR_FILE_NOT_FOUND) {
         return false;

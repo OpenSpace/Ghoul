@@ -61,11 +61,6 @@ std::vector<std::string> stackTrace() {
         const int MaxModuleNameLength = 1024;
         const int MaxAddressLength = 48;
 
-        std::vector<char> functionSymbol(MaxFunctionSymbolLength);
-        std::vector<char> moduleName(MaxModuleNameLength);
-        std::vector<char> addr(MaxAddressLength);
-        int offset = 0;
-
         //
         // Typically this is how the backtrace looks like:
         //
@@ -82,8 +77,12 @@ std::vector<std::string> stackTrace() {
         // 10  libdyld.dylib      0x00007fff91b647e1 start + 0
         //
 
-        // split the string, take out chunks out of stack trace
-        // we are primarily interested in module, function and address
+        // Split the string, take out chunks out of stack trace. We are primarily
+        // interested in module, function and address
+        std::vector<char> moduleName = std::vector<char>(MaxModuleNameLength);
+        std::vector<char> addr = std::vector<char>(MaxAddressLength);
+        std::vector<char> functionSymbol = std::vector<char>(MaxFunctionSymbolLength);
+        int offset = 0;
         sscanf(
             strs[i],
             "%*s %1024s %48s %1024s %*s %d",
@@ -94,8 +93,8 @@ std::vector<std::string> stackTrace() {
         );
 
         int isValidCppName = 0;
-        // if this is a C++ library, symbol will be demangled
-        // on success function returns 0
+        // If this is a C++ library, the symbol will be demangled. On success function
+        // returns 0
         char* functionName = abi::__cxa_demangle(
             functionSymbol.data(),
             nullptr,

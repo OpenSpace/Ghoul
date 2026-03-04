@@ -54,10 +54,21 @@ namespace {
         }
 
         auto convert = [&](const std::string& key) {
-            return
-                (prettyPrint ? indentation : "") + key +
-                (prettyPrint ? " " : "") + "=" + (prettyPrint ? " " : "") +
-                formatValue(d, key, prettyPrint, indentation, indentationSteps + 1);
+            if (prettyPrint) {
+                return std::format(
+                    "{}{} = {}",
+                    indentation,
+                    key,
+                    formatValue(d, key, prettyPrint, indentation, indentationSteps + 1)
+                );
+            }
+            else {
+                return std::format(
+                    "{}={}",
+                    key,
+                    formatValue(d, key, prettyPrint, indentation, indentationSteps + 1)
+                );
+            }
         };
 
         std::vector<std::string> keys;
@@ -71,12 +82,18 @@ namespace {
             keys.end(),
             convert(*keys.begin()),
             [&](const std::string& a, const std::string& key) {
-                return a + "," + (prettyPrint ? "\n" : "") + indent + convert(key);
+                return std::format(
+                    "{},{}{}{}", a, prettyPrint ? "\n" : "", indent, convert(key)
+                );
             }
         );
 
-        return std::string("{") + (prettyPrint ? "\n" : "") + indent + lua +
-            (prettyPrint ? "\n" : "") + indent + "}";
+        return std::format(
+            "{{{0}{1}{2}{0}{1}}}",
+            prettyPrint ? "\n" : "",
+            indent,
+            lua
+        );
     }
 
     template <typename T>

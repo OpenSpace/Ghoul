@@ -72,7 +72,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                     currPos = kf.position;
                     interpolate = false;
                 }
-                // Prev keyframe
+                // Previous keyframe
                 else if (diff < 0.0 && diff > (prevPosTime - now)) {
                     prevPosTime = kf.time * _timeScale;
                     prevPos = kf.position;
@@ -113,7 +113,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                     currRot = kf.rotation;
                     interpolate = false;
                 }
-                // Prev keyframe
+                // Previous keyframe
                 else if (diff < 0.0 && diff > (prevRotTime - now)) {
                     prevRotTime = kf.time * _timeScale;
                     prevRot = kf.rotation;
@@ -154,7 +154,7 @@ void ModelAnimation::animate(std::vector<ModelNode>& nodes, double now, bool ena
                     currScale = scale.scale;
                     interpolate = false;
                 }
-                // Prev keyframe
+                // Previous keyframe
                 else if (diff < 0.0 && diff > (prevScaleTime - now)) {
                     prevScaleTime = scale.time * _timeScale;
                     prevScale = scale.scale;

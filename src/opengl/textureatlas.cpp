@@ -39,8 +39,8 @@ TextureAtlas::InvalidRegionException::InvalidRegionException(std::string msg)
 TextureAtlas::TextureAtlas(glm::ivec3 size)
     : _size(std::move(size))
 {
-    // Limitations to the depth are due to the fact that the atlas is represented by
-    // a single texture on the GPU (which only allows up to four channels)
+    // Limitations to the depth are due to the fact that the atlas is represented by a
+    // single texture on the GPU (which only allows up to four channels)
     ghoul_assert(_size.x > 4, "Width has to be bigger than 4");
     ghoul_assert(_size.y > 4, "Height has to be bigger than 4");
     ghoul_assert(_size.z >= 1, "Depth has to be positive");
@@ -90,17 +90,17 @@ void TextureAtlas::initialize() {
     const GLenum dataType = GL_UNSIGNED_BYTE;
 
     _texture = std::make_unique<Texture>(
-        Texture::FormatInit{
+        Texture::FormatInit {
             .dimensions = glm::uvec3(glm::ivec2(_size), 1),
             .type = GL_TEXTURE_2D,
             .format = format,
             .dataType = dataType
         },
-        Texture::SamplerInit{
+        Texture::SamplerInit {
             .filter = Texture::FilterMode::Nearest
         }
     );
-    ghoul_assert(_texture != nullptr, "Error creating Texture");
+    ghoul_assert(_texture, "Error creating Texture");
 }
 
 void TextureAtlas::deinitialize() {

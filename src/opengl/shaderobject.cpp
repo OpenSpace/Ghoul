@@ -36,8 +36,7 @@ ShaderObject::ShaderObjectError::ShaderObjectError(std::string msg)
     : RuntimeError(std::move(msg), "ShaderObject")
 {}
 
-ShaderObject::ShaderCompileError::ShaderCompileError(std::string error,
-                                                     std::string ident,
+ShaderObject::ShaderCompileError::ShaderCompileError(std::string error, std::string ident,
                                                      std::string name)
     : ShaderObjectError(
         name.empty() ?
@@ -83,8 +82,8 @@ ShaderObject::ShaderObject(ShaderType shaderType, const std::filesystem::path& f
 ShaderObject::ShaderObject(ShaderObject&& rhs) noexcept
     : _id(rhs._id)
     , _type(rhs._type)
-    , _shaderName(std::move(rhs._shaderName))
-    , _loggerCat(std::move(rhs._loggerCat))
+    , _shaderName(rhs._shaderName)
+    , _loggerCat(rhs._loggerCat)
     , _onChangeCallback(std::move(rhs._onChangeCallback))
     , _preprocessor(std::move(rhs._preprocessor))
 {
@@ -137,13 +136,12 @@ void ShaderObject::rebuildFromFile() {
     }
 
     if (FileSys.cacheManager()) {
-        // we use the .baseName() version because otherwise we get a new file
-        // every time we reload the shader
+        // We use the .baseName() version because otherwise we get a new file every time
+        // we reload the shader
         generatedFilename = FileSys.cacheManager()->cachedFilename(base, "");
     }
     else {
-        // Either the cachemanager wasn't initialized or the
-        // filename could not be fetched
+        // Either the cachemanager wasn't initialized or the filename could not be fetched
         generatedFilename += ".GhoulGenerated.glsl";
     }
 
@@ -151,14 +149,13 @@ void ShaderObject::rebuildFromFile() {
     os.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     os.open(generatedFilename);
     os << contents;
-    os.close();
 #endif // GHL_DEBUG
 
-    const char* contentPtr =  contents.c_str();
+    const char* contentPtr = contents.c_str();
     glShaderSource(_id, 1, &contentPtr, nullptr);
 }
 
-void ShaderObject::deleteShader() {
+void ShaderObject::deleteShader() const {
     glDeleteShader(_id);
 }
 

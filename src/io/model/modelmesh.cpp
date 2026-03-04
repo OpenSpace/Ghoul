@@ -125,8 +125,8 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                     // Advance the texture unit index
                     textureUnitIndex++;
                 }
-                // Use embedded simple colors instead of textures
                 else {
+                    // Use embedded simple colors instead of textures
                     if (texture.type == TextureType::ColorDiffuse) {
                         program.setUniform("has_texture_diffuse", false);
                     }
@@ -149,8 +149,8 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                 if (texture.type == TextureType::TextureDiffuse ||
                     texture.type == TextureType::ColorDiffuse)
                 {
-                    // Use texture or color
                     if (texture.hasTexture) {
+                        // Use texture or color
                         // Activate proper texture unit before binding
                         textureUnits[textureUnitIndex].bind(*texture.texture);
 
@@ -162,8 +162,8 @@ void ModelMesh::render(opengl::ProgramObject& program, const glm::mat4& meshTran
                         textureUnitIndex++;
                         break;
                     }
-                    // Use embedded simple colors instead of textures
                     else {
+                        // Use embedded simple colors instead of textures
                         program.setUniform("has_texture_diffuse", false);
 
                         // Set the color in shader
@@ -199,13 +199,13 @@ float ModelMesh::calculateBoundingRadius(glm::mat4& transform) const {
         glm::vec4 position(v.position[0], v.position[1], v.position[2], 1.f);
         position = transform * position;
 
-        const float d = glm::pow(
+        const float d = std::pow(
             position.x, 2.f) +
-            glm::pow(position.y, 2.f) +
-            glm::pow(position.z, 2.f
+            std::pow(position.y, 2.f) +
+            std::pow(position.z, 2.f
         );
 
-        maximumDistanceSquared = glm::max(d, maximumDistanceSquared);
+        maximumDistanceSquared = std::max(d, maximumDistanceSquared);
     }
     return maximumDistanceSquared;
 }
@@ -293,7 +293,7 @@ void ModelMesh::initialize() {
     glVertexArrayAttribFormat(_vao, 4, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, color));
     glVertexArrayAttribBinding(_vao, 4, 0);
 
-    // initialize textures
+    // Initialize textures
     // Also check if there are several textures/colors of the same type for this mesh
     unsigned int nDiffuse = 0;
     unsigned int nSpecular = 0;

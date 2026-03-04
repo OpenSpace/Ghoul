@@ -40,9 +40,9 @@ void Event<T...>::subscribe(std::string name, std::string topic, Callback callba
 
 template <class... T>
 void Event<T...>::publish(const std::string& topic, T... message) {
-    // if the topic exists
+    // If the topic exists...
     if (_topics.find(topic) != _topics.end()) {
-        // go through all subscribers and send them the message
+        // ...go through all subscribers and send them the message
         for (Subscriber& subscriber : _topics[topic]) {
             subscriber.callback(message...);
         }
@@ -58,10 +58,7 @@ void Event<T...>::unsubscribe(const std::string& name, const std::string& topic)
             std::remove_if(
                 _topics[topic].begin(),
                 _topics[topic].end(),
-                // predicate function, true if subscriber name is equal to given name
-                [name](const Subscriber& subscriber) {
-                    return (subscriber.name == name);
-                }
+                [name](const Subscriber& subscriber) { return (subscriber.name == name); }
             ),
             _topics[topic].end()
         );
@@ -70,16 +67,13 @@ void Event<T...>::unsubscribe(const std::string& name, const std::string& topic)
 
 template <class... T>
 void Event<T...>::unsubscribe(const std::string& name) {
-    // Search through all topics to erase all callbacks that belong to the
-    // object with given name
+    // Search through all topics to erase all callbacks that belong to the object with
+    // given name
     for (std::pair<const std::string, std::vector<Subscriber>>& topic : _topics) {
         topic.second.erase(
             std::remove_if(
                 topic.second.begin(), topic.second.end(),
-                // predicate function, true if subscriber name is equal to given name
-                [name](const Subscriber& subscriber) {
-                    return (subscriber.name == name);
-                }
+                [name](const Subscriber& subscriber) { return (subscriber.name == name); }
             ),
             topic.second.end()
         );

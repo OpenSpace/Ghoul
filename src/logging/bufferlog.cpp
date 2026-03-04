@@ -57,8 +57,8 @@ namespace {
         /**
          * This value provides an offset to find the first byte in the buffer that has not
          * been used already. The values between `_buffer + sizeof(Header)` and
-         * `_buffer + sizeof(Header) + firstEmptyByte` are the logs that have
-         * been stored before.
+         * `_buffer + sizeof(Header) + firstEmptyByte` are the logs that have been stored
+         * before.
          */
         uint32_t firstEmptyByte;
     };
@@ -138,14 +138,14 @@ void BufferLog::resetBuffer() {
     // firstEmptyByte pointer so that following log will overwrite the buffer
     Header& h = header(_buffer);
 
-    // if test_and_set returns 'true', someone else is in the critical section
-    // unless we are currently in a callstack containing the callback function. In which
-    // case we are already safe
+    // If test_and_set returns 'true', someone else is in the critical section unless we
+    // are currently in a callstack containing the callback function. In which case we are
+    // already safe
     while (h.mutex.test_and_set() && !_inCallbackStack) {}
-    // the moment we return, we own the mutex
+    // The moment we return, we own the mutex
     h.firstEmptyByte = 0;
     if (!_inCallbackStack) {
-        // only release the mutex if we are not in the callback stack
+        // Only release the mutex if we are not in the callback stack
         h.mutex.clear();
     }
 }
@@ -157,17 +157,17 @@ void BufferLog::log(unsigned long long timestamp, const std::string& message) {
     // This is the full size of the incoming message. +1 for the terminating \0 character
     const size_t fullSize = sizeof(unsigned long long) + message.length() + 1;
 
-    // if test_and_set returns 'true', someone else is in the critical section
+    // If test_and_set returns 'true', someone else is in the critical section
     while (h.mutex.test_and_set()) {}
-    // the moment we return, we own the mutex
+    // The moment we return, we own the mutex
 
     const size_t requestedSize = h.firstEmptyByte + sizeof(Header) + fullSize;
 
     // If this message would exceed the available memory...
     if (requestedSize > _totalSize) {
-        // ... and we have a valid callback function
+        // ...and we have a valid callback function
         if (_callback) {
-            // delegate the cleaning up to the callback
+            // Delegate the cleaning up to the callback
             _inCallbackStack = true;
             _callback(*this, timestamp);
             _inCallbackStack = false;
@@ -225,18 +225,18 @@ void BufferLog::setBuffer(void* buffer, size_t bufferSize) {
     ghoul_assert(bufferSize > 0, "Total size must be positive");
 
     Header& h = header(_buffer);
-    // if test_and_set returns 'true', someone else is in the critical section
-    // unless we are currently in a callstack containing the callback function. In which
-    // case we are already safe
+    // If test_and_set returns 'true', someone else is in the critical section unless we
+    // are currently in a callstack containing the callback function. In which case we are
+    // already safe
     while (h.mutex.test_and_set() && !_inCallbackStack) {}
-    // the moment we return, we own the mutex
+    // The moment we return, we own the mutex
 
     _buffer = buffer;
     _totalSize = bufferSize;
     initializeBuffer();
 
     if (!_inCallbackStack) {
-        // only release the mutex if we are not in the callback stack
+        // Only release the mutex if we are not in the callback stack
         h.mutex.clear();
     }
 }
@@ -246,14 +246,14 @@ void BufferLog::writeToDisk(const std::string& filename) {
     file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     file.open(filename);
     Header& h = header(_buffer);
-    // if test_and_set returns 'true', someone else is in the critical section
-    // unless we are currently in a callstack containing the callback function. In
-    // which case we are already safe
+    // If test_and_set returns 'true', someone else is in the critical section unless we
+    // are currently in a callstack containing the callback function. In which case we are
+    // already safe
     while (h.mutex.test_and_set() && !_inCallbackStack) {}
-    // the moment we return, we own the mutex
+    // The moment we return, we own the mutex
     file.write(reinterpret_cast<char*>(_buffer), usedSize());
     if (!_inCallbackStack) {
-        // only release the mutex if we are not in the callback stack
+        // Only release the mutex if we are not in the callback stack
         h.mutex.clear();
     }
 }

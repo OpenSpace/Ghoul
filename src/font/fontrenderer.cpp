@@ -789,7 +789,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
         glEnable(GL_DEPTH_TEST);
     }
 
-    return { size, static_cast<int>(lines) };
+    return { .boundingBox = size, .numberOfLines = static_cast<int>(lines) };
 }
 
 FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,

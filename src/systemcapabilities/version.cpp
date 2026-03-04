@@ -35,17 +35,15 @@ namespace {
 } // namespace
 
 namespace ghoul {
-
-template <>
-std::string to_string(const systemcapabilities::Version& v) {
-    if (v.release != 0) {
-        return std::format("{}.{}.{}", v.major, v.minor, v.release);
+    template <>
+    std::string to_string(const systemcapabilities::Version& v) {
+        if (v.release != 0) {
+            return std::format("{}.{}.{}", v.major, v.minor, v.release);
+        }
+        else {
+            return std::format("{}.{}", v.major, v.minor);
+        }
     }
-    else {
-        return std::format("{}.{}", v.major, v.minor);
-    }
-}
-
 } // namespace ghoul
 
 namespace ghoul::systemcapabilities {

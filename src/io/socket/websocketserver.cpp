@@ -32,7 +32,7 @@
 namespace ghoul::io {
 
 WebSocketServer::WebSocketServer() {
-    // set up WebSocket++ logging
+    // Set up WebSocket++ logging
     _server.clear_access_channels(websocketpp::log::alevel::all);
     _server.set_access_channels(websocketpp::log::alevel::connect);
     _server.set_access_channels(websocketpp::log::alevel::disconnect);

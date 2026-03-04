@@ -54,7 +54,7 @@ struct MissingCaseException final : public std::logic_error {
  * \param function The function in which the assertion triggered
  * \param line The line in the \p file that triggered the assertion
  */
-void internal_assert(std::string expression, std::string message, std::string file,
+void internalAssert(std::string expression, std::string message, std::string file,
     std::string function, int line);
 
 } // namespace ghoul
@@ -96,7 +96,7 @@ void internal_assert(std::string expression, std::string message, std::string fi
 #define ghoul_assert(__condition__, __message__)                                         \
     do {                                                                                 \
         if (!(__condition__)) {                                                          \
-            ghoul::internal_assert(                                                      \
+            ghoul::internalAssert(                                                       \
                 #__condition__,                                                          \
                 __message__,                                                             \
                 __FILE__,                                                                \

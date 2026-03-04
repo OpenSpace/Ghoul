@@ -50,9 +50,9 @@ namespace {
         }
 
 
-        // This is weird.  stb_image.h says that the first pixel loaded is the one in the
-        // upper left.  However, if we load the data and just use it, the images are
-        // flipped in y.  I assume that there is a 1-t floating around somewhere and
+        // This is weird. stb_image.h says that the first pixel loaded is the one in the
+        // upper left. However, if we load the data and just use it, the images are
+        // flipped in y. I assume that there is a 1-t floating around somewhere and
         // someone should hunt that down.  For now, we just flip these values as well.
 
         // As we only need to flip in y direction, we can take entire scanlines and move

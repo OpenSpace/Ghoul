@@ -74,14 +74,14 @@ std::unique_ptr<opengl::Texture> RawVolumeReader::read(const std::string& filena
     }
 
     return std::make_unique<opengl::Texture>(
-        opengl::Texture::FormatInit{
+        opengl::Texture::FormatInit {
             .dimensions = glm::uvec3(_hints._dimensions),
             .type = GL_TEXTURE_3D,
             .format = _hints._format,
             .dataType = GL_UNSIGNED_BYTE,
             .internalFormat = _hints._internalFormat
         },
-        opengl::Texture::SamplerInit{
+        opengl::Texture::SamplerInit {
             .wrapping = opengl::Texture::WrappingMode::ClampToBorder
         },
         data.data()

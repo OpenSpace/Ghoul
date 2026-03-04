@@ -52,8 +52,7 @@ namespace {
 
     opengl::Texture::Format stringToFormat(std::string_view format) {
         using Format = opengl::Texture::Format;
-
-        if (format == "Red ") { return Format::Red; }
+        if (format == "Red ")      { return Format::Red; }
         else if (format == "RG  ") { return Format::RG; }
         else if (format == "RGB ") { return Format::RGB; }
         else if (format == "BGR ") { return Format::BGR; }
@@ -65,7 +64,6 @@ namespace {
 
     std::string formatToString(opengl::Texture::Format format) {
         using Format = opengl::Texture::Format;
-
         switch (format) {
             case Format::Red:            return "Red ";
             case Format::RG:             return "RG  ";
@@ -79,7 +77,7 @@ namespace {
     }
 
     GLenum stringToDataType(std::string_view dataType) {
-        if (dataType == "byte") { return GL_BYTE; }
+        if (dataType == "byte")      { return GL_BYTE; }
         else if (dataType == "ubyt") { return GL_UNSIGNED_BYTE; }
         else if (dataType == "shor") { return GL_SHORT; }
         else if (dataType == "usho") { return GL_UNSIGNED_SHORT; }
@@ -247,7 +245,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         fileStream.read(textureEntry.name.data(), nameSize * sizeof(char));
 
         // Texture
-        // dimensions
+        // Dimensions
         std::array<int32_t, 3> dimensionStorage = {};
         fileStream.read(
             reinterpret_cast<char*>(dimensionStorage.data()),
@@ -259,24 +257,24 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             static_cast<unsigned int>(dimensionStorage[2])
         );
 
-        // format
+        // Format
         std::string formatString;
         formatString.resize(FormatStringSize);
         fileStream.read(formatString.data(), FormatStringSize * sizeof(char));
         const opengl::Texture::Format format = stringToFormat(formatString);
 
-        // internal format
+        // Internal format
         uint32_t rawInternalFormat = 0;
         fileStream.read(reinterpret_cast<char*>(&rawInternalFormat), sizeof(uint32_t));
         const GLenum internalFormat = static_cast<GLenum>(rawInternalFormat);
 
-        // data type
+        // Data type
         std::string dataTypeString;
         dataTypeString.resize(FormatStringSize);
         fileStream.read(dataTypeString.data(), FormatStringSize * sizeof(char));
         const GLenum dataType = stringToDataType(dataTypeString);
 
-        // data
+        // Data
         int32_t textureSize = 0;
         fileStream.read(reinterpret_cast<char*>(&textureSize), sizeof(int32_t));
         if (textureSize <= 0) {
@@ -289,14 +287,14 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         fileStream.read(reinterpret_cast<char*>(data), textureSize);
 
         textureEntry.texture = std::make_unique<opengl::Texture>(
-            opengl::Texture::FormatInit{
+            opengl::Texture::FormatInit {
                 .dimensions = dimensions,
                 .type = GL_TEXTURE_2D,
                 .format = format,
                 .dataType = dataType,
                 .internalFormat = internalFormat
             },
-            opengl::Texture::SamplerInit{
+            opengl::Texture::SamplerInit {
                 .filter = opengl::Texture::FilterMode::AnisotropicMipMap
             },
             data
@@ -400,26 +398,26 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                     continue;
                 }
 
-                // type
+                // Type
                 fileStream.read(reinterpret_cast<char*>(&texture.type), sizeof(uint8_t));
 
-                // hasTexture
+                // HasTexture
                 uint8_t h = 0;
                 fileStream.read(reinterpret_cast<char*>(&h), sizeof(uint8_t));
                 texture.hasTexture = (h == 1);
 
-                // color
+                // Color
                 fileStream.read(
                     reinterpret_cast<char*>(&texture.color.r),
                     4 * sizeof(float)
                 );
 
-                // isTransparent
+                // IsTransparent
                 uint8_t isT = 0;
                 fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
                 texture.isTransparent = (isT == 1);
 
-                // texture
+                // Texture
                 if (texture.hasTexture) {
                     // Read which index in the textureStorageArray that this texture
                     // should point to
@@ -614,12 +612,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             animation->nodeAnimations().push_back(nodeAnimation);
         }
 
-        // _isTransparent
+        // IsTransparent
         uint8_t isT = 0;
         fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
         const bool isTransparent = (isT == 1);
 
-        // _hasCalcTransparency
+        // HasCalcTransparency
         uint8_t hasCalcT = 0;
         fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
         const bool hasCalcTransparency = (hasCalcT == 1);
@@ -634,12 +632,12 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         );
     }
     else {
-        // _isTransparent
+        // IsTransparent
         uint8_t isT = 0;
         fileStream.read(reinterpret_cast<char*>(&isT), sizeof(uint8_t));
         const bool isTransparent = (isT == 1);
 
-        // _hasCalcTransparency
+        // HasCalcTransparency
         uint8_t hasCalcT = 0;
         fileStream.read(reinterpret_cast<char*>(&hasCalcT), sizeof(uint8_t));
         const bool hasCalcTransparency = (hasCalcT == 1);
@@ -684,7 +682,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         fileStream.write(_textureStorage[te].name.data(), nameSize);
 
         // Texture
-        // dimensions
+        // Dimensions
         std::array<int32_t, 3> dimensionStorage;
         dimensionStorage[0] = _textureStorage[te].texture->dimensions().x;
         dimensionStorage[1] = _textureStorage[te].texture->dimensions().y;
@@ -695,11 +693,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             3 * sizeof(int32_t)
         );
 
-        // format
+        // Format
         std::string format = formatToString(_textureStorage[te].texture->format());
         fileStream.write(format.data(), FormatStringSize * sizeof(char));
 
-        // internal format
+        // Internal format
         uint32_t internalFormat = static_cast<uint32_t>(
             _textureStorage[te].texture->internalFormat()
         );
@@ -708,12 +706,12 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             sizeof(uint32_t)
         );
 
-        // data type
+        // Data type
         std::string dataType =
             dataTypeToString(_textureStorage[te].texture->dataType());
         fileStream.write(dataType.data(), FormatStringSize * sizeof(char));
 
-        // data
+        // Data
         std::vector<std::byte> pixels = _textureStorage[te].texture->pixelData();
         int32_t nPixels = static_cast<int32_t>(pixels.size());
         fileStream.write(reinterpret_cast<const char*>(&nPixels), sizeof(int32_t));
@@ -786,8 +784,7 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
             fileStream.write(reinterpret_cast<const char*>(&nTextures), sizeof(int32_t));
 
             for (int32_t t = 0; t < nTextures; t++) {
-                // Don't save the debug texture to the cache
-                // Write matching skip marker
+                // Don't save the debug texture to the cache. Write matching skip marker
                 if (mesh.textures()[t].useForcedColor) {
                     fileStream.write(
                         reinterpret_cast<const char*>(&ShouldSkipMarker),
@@ -802,27 +799,27 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
                     );
                 }
 
-                // type
+                // Type
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.textures()[t].type),
                     sizeof(uint8_t)
                 );
 
-                // hasTexture
+                // HasTexture
                 uint8_t h = (mesh.textures()[t].hasTexture) ? 1 : 0;
                 fileStream.write(reinterpret_cast<const char*>(&h), sizeof(uint8_t));
 
-                // color
+                // Color
                 fileStream.write(
                     reinterpret_cast<const char*>(&mesh.textures()[t].color.r),
                      4 * sizeof(float)
                 );
 
-                // isTransparent
+                // IsTransparent
                 uint8_t isT = (mesh.textures()[t].isTransparent) ? 1 : 0;
                 fileStream.write(reinterpret_cast<const char*>(&isT), sizeof(uint8_t));
 
-                // texture
+                // Texture
                 if (mesh.textures()[t].hasTexture) {
                     // Search the textureStorage to find the texture entry
                     bool wasFound = false;
@@ -1005,11 +1002,11 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         }
     }
 
-    // _isTransparent
+    // IsTransparent
     uint8_t isT = _isTransparent ? 1 : 0;
     fileStream.write(reinterpret_cast<const char*>(&isT), sizeof(uint8_t));
 
-    // _hasCalcTransparency
+    // HasCalcTransparency
     uint8_t hasCalcT = _hasCalcTransparency ? 1 : 0;
     fileStream.write(reinterpret_cast<const char*>(&hasCalcT), sizeof(uint8_t));
 
@@ -1092,7 +1089,6 @@ bool ModelGeometry::isTransparent() const {
     return _isTransparent;
 }
 
-
 std::vector<io::ModelNode>& ModelGeometry::nodes() {
     return _nodes;
 }
@@ -1142,6 +1138,7 @@ void ModelGeometry::setTimeScale(float timeScale) {
         LERROR("Cannot set time scale of empty animation");
         return;
     }
+
     _animation->setTimeScale(timeScale);
 }
 

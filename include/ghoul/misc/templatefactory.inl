@@ -30,28 +30,26 @@
 #include <utility>
 
 namespace {
-    /*
-     * The working principle is as follows: There are two methods which can create
-     * subclasses, 'create' and 'createWithDictionary'. The first one will create the
-     * subclass using the default constructor while the second can use the default
-     * constructor or a constructor using a ghoul::Dictionary as an input. Since both
-     * methods adhere to the same function prototype 'BaseClass* (*FactoryFuncPtr)(bool,
-     * const Dictionary&)', they can be stored in the same TemplateFactory's '_map'
-     * without the TemplateFactory knowing which of the two functions it is. If C++ would
-     * support partial template specialization, two separate methods wouldn't be necessary
-     * and could instead be split up by a single template argument. Instead, a helper
-     * class 'CreateHelper' has to be created as partial template specialization is
-     * allowed for classes. 'CreateHelper' has a single method that returns either a
-     * 'create' or a 'createWithDictionary' function pointer, depending on the third
-     * parameter Constructor; this parameter is determined at compile-time in the
-     * registerClass by using the constant values DEFAULT_CONSTRUCTOR with
-     * std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
-     */
+    // The working principle is as follows: There are two methods which can create
+    // subclasses, 'create' and 'createWithDictionary'. The first one will create the
+    // subclass using the default constructor while the second can use the default
+    // constructor or a constructor using a ghoul::Dictionary as an input. Since both
+    // methods adhere to the same function prototype 'BaseClass* (*FactoryFuncPtr)(bool,
+    // const Dictionary&)', they can be stored in the same TemplateFactory's '_map'
+    // without the TemplateFactory knowing which of the two functions it is. If C++ would
+    // support partial template specialization, two separate methods wouldn't be necessary
+    // and could instead be split up by a single template argument. Instead, a helper
+    // class 'CreateHelper' has to be created as partial template specialization is
+    // allowed for classes. 'CreateHelper' has a single method that returns either a
+    // 'create' or a 'createWithDictionary' function pointer, depending on the third
+    // parameter Constructor; this parameter is determined at compile-time in the
+    // registerClass by using the constant values DEFAULT_CONSTRUCTOR with
+    // std::has_default_constructor and DICTIONARY_CONSTRUCTOR with std::is_convertible
 
     constexpr int DefaultConstructor = 1;
     constexpr int DictionaryConstructor = 2;
 
-    /// Create Class using only the default constructor
+    // Create Class using only the default constructor
     template <typename BaseClass, typename Class>
     BaseClass* createDefault(bool useDictionary, const ghoul::Dictionary& dict,
                              pmr::memory_resource* pool)
@@ -110,8 +108,7 @@ namespace {
             std::string className = typeid(Class).name();
             throw ghoul::TemplateConstructionError(std::format(
                 "Class '{}' does only provide a Dictionary constructor but was called "
-                "using the default constructor",
-                className
+                "using the default constructor", className
             ));
         }
         if (pool) {

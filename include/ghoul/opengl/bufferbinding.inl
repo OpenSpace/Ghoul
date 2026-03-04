@@ -101,7 +101,6 @@ unsigned int BufferBinding<T>::maxBufferBindings() {
 template <bufferbinding::Buffer T>
 void BufferBinding<T>::assignBinding() {
     if (_totalActive >= _maxBufferBindings) {
-        //throw MaxBufferBindingsExceeded();
         return;
     }
 
@@ -123,7 +122,8 @@ void BufferBinding<T>::initialize() {
         _maxBufferBindings = maxBufferBindings();
     }
     else {
-        _maxBufferBindings = 8; // Reasonable default setting for OpenGL
+        // Reasonable default setting for OpenGL
+        _maxBufferBindings = 8;
     }
     _busyBindings = std::vector<bool>(_maxBufferBindings, false);
     _isInitialized = true;

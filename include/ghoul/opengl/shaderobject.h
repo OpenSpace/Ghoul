@@ -191,7 +191,7 @@ public:
      * functions, the name might still be in use if the ShaderObject is attached to a
      * ProgramObject prior to deleting.
      */
-    void deleteShader();
+    void deleteShader() const;
 
     /**
      * This method will compile the shader source in this ShaderObject and returns the

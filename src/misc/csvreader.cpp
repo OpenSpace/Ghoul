@@ -121,7 +121,7 @@ namespace {
                         );
                     }
 
-                    // and it is at the last position so we have our winner
+                    // And it is at the last position so we have our winner
                     lineValues[i] = totalValue + ", " + lineValues[j];
                     // Remove the beginning and end "
                     ghoul_assert(lineValues[i].front() == '"', "Unexpected line");

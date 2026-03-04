@@ -75,19 +75,57 @@ MissingCaseException::MissingCaseException()
     : std::logic_error("Missing Case")
 {}
 
-void internal_assert(std::string expression, std::string message, std::string file,
-                     std::string function, int line)
+void internalAssert(std::string expression, std::string message, std::string file,
+                    std::string function, int line)
 {
-    if (!isPermanentlyIgnored(file, line)) {
-        const std::string padding = "    ";
+    if (isPermanentlyIgnored(file, line)) {
+        return;
+    }
 
-        std::cerr << '\n'
-            << padding << "File:       " << file << ", line " << line << '\n'
-            << padding << "Function:   " << function << '\n'
-            << padding << "Assertion:  " << expression
-            << padding << message << '\n';
+    constexpr std::string_view padding = "    ";
 
-        if (AlwaysAssert) {
+    std::cerr << std::format(
+        "\n"
+        "{0}File:       {1}, line {2}\n"
+        "{0}Function:   {3}\n"
+        "{0}Assertion:  {4}"
+        "{0}{5}\n",
+        padding, file, line, function, expression, message
+    );
+
+    if (AlwaysAssert) {
+#ifdef _MSC_VER
+        __debugbreak();
+#endif // _MSC_VER
+
+        throw AssertionException(
+            std::move(expression),
+            std::move(message),
+            std::move(file),
+            std::move(function),
+            line
+        );
+    }
+
+    while (true) {
+        std::cerr <<
+            "(I)gnore / Ignore (P)ermanently / (A)ssertion / (S)tacktrace / (E)xit: ";
+        std::string inputLine;
+        ghoul::getline(std::cin, inputLine);
+        if (inputLine.empty()) {
+            continue;
+        }
+
+        inputLine = toLowerCase(inputLine);
+
+        if (inputLine[0] == 'i') {
+            break;
+        }
+        else if (inputLine[0] == 'p') {
+            addPermanentlyIgnoredAssert(file, line);
+            break;
+        }
+        else if (inputLine[0] == 'a') {
 #ifdef _MSC_VER
             __debugbreak();
 #endif // _MSC_VER
@@ -100,52 +138,19 @@ void internal_assert(std::string expression, std::string message, std::string fi
                 line
             );
         }
+        else if (inputLine[0] == 's') {
+            std::vector<std::string> st = stackTrace();
 
-        while (true) {
-            std::cerr <<
-                "(I)gnore / Ignore (P)ermanently / (A)ssertion / (S)tacktrace / (E)xit: ";
-            std::string inputLine;
-            ghoul::getline(std::cin, inputLine);
-            if (inputLine.empty()) {
-                continue;
+            std::cerr << '\n';
+            for (size_t i = 0; i < st.size(); i++) {
+                std::cerr << i << ": " << st[i] << '\n';
             }
+            std::cerr << '\n';
 
-            inputLine = toLowerCase(inputLine);
-
-            if (inputLine[0] == 'i') {
-                break;
-            }
-            else if (inputLine[0] == 'p') {
-                addPermanentlyIgnoredAssert(file, line);
-                break;
-            }
-            else if (inputLine[0] == 'a') {
-#ifdef _MSC_VER
-                __debugbreak();
-#endif // _MSC_VER
-
-                throw AssertionException(
-                    std::move(expression),
-                    std::move(message),
-                    std::move(file),
-                    std::move(function),
-                    line
-                );
-            }
-            else if (inputLine[0] == 's') {
-                std::vector<std::string> st = stackTrace();
-
-                std::cerr << '\n';
-                for (size_t i = 0; i < st.size(); i++) {
-                    std::cerr << i << ": " << st[i] << '\n';
-                }
-                std::cerr << '\n';
-
-                continue;
-            }
-            else if (inputLine[0] == 'e') {
-                exit(EXIT_FAILURE);
-            }
+            continue;
+        }
+        else if (inputLine[0] == 'e') {
+            exit(EXIT_FAILURE);
         }
     }
 }

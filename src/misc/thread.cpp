@@ -55,8 +55,8 @@ namespace {
                 return 0;
             case ThreadPriorityClass::High:
                 switch (p) {
-                    // min-max values come from the man page of getschedparam
-                    // normal value was measured on macOS to be the default value
+                    // Min-Max values come from the man page of getschedparam
+                    // normal value was measured to be the default value
                     // below/above normal values are halfway between other values
                     case ThreadPriorityLevel::Lowest:      return 1;
                     case ThreadPriorityLevel::BelowNormal: return 16;
@@ -118,11 +118,7 @@ void setPriority(std::thread& t, ThreadPriorityClass priorityClass,
     }
 
     param.sched_priority = convertThreadPriorityLevel(priorityClass, priorityLevel);
-    res = pthread_setschedparam(
-        t.native_handle(),
-        policy,
-        &param
-    );
+    res = pthread_setschedparam(t.native_handle(), policy, &param);
     if (res != 0) {
         throw RuntimeError(
             "Error setting scheduling parameters with error " + std::to_string(res),

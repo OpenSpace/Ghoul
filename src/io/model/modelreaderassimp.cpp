@@ -90,8 +90,9 @@ namespace {
                                                     std::filesystem::path& modelDirectory)
     {
         for (unsigned int i = 0; i < material.GetTextureCount(type); i++) {
-            ModelMesh::Texture meshTexture;
-            meshTexture.type = enumType;
+            ModelMesh::Texture meshTexture = {
+                .type = enumType
+            };
             aiString path;
             material.GetTexture(type, i, &path);
 
@@ -287,8 +288,8 @@ namespace {
 
             // Texture Coordinates
             if (mesh.HasTextureCoords(0)) {
-                // Each vertex can have at most 8 different texture coordinates.
-                // We are using only the first one provided.
+                // Each vertex can have at most 8 different texture coordinates. We are
+                // using only the first one provided
                 vertex.tex[0] = mesh.mTextureCoords[0][i].x;
                 vertex.tex[1] = mesh.mTextureCoords[0][i].y;
             }
@@ -352,11 +353,10 @@ namespace {
 
         // We assume a convention for sampler names in the shaders. Each diffuse texture
         // should be named as 'texture_diffuse', at the moment only one texture per type
-        // is supported. Same applies to other textures as the following
-        // list summarizes:
-        // diffuse: texture_diffuse or color_diffuse if embedded simple material
-        // specular: texture_specular or color_specular if embedded simple material
-        // normal: texture_normal
+        // is supported. Same applies to other textures as the following list summarizes:
+        //  - diffuse: texture_diffuse or color_diffuse if embedded simple material
+        //  - specular: texture_specular or color_specular if embedded simple material
+        //  - normal: texture_normal
 
         // Opacity
         float opacity = 0.f;
@@ -401,11 +401,12 @@ namespace {
             if (hasColor4 == AI_SUCCESS) {
                 // Only add the color if it is not transparent
                 if (color4.a != 0.f) {
-                    ModelMesh::Texture texture;
-                    texture.hasTexture = false;
-                    texture.type = ModelMesh::TextureType::ColorDiffuse;
-                    texture.color = glm::vec4(color4.r, color4.g, color4.b, color4.a);
-                    texture.isTransparent = texture.color.a < 1.f;
+                    ModelMesh::Texture texture = {
+                        .type = ModelMesh::TextureType::ColorDiffuse,
+                        .hasTexture = false,
+                        .color = glm::vec4(color4.r, color4.g, color4.b, color4.a),
+                        .isTransparent = texture.color.a < 1.f
+                    };
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -413,17 +414,18 @@ namespace {
                 aiColor3D color3 = aiColor3D(0.f, 0.f, 0.f);
                 const aiReturn hasColor3 = material->Get(AI_MATKEY_COLOR_DIFFUSE, color3);
                 if (hasColor3 == AI_SUCCESS) {
-                    ModelMesh::Texture texture;
-                    texture.hasTexture = false;
-                    texture.type = ModelMesh::TextureType::ColorDiffuse;
-                    texture.color = glm::vec4(color3.r, color3.g, color3.b, 1.f);
+                    ModelMesh::Texture texture = {
+                        .type = ModelMesh::TextureType::ColorDiffuse,
+                        .hasTexture = false,
+                        .color = glm::vec4(color3.r, color3.g, color3.b, 1.f)
+                    };
                     textureArray.push_back(std::move(texture));
                 }
             }
             if (hasOpacity) {
-                textureArray.back().isTransparent = true;
-                textureArray.back().color.a =
-                    std::min(opacity, textureArray.back().color.a);
+                ModelMesh::Texture& tex = textureArray.back();
+                tex.isTransparent = true;
+                tex.color.a = std::min(opacity, tex.color.a);
             }
         }
 
@@ -454,10 +456,11 @@ namespace {
             if (hasColor4 == AI_SUCCESS && !color4.IsBlack()) {
                 // Only add the color if it is not transparent
                 if (color4.a != 0.f) {
-                    ModelMesh::Texture texture;
-                    texture.hasTexture = false;
-                    texture.type = ModelMesh::TextureType::ColorSpecular;
-                    texture.color = glm::vec4(color4.r, color4.g, color4.b, 1.f);
+                    ModelMesh::Texture texture = {
+                        .type = ModelMesh::TextureType::ColorSpecular,
+                        .hasTexture = false,
+                        .color = glm::vec4(color4.r, color4.g, color4.b, 1.f)
+                    };
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -465,10 +468,11 @@ namespace {
                 aiColor3D color3 = aiColor3D(0.f, 0.f, 0.f);
                 const aiReturn hasColor = material->Get(AI_MATKEY_COLOR_SPECULAR, color3);
                 if (hasColor == AI_SUCCESS && !color3.IsBlack()) {
-                    ModelMesh::Texture texture;
-                    texture.hasTexture = false;
-                    texture.type = ModelMesh::TextureType::ColorSpecular;
-                    texture.color = glm::vec4(color3.r, color3.g, color3.b, 1.f);
+                    ModelMesh::Texture texture = {
+                        .type = ModelMesh::TextureType::ColorSpecular,
+                        .hasTexture = false,
+                        .color = glm::vec4(color3.r, color3.g, color3.b, 1.f)
+                    };
                     textureArray.push_back(std::move(texture));
                 }
             }
@@ -520,8 +524,10 @@ namespace {
         );
     }
 
-    // Process a node in a recursive fashion. Process each individual mesh located
-    // at the node and repeats this process on its children nodes (if any)
+    /**
+     * Process a node in a recursive fashion.Process each individual mesh located at the
+     * node and repeats this process on its children nodes (if any).
+     */
     void processNode(const aiNode& node, const aiScene& scene,
                      std::vector<ModelNode>& nodes, int parent,
                      std::unique_ptr<ModelAnimation>& modelAnimation,
@@ -550,9 +556,9 @@ namespace {
         std::vector<ModelMesh> meshArray;
         meshArray.reserve(node.mNumMeshes);
         for (unsigned int i = 0; i < node.mNumMeshes; i++) {
-            // The node object only contains indices to the actual objects in the scene
-            // The scene contains all the data, node is just to keep stuff organized
-            // (like relations between nodes)
+            // The node object only contains indices to the actual objects in the scene.
+            // The scene contains all the data, node is just to keep stuff organized (like
+            // relations between nodes)
             aiMesh* mesh = scene.mMeshes[node.mMeshes[i]];
 
             if (mesh->HasBones()) {
@@ -671,8 +677,8 @@ namespace {
             }
         }
 
-        // After we've processed all of the meshes (if any) we then recursively
-        // process each of the children nodes (if any)
+        // After we've processed all of the meshes (if any) we then recursively process
+        // each of the children nodes (if any)
         for (unsigned int i = 0; i < node.mNumChildren; i++) {
             processNode(
                 *(node.mChildren[i]),

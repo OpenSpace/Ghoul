@@ -95,8 +95,8 @@ namespace {
         if (vec.empty()) {
             return "[]";
         }
-        std::stringstream values;
 
+        std::stringstream values;
         for (size_t i = 0; i < vec.size() - 1; i++) {
             if constexpr (std::is_arithmetic_v<T>) {
                 const double v = static_cast<double>(vec[i]);
@@ -114,10 +114,12 @@ namespace {
     /**
     * Converts a single value \p key out of the \p dictionary by manually iterating all
     * the types and trying to access them.
+    *
     * \param dictionary The Dictionary from which the \p key should be extracted and
-    * converted
+    *        converted
     * \param key The key in the Dictionary that should be converted
     * \return A JSON representation of the \p key's value
+    *
     * \throw JsonFormattingError If the \p key points to a type that cannot be converted
     */
     std::string formatValue(const Dictionary& dictionary, const std::string& key) {
@@ -206,7 +208,7 @@ std::string formatJson(const Dictionary& dictionary) {
                 return std::format("{},{}", a, convert(key, dictionary));
             }
         );
-        return "[" + json + "]";
+        return std::format("[{}]", json);
     }
     else {
         auto convert = [](const std::string& key, const Dictionary& d) {
