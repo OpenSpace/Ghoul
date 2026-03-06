@@ -44,18 +44,20 @@
 namespace ghoul::opengl {
 
 /**
- * This class represents a texture atlas which automatically organizes smaller textures
- * in a compact representation. The TextureAtlas is useful if many small textures are
- * needed, but the overhead of creating a separate Texture for each is not desireable.
- * The TextureAtlas is created with a `size`, and in order to fill the atlas, new regions
- * have to first be requested (#newRegion) and then filled with data (#setRegionData). Due
- * to the fact that the TextureAtlas is represented by a single Texture on the GPU, the
+ * This class represents a texture atlas which automatically organizes smaller textures in
+ * a compact representation. The TextureAtlas is useful if many small textures are needed,
+ * but the overhead of creating a separate Texture for each is not desireable. The
+ * TextureAtlas is created with a `size`, and in order to fill the atlas, new regions have
+ * to first be requested (#newRegion) and then filled with data (#setRegionData). Due to
+ * the fact that the TextureAtlas is represented by a single Texture on the GPU, the
  * `depth` can only be `1`, `2`, `3`, or `4`. Before the atlas can be used, it has to be
  * uploaded to the GPU first (#upload).
  */
 class TextureAtlas {
 public:
-    /// Exception that gets thrown if an invalid region would be returned or is used
+    /**
+     * Exception that gets thrown if an invalid region would be returned or is used.
+     */
     struct InvalidRegionException : RuntimeError {
         explicit InvalidRegionException(std::string msg);
     };
@@ -97,8 +99,8 @@ public:
     TextureAtlas& operator=(TextureAtlas&& rhs) noexcept;
 
     /**
-     * Initializes the TextureAtlas and creates its backend storage. This method
-     * requires a valid OpenGL context.
+     * Initializes the TextureAtlas and creates its backend storage. This method requires
+     * a valid OpenGL context.
      */
     void initialize();
 
@@ -150,7 +152,9 @@ public:
      */
     void setRegionData(RegionHandle handle, void* data);
 
-    /// Structure that is returned from textureCoordinates function
+    /**
+     * Structure that is returned from textureCoordinates function.
+     */
     struct TextureCoordinatesResult {
         glm::vec2 topLeft = glm::vec2(0.f);
         glm::vec2 bottomRight = glm::vec2(0.f);
@@ -185,8 +189,8 @@ public:
      *        first two parameters `x` and `y` determine an offset for the top left
      *        corner, while the third and fourth parameters are subtracted from the bottom
      *        right corner. That means that if `windowing` is equal to
-     *        `glm::ivec4(width / 4, height / 4, width / 4, height / 4`, a
-     *        subset in the center of the region is returned
+     *        `glm::ivec4(width / 4, height / 4, width / 4, height / 4`, a subset in the
+     *        center of the region is returned
      * \return A TextureCoordinatesResult structure containing the `topLeft` corner of the
      *         region in texture coordinates and that `bottomRight` corner of the region
      *         in texture coordinates

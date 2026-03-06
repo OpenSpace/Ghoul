@@ -41,11 +41,13 @@ class TextureWriterBase;
  * This class manages multiple TextureWriterBase and makes them available through one
  * method saveTexture. TextureWriterBases are added through the method addWriter. The
  * class provides a static member, but also allows users to create local variants.
- * TextureWriterBases can be reused between multiple TextureWriters
+ * TextureWriterBases can be reused between multiple TextureWriters.
  */
 class TextureWriter {
 public:
-    /// Exception that gets thrown when there is no writer for the provided \p extension
+    /**
+     * Exception that gets thrown when there is no writer for the provided \p extension.
+     */
     struct MissingWriterException final : public RuntimeError {
         explicit MissingWriterException(std::string extension);
         const std::string fileExtension;

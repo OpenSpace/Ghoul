@@ -66,7 +66,7 @@ public:
     struct ShaderCompileError final : public ShaderObjectError {
         /**
          * The constructor constructing a ShaderCompileError containing the cause for the
-         * error (\p error) as well as the, optional, \p ident and \p name
+         * error (\p error) as well as the, optional, \p ident and \p name.
          */
         explicit ShaderCompileError(std::string error, std::string ident,
             std::string name);
@@ -83,8 +83,7 @@ public:
 
     /**
      * An enum of the different types of shaders that can be used in OpenGL. They can be
-     * used interchangeably in native OpenGL calls, too. Compute shaders are only
-     * available if OpenGL 4.3 is available.
+     * used interchangeably in native OpenGL calls, too.
      */
     enum class ShaderType : std::underlying_type_t<GLenum> {
         Vertex = static_cast<std::underlying_type_t<GLenum>>(GL_VERTEX_SHADER),
@@ -128,7 +127,7 @@ public:
 
     /**
      * A move constructor that will move all of the internal state, and the shader source,
-     * but it will leave the other object in an invalid state
+     * but it will leave the other object in an invalid state.
      */
     ShaderObject(ShaderObject&& rhs) noexcept;
 
@@ -161,15 +160,11 @@ public:
 
     /**
      * Sets the dictionary of the shader object. Will trigger a rebuild from file.
-     *
-     * \param dictionary object
      */
     void setDictionary(Dictionary dictionary);
 
     /**
      * Sets the shader object callback.
-     *
-     * \param changeCallback object
      */
     void setShaderObjectCallback(ShaderObjectCallback changeCallback);
 

@@ -56,7 +56,7 @@ public:
     bool hasAnimation() const;
 
 private:
-    // glm::mat4 is not noexcept move constructable, use an array instead for transform
+    // `glm::mat4` is not noexcept move constructable, use an array instead for transform
     // Array is column major
     std::array<GLfloat, 16> _transform = {
         1.f, 0.f, 0.f, 0.f,

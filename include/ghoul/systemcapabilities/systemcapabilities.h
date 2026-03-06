@@ -59,6 +59,7 @@ public:
      * Returns a reference to the global SystemCapabilities object.
      *
      * \return A reference to the global SystemCapabilities object
+     *
      * \pre The static SystemCapabilities must have been initialized
      */
     static SystemCapabilities& ref();
@@ -103,7 +104,7 @@ public:
      * \param component The component that will be added to this SystemCapabilities
      *        object.
      *
-     * \pre \p component must not be nullptr
+     * \pre \p component must not be `nullptr`
      * \pre \p A component of the same type must not have been added before
      */
     void addComponent(std::unique_ptr<SystemCapabilitiesComponent> component);

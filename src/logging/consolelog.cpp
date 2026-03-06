@@ -86,7 +86,7 @@ void ConsoleLog::log(LogLevel level, std::string_view category, std::string_view
         res += ' ';
     }
     else {
-        // the message is longer than our 25 width space. We'd like to keep 4 characters
+        // The message is longer than our 25 width space. We'd like to keep 4 characters
         // at the end for context
 
         // Onelongcategorystringthatneedstobeshortended ->

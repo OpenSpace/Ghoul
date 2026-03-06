@@ -48,7 +48,9 @@ enum class EasingFunction : uint8_t {
     BounceEaseIn,      BounceEaseOut,      BounceEaseInOut
 };
 
-/// Function pointer representing any of the easing functions defined in this file
+/**
+ * Function pointer representing any of the easing functions defined in this file.
+ */
 template <typename T> using EasingFunc = T(*)(T);
 
 /**
@@ -77,7 +79,7 @@ template <typename T>
  * \return The enum value for the easing function named \p name
  *
  * \throw std::invalid_argument If \p name is not a valid name for an easing function
- * \pre \p name must not be nullptr
+ * \pre \p name must not be `nullptr`
  */
 [[nodiscard]] EasingFunction easingFunctionFromName(std::string_view name);
 
@@ -90,7 +92,7 @@ template <typename T>
  *        name
  * \return `true` if \p name is a valid name for an easing function, `false` otherwise
  *
- * \pre \p name must not be nullptr
+ * \pre \p name must not be `nullptr`
  */
 [[nodiscard]] bool isValidEasingFunctionName(std::string_view name);
 
@@ -100,7 +102,7 @@ template <typename T>
  * function is used.
  *
  * \param p The parameter to be interpolated in [0,1]
- * \param func The =enum that defines the easing function that is used to ease/interpolate
+ * \param func The enum that defines the easing function that is used to ease/interpolate
  *        \p p
  * \return The interpolated value using the easing function defined by \p func
  *

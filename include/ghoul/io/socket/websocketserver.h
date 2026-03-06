@@ -60,7 +60,7 @@ public:
     bool hasPendingSockets() const override;
 
     /**
-     * Get next pending connection. Non-blocking. Can return nullptr.
+     * Get next pending connection. Non-blocking. Can return `nullptr`.
      */
     std::unique_ptr<WebSocket> nextPendingWebSocket();
     std::unique_ptr<Socket> nextPendingSocket() override;

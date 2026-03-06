@@ -154,12 +154,12 @@ protected:
     static void deinitializeWMI();
 
     /**
-    * Returns if the Windows Management Instrumentation has been initialized before. If
-    * the WMI is not enabled, or the application is compiled on a non-Windows
-    * architecture, this method is a no-op.
-    *
-    * \return `true` if the WMI has been initialized
-    */
+     * Returns if the Windows Management Instrumentation has been initialized before. If
+     * the WMI is not enabled, or the application is compiled on a non-Windows
+     * architecture, this method is a no-op.
+     *
+     * \return `true` if the WMI has been initialized
+     */
     static bool isWMIInitialized();
 
     /**
@@ -244,8 +244,7 @@ protected:
      * \param wmiClass The class in which the required attribute resides
      * \param attribute The attribute which we are interested in
      * \param value A reference to the value, where the attribute will be stored in (if
-     *        the attribute could be found and it is of type
-     *        `unsigned long long`)
+     *        the attribute could be found and it is of type `unsigned long long`)
      *
      * \throw WMIError If there was an error querying the Windows Management
      *        Instrumentation service or there was no query result available
@@ -258,13 +257,13 @@ protected:
 
     /**
      * The locator object that was used in the `CoCreateInstance` call in the
-     * #initializeWMI call
+     * #initializeWMI call.
      */
     static IWbemLocator* _iwbemLocator;
 
     /**
      * The service object that was used in the `_iwbemLocator->ConnectServer`
-     * call in the #initializeWMI call
+     * call in the #initializeWMI call.
      */
     static IWbemServices* _iwbemServices;
 #endif // WIN32
@@ -273,34 +272,32 @@ protected:
 } // namespace ghoul::systemcapabilities
 
 namespace ghoul {
-
-template <>
-inline std::string to_string(
+    template <>
+    inline std::string to_string(
                       const systemcapabilities::SystemCapabilitiesComponent::Verbosity& v)
-{
-    using Verbosity = systemcapabilities::SystemCapabilitiesComponent::Verbosity;
-    switch (v) {
-        case Verbosity::None:    return "None";
-        case Verbosity::Minimal: return "Minimal";
-        case Verbosity::Default: return "Default";
-        case Verbosity::Full:    return "Full";
-        default:                 throw MissingCaseException();
+    {
+        using Verbosity = systemcapabilities::SystemCapabilitiesComponent::Verbosity;
+        switch (v) {
+            case Verbosity::None:    return "None";
+            case Verbosity::Minimal: return "Minimal";
+            case Verbosity::Default: return "Default";
+            case Verbosity::Full:    return "Full";
+            default:                 throw MissingCaseException();
+        }
     }
-}
 
-template <>
-constexpr systemcapabilities::SystemCapabilitiesComponent::Verbosity from_string(
-                                                                  std::string_view string)
-{
-    using Verbosity = systemcapabilities::SystemCapabilitiesComponent::Verbosity;
+    template <>
+    constexpr systemcapabilities::SystemCapabilitiesComponent::Verbosity from_string(
+                                                                 std::string_view string)
+    {
+        using Verbosity = systemcapabilities::SystemCapabilitiesComponent::Verbosity;
 
-    if (string == "None") { return Verbosity::None; }
-    else if (string == "Minimal") { return Verbosity::Minimal; }
-    else if (string == "Default") { return Verbosity::Default; }
-    else if (string == "Full") { return Verbosity::Full; }
-    throw RuntimeError("Unknown verbosity '" + std::string(string) + "'");
-}
-
+        if (string == "None") { return Verbosity::None; }
+        else if (string == "Minimal") { return Verbosity::Minimal; }
+        else if (string == "Default") { return Verbosity::Default; }
+        else if (string == "Full") { return Verbosity::Full; }
+        throw RuntimeError(std::format("Unknown verbosity '{}'", string));
+    }
 } // namespace ghoul
 
 #endif // __GHOUL___SYSTEMCAPABILITIESCOMPONENT___H__

@@ -38,8 +38,8 @@
 namespace ghoul {
 
 /**
- * Computes the CRC-32 hash of the zero terminated string \p s. If the passed value
- * \p s is a compile constant, the crc32 hash will also be computed at compile time.
+ * Computes the CRC-32 hash of the zero terminated string \p s. If the passed value \p s
+ * is a compile constant, the crc32 hash will also be computed at compile time.
  *
  * \param s The string for which to compute the CRC-32 hash
  * \return The hash value for the passed string

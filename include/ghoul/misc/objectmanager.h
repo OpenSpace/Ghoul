@@ -68,9 +68,9 @@ public:
     ObjectManager(std::string name);
 
     /**
-     * Checks whether all objects have been released and asserts if the application
-     * was built in Debug mode. If asserts are disabled, this method does nothing except
-     * free all held objects.
+     * Checks whether all objects have been released and asserts if the application was
+     * built in Debug mode. If asserts are disabled, this method does nothing except free
+     * all held objects.
      */
     ~ObjectManager();
 
@@ -106,10 +106,10 @@ public:
     /**
      * Releases the object with the provided \p name. If the object has been requested
      * `i` number of times, and this is the `i`th call for this \p name, the
-     * \p destructionFunction is called with the object to take care of any
-     * additional destruction. OBS: The regular destructor of the object will be
-     * automatically called after the \p destructionFunction returns, so it is **not**
-     * advised for the client to call `delete` on the object as well.
+     * \p destructionFunction is called with the object to take care of any additional
+     * destruction. OBS: The regular destructor of the object will be automatically called
+     * after the \p destructionFunction returns, so it is **not** advised for the client
+     * to call `delete` on the object as well.
      *
      * \param name The unique name of the object that should be released
      * \param destructionFunction The function that can handle additional destruction
@@ -121,12 +121,12 @@ public:
         const DestructionCallback& destructionFunction = [](T*) {});
 
     /**
-     * Releases the provided \p object. If the object has been requested
-     * `i` number of times, and this is the `i`th call for this \p object, the
-     * \p destructionFunction is called with the object to take care of any
-     * additional destruction. OBS: The regular destructor of the object will be
-     * automatically called after the \p destructionFunction returns, so it is **not**
-     * advised for the client to call `delete` on the object as well.
+     * Releases the provided \p object. If the object has been requested `i` number of
+     * times, and this is the `i`th call for this \p object, the \p destructionFunction is
+     * called with the object to take care of any additional destruction. OBS: The regular
+     * destructor of the object will be automatically called after the
+     * \p destructionFunction returns, so it is **not** advised for the client to call
+     * `delete` on the object as well.
      *
      * \param object The object that should be released or `nullptr`
      * \param destructionFunction The function that can handle additional destruction

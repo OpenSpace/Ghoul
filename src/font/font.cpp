@@ -230,7 +230,7 @@ const Font::Glyph* Font::glyph(wchar_t character) {
         }
     }
 
-    // charcode -1 is special: it is used for line drawing (overline, underline,
+    // Charcode -1 is special: it is used for line drawing (overline, underline,
     // strikethrough) and background.
     if (character == static_cast<wchar_t>(-1)) {
         const opengl::TextureAtlas::RegionHandle handle = _atlas.newRegion(4, 4);
@@ -409,10 +409,9 @@ void Font::loadGlyphs(std::vector<wchar_t> characters) {
         const TextureAtlas::RegionHandle handle = _atlas.newRegion(width, height);
 
         // If we don't have an outline for this font, our current 'width' and 'height'
-        // corresponds to the buffer, so we can just use it straight away.
-        // If we have an outline, the buffer has a different size from the region in the
-        // atlas, so we need to copy the values from the buffer into the atlas region
-        // first
+        // corresponds to the buffer, so we can just use it straight away. If we have an
+        // outline, the buffer has a different size from the region in the atlas, so we
+        // need to copy the values from the buffer into the atlas region first
         if (!_hasOutline) {
             if (insideBitmap->bitmap.buffer) {
                 _atlas.setRegionData(handle, insideBitmap->bitmap.buffer);

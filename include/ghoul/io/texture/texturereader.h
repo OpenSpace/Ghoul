@@ -48,7 +48,9 @@ class TextureReaderBase;
  */
 class TextureReader {
 public:
-    /// Exception that gets thrown when there is no reader for the provided \p extension
+    /**
+     * Exception that gets thrown when there is no reader for the provided \p extension.
+     */
     struct MissingReaderException final : public RuntimeError {
         explicit MissingReaderException(std::string extension,
             std::filesystem::path file_);
@@ -57,7 +59,9 @@ public:
         const std::filesystem::path file;
     };
 
-    /// Exception that gets thrown when an invalid load result occurs
+    /**
+     * Exception that gets thrown when an invalid load result occurs.
+     */
     struct InvalidLoadException final : public RuntimeError {
         explicit InvalidLoadException(void* memory, size_t size);
 
@@ -138,9 +142,9 @@ public:
     glm::ivec2 imageSize(const std::filesystem::path& filename) const;
 
     /**
-     * Returns a list of all the extensions that are supported by registered readers. If
-     * a file with an extension included in this list is passed to the loadTexture file
-     * and the file is not corrupted, it will be successfully loaded.
+     * Returns a list of all the extensions that are supported by registered readers. If a
+     * file with an extension included in this list is passed to the loadTexture file and
+     * the file is not corrupted, it will be successfully loaded.
      *
      * \return A list of all supported extensions
      */

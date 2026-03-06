@@ -43,7 +43,9 @@ namespace ghoul::io {
  */
 class TextureReaderBase {
 public:
-    /// The exception that gets thrown if there was an error loading the Texture
+    /**
+     * The exception that gets thrown if there was an error loading the Texture.
+     */
     struct TextureLoadException final : public RuntimeError {
         explicit TextureLoadException(std::filesystem::path name, std::string msg,
             const TextureReaderBase* r);

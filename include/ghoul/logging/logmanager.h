@@ -51,8 +51,8 @@ class Log;
  * The different LogLevel available are: LogLevel::Debug, LogLevel::Info,
  * LogLevel::Warning, LogLevel::Error, LogLevel::Fatal.
  *
- * If a LogManager was created with a LogLevel x, all messages with
- * LogLevel y <= x will be passed to Log handler.
+ * If a LogManager was created with a LogLevel x, all messages with LogLevel `y <= x` will
+ * be passed to Log handler.
  *
  * Macros are defined to make logging messages easier. These macros are: #LDEBUG,
  * #LDEBUGC, #LINFO, #LINFOC, #LWARNING, #LWARNINGC, #LERROR, #LERRORC, #LFATAL, #LFATALC.
@@ -77,9 +77,8 @@ public:
      * \param immediateFlush Determines if all Log%s will be flushed out immediately
      *        after a message was received. In the case of file-backed logs, the files
      *        will be written out to disk and in case of a console log, the console will
-     *        be updated. Passing `true` will slow down the execution but
-     *        guarantees that a crash immediately after a log message won't lead to data
-     *        loss
+     *        be updated. Passing `true` will slow down the execution but guarantees that
+     *        a crash immediately after a log message won't lead to data loss
      */
     LogManager(LogLevel level = LogLevel::Info,
         ImmediateFlush immediateFlush = ImmediateFlush::No);
@@ -94,7 +93,7 @@ public:
      * \param category The category of the message, which will be used depending on the
      *        Log%s
      * \param message The message that will be passed to the Log%s. May contain control
-     *        sequences.
+     *        sequences
      */
     void logMessage(LogLevel level, std::string_view category, std::string_view message);
 

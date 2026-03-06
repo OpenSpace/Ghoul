@@ -74,7 +74,7 @@ public:
         std::string_view message) override;
 
     /**
-     * Flushes the stream and, thereby, all messages that are in the associated buffer
+     * Flushes the stream and, thereby, all messages that are in the associated buffer.
      */
     void flush() override;
 

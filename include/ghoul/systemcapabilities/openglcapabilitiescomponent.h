@@ -127,24 +127,24 @@ public:
     int max3DTextureSize() const;
 
     /**
-     * Returns the maximum number of atomic counter buffer bindings
-     * that are available on the main graphics card.
+     * Returns the maximum number of atomic counter buffer bindings that are available on
+     * the main graphics card.
      *
      * \return The maximum number of bindings
      */
     int maxAtomicCounterBufferBindings() const;
 
     /**
-     * Returns the maximum number of shader storage bindings
-     * that are available on the main graphics card.
+     * Returns the maximum number of shader storage bindings that are available on the
+     * main graphics card.
      *
      * \return The maximum number of bindings
      */
     int maxShaderStorageBufferBindings() const;
 
     /**
-     * Returns the maximum number of uniform buffer bindings
-     * that are available on the main graphics card.
+     * Returns the maximum number of uniform buffer bindings that are available on the
+     * main graphics card.
      *
      * \return The maximum number of bindings
      */

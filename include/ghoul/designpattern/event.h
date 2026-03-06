@@ -79,7 +79,7 @@ private:
         Callback callback;
     };
 
-    /// Maps event topics to subscriber callbacks.
+    /// Maps event topics to subscriber callbacks
     std::unordered_map<std::string, std::vector<Subscriber>> _topics;
 };
 

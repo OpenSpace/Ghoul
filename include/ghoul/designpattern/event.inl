@@ -53,7 +53,7 @@ template <class... T>
 void Event<T...>::unsubscribe(const std::string& name, const std::string& topic) {
     if (_topics.find(topic) != _topics.end()) {
         // Search through the whole array of subscribers to given topic and remove all
-        // callbacks that the corresponds to the subscribers name.
+        // callbacks that the corresponds to the subscribers name
         _topics[topic].erase(
             std::remove_if(
                 _topics[topic].begin(),

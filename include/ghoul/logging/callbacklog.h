@@ -48,7 +48,9 @@ namespace ghoul::logging {
  */
 class CallbackLog : public Log {
 public:
-    /// The type of function that is used as a callback in this log
+    /**
+     * The type of function that is used as a callback in this log.
+     */
     using CallbackFunction = std::function<void(std::string)>;
 
     /**
@@ -82,9 +84,9 @@ public:
         std::string_view message) override;
 
     /**
-     * Replaces the old callback with this `callbackFunction`. This function
-     * is not checked and it is the caller's responsiblity to assure that the function
-     * object is callable.
+     * Replaces the old callback with this `callbackFunction`. This function is not
+     * checked and it is the caller's responsiblity to assure that the function object is
+     * callable.
      *
      * \param callbackFunction The new callback function that will be called henceforth
      */

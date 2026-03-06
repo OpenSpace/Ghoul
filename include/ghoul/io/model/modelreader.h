@@ -45,7 +45,9 @@ public:
     BooleanType(ForceRenderInvisible);
     BooleanType(NotifyInvisibleDropped);
 
-    /// Exception that gets thrown when there is no reader for the provided \p extension
+    /**
+     * Exception that gets thrown when there is no reader for the provided \p extension.
+     */
     struct MissingReaderException final : public RuntimeError {
         explicit MissingReaderException(std::string extension,
             std::filesystem::path file_);
@@ -78,8 +80,8 @@ public:
      * \throw MissingReaderException If there was no reader for the specified \p filename
      * \pre \p filename must not be empty
      * \pre \p filename must have an extension
-     * \pre At least one ModelReaderBase must have been added to the ModelReader
-     *      before (addReader)
+     * \pre At least one ModelReaderBase must have been added to the ModelReader before
+     *      (addReader)
      */
     std::unique_ptr<modelgeometry::ModelGeometry> loadModel(
         const std::filesystem::path& filename,
@@ -87,9 +89,9 @@ public:
         NotifyInvisibleDropped notifyInvisibleDropped = NotifyInvisibleDropped::Yes);
 
     /**
-     * Returns a list of all the extensions that are supported by registered readers. If
-     * a file with an extension included in this list is passed to the loadModel method
-     * and the file is not corrupted, it will be successfully loaded.
+     * Returns a list of all the extensions that are supported by registered readers. If a
+     * file with an extension included in this list is passed to the loadModel method and
+     * the file is not corrupted, it will be successfully loaded.
      *
      * \return A list of all supported extensions
      */
@@ -97,8 +99,8 @@ public:
 
     /**
      * Adds the \p reader to this ModelReader and makes it available through subsequent
-     * calls to loadModel. If an extension is supported by multiple ModelReaderBases,
-     * the ModelReaderBase that was added first will be used.
+     * calls to loadModel. If an extension is supported by multiple ModelReaderBases, the
+     * ModelReaderBase that was added first will be used.
      *
      * \param reader The reader that is to be added to this ModelReader
      *

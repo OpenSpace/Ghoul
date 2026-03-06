@@ -31,9 +31,9 @@ namespace ghoul {
 
 std::vector<uint8_t> decodeBase64(std::string_view base64) {
     // Implementation of this function based on:
-    // 1. https://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base
-    //    64-with-cpp/
-    // 2. https://stackoverflow.com/a/180949
+    //   1. https://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base
+    //      64-with-cpp/
+    //   2. https://stackoverflow.com/a/180949
 
     constexpr std::string_view Base64Chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

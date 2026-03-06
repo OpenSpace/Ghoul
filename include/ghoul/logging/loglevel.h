@@ -36,8 +36,8 @@
 namespace ghoul::logging {
 
 /**
- * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed
- * to be strictly ordered from least important to important.
+ * Enumerates all available LogLevel for the LogManager. The LogLevels are guaranteed to
+ * be strictly ordered from least important to important.
  */
 enum class LogLevel {
     /// All log messages are accepted
@@ -105,7 +105,7 @@ constexpr logging::LogLevel from_string(std::string_view string) {
 }
 
 /**
- * Returns the color representation of the passed LogLevel
+ * Returns the color representation of the passed LogLevel.
  */
 constexpr glm::vec4 toColor(logging::LogLevel level) {
     constexpr glm::vec4 White(0.9f, 0.9f, 0.9f, 1.f);

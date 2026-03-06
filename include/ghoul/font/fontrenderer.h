@@ -52,13 +52,17 @@ class Font;
  */
 class FontRenderer {
 public:
-    /// Information about the bounding box for a rendered text.
+    /**
+     * Information about the bounding box for a rendered text.
+     */
     struct BoundingBoxInformation {
         glm::vec2 boundingBox = glm::vec2(0.f);
         int numberOfLines = 0;
     };
 
-    /// Information about the projected rendered text.
+    /**
+     * Information about the projected rendered text.
+     */
     struct ProjectedLabelsInformation {
         bool enableDepth = false;
         bool enableFalseDepth = false;
@@ -81,7 +85,7 @@ public:
      * passed text. In addition the initial size of the rendering window has to be passed.
      * The inputs for the ProgramObject are as follows:
      *
-     * The <b>vertex shader</b> recieves three `vec2` for each vertex: The `Position`
+     * The **vertex shader** recieves three `vec2` for each vertex: The `Position`
      * (location 0) in pixel screen space coordinates, the `Base Texture Coordinates`
      * (location 1) which provides the texture coordinates for the base font layer, and
      * the `Outline Texture Coordinates` (location 2) which provides the texture
@@ -95,7 +99,7 @@ public:
      * Finally, the `hasOutline` (`bool`) is `true` whether the passed font has an outline
      * or not.
      *
-     * \param program The custom ProgramObject that is used to render any passed text.
+     * \param program The custom ProgramObject that is used to render any passed text
      * \param framebufferSize The size of the framebuffer into which this FontRenderer
      *        renders
      */
@@ -108,10 +112,10 @@ public:
     ~FontRenderer();
 
     /**
-     * Create a new instance of the FontRenderer with a default ProgramObject. This
-     * method requires the FileSystem to be initialized, as temporary files containing the
-     * source code of the ShaderObjects will be created. This method requires a valid
-     * OpenGL state.
+     * Create a new instance of the FontRenderer with a default ProgramObject. This method
+     * requires the FileSystem to be initialized, as temporary files containing the source
+     * code of the ShaderObjects will be created. This method requires a valid OpenGL
+     * state.
      *
      * \return A raw pointer to the new default instance
      */
@@ -147,8 +151,8 @@ public:
      * Check whether the singleton variant of the FontRenderer has already been
      * initialized.
      *
-     * \return `true` if the singleton FontRenderer has already been initialized;
-     *         `false` otherwise
+     * \return `true` if the singleton FontRenderer has already been initialized; `false`
+     *         otherwise
      */
     static bool isInitialized();
 
@@ -164,7 +168,7 @@ public:
      * Returns the singleton FontRenderer that renders projected text. This method
      * triggers an assertion if the FontRenderer was not initialized before usage.
      *
-     * \return The singleton Fontrenderer rendering projected text.
+     * \return The singleton Fontrenderer rendering projected text
      */
     static FontRenderer& defaultProjectionRenderer();
 
@@ -178,9 +182,9 @@ public:
     void setFramebufferSize(glm::vec2 framebufferSize);
 
     /**
-     * Renders the provided \p text to the pixel coordinates \p pos using the Font
-     * \p font in the base color \p color. If the \p font has an outline, it is rendered
-     * in black and the alpha value from the provided \p color.
+     * Renders the provided \p text to the pixel coordinates \p pos using the Font \p font
+     * in the base color \p color. If the \p font has an outline, it is rendered in black
+     * and the alpha value from the provided \p color.
      *
      * \param font The Font that is used to render the provided text
      * \param pos The screen-space position (in pixel coordinates) for 2D text rendering,
@@ -196,9 +200,9 @@ public:
         const glm::vec4& color = glm::vec4(1.f)) const;
 
     /**
-     * Renders the provided \p text to the pixel coordinates \p pos using the Font
-     * \p font in the base color \p color and the outline color \p outlineColor. If the
-     * \p font does not have an outline, the \p outlineColor is ignored.
+     * Renders the provided \p text to the pixel coordinates \p pos using the Font \p font
+     * in the base color \p color and the outline color \p outlineColor. If the \p font
+     * does not have an outline, the \p outlineColor is ignored.
      *
      * \param font The Font that is used to render the provided text
      * \param pos The screen-space position (in pixel coordinates) for 2D text rendering,
@@ -244,8 +248,8 @@ public:
     * \p color's alpha value.
     *
     * \param font The Font that is used to render the provided text
-    * \param pos The world-space coordinate for projection subject rendering that
-    *        is used to render the text
+    * \param pos The world-space coordinate for projection subject rendering that is used
+    *        to render the text
     * \param text The text that is rendered to the screen.The \p text can also contain
     *        `\n` to have a linebreak, which is of the correct length with regard to the
     *        selected font
@@ -267,7 +271,7 @@ public:
     * \param pos The world-space coordinate for projection subject rendering that is used
     *        to render the text
     * \param text The text that is rendered to the screen.The \p text can also contain
-    *        '\\n' to have a linebreak, which is of the correct length with regard to the
+    *        '\n' to have a linebreak, which is of the correct length with regard to the
     *        selected font.
     * \param labelInfo Label information for the rendered text
     * \return The bounding box of the text and the number of lines that were printed

@@ -142,8 +142,8 @@ namespace {
 
         glm::mat4 globalTransform;
         if (node->hasAnimation()) {
-            // Animation is given by Assimp in absolute format
-            // i.e. animation replaces old transform
+            // Animation is given by Assimp in absolute format, i.e. animation replaces
+            // old transform
             globalTransform = parentTransform * node->animationTransform();
         }
         else {

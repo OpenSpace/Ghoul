@@ -61,7 +61,6 @@ std::vector<std::string> stackTrace() {
         const int MaxModuleNameLength = 1024;
         const int MaxAddressLength = 48;
 
-        //
         // Typically this is how the backtrace looks like:
         //
         // 0   <app/lib-name>     0x0000000100000e98 _Z5tracev + 72
@@ -75,7 +74,6 @@ std::vector<std::string> stackTrace() {
         // 8   <app/lib-name>     0x0000000100000fd9 _Z3fn6v + 9
         // 9   <app/lib-name>     0x0000000100001018 main + 56
         // 10  libdyld.dylib      0x00007fff91b647e1 start + 0
-        //
 
         // Split the string, take out chunks out of stack trace. We are primarily
         // interested in module, function and address

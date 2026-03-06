@@ -107,7 +107,7 @@ public:
     /**
      * Checks whether the \p token has been registered to a path before.
      *
-     * \param token The token to be checked.
+     * \param token The token to be checked
      *
      * \return `true` if the \p token has been registered before, `false` otherwise
      */
@@ -125,11 +125,11 @@ public:
 
     /**
      * Creates a CacheManager for this FileSystem. If a CacheManager already exists, this
-     * method will fail and log an error. The passed \p directory has to be a valid
-     * and existing Directory.
+     * method will fail and log an error. The passed \p directory has to be a valid and
+     * existing Directory.
      *
-     * \param directory The directory in which all cached files will be stored. Has
-     *        to be an existing directory with proper read/write access.
+     * \param directory The directory in which all cached files will be stored. Has to be
+     *        an existing directory with proper read/write access.
      *
      * \pre \p directory must point to an existing directory
      * \pre The CacheManager must not have been created before without destroying it
@@ -279,7 +279,7 @@ BooleanType(Sorted);
  * \p recursive is `true`, any directory encountered will be recursively walked and if
  * \p sorted is `true`, the returning vector alphabetically sorted. The \p filter
  * determines for each encountered path whether it should be included or not. If no
- * \p filter is provided all provided paths wil be accepted.
+ * \p filter is provided all provided paths will be accepted.
  *
  * \param path The directory that should be walked
  * \param recursive If this value is set to `true`, then any directory will be recursively
@@ -290,7 +290,7 @@ BooleanType(Sorted);
  * \param filter This filter function will be executed for each encounted path, both files
  *        and directories (if \p recursive is `true`). If the filter function returns
  *        `false` for a path, it will not be included in the final list, if it was a file,
- *        and its contents will not be considered, if it was a directory.
+ *        and its contents will not be considered, if it was a directory
  *
  * \pre \p path must be a valid and existing directory
  */
@@ -302,7 +302,7 @@ std::vector<std::filesystem::path> walkDirectory(const std::filesystem::path& pa
 /**
  * Checks whether \p root is a direct parent of \p p.
  *
- * \return `true` if \p root is a direct parent of \p p. `false` otherwise.
+ * \return `true` if \p root is a direct parent of \p p. `false` otherwise
  */
 bool isSubdirectory(std::filesystem::path p, std::filesystem::path root);
 

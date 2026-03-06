@@ -29,7 +29,7 @@
 #include <memory>
 
 // The coding style in this file is a bit different to make the class in here more similar
-// to the STD
+// to the std
 
 namespace ghoul {
 

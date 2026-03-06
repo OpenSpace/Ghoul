@@ -188,8 +188,10 @@ namespace {
       out_normal = vec4(0.0, 0.0, 1.0, 0.0);
     })";
 
-    // Extracts the next line from the string view and returns it, the passed string_view
-    // is modified to remove the new line *and* the \n character
+    /**
+     * Extracts the next line from the string view and returns it, the passed string_view
+     * is modified to remove the new line *and* the \n character.
+     */
     std::string_view extractLine(std::string_view& view) {
         const std::string_view::size_type p = view.find('\n');
         if (p == std::string_view::npos) {
@@ -664,7 +666,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                 (((projPos[1] / projPos[1].w) + glm::vec4(1.f)) / glm::vec4(2.f)) *
                 glm::vec4(_framebufferSize.x, _framebufferSize.y, 1.f, 1.f);
 
-            // The billboard is bigger than the maximum size allowed:
+            // The billboard is bigger than the maximum size allowed
             heightInPixels =
                 heightInPixels == 0.0 ?
                 glm::length(topLeft - bottomLeft) :
@@ -726,7 +728,7 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
 
             width += glyph->horizontalAdvance;
             height = std::max(height, static_cast<float>(glyph->height));
-        } // end of a line
+        }
 
         size.x = std::max(size.x, width);
         movingPos.y -= h;
@@ -808,9 +810,9 @@ FontRenderer::BoundingBoxInformation FontRenderer::render(Font& font,
                                                           std::string_view text,
                                         const ProjectedLabelsInformation& labelInfo) const
 {
-    constexpr glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
-    constexpr glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
-    return render(font, pos, text, color, outlineColor, labelInfo);
+    constexpr glm::vec4 Color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    constexpr glm::vec4 OutlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    return render(font, pos, text, Color, OutlineColor, labelInfo);
 }
 
 void FontRenderer::setFramebufferSize(glm::vec2 framebufferSize) {
@@ -858,30 +860,29 @@ glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text,
 glm::vec2 RenderFont(Font& font, glm::vec2& pos, std::string_view text,
                      const glm::vec4& color, CrDirection direction)
 {
-    return RenderFont(font, pos, text, color, direction, { 0.f, 0.f, 0.f, color.a });
+    const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, color.a);
+    return RenderFont(font, pos, text, color, direction, outlineColor);
 }
 
 glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text,
                      const glm::vec4& color)
 {
-    return RenderFont(font, pos, text, color, { 0.f, 0.f, 0.f, color.a });
+    const glm::vec4 outlineColor = glm::vec4(0.f, 0.f, 0.f, color.a);
+    return RenderFont(font, pos, text, color, outlineColor);
 }
 
 glm::vec2 RenderFont(Font& font, glm::vec2& pos, std::string_view text,
                      CrDirection direction)
 {
-    return RenderFont(
-        font,
-        pos,
-        text,
-        { 1.f, 1.f, 1.f, 1.f },
-        direction,
-        { 0.f, 0.f, 0.f, 1.f }
-    );
+    constexpr glm::vec4 Color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    constexpr glm::vec4 OutlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    return RenderFont(font, pos, text, Color, direction, OutlineColor);
 }
 
 glm::vec2 RenderFont(Font& font, const glm::vec2& pos, std::string_view text) {
-    return RenderFont(font, pos, text, { 1.f, 1.f, 1.f, 1.f }, { 0.f, 0.f, 0.f, 1.f });
+    constexpr glm::vec4 Color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    constexpr glm::vec4 OutlineColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    return RenderFont(font, pos, text, Color, OutlineColor);
 }
 
 } // namespace ghoul::fontrendering

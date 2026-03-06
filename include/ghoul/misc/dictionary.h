@@ -74,7 +74,9 @@ concept SupportedByDictionary = IsAnyOf<
  */
 class Dictionary {
 public:
-    /// This is a list of all types that can be stored and retrieved from the Dictionary
+    /**
+     * This is a list of all types that can be stored and retrieved from the Dictionary.
+     */
     using Types = std::variant<
         bool, int, double, std::string, std::filesystem::path, Dictionary, void*,
         std::vector<int>, std::vector<double>, std::vector<std::string>,
@@ -151,7 +153,7 @@ public:
     std::vector<std::string_view> keys() const;
 
     /**
-     * Removes the provided \p key from the dictionary.  If the key does not exist, this
+     * Removes the provided \p key from the dictionary. If the key does not exist, this
      * operation does not do anything.
      *
      * \param key The key to remove
@@ -177,7 +179,7 @@ public:
      * values contained in \p dict also exist in this dictionary. This dictionary might
      * contain additional values though.
      *
-     * \p dict The subset dictionary
+     * \param dict The subset dictionary
      * \return `true` if the \p dict is a subset, `false` otherwise
      */
     bool isSubset(const Dictionary& dict) const;

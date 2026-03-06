@@ -51,8 +51,8 @@ public:
      *
      * \param ptr1 The reference to the parameter that will be set when this command is
      *        executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -107,8 +107,8 @@ public:
      *        executed
      * \param ptr2 The reference to the second parameter that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -168,8 +168,8 @@ public:
      *        command is executed
      * \param ptr3 The reference to the third parameter that will be set when this command
      *        is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -208,8 +208,8 @@ protected:
 };
 
 /**
- * This class represents a command that can occur only once in a given commandline and
- * has 4 arguments of respective types \p T, \p U, \p V, and \p U. The command tries to
+ * This class represents a command that can occur only once in a given commandline and has
+ * 4 arguments of respective types \p T, \p U, \p V, and \p U. The command tries to
  * convert the parameters to the appropriate types and stores them. The template classes
  * \p T, \p U, \p V, and \p U must be convertable using an `std::stringstream`.
  *
@@ -234,8 +234,8 @@ public:
      *        is executed
      * \param ptr4 The reference to the fourth parameter that will be set when this
      *        command is executed
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -277,20 +277,17 @@ protected:
 
 /**
  * This class represents a command with zero arguments that can only occur once in a given
- * commandline. The bool pointer will be set to `true`, if the command is
- * executed.
+ * commandline. The bool pointer will be set to `true`, if the command is executed.
  */
 class SingleCommandZeroArguments : public CommandlineCommand {
 public:
     /**
-     * This constructor uses one `bool` parameter that is set to
-     * `true` if this command has bee found. The command does not take
-     * ownership of the passed value.
+     * This constructor uses one `bool` parameter that is set to `true` if this command
+     * has been found. The command does not take ownership of the passed value.
      *
-     * \param ptr The reference to the bool that will be set to `true` on
-     *        execution
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param ptr The reference to the bool that will be set to `true` on execution
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -300,7 +297,7 @@ public:
         std::string shortName = "", std::string infoText = "");
 
     /**
-     * Sets the `bool` value passed in the constructor to `true`
+     * Sets the `bool` value passed in the constructor to `true`.
      */
     void execute(const std::vector<std::string>& /*parameters*/) override;
 

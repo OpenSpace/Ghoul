@@ -51,9 +51,9 @@ std::string toUpperCase(const std::string& s);
 std::string toLowerCase(const std::string& s);
 
 /**
- * Separates the provided \p input URI into separate parts. If \p input is
- * `a.b.c.d 1.e`, the returned vector will contain one entry for
- * `a`, `b`, `c`, `d 1`, and `e`. If an error occurred, an exception will be thrown.
+ * Separates the provided \p input URI into separate parts. If \p input is `a.b.c.d 1.e`,
+ * the returned vector will contain one entry for `a`, `b`, `c`, `d 1`, and `e`. If an
+ * error occurred, an exception will be thrown.
  *
  * \param input The input URI that is to be tokenized using the \p separator
  * \param separator The separator that is used for tokenize the string
@@ -85,7 +85,7 @@ void trimWhitespace(std::string_view& value);
  * of the character(s) (if repeating) will be removed. Useful for strings that are
  * surrounded by unwanted characters such as quotes, brackets, etc.
  *
- * \param valueString The string from which to remove the unwanted characters.
+ * \param valueString The string from which to remove the unwanted characters
  * \param charToRemove The character to remove from both the beginning & end of string
  */
 void trimSurroundingCharacters(std::string& valueString, const char charToRemove);

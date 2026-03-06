@@ -80,8 +80,8 @@ typedef struct {
 void initializeLevmarqStats(LMstat* lmstat);
 
 /**
- * Main function call, finds appropriate values for par[nDOF] that manipulates the
- * camera correctly to direct-manipulation.
+ * Main function call, finds appropriate values for par[nDOF] that manipulates the camera
+ * correctly to direct-manipulation.
  */
 bool levmarq(int npar, double* par, int ny, double* dysq,
     double (*func)(double*, int, void*, LMstat*),

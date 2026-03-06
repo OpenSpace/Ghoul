@@ -43,7 +43,9 @@ namespace ghoul::io {
  */
 class ModelReaderBase {
 public:
-    /// The exception that gets thrown if there was an error loading the Model from file
+    /**
+     * The exception that gets thrown if there was an error loading the Model from file.
+     */
     struct ModelLoadException final : public RuntimeError {
         explicit ModelLoadException(std::filesystem::path name, std::string msg,
             const ModelReaderBase* r);
@@ -58,7 +60,6 @@ public:
         const ModelReaderBase* reader;
     };
 
-    /// Default virtual destructor
     virtual ~ModelReaderBase() = default;
 
     /**
@@ -85,7 +86,7 @@ public:
     /**
      * Returns a list of all extensions.
      *
-     * \return The supported file extensions.
+     * \return The supported file extensions
      */
     virtual std::vector<std::string> supportedExtensions() const = 0;
 };

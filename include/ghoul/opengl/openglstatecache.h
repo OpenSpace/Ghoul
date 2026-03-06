@@ -40,8 +40,10 @@ namespace ghoul::opengl {
  */
 class OpenGLStateCache {
 public:
-    // Currently, this class is a Singleton. In the future we will enable multiple
-    // instances of the class when working with multiple OpenGL contexts.
+    /**
+     * Currently, this class is a Singleton. In the future we will enable multiple
+     * instances of the class when working with multiple OpenGL contexts.
+     */
     static OpenGLStateCache* instance();
 
     OpenGLStateCache(const OpenGLStateCache&) = delete;
@@ -80,7 +82,7 @@ private:
     // FrameBuffers names possible to create
     GLuint _defaultFramebuffer = std::numeric_limits<GLuint>::max();
 
-    // ViewPort
+    // Viewport
     std::array<GLint, 4> _viewport = { 0, 0, 0, 0 };
 
     // Polygon and Culling

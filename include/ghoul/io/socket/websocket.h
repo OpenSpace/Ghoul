@@ -70,7 +70,7 @@ public:
     enum class ClosingReason : int {
         Normal      = 1000,
         GoingAway   = 1001,
-        // custom app-specific reasons
+        // Custom app-specific reasons
         ClosingAll  = 4000
     };
 

@@ -48,9 +48,9 @@ namespace ghoul::logging {
 class BufferLog {
 public:
     /**
-     * This exception is thrown if a call to #log exhausted the available memory and
-     * there is either no registered MemoryExhaustedCallback or the registered callback
-     * failed to free enough memory.
+     * This exception is thrown if a call to #log exhausted the available memory and there
+     * is either no registered MemoryExhaustedCallback or the registered callback failed
+     * to free enough memory.
      */
     struct MemoryExhaustionException final : public RuntimeError {
         explicit MemoryExhaustionException(int sizeTotal, int sizeRequested);
@@ -75,13 +75,13 @@ public:
      * header. The size of the header is version-dependent.
      *
      * \param address The address to the buffer that will be used by this log. The
-     *        ownership of the memory is <b>not</b> passed to the BufferLog by this
+     *        ownership of the memory is **not** passed to the BufferLog by this
      * \param bufferSize The total size of the buffer. It is the callers responsibility to
      *        assure that the provided buffer is at least as big as \p totalSize
-     * \param callback The MemoryExhaustedCallback that will be used when a potential
-     *        log entry would exhaust the available memory in the buffer. It is the
-     *        callback's responsibility to either clear the buffer (#resetBuffer) or
-     *        provide a new buffer that is used instead (#setBuffer)
+     * \param callback The MemoryExhaustedCallback that will be used when a potential log
+     *        entry would exhaust the available memory in the buffer. It is the callback's
+     *        responsibility to either clear the buffer (#resetBuffer) or provide a new
+     *        buffer that is used instead (#setBuffer)
      *
      * \pre \p address must not be `nullptr`
      * \pre \p bufferSize must be positive
@@ -160,15 +160,15 @@ public:
     /**
      * Provides a new buffer that will be used by this BufferLog. This method can be used
      * by the MemoryExhaustCallback to provide a new buffer while taking take of the old
-     * buffer (#buffer) separately. The caller is responsible to ensure that the
-     * \p buffer contains at least as many bytes as \p bufferSize. As the BufferLog does
-     * not take ownership of the provided buffer, the old buffer might become unavailable
-     * after this function call. This has to be taken care of by the caller or a memory
-     * leak will occur. This method is thread-safe.
+     * buffer (#buffer) separately. The caller is responsible to ensure that the \p buffer
+     * contains at least as many bytes as \p bufferSize. As the BufferLog does not take
+     * ownership of the provided buffer, the old buffer might become unavailable after
+     * this function call. This has to be taken care of by the caller or a memory leak
+     * will occur. This method is thread-safe.
      *
      * \param buffer The buffer that will be used by the BufferLog from now on
      * \param bufferSize The size of the buffer that will be used by the BufferLog to
-     *        store messages.
+     *        store messages
      *
      * \pre \p buffer must not be `nullptr`
      * \pre \p bufferSize must be positive
@@ -190,7 +190,7 @@ public:
      * thread-safe.
      *
      * \param filename The path to the file which will hold the contents of the buffer.
-     *        Any existing file at that location will be overwritten in the process.
+     *        Any existing file at that location will be overwritten in the process
      */
     void writeToDisk(const std::string& filename);
 
@@ -202,19 +202,19 @@ protected:
     void initializeBuffer();
 
     /// This block of memory will store all log messages that are added to this BufferLog
-    /// it has to be as big as the value provided in `_totalSize`.
+    /// it has to be as big as the value provided in `_totalSize`
     void* _buffer;
     size_t _totalSize; ///< The total size of the buffer used by this BufferLog
 
     /// This callback will be called when an incoming log message would exhaust the
     /// available memory of the buffer. The callback has to either provide a new buffer
     /// which will be used henceforth (#setBuffer) or mark the current buffer as
-    /// reusable (#resetBuffer).
+    /// reusable (#resetBuffer)
     MemoryExhaustedCallback _callback;
 
     /// This variable is `true` if this BufferLog has had its callback trigged in the
     /// current callstack. It forces some methods to ignore the `atomic_lock` to ensure
-    /// that no deadlock can happen.
+    /// that no deadlock can happen
     bool _inCallbackStack = false;
 };
 

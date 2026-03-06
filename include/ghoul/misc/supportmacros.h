@@ -43,7 +43,7 @@
 #define RESTORE_OPTIMIZATION #warning("OPTIMIZATION macros not implemented")
 
 #elif defined __clang__
-//We are running Clang
+// We are running Clang
 #define DISABLE_OPTIMIZATION #pragma optimize off
 #define RESTORE_OPTIMIZATION #pragma optimize on
 

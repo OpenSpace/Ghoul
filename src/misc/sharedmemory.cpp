@@ -36,9 +36,9 @@
 #include <cstring>
 #include <sys/shm.h>
 // Common access type bits, used with ipcperm()
-constexpr int IPC_R = 000400; // read permission
-constexpr int IPC_W = 000200; // write/alter permission
-constexpr int IPC_M = 010000; // permission to change control info
+constexpr int IPC_R = 000400; // Read permission
+constexpr int IPC_W = 000200; // Write/alter permission
+constexpr int IPC_M = 010000; // Permission to change control info
 #endif // WIN32
 
 namespace {

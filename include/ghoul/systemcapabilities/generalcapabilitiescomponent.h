@@ -115,8 +115,8 @@ public:
     OperatingSystem operatingSystem() const;
 
     /**
-     * Returns the operating system as a parsed string. It should contain the
-     * manufacturer and the version.
+     * Returns the operating system as a parsed string. It should contain the manufacturer
+     * and the version.
      *
      * \return The operating system
      */
@@ -169,7 +169,7 @@ public:
     unsigned int cacheSize() const;
 
     /**
-     * Returns all supported exteions as commaseparated string.
+     * Returns all supported exteions as comma separated string.
      *
      * \return The extension
      */

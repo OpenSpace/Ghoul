@@ -36,8 +36,8 @@ namespace ghoul {
  * Decodes a Base64-encoded string. This function takes a Base64-encoded input string and
  * returns the decoded data as a vector of bytes.
  *
- * \param base64 The Base64-encoded input string.
- * \return A vector containing the decoded bytes.
+ * \param base64 The Base64-encoded input string
+ * \return A vector containing the decoded bytes
  */
 std::vector<uint8_t> decodeBase64(std::string_view base64);
 

@@ -49,7 +49,6 @@ enum class SelectionArea {
  *
  * \param selectionArea The selection area from which to return the contents of. This
  *        parameter is only used on Linux and is ignored on other operating systems
- *
  * \return The contents of the system-wide clipboard
  */
 std::string clipboardText(SelectionArea selectionArea = SelectionArea::Clipboard);

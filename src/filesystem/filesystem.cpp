@@ -159,7 +159,11 @@ std::filesystem::path FileSystem::expandPathTokens(std::string path,
 
             if (beginning == std::string::npos || closing == std::string::npos) {
                 // There is no token left
-                return TokenInformation{ "", std::string::npos, 0 };
+                return TokenInformation {
+                    .token = "",
+                    .beginning = std::string::npos,
+                    .length = 0
+                };
             }
 
             const std::string token = path.substr(beginning, closingLocation - beginning);
@@ -170,7 +174,11 @@ std::filesystem::path FileSystem::expandPathTokens(std::string path,
                 continue;
             }
             else {
-                return TokenInformation{ token, beginning, closingLocation - beginning };
+                return TokenInformation {
+                    .token = token,
+                    .beginning = beginning,
+                    .length = closingLocation - beginning
+                };
             }
         }
     };

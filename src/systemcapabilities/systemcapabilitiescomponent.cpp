@@ -42,8 +42,8 @@ namespace {
     using namespace ghoul;
 
 #ifdef WIN32
-    /// Exception that will be thrown if there was an error regarding Windows
-    /// Management Instrumentation
+    /// Exception that will be thrown if there was an error regarding Windows Management
+    /// Instrumentation
     struct WMIError final : public RuntimeError {
         explicit WMIError(std::string msg, HRESULT code)
             : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")
@@ -217,7 +217,7 @@ void SystemCapabilitiesComponent::initializeWMI() {
         0,                       // Security flags.
         nullptr,                 // Authority (for example, Kerberos)
         nullptr,                 // Context object
-        &_iwbemServices          // pointer to IWbemServices proxy
+        &_iwbemServices          // Pointer to IWbemServices proxy
     );
     if (FAILED(hRes)) {
         _iwbemLocator->Release();
@@ -239,8 +239,8 @@ void SystemCapabilitiesComponent::initializeWMI() {
         nullptr,                     // Server principal name
         RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
         RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
-        nullptr,                     // client identity
-        EOAC_NONE                    // proxy capabilities
+        nullptr,                     // Client identity
+        EOAC_NONE                    // Proxy capabilities
     );
     if (FAILED(hRes)) {
         _iwbemServices->Release();

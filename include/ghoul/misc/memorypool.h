@@ -50,7 +50,7 @@ namespace ghoul {
  *
  * OBS: If the MemoryPool is destroyed, all memory that was returned from the alloc method
  *      is freed, but if the memory was used to create objects, their destructors are not
- *      called.
+ *      called
  *
  * \tparam BucketSize The size of each bucket in bytes
  */
@@ -60,9 +60,9 @@ public:
     const static int _bucketSize = BucketSize;
 
     /**
-     * Creates the MemoryBool with the specified number of buckets already created
+     * Creates the MemoryBool with the specified number of buckets already created.
      *
-     * \param nBuckets the number of buckets that should be created at creation time
+     * \param nBuckets The number of buckets that should be created at creation time
      */
     explicit MemoryPool(int nBuckets = 1);
 
@@ -82,9 +82,8 @@ public:
      * Returns a pointer to an allocated object of type T. The parameters to this function
      * are passed on to the contructor of T.
      *
-     * \param args The arguments to the constructor of T
-     *
      * \tparam T The type of the object that is to be constructed
+     * \param args The arguments to the constructor of T
      */
     template <typename T, class... Types>
     T* alloc(Types&&... args);
@@ -93,7 +92,9 @@ public:
     void do_deallocate(void* p, std::size_t bytes, std::size_t alignment) final;
     bool do_is_equal(const pmr::memory_resource& other) const noexcept final;
 
-    /// Returns the number of buckets that have been allocated
+    /**
+     * Returns the number of buckets that have been allocated.
+     */
     int nBuckets() const;
 
     /**
@@ -102,7 +103,9 @@ public:
      */
     std::vector<int> occupancies() const;
 
-    /// Returns the total occupancy for the whole MemoryPool
+    /**
+     * Returns the total occupancy for the whole MemoryPool.
+     */
     int totalOccupancy() const;
 
 private:
@@ -139,7 +142,7 @@ public:
     /**
      * Creates the MemoryBool with the specified number of buckets already created.
      *
-     * \param nBuckets the number of buckets that should be created at creation time
+     * \param nBuckets The number of buckets that should be created at creation time
      */
     explicit ReusableTypedMemoryPool(int nBuckets = 1);
 
@@ -163,7 +166,7 @@ public:
      *
      * \param n The number of Ts that determine the size of the reserved memory block
      * \return A list of pointers that each are big enough to hold a single T. These are
-     *         not guaranteed to be contiguous.
+     *         not guaranteed to be contiguous
      */
     std::vector<void*> allocate(int n);
 
@@ -173,7 +176,7 @@ public:
      *
      * \param ptr The pointer that should be returned and marked for reuse. This pointer
      *            must be a pointer that has previously been returned by the allocate
-     *            method.
+     *            method
      */
     void free(T* ptr);
 

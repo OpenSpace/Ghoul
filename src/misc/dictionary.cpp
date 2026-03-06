@@ -53,7 +53,9 @@ namespace {
     template <typename T> using isGLMType = is_one_of<T, GLMTypes>;
 
 
-    /// Exception that is thrown if the Dictionary does not contain a provided key
+    /**
+     * Exception that is thrown if the Dictionary does not contain a provided key.
+     */
     struct KeyError final : public RuntimeError {
         explicit KeyError(std::string msg)
             : RuntimeError(std::move(msg), "Dictionary")

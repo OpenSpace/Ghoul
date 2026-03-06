@@ -65,21 +65,23 @@ struct LuaExecutionException final : public LuaRuntimeException {
     const std::filesystem::path filename;
 };
 
-/// If an instance of this struct is passed to the #push method, it will cause a nil value
-/// to be pushed onto the stack
+/**
+ * If an instance of this struct is passed to the #push method, it will cause a nil value
+ * to be pushed onto the stack.
+ */
 struct nil_t {};
 
 BooleanType(PopValue);
 
 /**
- * Returns the location of the calling function using `luaL_where` and returns
- * that location as a string. This method is just a wrapper around this function and its
- * use is for non-fatal error handling.
+ * Returns the location of the calling function using `luaL_where` and returns that
+ * location as a string. This method is just a wrapper around this function and its use is
+ * for non-fatal error handling.
  *
  * \param state The Lua state that is to be examined
  * \return The location of the function whose stack is being tested
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  */
 [[nodiscard]] const char* errorLocation(lua_State* state);
 
@@ -93,20 +95,20 @@ BooleanType(PopValue);
  * \return The symbolic value that is returned by the `luaL_error` function to signal the
  *         Lua interpreter that an error has occurred
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  */
 int luaError(lua_State* state, const std::string& message);
 
 /**
  * Returns a string describing the \p state's value at location \p location. Supported
- * value types are `boolean`, `number`, `string` and `table`. For other types, only
- * the type as converted to string is returned.
+ * value types are `boolean`, `number`, `string` and `table`. For other types, only the
+ * type as converted to string is returned.
  *
  * \param state The Lua state from which to read the value
  * \param location The location from which the value should be extracted
  * \return A string representation of the value
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  */
 [[nodiscard]] std::string luaValueToString(lua_State* state, int location);
 
@@ -117,7 +119,7 @@ int luaError(lua_State* state, const std::string& message);
  * \param tableLocation The location from which the table should be extracted
  * \return A string representation of the table
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  * \pre The Lua object at location \p tableLocation must be a table
  */
 [[nodiscard]] std::string luaTableToString(lua_State* state, int tableLocation);
@@ -137,7 +139,7 @@ int luaError(lua_State* state, const std::string& message);
  * \param state The Lua state that will have its stack printed
  * \return The description of the current \p state's stack
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  */
 [[nodiscard]] std::string stackInformation(lua_State* state);
 
@@ -161,8 +163,8 @@ int luaError(lua_State* state, const std::string& message);
  * \throw FormattingException If the #ghoul::Dictionary contains mixed keys of both type
  *        `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
- * \throw LuaRuntimeException If there was an error initializing a new Lua state if it
- *        was necessary
+ * \throw LuaRuntimeException If there was an error initializing a new Lua state if it was
+ *        necessary
  * \pre \p filename must not be empty
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
@@ -180,15 +182,15 @@ void loadDictionaryFromFile(const std::filesystem::path& filename, Dictionary& d
  * \param filename The filename pointing to the script that is executed.
  * \param state If this is set to a valid lua_State, this state is used instead of
  *        creating a new state. It is the callers responsibility to ensure that the passed
- *        state is valid if this parameter is not `nullptr`. After calling this
- *        method, the stack of the passed state will be empty after this function returns
+ *        state is valid if this parameter is not `nullptr`. After calling this method,
+ *        the stack of the passed state will be empty after this function returns
  * \return The ghoul::Dictionary described by the Lua script
  *
  * \throw FormattingException If the #ghoul::Dictionary contains mixed keys of both type
  *        `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
- * \throw LuaRuntimeException If there was an error initializing a new Lua state if it
- *        was necessary
+ * \throw LuaRuntimeException If there was an error initializing a new Lua state if it was
+ *        necessary
  * \pre \p filename must not be empty
  * \pre \p filename must be a path to an existing file
  * \post The \p state%'s stack is empty
@@ -212,8 +214,8 @@ Dictionary loadDictionaryFromFile(const std::filesystem::path& filename,
  *        state is valid. After calling this method, the stack of the passed state will be
  *        empty
  *
- * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
- *        keys of both type `string` and type `number`
+ * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed keys of
+ *        both type `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
@@ -257,8 +259,8 @@ void loadArrayDictionaryFromString(const std::string& script, Dictionary& dictio
  *        empty
  * \return The ghoul::Dictionary described by the Lua script
  *
- * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed
- *        keys of both type `string` and type `number`
+ * \throw ghoul::lua::FormattingException If the #ghoul::Dictionary contains mixed keys of
+ *        both type `string` and type `number`
  * \throw FormattingException If the script did not return anything else but a table
  * \pre \p script must not be empty
  * \post \p state%'s stack is empty
@@ -300,7 +302,7 @@ Dictionary loadArrayDictionaryFromString(const std::string& script,
  *
  * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
  *        `string` and type `number`
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  * \post \p state%'s stack is unchanged
  */
 void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
@@ -318,7 +320,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
  * \return The #ghoul::Dictionary into which the values from the stack are added
  * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
  *        `string` and type `number`
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  * \post \p state%'s stack is unchanged
  */
 Dictionary luaDictionaryFromState(lua_State* state, int location = -1);
@@ -333,7 +335,7 @@ Dictionary luaDictionaryFromState(lua_State* state, int location = -1);
  * \param dictionary The #ghoul::Dictionary into which the values from the stack are
  *        added
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  * \post \p state%'s stack is unchanged
  */
 void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary);
@@ -341,7 +343,6 @@ void luaArrayDictionaryFromState(lua_State* state, Dictionary& dictionary);
 
 /**
  * Converts the Lua type to a human-readable string. The supported types are:
- *
  *   - `LUA_TNONE`: None
  *   - `LUA_TNIL`: Nil
  *   - `LUA_TBOOLEAN`: Boolean
@@ -382,7 +383,7 @@ lua_State* createNewLuaState(bool sandboxed = true, bool loadStandardLibraries =
  *
  * \param state The Lua state that is to be deleted
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  */
 void destroyLuaState(lua_State* state);
 
@@ -396,7 +397,7 @@ void destroyLuaState(lua_State* state);
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
  * \throw FileNotFoundError If the file does not exist
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  * \pre \p filename must not be empty
  * \pre \p filename must be a file that exist
  */
@@ -409,7 +410,7 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename);
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
  *
- * \pre \p state must not be nullptr
+ * \pre \p state must not be `nullptr`
  * \pre \p script must not be empty
  */
 void runScript(lua_State* state, std::string_view script);
@@ -460,9 +461,9 @@ int checkArgumentsAndThrow(lua_State* L, std::pair<int, int> range,
     const char* component = nullptr);
 
 /**
- * Checks if the number of arguments on the Lua stack is in either equal to \p
- * expected ro inside the \p range of allowed values. If the numbers do not agree, an
- * error is logged and a ghoul::lua::LuaExecutionException is raised.
+ * Checks if the number of arguments on the Lua stack is in either equal to \p expected or
+ * inside the \p range of allowed values. If the numbers do not agree, an error is logged
+ * and a ghoul::lua::LuaExecutionException is raised.
  *
  * \param L The Lua stack from which the arguments are checked
  * \param expected The expected value
@@ -504,11 +505,10 @@ bool isScriptBinary(std::string_view script);
  * \tparam T The type of the return value.
  * \param L The stack from which the value is checked
  * \param location The location at which the value is checked
- *
  * \return `true` if the value at location exists and has the requested type `T` `false`
  *         otherwise
  *
- * \pre L must not be nullptr
+ * \pre L must not be `nullptr`
  */
 template <typename T>
 bool hasValue(lua_State* L, int location = -1);
@@ -524,7 +524,7 @@ bool hasValue(lua_State* L, int location = -1);
  *        the stack
  *
  * \throw LuaFormatException If the value at the provided stack location is not T
- * \pre L must not be nullptr
+ * \pre L must not be `nullptr`
  */
 template <typename T>
 T value(lua_State* L, int location = -1, PopValue shouldPopValue = PopValue::Yes);
@@ -535,15 +535,15 @@ T value(lua_State* L, int location = -1, PopValue shouldPopValue = PopValue::Yes
  * the wrong type, a LuaFormatException is thrown.  It is possible to pass
  * std::optional<T> as arguments, which do not have to exist, but if they do, they have to
  * be of the right type.  Furthermore, first all non-optional arguments must be listed
- * before any std::optional arguments are listed
+ * before any std::optional arguments are listed.
  *
  * \param L The stack from which the values are extracted
- * \param location The base location fro mwhich the values are extracted
+ * \param location The base location from which the values are extracted
  * \param shouldPopValue If the values were successfully retrieved, should they be removed
  *        from the stack
  *
  * \throw LuaFormatException If the value at the provided stack location is not T
- * \pre L must not be nullptr
+ * \pre L must not be `nullptr`
  */
 template <typename... Ts>
 constexpr std::tuple<Ts...> values(lua_State* L, int location = 1,
@@ -564,7 +564,7 @@ constexpr std::tuple<Ts...> values(lua_State* L, int location = 1,
  * \param location The location on the registry where the user data is stored
  * \return A pointer to the user data at the specified location
  *
- * \pre \p L must not be nullptr
+ * \pre \p L must not be `nullptr`
  */
 template <typename T>
 T* userData(lua_State* L, int location = 1);
@@ -592,7 +592,7 @@ T* userData(lua_State* L, int location = 1);
  * \param arguments The variable arguments that are pushed to the stack in the order in
  *        which they appear in this function call
  *
- * \pre \p L must not be nullptr
+ * \pre \p L must not be `nullptr`
  */
 template <typename... Ts>
 void push(lua_State* L, Ts... arguments);
@@ -611,7 +611,7 @@ namespace internal {
      * \param location The location from which the value should be extracted
      *
      * \throw LuaFormatException If the value at the provided stack location is not T
-     * \pre \p L must not be nullptr
+     * \pre \p L must not be `nullptr`
      */
     template <typename T>
     T valueInner(lua_State* L, int location = 1);

@@ -52,7 +52,7 @@ ObjectManager<T>::~ObjectManager() {
 template <typename T>
 void ObjectManager<T>::releaseAll(Warnings emitWarnings) {
     // If we are not interested in the warnings, we can just clear the map and let the
-    // destructors do their job right away.
+    // destructors do their job right away
     if (!emitWarnings) {
         _objects.clear();
         return;

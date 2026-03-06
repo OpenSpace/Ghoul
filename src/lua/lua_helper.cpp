@@ -45,7 +45,7 @@ namespace {
         if (relativeLocation >= 0) {
             return relativeLocation;
         }
-        // Negative indices implies indexing the stack from top.
+        // Negative indices implies indexing the stack from top
         // -1 is the topmost item. +1 is the first item
         const int nItems = lua_gettop(state);
         return nItems + relativeLocation + 1;
@@ -399,7 +399,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
 
     lua_pushnil(state);
     while (lua_next(state, location) != 0) {
-        // get the key
+        // Get the key
         std::string key;
         const int keyType = lua_type(state, KeyTableIndex);
         switch (keyType) {
@@ -433,7 +433,7 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
                 throw LuaFormatException("Table index type is not a number or a string");
         }
 
-        // get the value
+        // Get the value
         const int valueType = lua_type(state, ValueTableIndex);
         switch (valueType) {
             case LUA_TNUMBER: {

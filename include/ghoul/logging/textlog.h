@@ -64,9 +64,8 @@ public:
      *        a single file will be used. If this is 3, there will be files
      *        `filename.ext`, `filename-1.ext`, and `filename-2.ext` with the numbered
      *        files being the previous versions of the log file.
-     * \param writeToAppend If this is `true`, the log messages will be appended
-     *        to the file. If it is `false` the file will be overwritten without
-     *        a warning
+     * \param writeToAppend If this is `true`, the log messages will be appended to the
+     *        file. If it is `false` the file will be overwritten without a warning
      * \param timeStamping Determines if the log should print the time when a message is
      *        logged in the log messages
      * \param dateStamping Determines if the log should print the time when a message is

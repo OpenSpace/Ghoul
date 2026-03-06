@@ -62,10 +62,14 @@ public:
      */
     FontManager(glm::ivec3 atlasDimensions = glm::ivec3(512, 512, 1));
 
-    /// Initializes the TextureAtlas backend and requires a valid OpenGL state.
+    /**
+     * Initializes the TextureAtlas backend and requires a valid OpenGL state.
+     */
     void initialize();
 
-    /// Deinitializes the TextureAtlas backend and requires a valid OpenGL state.
+    /**
+     * Deinitializes the TextureAtlas backend and requires a valid OpenGL state.
+     */
     void deinitialize();
 
     /**

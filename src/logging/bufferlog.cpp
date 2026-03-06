@@ -135,7 +135,7 @@ void BufferLog::setCallback(MemoryExhaustedCallback callback) {
 
 void BufferLog::resetBuffer() {
     // Resetting the buffer does not overwrite any of the data but resets the
-    // firstEmptyByte pointer so that following log will overwrite the buffer
+    // `firstEmptyByte` pointer so that following log will overwrite the buffer
     Header& h = header(_buffer);
 
     // If test_and_set returns 'true', someone else is in the critical section unless we

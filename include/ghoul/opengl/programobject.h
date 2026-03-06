@@ -151,8 +151,6 @@ public:
 
     /**
      * Sets the shader object callback.
-     *
-     * \param changeCallback object
      */
     void setProgramObjectCallback(ProgramObjectCallback changeCallback);
 
@@ -161,7 +159,7 @@ public:
      *
      * \param shaderObject The ShaderObject that will be attached to this ProgramObject.
      *
-     * \pre \p shaderObject must not be nullptr
+     * \pre \p shaderObject must not be `nullptr`
      * \pre \p shaderObject must not have been registered before
      */
     void attachObject(std::shared_ptr<ShaderObject> shaderObject);
@@ -171,7 +169,7 @@ public:
      *
      * \param shaderObject The ShaderObject that should be detached.
      *
-     * \pre \p shaderObject must not be nullptr
+     * \pre \p shaderObject must not be `nullptr`
      * \pre \p shaderObject must have been registered before
      */
     void detachObject(const std::shared_ptr<ShaderObject>& shaderObject);
@@ -340,10 +338,6 @@ public:
         const std::filesystem::path& tessellationEvaluationShaderPath,
         const std::filesystem::path& tessellationControlShaderPath,
         const Dictionary& dictionary = Dictionary());
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    ////// Uniforms
-    //////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Enables and disables the logging of a warning if the location of a uniform can not
@@ -2107,8 +2101,8 @@ public:
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
-     * \p v3, and \p v4. Returns `true` if the vertex attribute could be found;
-     * `false` otherwise. Will call the OpenGL function `glVertexAttribI4i`.
+     * \p v3, and \p v4. Returns `true` if the vertex attribute could be found; `false`
+     * otherwise. Will call the OpenGL function `glVertexAttribI4i`.
      *
      * \param name The name of the vertex attribute to be set
      * \param v1 The first value the vertex attribute should be set to
@@ -3055,9 +3049,9 @@ public:
     void setAttribute(GLuint location, const glm::dvec2& value) const;
 
     /**
-     * Sets the vertex attribute \p location to the passed \p value. Returns
-     * `true` if the vertex attribute could be found; `false` otherwise. Will call the
-     * OpenGL function `glVertexAttribL3dv`.
+     * Sets the vertex attribute \p location to the passed \p value. Returns `true` if the
+     * vertex attribute could be found; `false` otherwise. Will call the OpenGL function
+     * `glVertexAttribL3dv`.
      *
      * \param location The location of the vertex attribute
      * \param value The value the vertex attribute should be set to
@@ -3329,10 +3323,6 @@ public:
     void setAttribute(GLuint location, const glm::dmat4x4& value,
         Transpose transpose = Transpose::No) const;
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    ////// Attributes
-    //////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * Enables and disables the logging of a warning if the location of a subroutine can
      * not be found in any of the attached ShaderObjects.
@@ -3528,8 +3518,8 @@ private:
     /// All the ShaderObjects that are managed and attached to this ProgramObject
     std::vector<std::shared_ptr<ShaderObject>> _shaderObjects;
 
-    /// A flag indicating whether the program needs to be recompiled
-    /// due to a change in the shader source or in the dictionary
+    /// A flag indicating whether the program needs to be recompiled due to a change in
+    /// the shader source or in the dictionary
     bool _programIsDirty = true;
 };
 

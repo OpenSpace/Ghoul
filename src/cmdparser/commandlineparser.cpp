@@ -154,8 +154,8 @@ CommandlineParser::DisplayHelpText CommandlineParser::execute() {
         // Test if the next argument is a command or a parameter for a nameless argument.
         // The restriction for '-' is enforced in the #addCommand method
         if (_arguments[i][0] != '-') {
-            // The rest of the commands until the next '-' are for the nameless command
-            // if we have one
+            // The rest of the commands until the next '-' are for the nameless command if
+            // we have one
             if (_commandForNamelessArguments) {
                 const int number = extractArguments(
                     _arguments,

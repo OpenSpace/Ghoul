@@ -35,20 +35,22 @@ class FileSystem;
 
 /**
  * This class is a handle for a generic file in the file system. The main functionality is
- * a platform-independent way of being notified of changes of the file. The constructor
- * or the #setCallback methods expect an `std::function` object (possibly initialized
- * using a lambda-expression) that will be called whenever the file changes on the hard
- * disk. The callback function has this object passed as a parameter. If many changes of
- * the file happen in quick succession, each change will trigger a separate call of the
- * callback. The file system is not polled, but the changes are pushed to the application,
- * so the changes are registered efficiently and are solely impacted by the overhead of
+ * a platform-independent way of being notified of changes of the file. The constructor or
+ * the #setCallback methods expect an `std::function` object (possibly initialized using a
+ * lambda-expression) that will be called whenever the file changes on the hard disk. The
+ * callback function has this object passed as a parameter. If many changes of the file
+ * happen in quick succession, each change will trigger a separate call of the callback.
+ * The file system is not polled, but the changes are pushed to the application, so the
+ * changes are registered efficiently and are solely impacted by the overhead of
  * `std::function`.
  *
  * \see FileSystem The system to register and use tokens
  */
 class File {
 public:
-    /// The type of the std::function that is used as the prototype for the callback
+    /**
+     * The type of the std::function that is used as the prototype for the callback.
+     */
     using FileChangedCallback = std::function<void()>;
 
     /**
@@ -57,7 +59,6 @@ public:
      * \param filename The path to the file this File object should point to
      *
      * \pre \p filename must not be empty
-     *
      */
     File(std::filesystem::path filename);
 
@@ -79,8 +80,8 @@ public:
 
 
     /**
-     * Sets a new callback function that will be used for this File object. If there
-     * has not been a callback before, there are no race conditions. If there has been a
+     * Sets a new callback function that will be used for this File object. If there has
+     * not been a callback before, there are no race conditions. If there has been a
      * registered callback before and the callback is changed from another thread, a race
      * condition might appear if a file is changed in the file system at the same time.
      *
@@ -111,13 +112,11 @@ private:
     /// The filename of this File
     std::filesystem::path _filename;
 
-    /**
-     * The callback that is called when the file changes on disk. Has no performance
-     * impact when it is not used.
-     */
+    /// The callback that is called when the file changes on disk. Has no performance
+    /// impact when it is not used
     FileChangedCallback _fileChangedCallback;
 
-    int _indx = -1;
+    int _index = -1;
 };
 
 } // namespace ghoul::filesystem

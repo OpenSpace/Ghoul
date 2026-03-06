@@ -106,10 +106,8 @@ private:
     /// The number in `[0, maxTexUnits]` referring to this TextureUnit
     GLint _number = 0;
 
-    /**
-     * The enum in `[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]` referring to this
-     * TextureUnit
-     */
+    /// The enum in `[GL_TEXTURE0, GL_TEXTURE0 + maxTexUnits]` referring to this
+    /// TextureUnit
     GLenum _glEnum = GLenum(0);
 
     /// `true` if this TextureUnit has been assigned

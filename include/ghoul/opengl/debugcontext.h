@@ -98,7 +98,6 @@ enum class Type : std::underlying_type_t<GLenum> {
     Portability = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_PORTABILITY),
     /// Implementation-dependent performance warnings
     Performance = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_PERFORMANCE),
-    // These three values are not available on OpenGL prior to 4.3
     /// Annotation of the command stream
     Marker = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_TYPE_MARKER),
     /// Entering a debug group
@@ -120,7 +119,7 @@ enum class Severity : std::underlying_type_t<GLenum> {
     /// linker errors
     High = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SEVERITY_HIGH),
     /// Severe performance warnings; GLSL or other shader compiler and linker warnings;
-    ///use of currently deprecated behavior
+    /// use of currently deprecated behavior
     Medium = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SEVERITY_MEDIUM),
     /// Performance warnings from redundant state changes; trivial undefined behavior
     Low = static_cast<std::underlying_type_t<GLenum>>(GL_DEBUG_SEVERITY_LOW),
@@ -198,15 +197,15 @@ void setDebugCallback(CallbackFunction callback);
 namespace ghoul {
 
 /**
-* Converts a string with a \p value into a opengl::debug::Source object.
-* The valid values are "API", "Window System", "Shader Compiler", "Third Party",
-* "Application", "Other", and "Don't care".
-*
-* \param value The string containing the name of a opengl::debug::Source
-*
-* \throw std::out_of_range if the \p value is not a valid name of an
-*        opengl::debug::Source object
-*/
+ * Converts a string with a \p value into a opengl::debug::Source object.
+ * The valid values are "API", "Window System", "Shader Compiler", "Third Party",
+ * "Application", "Other", and "Don't care".
+ *
+ * \param value The string containing the name of a opengl::debug::Source
+ *
+ * \throw std::out_of_range if the \p value is not a valid name of an
+ *        opengl::debug::Source object
+ */
 template <>
 constexpr opengl::Source from_string(std::string_view value) {
     if (value == "API") { return opengl::Source::API; }
@@ -221,15 +220,15 @@ constexpr opengl::Source from_string(std::string_view value) {
 }
 
 /**
-* Converts a string with a \p value into a opengl::debug::Source object.
-* The valid values are "Error", "Deprecated", "Undefined", "Portability",
-* "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
-*
-* \param value The string containing the name of a opengl::debug::Type
-*
-* \throw std::out_of_range if the \p value is not a valid name of an
-*        opengl::debug::Type object
-*/
+ * Converts a string with a \p value into a opengl::debug::Source object. The valid values
+ * are "Error", "Deprecated", "Undefined", "Portability", "Performance", "Marker",
+ * "Push group", "Pop group", "Other", and "Don't care".
+ *
+ * \param value The string containing the name of a opengl::debug::Type
+ *
+ * \throw std::out_of_range if the \p value is not a valid name of an opengl::debug::Type
+ *        object
+ */
 template <>
 constexpr opengl::Type from_string(std::string_view value) {
     if (value == "Error") { return opengl::Type::Error; }
@@ -247,14 +246,14 @@ constexpr opengl::Type from_string(std::string_view value) {
 }
 
 /**
-* Converts a string with a \p value into a opengl::debug::Severity object.
-* The valid values are "High", "Medium", "Low", and "Notification".
-*
-* \param value The string containing the name of a opengl::debug::Severity
-*
-* \throw std::out_of_range if the \p value is not a valid name of an
-*        opengl::debug::Severity object
-*/
+ * Converts a string with a \p value into a opengl::debug::Severity object. The valid
+ * values are "High", "Medium", "Low", and "Notification".
+ *
+ * \param value The string containing the name of a opengl::debug::Severity
+ *
+ * \throw std::out_of_range if the \p value is not a valid name of an
+ *        opengl::debug::Severity object
+ */
 template <>
 constexpr opengl::Severity from_string(std::string_view value) {
     if (value == "High") { return opengl::Severity::High; }
@@ -266,9 +265,9 @@ constexpr opengl::Severity from_string(std::string_view value) {
 }
 
 /**
- * Converts the \p value object into its string representation.
- * The valid return values are: "API", "Window System", "Shader Compiler", "Third Party",
- * "Application", "Other", and "Don't care".
+ * Converts the \p value object into its string representation. The valid return values
+ * are: "API", "Window System", "Shader Compiler", "Third Party", "Application", "Other",
+ * and "Don't care".
  *
  * \param value The ghoul::opengl::debug::Source that is converted into a string
  * \return The string representation of the \p value
@@ -288,9 +287,9 @@ inline std::string to_string(const opengl::Source& value) {
 }
 
 /**
- * Converts the \p value object into its string representation.
- * The valid return values are: "Error", "Deprecated", "Undefined", "Portability",
- * "Performance", "Marker", "Push group", "Pop group", "Other", and "Don't care".
+ * Converts the \p value object into its string representation. The valid return values
+ * are: "Error", "Deprecated", "Undefined", "Portability", "Performance", "Marker",
+ * "Push group", "Pop group", "Other", and "Don't care".
  *
  * \param value The ghoul::opengl::debug::Type that is converted into a string
  * \return The string representation of the \p value
@@ -313,8 +312,8 @@ inline std::string to_string(const opengl::Type& value) {
 }
 
 /**
- * Converts the \p value object into its string representation.
- * The valid return values are: "High", "Medium", "Low", and "Notification".
+ * Converts the \p value object into its string representation. The valid return values
+ * are: "High", "Medium", "Low", and "Notification".
  *
  * \param value The ghoul::opengl::debug::Severity that is converted into a string
  * \return The string representation of the \p value

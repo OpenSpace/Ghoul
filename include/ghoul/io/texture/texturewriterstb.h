@@ -30,7 +30,9 @@
 
 namespace ghoul::io {
 
-/// Writes the texture using the Sean Barrett's stb_image library
+/**
+ * Writes the texture using the Sean Barrett's stb_image library.
+ */
 class TextureWriterSTB : public TextureWriterBase {
     /**
      * Saves the \p texture to disk.

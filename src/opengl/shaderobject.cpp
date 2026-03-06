@@ -105,7 +105,7 @@ const std::string& ShaderObject::name() const {
 void ShaderObject::setShaderObjectCallback(ShaderObjectCallback changeCallback) {
     _onChangeCallback = std::move(changeCallback);
     // The ShaderPreprocessor will take care to call the callback whenever the underlying
-    // file changes, an included file changes, or the dictionary changes.
+    // file changes, an included file changes, or the dictionary changes
     _preprocessor.setCallback(_onChangeCallback);
 }
 

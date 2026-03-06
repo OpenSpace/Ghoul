@@ -33,8 +33,8 @@ namespace ghoul {
 template <typename T> using Integrand = std::function<T(double)>;
 
 /**
- * Compute the approximate integral of integrand \p f numerially using Simpson's Rule.
- * The interval for the integration is given by \p t0 and \p t1.
+ * Compute the approximate integral of integrand \p f numerially using Simpson's Rule. The
+ * interval for the integration is given by \p t0 and \p t1.
  *
  * \param t0 The lower bound for the integration interval
  * \param t1 The upper bound for the integration interval

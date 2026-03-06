@@ -37,7 +37,7 @@ namespace bufferbinding {
         ShaderStorage,
         Uniform
     };
-} // bufferbinding
+} // namespace bufferbinding
 
 /**
  * This class manages buffer bindings for ATOMIC_COUNTER_BUFFER, GL_SHADER_STORAGE_BUFFER,
@@ -63,9 +63,9 @@ public:
     ~BufferBinding();
 
     /**
-     * This method returns the binding number that was assigned to this BufferBinding.
-     * If this is the first call to #bindingNumber, a free binding number
-     * will be assigned to this object.
+     * This method returns the binding number that was assigned to this BufferBinding. If
+     * this is the first call to #bindingNumber, a free binding number will be assigned to
+     * this object.
      *
      * \return The buffer binding number that was assigned to this BufferBinding
      */
@@ -81,8 +81,8 @@ public:
     operator GLint();
 
     /**
-     * Deinitializes all the used BufferBinding%s and marks them as free. The total
-     * number of used buffer bindings after this call will be `0`.
+     * Deinitializes all the used BufferBinding%s and marks them as free. The total numbe
+     * of used buffer bindings after this call will be `0`.
      */
     static void deinitialize();
 
@@ -123,11 +123,11 @@ private:
     /// The number in `[0, maxBindings]` referring to this BufferBinding
     GLint _number = 0;
 
-    /// `true` if the list of busy bindings and the maximum number of bindings
-    /// have been initialized
+    /// `true` if the list of busy bindings and the maximum number of bindings have been
+    /// initialized
     static bool _isInitialized;
 
-    // assigned
+    /// assigned
     bool _assigned = false;
 
     /// The total number of active texture bindings

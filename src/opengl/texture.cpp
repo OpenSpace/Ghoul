@@ -45,9 +45,11 @@ namespace {
         {}
     };
 
-    // Returns the internal format for the provided format initialization struct. If the
-    // internal format is explicitly specified, it is returned. Otherwise it is deduced
-    // from the format and dataType parameters.
+    /**
+     * Returns the internal format for the provided format initialization struct. If the
+     * internal format is explicitly specified, it is returned. Otherwise it is deduced
+     * from the format and dataType parameters.
+     */
     constexpr GLenum toInternalFormat(const Texture::FormatInit& frmt) {
         if (frmt.internalFormat.has_value()) {
             return *frmt.internalFormat;

@@ -118,8 +118,8 @@ public:
      * must return the new-allocated class. The function pointer is stored in the
      * TemplateFactory.
      *
-     * \param useDictionary `true` if the class was called with a provided
-     *        Dictionary and the Dictionary should be used
+     * \param useDictionary `true` if the class was called with a provided Dictionary and
+     *        the Dictionary should be used
      * \param dict The Dictionary that should be used to initialize the subclass. If
      *        \p useDictionary is `false`, this is the empty Dictionary
      * \return The initialized subclass of type `BaseClass`
@@ -187,8 +187,8 @@ public:
      *
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre `Class` must be derived from `BaseClass`
-     * \pre `Class` must have a default constructor or a constructor that takes
-     *      a Dictionary
+     * \pre `Class` must have a default constructor or a constructor that takes a
+     *      Dictionary
      * \pre \p className must not be empty
      */
     template <typename Class>
@@ -200,14 +200,14 @@ public:
      * is it called in the #create methods of TemplateFactory. The `std::function` object
      * is stored inside.
      *
-     * \param className The class name, which will be registered with the provided
-     *        factory function
+     * \param className The class name, which will be registered with the provided factory
+     *        function
      * \param factoryFunction The `std::function` that will be called if the
      *        TemplateFactory is asked to create a class of type \p className. The first
-     *        argument of the function pointer is `true` if the #create method
-     *        was called with a Dictionary as an additional parameter, implying that the
-     *        subclass should be constructed using the Dictionary provided as the second
-     *        argument. The factory function is free to ignore this request
+     *        argument of the function pointer is `true` if the #create method was called
+     *        with a Dictionary as an additional parameter, implying that the subclass
+     *        should be constructed using the Dictionary provided as the second argument.
+     *        The factory function is free to ignore this request
      *
      * \throw TemplateFactoryError If the \p className has been registered before
      * \pre \p className must not be empty
@@ -220,8 +220,8 @@ public:
 
     /**
      * Checks if any class has been registered under the provided \p className As any
-     * invalid class will create a compile-time error, if a class has been registered,
-     * it is guaranteed that the \p className can be used to generate a valid instance.
+     * invalid class will create a compile-time error, if a class has been registered, it
+     * is guaranteed that the \p className can be used to generate a valid instance.
      *
      * \param className The class name that is to be tested
      * \return `true` if the \p className was used in #registerClass before; `false`
@@ -240,9 +240,9 @@ public:
     std::vector<std::string> registeredClasses() const override;
 
     /**
-     * Returns the `type_info` of the baseclass for this factory, i.e., the
-     * base class which is the super class for all actual instances that can be created
-     * using the #create method.
+     * Returns the `type_info` of the baseclass for this factory, i.e., the base class
+     * which is the super class for all actual instances that can be created using the
+     * #create method.
      *
      * \return The `type_info` of the baseclass for this factory
      */

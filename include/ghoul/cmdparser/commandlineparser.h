@@ -54,7 +54,7 @@ public:
      * \param longHelpCommand The long version of the command used to request help
      *        information
      */
-    CommandlineParser(std::string programName = "",
+    explicit CommandlineParser(std::string programName = "",
         AllowUnknownCommands allowUnknownCommands = AllowUnknownCommands::No,
         std::string shortHelpCommand = "-h",
         std::string longHelpCommand = "--help");
@@ -108,12 +108,12 @@ public:
      * executed, thus leaving the CommandlineCommands in an undefined state. In the case
      * of any other exception, none of the CommandlineCommands have been executed.
      *
-     * \return `true` if the help message should be displayed by the caller
-     *         using the displayHelp method.
+     * \return `true` if the help message should be displayed by the caller using the
+     *         displayHelp method
      *
-     * \throw CommandlineException If there are malformed commandline parameters that
-     *        were passed in the setCommandLine method. Malformed parameters may be due
-     *        to invalid commands, multiple commands for commands that do not allow for
+     * \throw CommandlineException If there are malformed commandline parameters that were
+     *        passed in the setCommandLine method. Malformed parameters may be due to
+     *        invalid commands, multiple commands for commands that do not allow for
      *        multiple executions, wrong parameter types, error with unnamed arguments
      * \throw CommandExecutionException If the execution of a CommandlineCommand failed
      */
@@ -151,16 +151,16 @@ public:
     /**
      * Returns if a command with the provided \p name has previously been registered.
      *
-     * \return `true` if a CommandlineCommand with the provided \p name has
-     *         previously been registered; `false` otherwise
+     * \return `true` if a CommandlineCommand with the provided \p name has previously
+     *         been registered; `false` otherwise
      */
     bool hasCommandForName(const std::string& name) const;
 
     /**
      * Returns if a command with the provided \p shortName has previously been registered.
      *
-     * \return `true` if a CommandlineCommand with the provided \p shortName
-     *         has previously been registered; `false` otherwise
+     * \return `true` if a CommandlineCommand with the provided \p shortName has
+     *         previously been registered; `false` otherwise
      */
     bool hasCommandForShortName(const std::string& shortName) const;
 
@@ -193,8 +193,8 @@ public:
      * command registered as the nameless command.
      *
      * \param command Show information for the command with the CommandlineCommand::name
-     *        or CommandlineCommand::shortName only. If `command = "Nameless"`
-     *        the usage information for the nameless argument is logged
+     *        or CommandlineCommand::shortName only. If `command = "Nameless"` the usage
+     *        information for the nameless argument is logged
      * \return The usage information for the provided CommandlineCommand
      *
      * \pre command must not be an empty string
@@ -225,8 +225,8 @@ protected:
      *
      * \param shortOrLongName Either the CommandlineCommand::name or
      *        CommandlineCommand::shortName of the command that should be fetched
-     * \return The command that respond to the given name or short name, or
-     *         `nullptr` if no such CommandlineCommand exists
+     * \return The command that respond to the given name or short name, or `nullptr` if
+     *         no such CommandlineCommand exists
      */
     CommandlineCommand* getCommand(const std::string& shortOrLongName);
 

@@ -29,7 +29,7 @@ template <typename T>
 double integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f) {
     ghoul_assert(n >= 2, "Number of partitions, n, must be at least 2");
 
-    // n must be an even number
+    // `n` must be an even number
     if (n % 2 != 0) {
         n += 1;
     }
@@ -39,13 +39,13 @@ double integrateSimpsonsRule(double t0, double t1, int n, Integrand<T> f) {
     T times4 = T(0);
     T times2 = T(0);
 
-    // weight 4
+    // Weight 4
     for (int i = 1; i < n; i += 2) {
         double t = t0 + static_cast<double>(i) * h;
         times4 += f(t);
     }
 
-    // weight 2
+    // Weight 2
     for (int i = 2; i < n; i += 2) {
         double t = t0 + static_cast<double>(i) * h;
         times2 += f(t);

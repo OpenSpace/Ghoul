@@ -698,7 +698,8 @@ std::string ShaderPreprocessor::includedFiles() const {
     for (size_t i = 0; i < _includedFiles.size(); i++) {
         result = std::format("{}{}: {}\n", result, i, _includedFiles[i].path());
     }
-    result.pop_back(); // remove the trailing \n
+    // Remove the trailing \n
+    result.pop_back();
     return result;
 }
 

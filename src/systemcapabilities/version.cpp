@@ -29,7 +29,7 @@
 
 namespace {
     constexpr unsigned int packVersion(int major, int minor, int release) {
-        // safe since: 2^8 * 1000 * 1000 < 2^32
+        // Safe since: 2^8 * 1000 * 1000 < 2^32
         return major * 1000 * 1000  +  minor * 1000  +  release;
     }
 } // namespace

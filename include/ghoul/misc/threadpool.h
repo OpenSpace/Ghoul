@@ -220,10 +220,10 @@ public:
     void clearRemainingTasks();
 
     /**
-     * This function queues a task and returns an `std::future` object that
-     * holds a potential return value of the function. The common use-case is passing a
-     * lambda expression to this function that either returns a value or just performs its
-     * task on the referenced values. All tasks passed to this functions are potentially
+     * This function queues a task and returns an `std::future` object that holds a
+     * potential return value of the function. The common use-case is passing a lambda
+     * expression to this function that either returns a value or just performs its task
+     * on the referenced values. All tasks passed to this functions are potentially
      * executed in parallel unless this ThreadPool was initialized with only a single
      * worker in the constructor or a subsequent call to #resize. The template parameters
      * of this function are best to be automatically determined. Example use-case:
@@ -277,8 +277,8 @@ public:
      * \tparam Args A variable list of arguments that can be passed to the \p task
      * \param task The task that will be executed.
      * \param arguments The potential list of arguments passed to the \p task
-     * \return A future containing the result of the evaluation of \p task with the
-     *         passed \p arguments.
+     * \return A future containing the result of the evaluation of \p task with the passed
+     *         \p arguments.
      */
     template <typename T, typename... Args>
     auto queue(std::packaged_task<T>&& task, Args&&... arguments)
@@ -309,20 +309,20 @@ private:
     };
 
     /**
-     * This class represents a thin wrapper around `std::queue` that provides
-     * `std::mutex` protection for the available methods, thus making them
-     * thread-safe to use. As soon as there is a better adapter pattern for the STL
-     * classes that works in a concurrent environment, this class is not needed anymore.
+     * This class represents a thin wrapper around `std::queue` that provides `std::mutex`
+     * protection for the available methods, thus making them thread-safe to use. As soon
+     * as there is a better adapter pattern for the STL classes that works in a concurrent
+     * environment, this class is not needed anymore.
      */
     class TaskQueue {
     public:
         /**
          * Returns the top element of the queue and whether this item existed. If the
-         * queue was empty, `{ Task(), false }` is returned, otherwise the
-         * second argument to the `tuple` is `true`.
+         * queue was empty, `{ Task(), false }` is returned, otherwise the second argument
+         * to the `tuple` is `true`.
          *
-         * \return A tuple containing either the top element of the queue and
-         *         `true`, or a default constructed Task and `false`
+         * \return A tuple containing either the top element of the queue and `true`, or a
+         *         default constructed Task and `false`
          */
         std::tuple<Task, bool> pop();
 
@@ -380,8 +380,8 @@ private:
     /// This mutex guards pushing to the queue
     std::mutex _queueMutex;
 
-    /// The mutex used by the `condition_variable` `_cv` used to
-    /// wait for and wake up Worker%s based on incoming Task%s
+    /// The mutex used by the `condition_variable` `_cv` used to wait for and wake up
+    /// Worker%s based on incoming Task%s
     std::shared_ptr<std::mutex> _mutex;
 
     /// The condition variable that is used to wake up Worker%s when new Task%s are
@@ -400,8 +400,8 @@ private:
     thread::ThreadPriorityClass _threadPriorityClass;
     /// The ghoul::thread::ThreadPriorityLevel of all the Worker%s of this ThreadPool
     thread::ThreadPriorityLevel _threadPriorityLevel;
-    /// Whether all Worker%s of this ThreadPool are started in the background mode
-    /// (if supported by the operating system)
+    /// Whether all Worker%s of this ThreadPool are started in the background mode (if
+    /// supported by the operating system)
     thread::Background _threadBackground;
 };
 

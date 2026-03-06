@@ -73,7 +73,7 @@ public:
     void interceptInput(InputInterceptor interceptor);
     void uninterceptInput();
 
-    /// Methods for binary communication
+    // Methods for binary communication
     template <typename T = char>
     bool get(T* buffer, size_t nItems = 1);
 
@@ -91,7 +91,7 @@ private:
      * Read size bytes from the socket, store them in buffer and dequeue them from input.
      * Block until size bytes have been read.
      *
-     * \return `false` if this fails. Use error() to get the socket error code.
+     * \return `false` if this fails. Use error() to get the socket error code
      */
     bool getBytes(char* buffer, size_t nItems = 1);
 
@@ -99,21 +99,21 @@ private:
      * Read size bytes from the socket, store them in buffer. Do NOT dequeue them from
      * input. Block until size bytes have been read.
      *
-     * \return `false` if this fails. Use error() to get the socket error code.
+     * \return `false` if this fails. Use error() to get the socket error code
      */
     bool peekBytes(char* buffer, size_t nItems);
 
     /**
      * Skip size bytes from the socket. Block until size bytes have been read.
      *
-     * \return `false` if this fails. Use error() to get the socket error code.
+     * \return `false` if this fails. Use error() to get the socket error code
      */
     bool skipBytes(size_t nItems);
 
     /**
      * Write size bytes from buffer into the socket.
      *
-     * \return `false` if this fails. Use error() to get the socket error code.
+     * \return `false` if this fails. Use error() to get the socket error code
      */
     bool putBytes(const char* buffer, size_t size = 1);
 

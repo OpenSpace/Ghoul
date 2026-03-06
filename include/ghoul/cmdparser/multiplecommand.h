@@ -285,8 +285,8 @@ protected:
 
 /**
  * This class represents a command with zero arguments which can be called multiple times
- * in a given commandline. The `int` pointer will contain the number of how
- * often the command was present in the command-line.
+ * in a given commandline. The `int` pointer will contain the number of how often the
+ * command was present in the command-line.
  *
  * \see MultipleCommand
  */
@@ -298,8 +298,8 @@ public:
      *
      * \param nExecutions The reference to the int that will be set to the number of
      *        executions
-     * \param name The full name for this command. Has to start with a `-` in
-     *        order to be valid
+     * \param name The full name for this command. Has to start with a `-` in order to be
+     *        valid
      * \param shortName The (optional) short name for this command. If it is provided, it
      *        has to start with a `-` in order to be valid
      * \param infoText The info text that will be presented to the user if it is requested
@@ -309,10 +309,9 @@ public:
         std::string shortName = "", std::string infoText = "");
 
     /**
-     * Increases the `int` value passed in the constructor by one per
-     * execution.
+     * Increases the `int` value passed in the constructor by one per execution.
      */
-    void execute(const std::vector<std::string>& /*parameters*/) override;
+    void execute(const std::vector<std::string>& parameters) override;
 
 protected:
     int& _ptr;

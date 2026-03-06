@@ -218,7 +218,7 @@ void GeneralCapabilitiesComponent::detectOS() {
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
         // For applications that have been manifested for Windows 8.1 or Windows 10.
         // Applications not manifested for Windows 8.1 or Windows 10 will return the
-        // Windows 8 OS version value (6.2).
+        // Windows 8 OS version value (6.2)
         if (osVersionInfo.dwMajorVersion == 10) {
             if (osVersionInfo.dwMinorVersion == 0) {
                 if (osVersionInfo.wProductType == VER_NT_WORKSTATION) {
@@ -375,7 +375,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     // __cpuid with an InfoType argument of 0 returns the number of valid Ids in
     // CPUInfo[0] and the CPU identification string in the other three array elements. The
     // CPU identification string is not in linear order. The code below arranges the
-    // information in a human readable form.
+    // information in a human readable form
     int CPUInfo[4] = { -1 };
     __cpuid(CPUInfo, 0);
     unsigned nIds = CPUInfo[0];
@@ -389,7 +389,7 @@ void GeneralCapabilitiesComponent::detectCPU() {
     for (unsigned i = 0; i <= nIds; i++) {
         __cpuid(CPUInfo, i);
 
-        // Interpret CPU feature information.
+        // Interpret CPU feature information
         if (i == 1) {
             hasSSE3NewInstructions = (CPUInfo[2] & 0x1);
             hasMonitorMWait = (CPUInfo[2] & 0x8);
@@ -399,19 +399,19 @@ void GeneralCapabilitiesComponent::detectCPU() {
         }
     }
 
-    // Calling __cpuid with 0x80000000 as the InfoType argument
-    // gets the number of valid extended IDs.
+    // Calling __cpuid with 0x80000000 as the InfoType argument gets the number of valid
+    // extended IDs
     __cpuid(CPUInfo, 0x80000000);
     unsigned nExIds = CPUInfo[0];
 
     char CPUBrandString[64];
     std::memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
-    // Get the information associated with each extended ID.
+    // Get the information associated with each extended ID
     for (unsigned i = 0x80000000; i <= nExIds; i++) {
         __cpuid(CPUInfo, i);
 
-        // Interpret CPU brand string and cache information.
+        // Interpret CPU brand string and cache information
         if (i == 0x80000002) {
             std::memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
         }

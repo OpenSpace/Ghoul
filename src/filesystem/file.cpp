@@ -66,11 +66,11 @@ const std::filesystem::path& File::path() const {
 }
 
 void File::installFileChangeListener() {
-    _indx = FileSys.addFileListener(path(), _fileChangedCallback);
+    _index = FileSys.addFileListener(path(), _fileChangedCallback);
 }
 
 void File::removeFileChangeListener() const {
-    FileSys.removeFileListener(_indx);
+    FileSys.removeFileListener(_index);
 }
 
 } // namespace ghoul::filesystem

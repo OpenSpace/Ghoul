@@ -169,8 +169,8 @@ T* MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::alloc(Types&&... args) 
 
 template <int BucketSize, bool InjectDebugMemory, bool NoDealloc>
 void MemoryPool<BucketSize, InjectDebugMemory, NoDealloc>::do_deallocate(void* ptr,
-                                                                        size_t bytes,
-                                                                     size_t /*alignment*/)
+                                                                         size_t bytes,
+                                                                         size_t)
 {
     ZoneScoped;
 

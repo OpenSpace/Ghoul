@@ -40,7 +40,9 @@ struct AssertionException final : public std::runtime_error {
         std::string func, int line);
 };
 
-/// Exception that gets thrown if switch-case statement is missing a case.
+/**
+ * Exception that gets thrown if switch - case statement is missing a case.
+ */
 struct MissingCaseException final : public std::logic_error {
     MissingCaseException();
 };

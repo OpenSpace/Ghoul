@@ -43,7 +43,7 @@ public:
     virtual bool hasPendingSockets() const = 0;
 
     /**
-     * Get next pending connection. Non-blocking. Can return nullptr.
+     * Get next pending connection. Non-blocking. Can return `nullptr`.
      */
     virtual std::unique_ptr<Socket> nextPendingSocket() = 0;
 

@@ -144,7 +144,7 @@ void ThreadPool::resize(int nThreads) {
 
     const int oldNThreads = size();
     if (oldNThreads <= nThreads) {
-        // if the number of threads has increased
+        // If the number of threads has increased
         _workers.resize(nThreads);
 
         // We only want to activate the new workers if we are not currently running
@@ -155,7 +155,7 @@ void ThreadPool::resize(int nThreads) {
         }
     }
     else {
-        // the number of threads has decreased
+        // The number of threads has decreased
         for (int i = oldNThreads - 1; i >= nThreads; --i) {
             // Tell the superfluous threads to finish
             *(_workers[i].shouldTerminate) = true;
@@ -163,11 +163,11 @@ void ThreadPool::resize(int nThreads) {
             // And detach the thread so we can safely remove the Worker object
             _workers[i].thread->detach();
         }
-        // The notification will do nothing for the first 'nThreads' threads, but it
-        // will cause the remaining 'nThreads - oldNThreads' to return
+        // The notification will do nothing for the first 'nThreads' threads, but it will
+        // cause the remaining 'nThreads - oldNThreads' to return
         _cv->notify_all();
 
-        // safe to delete because the threads are detached
+        // Safe to delete because the threads are detached
         _workers.resize(nThreads);
     }
     ghoul_assert(size() == nThreads, "The ThreadPool contains wrong number of workers");
@@ -229,9 +229,9 @@ void ThreadPool::activateWorker(Worker& worker) {
 
         // Infinite look that only gets broken if this thread should terminate or if it
         // gets woken up without there being a task
-        while (true) {  // loop #1
+        while (true) {
             // If there is something in the queue
-            while (hasTask) { // loop #2
+            while (hasTask) {
                 finishedInitializing = true;
 
                 // Do the task
@@ -259,7 +259,7 @@ void ThreadPool::activateWorker(Worker& worker) {
             // If we get here, there is no more work to be done and the ThreadPool is
             // still running, so we can sleep until there is more work
             (*nWaiting)++;
-            while (true) { // loop #3
+            while (true) {
                 finishedInitializing = true;
 
                 // We are doing this in an infinite loop, as we want to check regularly if

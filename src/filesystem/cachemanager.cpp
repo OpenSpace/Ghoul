@@ -57,7 +57,7 @@ namespace {
     using LoadedCacheInfo = std::pair<unsigned long, std::filesystem::path>;
 
     unsigned int generateHash(const std::filesystem::path& file, std::string_view info) {
-        // something that cannot occur in the filesystem
+        // Something that cannot occur in the filesystem
         constexpr char HashDelimiter = '|';
 
         const std::string s = std::format("{}{}{}", file, HashDelimiter, info);
@@ -260,8 +260,8 @@ std::filesystem::path CacheManager::cachedFilename(const std::filesystem::path& 
 
     const auto it = _files.find(hash);
     if (it != _files.cend()) {
-        // If we find the hash, it has been created before and we can just return the
-        // file name to the caller
+        // If we find the hash, it has been created before and we can just return the file
+        // * name to the caller
         return it->second;
     }
 

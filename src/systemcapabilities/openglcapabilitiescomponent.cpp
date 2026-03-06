@@ -139,7 +139,7 @@ void OpenGLCapabilitiesComponent::detectDriverInformation() {
     );
 
     queryWMI("Win32_VideoController", "AdapterRAM", _adapterRAM);
-    // adapterRAM is in bytes
+    // `adapterRAM` is in bytes
     _adapterRAM = (_adapterRAM / 1024) / 1024;
 
     queryWMI("Win32_VideoController", "Name", _adapterName);

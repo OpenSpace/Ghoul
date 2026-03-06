@@ -32,8 +32,8 @@ namespace ghoul {
 
 /**
  * Returns an interpolated value based on the factor supplied in \p t. In addition to the
- * interpolation factor \p t two values which to interpolate between must be supplied.
- * For `t = 0.0`, \p p0 is returned, for `t = 1.0`, \p p1 is returned.
+ * interpolation factor \p t two values which to interpolate between must be supplied. For
+ * `t = 0.0`, \p p0 is returned, for `t = 1.0`, \p p1 is returned.
  *
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation
@@ -80,13 +80,13 @@ T interpolateCatmullRom(double t, const T& p0, const T& p1, const T& p2, const T
  * on an implementation by Mika Rantanen:
  * https://qroph.github.io/2018/07/30/smooth-paths-using-catmull-rom-splines.html
  *
- * Four control points are used in the interpolation; \p p0, \p p1, \p p2, and \p p3.
- * The interpolation is calculated based on the interpolation factor \p t and the
- * parameter \p alpha, that controls the shape of the curve. A smaller alpha leads to
- * tighter turns at the control points, and that the resulting spline matches the control
- * polygon more closely. Centripetal version for alpha = 0, uniform for alpha = 0.5
- * and chordal for alpha = 1. Note that the "tension" value in Rantanen's implementation
- * is ignored (i.e. set to 1).
+ * Four control points are used in the interpolation; \p p0, \p p1, \p p2, and \p p3. The
+ * interpolation is calculated based on the interpolation factor \p t and the parameter
+ * \p alpha, that controls the shape of the curve. A smaller alpha leads to tighter turns
+ * at the control points, and that the resulting spline matches the control polygon more
+ * closely. Centripetal version for alpha = 0, uniform for alpha = 0.5 and chordal for
+ * alpha = 1. Note that the "tension" value in Rantanen's implementation is ignored (i.e.
+ * set to 1).
  *
  * \param t The interpolation factor to use in interpolation
  * \param p0 The first control point of the interpolation

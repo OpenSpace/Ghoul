@@ -49,7 +49,9 @@ namespace {
     constexpr int DefaultConstructor = 1;
     constexpr int DictionaryConstructor = 2;
 
-    // Create Class using only the default constructor
+    /**
+     * Create Class using only the default constructor.
+     */
     template <typename BaseClass, typename Class>
     BaseClass* createDefault(bool useDictionary, const ghoul::Dictionary& dict,
                              pmr::memory_resource* pool)
@@ -73,7 +75,9 @@ namespace {
         }
     }
 
-    // Create Class using the default constructor or the Dictionary
+    /**
+     * Create Class using the default constructor or the Dictionary.
+     */
     template <typename BaseClass, typename Class>
     BaseClass* createDefaultAndDictionary(bool useDictionary,
                                           const ghoul::Dictionary& dict,
@@ -99,7 +103,9 @@ namespace {
         }
     }
 
-    // Create Class using only the Dictionary constructor
+    /**
+     * Create Class using only the Dictionary constructor.
+     */
     template <typename BaseClass, typename Class>
     BaseClass* createDictionary(bool useDictionary, const ghoul::Dictionary& dict,
                                 pmr::memory_resource* pool)

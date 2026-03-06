@@ -55,9 +55,9 @@ namespace {
                 return 0;
             case ThreadPriorityClass::High:
                 switch (p) {
-                    // Min-Max values come from the man page of getschedparam
-                    // normal value was measured to be the default value
-                    // below/above normal values are halfway between other values
+                    // Min-Max values come from the man page of getschedparam normal value
+                    // was measured to be the default value below/above normal values are
+                    // halfway between other values
                     case ThreadPriorityLevel::Lowest:      return 1;
                     case ThreadPriorityLevel::BelowNormal: return 16;
                     case ThreadPriorityLevel::Normal:      return 32;

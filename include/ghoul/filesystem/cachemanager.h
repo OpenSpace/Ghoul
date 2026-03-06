@@ -104,9 +104,9 @@ public:
 
     /**
      * Removes the cached file and deleted the entry from the CacheManager. If the
-     * `file` has not previously been used to request a cache entry, no error
-     * will be signaled. If no information is provided, the method will use the date of
-     * last modification as a unique identifier for the file.
+     * `file` has not previously been used to request a cache entry, no error will be
+     * signaled. If no information is provided, the method will use the date of last
+     * modification as a unique identifier for the file.
      *
      * \param file The file for which the cache file should be deleted
      * \param information The detailed information for the cached file which should be

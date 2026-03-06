@@ -61,17 +61,19 @@ public:
      * This class contains the metrics and the texture locations in the TextureAtlas for a
      * single glyph for a specific font. Each glyph supplies two pairs of coordinates:
      *
-     * 1. The top left and bottom right corners of the base glyph (i.e., the regular
-     *    glyph if it is rendered without an outline.
+     * 1. The top left and bottom right corners of the base glyph (i.e., the regular glyph
+     *    if it is rendered without an outline
      * 2. The top left and bottom right corners of the outline glyph (i.e., a filled glyph
      *    that can be rendered behind the base glyph in a different color to provide an
-     *    outline to the base.
+     *    outline to the base
      */
     class Glyph {
     public:
         friend class Font;
 
-        /// The default constructor for a Glyph
+        /**
+         * The default constructor for a Glyph.
+         */
         Glyph(wchar_t character_, int width_ = 0, int height_ = 0,
             float leftBearing_ = 0.f, float topBearing_ = 0.f, float advanceX_ = 0.f,
             float advanceY_ = 0.f, glm::vec2 texCoordTopLeft_ = glm::vec2(0.f),
@@ -178,9 +180,9 @@ public:
      * this Font. The value returned is in pixel values and provides the width and the
      * height of the text if it were to be rendered.
      *
-     * \param text The text that is rendered to the screen. The `text` can also
-     *        contain `\n` to have a linebreak, which is of the correct length for the
-     *        selected font.
+     * \param text The text that is rendered to the screen. The `text` can also contain
+     *        `\n` to have a linebreak, which is of the correct length for the selected
+     *        font
      * \return The pixel coordinates of the bounding box of the passed text
      */
     glm::vec2 boundingBox(std::string_view text);
@@ -217,7 +219,9 @@ public:
     const opengl::Texture& atlasTexture() const;
 
 private:
-    /// Generates the Kerning values for all Glyph pairs that have sofar been loaded
+    /**
+     * Generates the Kerning values for all Glyph pairs that have sofar been loaded.
+     */
     void generateKerning();
 
     /// A list of all loaded Glyphs

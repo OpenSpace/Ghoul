@@ -37,8 +37,8 @@ namespace ghoul::cmdparser {
  * A command is an operation that can be called via command line arguments on program
  * startup. As this class is virtual, it has to be derived from with the #execute method
  * implemented. The CommandlineCommand are used by adding them to the CommandlineParser,
- * using the method CommandlineParser::addCommand. The common way of using the commands
- * is to pass a variable of appropriate type to the CommandlineCommand by reference, which
+ * using the method CommandlineParser::addCommand. The common way of using the commands is
+ * to pass a variable of appropriate type to the CommandlineCommand by reference, which
  * gets set to the correct value when the command is executed. Within the parser, the
  * command's `name` and `shortName` must be unique.
  *
@@ -51,7 +51,7 @@ public:
 
     /**
      * Exception that gets thrown if an error occurs in the CommandlineCommand::execute
-     * that could not be checked in the CommandlineCommand::checkParameters method
+     * that could not be checked in the CommandlineCommand::checkParameters method.
      */
     struct CommandExecutionException final : public RuntimeError {
         explicit CommandExecutionException(std::string msg);
@@ -59,7 +59,7 @@ public:
 
     /**
      * Exception that gets thrown if an error occurs in the
-     * ComandlineCommand::checkParameters
+     * ComandlineCommand::checkParameters.
      */
     struct CommandParameterException final : public RuntimeError {
         explicit CommandParameterException(std::string msg);
@@ -175,9 +175,9 @@ public:
 
 protected:
     /**
-     * Casts the string value \p s into the type `T`. If the conversion fails,
-     * an CommandException is thrown. The conversion is done via an
-     * `std::stringstream` so it can only cast those types supported by the stream.
+     * Casts the string value \p s into the type `T`. If the conversion fails, an
+     * CommandException is thrown. The conversion is done via an `std::stringstream` so it
+     * can only cast those types supported by the stream.
      *
      * \tparam T The type of the value which should be converted
      * \param s The `std::string` representation of the value

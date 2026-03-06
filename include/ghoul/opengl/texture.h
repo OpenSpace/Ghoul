@@ -113,19 +113,19 @@ public:
     struct FormatInit {
         /// The size of the new texture. The dimensionality of the dimensions must agree
         /// with the type of the texture. If a 2D texture is created, the `z` component of
-        /// the dimension should be set to `1`.
+        /// the dimension should be set to `1`
         glm::uvec3 dimensions;
 
         /// The type of the texture, should be one of GL_TEXTURE_1D, GL_TEXTURE_2D,
-        /// GL_TEXTURE_3D, etc.
+        /// GL_TEXTURE_3D, etc
         GLenum type;
 
-        /// Specifies the format of the data.
+        /// Specifies the format of the data
         Format format;
 
         /// The data type of the pixel data. See
         /// http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for a list of
-        /// possible values.
+        /// possible values
         GLenum dataType;
 
         /// The internal format for the texture. See
@@ -134,26 +134,26 @@ public:
         /// support hardware compression. See
         /// http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for more information.
         /// If this value is not specified, a suitable internal format will be
-        /// automatically selected based on the passed `format` and `dataType` parameters.
+        /// automatically selected based on the passed `format` and `dataType` parameters
         std::optional<GLenum> internalFormat = std::nullopt;
     };
 
     struct SamplerInit {
-        /// The Texture::FilterMode that will be used to interpolate between texels.
+        /// The Texture::FilterMode that will be used to interpolate between texels
         FilterMode filter = FilterMode::Linear;
 
         /// The Texture::WrappingMode that will be used to generate values on the border
-        /// of the texture.
+        /// of the texture
         std::variant<WrappingMode, WrappingModes> wrapping = WrappingMode::Repeat;
 
         /// If the \p filter is set to \c LinearMipMap or \c AnisotropicMipMap, this
-        /// specifies the level to be used.
+        /// specifies the level to be used
         std::optional<int> mipMapLevel = std::nullopt;
 
         /// Sets the border color of the texture
         std::optional<glm::vec4> borderColor = std::nullopt;
 
-        /// Changes the general swizzle mask of the texture.
+        /// Changes the general swizzle mask of the texture
         std::optional<std::array<GLenum, 4>> swizzleMask = std::nullopt;
     };
 
@@ -167,10 +167,10 @@ public:
      * \param data The data for the texture that should be uploaded or \c nullptr if no
      *        data should be uploaded
      * \param pixelAlignment The pixel alignment of the provided data.
-     * \param keepMemory If this is `Yes`, the passed memory in the `data` pointer will
-     *        be kept on the CPU. The memory behind the `data` pointer will still be owned
-     *        by the caller. This object will make a local copy of the data. If it is `No`
-     *        it will not be stored after passing the data to the GPU.
+     * \param keepMemory If this is `Yes`, the passed memory in the `data` pointer will be
+     *        kept on the CPU. The memory behind the `data` pointer will still be owned by
+     *        the caller. This object will make a local copy of the data. If it is `No` it
+     *        will not be stored after passing the data to the GPU.
      */
     explicit Texture(FormatInit format, SamplerInit sampler,
         const std::byte* data = nullptr, int pixelAlignment = 1,
@@ -237,7 +237,7 @@ public:
      *
      * \return The type for this texture. This value can either be `GL_TEXTURE_1D`,
      *         `GL_TEXTURE_2D` or `GL_TEXTURE_3D` depending on the dimension of the stored
-     *         texture.
+     *         texture
      */
     GLenum type() const;
 

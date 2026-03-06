@@ -41,8 +41,10 @@ namespace ghoul::modelgeometry {
 
 class ModelGeometry {
 public:
-    /// The exception that gets thrown if there was an error loading the cache file or
-    /// saving this model to a cache file
+    /**
+     * The exception that gets thrown if there was an error loading the cache file or
+     * saving this model to a cache file.
+     */
     struct ModelCacheException final : public RuntimeError {
         explicit ModelCacheException(std::filesystem::path file, std::string msg);
 
