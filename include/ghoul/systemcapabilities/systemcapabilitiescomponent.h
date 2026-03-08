@@ -96,7 +96,7 @@ public:
      * WMI is not used.
      *
      * \param initializeWMI If this parameter is `true`, the Windows Management
-     *        Instrumentation will be initialized.
+     *        Instrumentation will be initialized
      */
     SystemCapabilitiesComponent(InitializeWMI initializeWMI = InitializeWMI::Yes);
 

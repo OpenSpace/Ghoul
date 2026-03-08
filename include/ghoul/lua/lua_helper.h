@@ -152,7 +152,7 @@ int luaError(lua_State* state, const std::string& message);
  * restriction on the script is that it can only contain a pure array-style table (= only
  * indexed by numbers) or a pure dictionary-style table (= no numbering indices).
  *
- * \param filename The filename pointing to the script that is executed.
+ * \param filename The filename pointing to the script that is executed
  * \param dictionary The #ghoul::Dictionary into which the values from the script are
  *        added
  * \param state If this is set to a valid lua_State, this state is used instead of
@@ -179,7 +179,7 @@ void loadDictionaryFromFile(const std::filesystem::path& filename, Dictionary& d
  * pure array-style table (= only indexed by numbers) or a pure dictionary-style table
  * (= no numbering indices).
  *
- * \param filename The filename pointing to the script that is executed.
+ * \param filename The filename pointing to the script that is executed
  * \param state If this is set to a valid lua_State, this state is used instead of
  *        creating a new state. It is the callers responsibility to ensure that the passed
  *        state is valid if this parameter is not `nullptr`. After calling this method,
@@ -316,8 +316,8 @@ void luaDictionaryFromState(lua_State* state, Dictionary& dictionary,
  *
  * \param state The Lua state that is used to populate the \p dictionary
  * \param location The stack index of the item to extract. Defaults to -1 (topmost item)
- *
  * \return The #ghoul::Dictionary into which the values from the stack are added
+ *
  * \throw LuaFormatException If the \p dictionary contains mixed keys of both type
  *        `string` and type `number`
  * \pre \p state must not be `nullptr`
@@ -409,7 +409,6 @@ void runScriptFile(lua_State* state, const std::filesystem::path& filename);
  *
  * \throw LuaLoadingException If there was an error loading the script
  * \throw LuaExecutionError If there was an error executing the script
- *
  * \pre \p state must not be `nullptr`
  * \pre \p script must not be empty
  */

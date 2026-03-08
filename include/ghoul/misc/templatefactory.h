@@ -126,7 +126,7 @@ public:
      *
      * \throw TemplateConstructionError If the class was initialized using the wrong
      *        constructor, for example a class that does not have a Dictionary
-     *        constructor, but a Dictionary was used.
+     *        constructor, but a Dictionary was used
      */
     using FactoryFunction = std::function<
         BaseClass*(bool useDictionary, const Dictionary& dict, pmr::memory_resource* pool)

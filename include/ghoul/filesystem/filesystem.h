@@ -108,7 +108,6 @@ public:
      * Checks whether the \p token has been registered to a path before.
      *
      * \param token The token to be checked
-     *
      * \return `true` if the \p token has been registered before, `false` otherwise
      */
     bool hasRegisteredToken(const std::string& token) const;
@@ -129,7 +128,7 @@ public:
      * existing Directory.
      *
      * \param directory The directory in which all cached files will be stored. Has to be
-     *        an existing directory with proper read/write access.
+     *        an existing directory with proper read/write access
      *
      * \pre \p directory must point to an existing directory
      * \pre The CacheManager must not have been created before without destroying it

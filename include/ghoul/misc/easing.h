@@ -164,7 +164,6 @@ template <typename T>
  *
  * \pre \p p must be in [0,1]
  */
-
 template <typename T>
 [[nodiscard]] T quadraticEaseInOut(T p);
 
@@ -376,7 +375,6 @@ template <typename T>
  *
  * \pre \p p must be in [0,1]
  */
-
 template <typename T>
 [[nodiscard]] T circularEaseInOut(T p);
 
@@ -420,7 +418,6 @@ template <typename T>
  *
  * \pre \p p must be in [0,1]
  */
-
 template <typename T>
 [[nodiscard]] T exponentialEaseInOut(T p);
 

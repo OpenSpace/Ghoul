@@ -45,6 +45,7 @@ struct RuntimeError : public std::runtime_error {
      *
      * \param msg The main message of the exception
      * \param comp The optional component
+     *
      * \pre \p msg must not be empty
      */
     explicit RuntimeError(std::string msg, std::string comp = "");

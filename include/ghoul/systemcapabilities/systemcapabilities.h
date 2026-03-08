@@ -102,7 +102,7 @@ public:
      * to the SystemCapabilities.
      *
      * \param component The component that will be added to this SystemCapabilities
-     *        object.
+     *        object
      *
      * \pre \p component must not be `nullptr`
      * \pre \p A component of the same type must not have been added before
@@ -113,8 +113,8 @@ public:
      * Returns the component of type `T`.
      *
      * \tparam T The subclass of SystemCapabilitiesComponent that should be retrieved
-     * \return The SystemCapabilitiesComponent that should be retrieved or
-     *         `nullptr` if no such type exists
+     * \return The SystemCapabilitiesComponent that should be retrieved or `nullptr` if no
+     *         such type exists
      *
      * \throw CapabilitiesComponentNotFoundError If no component of type T could be found
      */

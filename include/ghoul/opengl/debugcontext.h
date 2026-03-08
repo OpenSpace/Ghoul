@@ -138,7 +138,7 @@ enum class Severity : std::underlying_type_t<GLenum> {
  * \param debug Determines whether the context's debug mode should be enabled or disabled
  * \param synchronous Determines whether the debug messages are provided synchronously
  *        (i.e. on the same thread as the OpenGL context and in the same stack frame), or
- *        whether debug callbacks can occur at any time.
+ *        whether debug callbacks can occur at any time
  */
 void setDebugOutput(DebugOutput debug, SynchronousOutput synchronous);
 
@@ -167,7 +167,7 @@ void setDebugMessageControl(Source source, Type type, Severity severity, Enabled
  *
  * \pre \p source must not be Source::Dontcare
  * \pre \p type must not be Type::Dontcare
-  */
+ */
 void setDebugMessageControl(Source source, Type type,
     const std::vector<unsigned int>& identifiers, Enabled enabled);
 

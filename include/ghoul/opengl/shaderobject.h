@@ -115,7 +115,7 @@ public:
      * \param filename The name of the file that will be used to load the source of this
      *        shader
      * \param name The human readable name of this ShaderObject
-     * \param dictionary The dictionary that is used for the !ShaderPreprocessor
+     * \param dictionary The dictionary that is used for the ShaderPreprocessor
      *
      * \throw ShaderObjectError If no new OpenGL name for the ShaderObject could be
      *        generated

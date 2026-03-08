@@ -166,11 +166,11 @@ public:
      * \param sampler The initialization struct describing the sampling of the data
      * \param data The data for the texture that should be uploaded or \c nullptr if no
      *        data should be uploaded
-     * \param pixelAlignment The pixel alignment of the provided data.
+     * \param pixelAlignment The pixel alignment of the provided data
      * \param keepMemory If this is `Yes`, the passed memory in the `data` pointer will be
      *        kept on the CPU. The memory behind the `data` pointer will still be owned by
      *        the caller. This object will make a local copy of the data. If it is `No` it
-     *        will not be stored after passing the data to the GPU.
+     *        will not be stored after passing the data to the GPU
      */
     explicit Texture(FormatInit format, SamplerInit sampler,
         const std::byte* data = nullptr, int pixelAlignment = 1,
@@ -196,7 +196,7 @@ public:
     /**
      * Returns the OpenGL name of this texture.
      *
-     * \return The OpenGl name of this texture
+     * \return The OpenGL name of this texture
      */
     operator GLuint() const;
 
@@ -312,7 +312,7 @@ public:
      * determined by the sizes when the texture was created initially or else an error
      * message will be raised by OpenGL.
      *
-     * \param pixels The pointer to the new data array that should be used.
+     * \param pixels The pointer to the new data array that should be used
      * \param pixelAlignment The byte-alignment for each of the pixels in the provided
      *        \p pixels array
      * \param keepMemory If this is set to `Yes`, a copy of the passed memory will be

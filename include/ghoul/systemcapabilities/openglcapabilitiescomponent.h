@@ -120,10 +120,10 @@ public:
     int max2DTextureSize() const;
 
     /**
-    * Returns the largest dimension for a 3D texture on this graphics card.
-    *
-    * \return The largest dimension for a 3D texture on this graphics card
-    */
+     * Returns the largest dimension for a 3D texture on this graphics card.
+     *
+     * \return The largest dimension for a 3D texture on this graphics card
+     */
     int max3DTextureSize() const;
 
     /**
@@ -168,14 +168,26 @@ protected:
     void detectCapabilities() override;
     void clearCapabilities() override;
 
-    /// Detect the maximum supported GLSL Version
+    /**
+     * Detect the maximum supported GLSL Version.
+     */
     void detectGLSLVersion();
-    /// Detect the vendor of the main GPU
-    /// \throw GPUVendorError if there was an error detecting the GPU vendor
+
+    /**
+     * Detect the vendor of the main GPU.
+     *
+     * \throw GPUVendorError if there was an error detecting the GPU vendor
+     */
     void detectGPUVendor();
-    /// Get the vendor string from OpenGL
+
+    /**
+     * Get the vendor string from OpenGL.
+     */
     void detectGLRenderer();
-    /// Detect all available extensions
+
+    /**
+     * Detect all available extensions.
+     */
     void detectExtensions();
 
     /**

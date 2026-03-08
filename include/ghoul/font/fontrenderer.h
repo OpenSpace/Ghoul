@@ -243,39 +243,39 @@ public:
         const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
     /**
-    * Renders the provided \p text to the coordinates \p pos using the \p font in the
-    * base \p color. If the \p font has an outline, it is rendered in black, using the
-    * \p color's alpha value.
-    *
-    * \param font The Font that is used to render the provided text
-    * \param pos The world-space coordinate for projection subject rendering that is used
-    *        to render the text
-    * \param text The text that is rendered to the screen.The \p text can also contain
-    *        `\n` to have a linebreak, which is of the correct length with regard to the
-    *        selected font
-    * \param color The base color that is used to render the text
-    * \param labelInfo Label information for the rendered text
-    * \param offset Moves the label in xy position of the text's plane
-    * \return The bounding box of the text and the number of lines that were printed
-    */
+     * Renders the provided \p text to the coordinates \p pos using the \p font in the
+     * base \p color. If the \p font has an outline, it is rendered in black, using the
+     * \p color's alpha value.
+     *
+     * \param font The Font that is used to render the provided text
+     * \param pos The world-space coordinate for projection subject rendering that is used
+     *        to render the text
+     * \param text The text that is rendered to the screen.The \p text can also contain
+     *        `\n` to have a linebreak, which is of the correct length with regard to the
+     *        selected font
+     * \param color The base color that is used to render the text
+     * \param labelInfo Label information for the rendered text
+     * \param offset Moves the label in xy position of the text's plane
+     * \return The bounding box of the text and the number of lines that were printed
+     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
         std::string_view text, const glm::vec4& color,
         const ProjectedLabelsInformation& labelInfo,
         const glm::vec2& offset = glm::vec2(0.f, 0.f)) const;
 
     /**
-    * Renders the provided \p text to the coordinates \p pos using the \p font in white
-    * and a black outline, if the \p font has one.
-    *
-    * \param font The Font that is used to render the provided text
-    * \param pos The world-space coordinate for projection subject rendering that is used
-    *        to render the text
-    * \param text The text that is rendered to the screen.The \p text can also contain
-    *        '\n' to have a linebreak, which is of the correct length with regard to the
-    *        selected font.
-    * \param labelInfo Label information for the rendered text
-    * \return The bounding box of the text and the number of lines that were printed
-    */
+     * Renders the provided \p text to the coordinates \p pos using the \p font in white
+     * and a black outline, if the \p font has one.
+     *
+     * \param font The Font that is used to render the provided text
+     * \param pos The world-space coordinate for projection subject rendering that is used
+     *        to render the text
+     * \param text The text that is rendered to the screen.The \p text can also contain
+     *        '\n' to have a linebreak, which is of the correct length with regard to the
+     *        selected font.
+     * \param labelInfo Label information for the rendered text
+     * \return The bounding box of the text and the number of lines that were printed
+     */
     BoundingBoxInformation render(Font& font, const glm::vec3& pos,
         std::string_view text, const ProjectedLabelsInformation& labelInfo) const;
 

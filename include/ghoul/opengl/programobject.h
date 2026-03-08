@@ -157,7 +157,7 @@ public:
     /**
      * Attaches the specified ShaderObject to this ProgramObject.
      *
-     * \param shaderObject The ShaderObject that will be attached to this ProgramObject.
+     * \param shaderObject The ShaderObject that will be attached to this ProgramObject
      *
      * \pre \p shaderObject must not be `nullptr`
      * \pre \p shaderObject must not have been registered before
@@ -167,7 +167,7 @@ public:
     /**
      * Detaches the specified ShaderObject from this ProgramObject.
      *
-     * \param shaderObject The ShaderObject that should be detached.
+     * \param shaderObject The ShaderObject that should be detached
      *
      * \pre \p shaderObject must not be `nullptr`
      * \pre \p shaderObject must have been registered before
@@ -2699,6 +2699,7 @@ public:
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
      * \return `true` if the attribute was successfully set, `false` otherwise
+     *
      * \pre \p name must not be empty
      */
     bool setAttribute(const std::string& name, const glm::dmat4x2& value,
@@ -3452,7 +3453,7 @@ public:
      * \param indices The list of subroutine indices that will be used to set all of the
      *        subroutine uniforms in the attached shader object
      * \return `true` if all uniform subroutines were set correctly, `false` otherwise,
-     *         i.e., if \p indices did not contain the correct number of indices.
+     *         i.e., if \p indices did not contain the correct number of indices
      *
      * \pre \p indices must not be empty
      */

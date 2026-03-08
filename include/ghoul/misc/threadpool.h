@@ -275,10 +275,10 @@ public:
      *
      * \tparam T The type information of the `std::packaged_task` that is to be executed
      * \tparam Args A variable list of arguments that can be passed to the \p task
-     * \param task The task that will be executed.
+     * \param task The task that will be executed
      * \param arguments The potential list of arguments passed to the \p task
      * \return A future containing the result of the evaluation of \p task with the passed
-     *         \p arguments.
+     *         \p arguments
      */
     template <typename T, typename... Args>
     auto queue(std::packaged_task<T>&& task, Args&&... arguments)
