@@ -171,7 +171,7 @@ namespace {
         gl_FragDepth = 0.0;
       }
       else {
-        if (depth > 1.0) {
+        if (in_data.depth > 1.0) {
           gl_FragDepth = in_data.depth / pow(10, 30);
         }
         else {
