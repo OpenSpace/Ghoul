@@ -64,7 +64,7 @@ public:
     TextureUnit(TextureUnit&&) noexcept = default;
 
     /**
-     * Activates and binds the provided texture to the TextureUnit. 
+     * Activates and binds the provided texture to the TextureUnit.
      */
     void bind(GLuint texture);
 

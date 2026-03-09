@@ -23,9 +23,9 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
- /*****************************************************************************************
-  * Modified parts of the code from Ron Babich is used in the following code.             *
-  ****************************************************************************************/
+ /****************************************************************************************
+  * Modified parts of the code from Ron Babich is used in the following code.            *
+  ***************************************************************************************/
 
  /**
   * levmarq.c, levmarq.h, and examples are provided under the MIT license.
@@ -54,7 +54,10 @@
   * OTHER DEALINGS IN THE SOFTWARE.
   */
 
-#include <glm/glm.hpp>
+#ifndef __GHOUL___LEVMARQ_SOLVER___H__
+#define __GHOUL___LEVMARQ_SOLVER___H__
+
+#include <ghoul/glm.h>
 #include <string>
 #include <vector>
 
@@ -89,3 +92,5 @@ bool levmarq(int npar, double* par, int ny, double* dysq,
     void* fdata, LMstat* lmstat);
 
 } // namespace ghoul
+
+#endif // __GHOUL___LEVMARQ_SOLVER___H__

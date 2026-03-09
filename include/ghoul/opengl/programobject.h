@@ -1983,7 +1983,7 @@ public:
      */
     void setUniform(GLint location, const glm::dmat4x4& value,
         Transpose transpose = Transpose::No) const;
-    
+
 
     //////////////////////////////////////////////////////////////////////////////////////
     ////// SSBO Bindings
