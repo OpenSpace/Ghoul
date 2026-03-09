@@ -2064,11 +2064,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool value) const;
+    void setAttribute(const std::string& name, bool value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2078,11 +2077,10 @@ public:
      * \param name The name of the vertex attribute to be set
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool v1, bool v2) const;
+    void setAttribute(const std::string& name, bool v1, bool v2) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2093,11 +2091,10 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool v1, bool v2, bool v3) const;
+    void setAttribute(const std::string& name, bool v1, bool v2, bool v3) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2109,11 +2106,10 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, bool v1, bool v2, bool v3, bool v4) const;
+    void setAttribute(const std::string& name, bool v1, bool v2, bool v3, bool v4) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2122,11 +2118,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::bvec2& value) const;
+    void setAttribute(const std::string& name, const glm::bvec2& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2135,11 +2130,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::bvec3& value) const;
+    void setAttribute(const std::string& name, const glm::bvec3& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2148,11 +2142,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::bvec4& value) const;
+    void setAttribute(const std::string& name, const glm::bvec4& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2161,11 +2154,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint value) const;
+    void setAttribute(const std::string& name, GLint value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2175,11 +2167,10 @@ public:
      * \param name The name of the vertex attribute to be set
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint v1, GLint v2) const;
+    void setAttribute(const std::string& name, GLint v1, GLint v2) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2190,11 +2181,10 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3) const;
+    void setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2206,11 +2196,10 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3,
+    void setAttribute(const std::string& name, GLint v1, GLint v2, GLint v3,
         GLint v4) const;
 
     /**
@@ -2220,11 +2209,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::ivec2& value) const;
+    void setAttribute(const std::string& name, const glm::ivec2& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2233,11 +2221,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::ivec3& value) const;
+    void setAttribute(const std::string& name, const glm::ivec3& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2246,11 +2233,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::ivec4& value) const;
+    void setAttribute(const std::string& name, const glm::ivec4& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2259,11 +2245,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLfloat value) const;
+    void setAttribute(const std::string& name, GLfloat value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2273,11 +2258,10 @@ public:
      * \param name The name of the vertex attribute to be set
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLfloat v1, GLfloat v2) const;
+    void setAttribute(const std::string& name, GLfloat v1, GLfloat v2) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2288,11 +2272,10 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3) const;
+    void setAttribute(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2304,11 +2287,10 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3,
+    void setAttribute(const std::string& name, GLfloat v1, GLfloat v2, GLfloat v3,
         GLfloat v4) const;
 
     /**
@@ -2318,11 +2300,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::vec2& value) const;
+    void setAttribute(const std::string& name, const glm::vec2& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2331,11 +2312,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::vec3& value) const;
+    void setAttribute(const std::string& name, const glm::vec3& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2344,11 +2324,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::vec4& value) const;
+    void setAttribute(const std::string& name, const glm::vec4& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2357,11 +2336,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLdouble value) const;
+    void setAttribute(const std::string& name, GLdouble value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1 and \p v2.
@@ -2371,11 +2349,10 @@ public:
      * \param name The name of the vertex attribute to be set
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLdouble v1, GLdouble v2) const;
+    void setAttribute(const std::string& name, GLdouble v1, GLdouble v2) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed values \p v1, \p v2,
@@ -2386,11 +2363,10 @@ public:
      * \param v1 The first value the vertex attribute should be set to
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLdouble v1, GLdouble v2,
+    void setAttribute(const std::string& name, GLdouble v1, GLdouble v2,
         GLdouble v3) const;
 
     /**
@@ -2403,11 +2379,10 @@ public:
      * \param v2 The second value the vertex attribute should be set to
      * \param v3 The third value the vertex attribute should be set to
      * \param v4 The fourth value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, GLdouble v1, GLdouble v2, GLdouble v3,
+    void setAttribute(const std::string& name, GLdouble v1, GLdouble v2, GLdouble v3,
         GLdouble v4) const;
 
     /**
@@ -2417,11 +2392,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dvec2& value) const;
+    void setAttribute(const std::string& name, const glm::dvec2& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2430,11 +2404,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dvec3& value) const;
+    void setAttribute(const std::string& name, const glm::dvec3& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2443,11 +2416,10 @@ public:
      *
      * \param name The name of the vertex attribute to be set
      * \param value The value the vertex attribute should be set to
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dvec4& value) const;
+    void setAttribute(const std::string& name, const glm::dvec4& value) const;
 
     /**
      * Locates and sets the vertex attribute \p name to the passed \p value. Returns
@@ -2458,11 +2430,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat2x2& value,
+    void setAttribute(const std::string& name, const glm::mat2x2& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2474,11 +2445,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat2x3& value,
+    void setAttribute(const std::string& name, const glm::mat2x3& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2490,11 +2460,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat2x4& value,
+    void setAttribute(const std::string& name, const glm::mat2x4& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2506,11 +2475,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat3x2& value,
+    void setAttribute(const std::string& name, const glm::mat3x2& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2522,11 +2490,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat3x3& value,
+    void setAttribute(const std::string& name, const glm::mat3x3& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2538,11 +2505,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat3x4& value,
+    void setAttribute(const std::string& name, const glm::mat3x4& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2554,11 +2520,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat4x2& value,
+    void setAttribute(const std::string& name, const glm::mat4x2& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2570,11 +2535,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat4x3& value,
+    void setAttribute(const std::string& name, const glm::mat4x3& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2586,11 +2550,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::mat4x4& value,
+    void setAttribute(const std::string& name, const glm::mat4x4& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2602,11 +2565,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat2x2& value,
+    void setAttribute(const std::string& name, const glm::dmat2x2& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2618,11 +2580,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat2x3& value,
+    void setAttribute(const std::string& name, const glm::dmat2x3& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2634,11 +2595,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat2x4& value,
+    void setAttribute(const std::string& name, const glm::dmat2x4& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2650,11 +2610,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat3x2& value,
+    void setAttribute(const std::string& name, const glm::dmat3x2& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2666,11 +2625,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat3x3& value,
+    void setAttribute(const std::string& name, const glm::dmat3x3& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2682,11 +2640,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat3x4& value,
+    void setAttribute(const std::string& name, const glm::dmat3x4& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2698,11 +2655,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat4x2& value,
+    void setAttribute(const std::string& name, const glm::dmat4x2& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2714,11 +2670,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat4x3& value,
+    void setAttribute(const std::string& name, const glm::dmat4x3& value,
         Transpose transpose = Transpose::No) const;
 
     /**
@@ -2730,11 +2685,10 @@ public:
      * \param value The value the vertex attribute should be set to
      * \param transpose Transpose::Yes if the matrix should be set in row major order,
      *        Transpose::No if the matrix is in column major order
-     * \return `true` if the attribute was successfully set, `false` otherwise
      *
      * \pre \p name must not be empty
      */
-    bool setAttribute(const std::string& name, const glm::dmat4x4& value,
+    void setAttribute(const std::string& name, const glm::dmat4x4& value,
         Transpose transpose = Transpose::No) const;
 
     /**
