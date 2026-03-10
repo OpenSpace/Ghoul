@@ -86,6 +86,8 @@ public:
      *        possible to automatically detect this based on the image information. For
      *        example, someone might want to load a 128x1 texture but use it as a 2D
      *        texture instead
+     * \param samplerSettings The settings that should be used for the Texture that is
+     *        created from the contents of the \p filename
      *
      * \throw TextureLoadException If there was an error reading the \p filename
      * \throw MissingReaderException If there was no reader for the specified \p filename
@@ -117,6 +119,8 @@ public:
      *        should be the same as the usual file extension for the image. However, this
      *        parameter is only used to determine which TextureReader is used for this
      *        memory, if multiple readers are registered
+     * \param samplerSettings The settings that should be used for the Texture that is
+     *        created from the contents of the \p memory
      *
      * \throw TextureLoadException If there was an error reading the \p memory
      * \throw MissingReaderException If there was no reader for the specified \p filename

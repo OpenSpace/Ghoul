@@ -162,7 +162,7 @@ public:
      * uploaded to the GPU. The data pointed to by \p data needs to be large enough to
      * accomodate `format.dimensions` and `format.dataType`.
      *
-     * \param forat The initialization struct describing the format of the Texture data
+     * \param format The initialization struct describing the format of the Texture data
      * \param sampler The initialization struct describing the sampling of the data
      * \param data The data for the texture that should be uploaded or \c nullptr if no
      *        data should be uploaded

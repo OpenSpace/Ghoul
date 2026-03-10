@@ -39,6 +39,8 @@ public:
      *
      * \param filename The texture that should be loaded from the hard disk
      * \param nDimensions The number of dimensions of the texture that is created
+     * \param samplerSettings The settings that should be used for the Texture that is
+     *        created from the contents of the \p filename
      * \return The loaded Texture object
      *
      * \throw TextureLoadException If there was an error loading the texture
@@ -58,6 +60,8 @@ public:
      * \param memory The memory that contains the bytes of the Texture to be loaded
      * \param size The number of bytes contained in \p memory
      * \param nDimensions The number of dimensions of the texture that is created
+     * \param samplerSettings The settings that should be used for the Texture that is
+     *        created from the contents of the \p memory
      *
      * \throw TextureLoadException If there was an error reading the \p memory
      * \pre \p memory must not be `nullptr`

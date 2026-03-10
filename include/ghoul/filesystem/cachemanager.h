@@ -76,6 +76,8 @@ public:
      * \param information Additional information that is used to uniquely identify the
      *        cached file. The combination of the \p file and \p information must uniquely
      *        identify a cached file
+     * \param subDirectory If this is a non-empty string, the cached file name will be
+     *        located inside the provided subdirectory
      * \return The cached file that can be used by the caller to store the results
      *
      * \throw RuntimeError If there is an illegal character (`/`, `\\`, `?`, `%`, `*`,

@@ -36,10 +36,10 @@ namespace ghoul::opengl {
 /**
  * This class manages Texture Units and is a wrapper around `GL_TEXTURE0`, `GL_TEXTURE1`,
  * ... It manages which texture units are currently active and which units are free to
- * use. To use a TextureUnit, it has to be #activate%d, the Texture has to be bound, and
- * then the #unitNumber can be retrieved so that it can be used in a uniform. A unit
- * number is assigned as soon as the first call to #activate, #glEnum, or #unitNumber is
- * made. If there are no free unit numbers left, an `std::runtime_error` will be thrown.
+ * use. To use a TextureUnit, it has to be activate%d, the Texture has to be bound, and
+ * then the unitNumber can be retrieved so that it can be used in a uniform. A unit number
+ * is assigned as soon as the first call to activate, glEnum, or unitNumber is made. If
+ * there are no free unit numbers left, an `std::runtime_error` will be thrown.
  */
 class TextureUnit {
 public:
@@ -76,9 +76,9 @@ public:
 
     /**
      * This operator returns the texture unit number that was assigned to this
-     * TextureUnit. If this is the first call to either #activate, #glEnum, or unitNumber,
-     * a free unit number will be assigned to this object. Is guaranteed to give the same
-     * result as #unitNumber.
+     * TextureUnit. If this is the first call to either activate, glEnum, or unitNumber, a
+     * free unit number will be assigned to this object. Is guaranteed to give the same
+     * result as unitNumber.
      *
      * \return The texture unit number that was assigned to this TextureUnit
      *
@@ -88,7 +88,7 @@ public:
 
 private:
     /**
-     * This method is called the first time either #activate, #glEnum, or #unitNumber is
+     * This method is called the first time either activate, glEnum, or unitNumber is
      * called. It will assign a new OpenGL texture unit to this TextureUnit and mark this
      * new unit as used until this TextureUnit is destroyed.
      *
@@ -98,7 +98,7 @@ private:
 
     /**
      * Initializes the maximum number of texture units using
-     * #ghoul::systemcapabilities::SystemCapabilities and marks all texture units as
+     * ghoul::systemcapabilities::SystemCapabilities and marks all texture units as
      * unused. This method is called the first time a TextureUnit is created.
      */
     static void initialize();
