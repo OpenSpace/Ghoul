@@ -1984,11 +1984,6 @@ public:
     void setUniform(GLint location, const glm::dmat4x4& value,
         Transpose transpose = Transpose::No) const;
 
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    ////// SSBO Bindings
-    //////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * Locates and sets the SSBO \p name with the passed \p binding. Returns `true` if the
      * block could be found; `false` otherwise. Will call the OpenGL function
@@ -2011,11 +2006,6 @@ public:
      * \param binding The binding the block should be bound to
      */
     void setSsboBinding(GLuint index, GLuint binding) const;
-
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    ////// Attributes
-    //////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Enables and disables the logging of a warning if the location of an attribute can

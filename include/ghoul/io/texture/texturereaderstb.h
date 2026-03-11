@@ -30,7 +30,9 @@
 
 namespace ghoul::io {
 
-/// Loads the texture using the Sean Barrett's stb_image library.
+/**
+ * Loads the texture using the Sean Barrett's stb_image library.
+ */
 class TextureReaderSTB : public TextureReaderBase {
 public:
     /**

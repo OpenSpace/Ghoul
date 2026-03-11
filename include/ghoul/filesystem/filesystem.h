@@ -211,20 +211,30 @@ private:
     std::unique_ptr<CacheManager> _cacheManager;
 
 #ifdef WIN32
-    /// Windows specific deinitialize function
+    /**
+     * Windows specific deinitialize function.
+     */
     void deinitializeInternalWindows();
 
-    /// Starts watching a directory
+    /**
+     * Starts watching a directory.
+     */
     void beginRead(DirectoryHandle* directoryHandle);
 
-    /// Handles the callback for a directory for the local file path
+    /**
+     * Handles the callback for a directory for the local file path.
+     */
     static void callbackHandler(DirectoryHandle* directoryHandle,
         const std::string& filePath);
 
-    /// External function that calls beginRead
+    /**
+     * External function that calls beginRead.
+     */
     friend void readStarter(DirectoryHandle* directoryHandle);
 
-    /// External function that calls callbackHandler
+    /**
+     * External function that calls callbackHandler.
+     */
     friend void callbackHandler(DirectoryHandle* directoryHandle,
         const std::string& filePath);
 
@@ -241,13 +251,19 @@ private:
     std::map<std::filesystem::path, DirectoryHandle*> _directories;
 
 #else // ^^^^ WIN32 // !WIN32 vvvv
-    /// Linux specific initialize function
+    /**
+     * Linux specific initialize function.
+     */
     void initializeInternalLinux();
 
-    /// Linux specific deinitialize function
+    /**
+     * Linux specific deinitialize function.
+     */
     void deinitializeInternalLinux();
 
-    /// Function that run by the watcher thread
+    /**
+     * Function that run by the watcher thread.
+     */
     static void inotifyWatcher();
 
     int _inotifyHandle;

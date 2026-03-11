@@ -295,8 +295,10 @@ private:
     /// single list
     using Task = std::function<void()>;
 
-    /// A worker object that consists of a thread and a boolean flag that determines
-    /// whether the worker should terminatate (or rather return out of the infinite loop).
+    /**
+     * A worker object that consists of a thread and a boolean flag that determines
+     * whether the worker should terminatate (or rather return out of the infinite loop).
+     */
     struct Worker {
         /// The thread that grabs a task from the ThreadPool or waits until there is a
         /// task. This is stored as a unique_ptr in order to make the storage in a vector

@@ -39,8 +39,10 @@ namespace ghoul::systemcapabilities {
  */
 class OpenGLCapabilitiesComponent : public SystemCapabilitiesComponent {
 public:
-    /// The main exception that is thrown if there is an error detecting an OpenGL
-    /// capability
+    /**
+     * The main exception that is thrown if there is an error detecting an OpenGL
+     * capability.
+     */
     struct OpenGLCapabilitiesComponentError : public RuntimeError {
         explicit OpenGLCapabilitiesComponentError(std::string msg);
     };
@@ -49,7 +51,9 @@ public:
         explicit GPUVendorError(std::string msg);
     };
 
-    /// This enum stores the possible vendors of graphics cards that can be detected
+    /**
+     * This enum stores the possible vendors of graphics cards that can be detected.
+     */
     enum class Vendor {
         Nvidia, ///< Nvidia
         AmdATI, ///< AMD/ATI
@@ -206,7 +210,7 @@ protected:
     Vendor _vendor = Vendor::Other;
     /// GL_RENDERER
     std::string _glRenderer;
-    /// supported GLSL extensions
+    /// Supported GLSL extensions
     std::vector<std::string> _extensions;
     /// GLEW Version
     Version _glewVersion = { .major = 0, .minor = 0, .release = 0 };

@@ -55,14 +55,20 @@ struct Boolean {
     //enum class Value { Yes = 1, No = 0 };
     //using enum Value;
 
-    /// Non-explicit constructor so that we can automatically convert between different
-    /// aliases of Boolean
+    /**
+     * Non - explicit constructor so that we can automatically convert between different
+     * aliases of Boolean.
+     */
     constexpr Boolean(Value v) : value(v) {}
 
-    /// Explicit constructor to convert from `bool` into Boolean
+    /**
+     * Explicit constructor to convert from `bool` into Boolean.
+     */
     constexpr explicit Boolean(bool v) : value(v ? Yes : No) {}
 
-    /// This operator returns `true` if the stored value is equal to `Yes`.
+    /**
+     * This operator returns `true` if the stored value is equal to `Yes`.
+     */
     constexpr operator bool() const noexcept { return value == Yes; }
 
     constexpr bool operator==(Boolean r) const noexcept { return value == r.value; }

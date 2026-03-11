@@ -128,7 +128,7 @@ enum class Severity : std::underlying_type_t<GLenum> {
         GL_DEBUG_SEVERITY_NOTIFICATION
     ),
     /// Used in the setDebugMessageControl functions to refer to any severity
-    Dontcare = static_cast<std::underlying_type_t<GLenum>>(GL_DONT_CARE)
+    DontCare = static_cast<std::underlying_type_t<GLenum>>(GL_DONT_CARE)
 };
 
 /**

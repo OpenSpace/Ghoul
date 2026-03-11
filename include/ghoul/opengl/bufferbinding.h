@@ -127,7 +127,7 @@ private:
     /// initialized
     static bool _isInitialized;
 
-    /// assigned
+    /// Indicates if this buffer has already been assigned
     bool _assigned = false;
 
     /// The total number of active texture bindings

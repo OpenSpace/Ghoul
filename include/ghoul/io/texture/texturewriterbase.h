@@ -58,7 +58,9 @@ public:
         const TextureWriterBase& writer;
     };
 
-    /// Default virtual destructor
+    /**
+     * Default virtual destructor.
+     */
     virtual ~TextureWriterBase() = default;
 
     /**

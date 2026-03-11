@@ -360,10 +360,14 @@ public:
     const T& texel(const glm::uvec3& pos) const;
 
 protected:
-    /// Initializes the OpenGL state of this texture
+    /**
+     * Initializes the OpenGL state of this texture.
+     */
     void initialize(const std::byte* data);
 
-    /// Upload the provided data to the GPU
+    /**
+     * Upload the provided data to the GPU.
+     */
     void uploadTexture(const std::byte* data) const;
 
 private:

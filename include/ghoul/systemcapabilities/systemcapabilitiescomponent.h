@@ -100,7 +100,9 @@ public:
      */
     SystemCapabilitiesComponent(InitializeWMI initializeWMI = InitializeWMI::Yes);
 
-    /// The virtual destructor that will deinitialize all necessary values
+    /**
+     * The virtual destructor that will deinitialize all necessary values.
+     */
     virtual ~SystemCapabilitiesComponent();
 
     /**

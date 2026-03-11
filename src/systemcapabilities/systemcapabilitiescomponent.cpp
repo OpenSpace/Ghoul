@@ -42,8 +42,10 @@ namespace {
     using namespace ghoul;
 
 #ifdef WIN32
-    /// Exception that will be thrown if there was an error regarding Windows Management
-    /// Instrumentation
+    /**
+     * Exception that will be thrown if there was an error regarding Windows Management
+     * Instrumentation.
+     */
     struct WMIError final : public RuntimeError {
         explicit WMIError(std::string msg, HRESULT code)
             : RuntimeError(std::format("{}. Error Code: {}", msg, code), "WMI")

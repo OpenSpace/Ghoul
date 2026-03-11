@@ -122,7 +122,9 @@ public:
     T& component();
 
 private:
-    /// Clears the capabilities of all components
+    /**
+     * Clears the capabilities of all components.
+     */
     void clearCapabilities();
 
     /// The list of all components of this SystemCapabilities

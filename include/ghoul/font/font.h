@@ -95,7 +95,7 @@ public:
         /// Glyph's height in pixels
         const int height;
 
-        ///< Glyph's left bearing expressed in pixels
+        /// Glyph's left bearing expressed in pixels
         const float leftBearing;
 
         /// Glyphs's top bearing expressed in pixels

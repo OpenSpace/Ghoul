@@ -61,8 +61,10 @@
 #include <array>
 #include <type_traits>
 
-/// This is just an empty tag that can be used to provide better error messages for the
-/// updateUniformLocations method
+/**
+ * This is just an empty tag that can be used to provide better error messages for the
+ * updateUniformLocations method.
+ */
 struct UniformCacheBase {};
 
 #define UniformCache1(v1)                                                                \

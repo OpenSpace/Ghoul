@@ -204,7 +204,8 @@ protected:
     /// This block of memory will store all log messages that are added to this BufferLog
     /// it has to be as big as the value provided in `_totalSize`
     void* _buffer;
-    size_t _totalSize; ///< The total size of the buffer used by this BufferLog
+    /// The total size of the buffer used by this BufferLog
+    size_t _totalSize;
 
     /// This callback will be called when an incoming log message would exhaust the
     /// available memory of the buffer. The callback has to either provide a new buffer

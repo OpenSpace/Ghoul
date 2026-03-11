@@ -113,8 +113,8 @@ private:
     /// `true` if this TextureUnit has been assigned
     bool _assigned = false;
 
-    /// `true` if the list of busy units and the maximum number of units have
-    /// been initialized
+    /// `true` if the list of busy units and the maximum number of units have been
+    /// initialized
     static bool _isInitialized;
 
     /// The total number of active texture unit
