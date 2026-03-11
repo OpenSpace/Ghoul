@@ -177,7 +177,10 @@ namespace {
             globalTransform = parentTransform * node->transform();
         }
 
-        transforms.push_back(globalTransform * glm::vec4(0, 0, 0, 1));
+        // ignore nodes that do not have a mesh
+        if (node->meshes().size() > 0) {
+          transforms.push_back(globalTransform * glm::vec4(0, 0, 0, 1));
+        }
 
         for (int child : node->children()) {
             pickupTransformRecursive(
@@ -1212,9 +1215,17 @@ glm::vec3 ModelGeometry::center() const {
     std::vector<glm::vec3> transformedPositions;
     pickupTransformRecursive(transformedPositions, _nodes, _nodes.data(), transform);
 
-    // Pick the last one as the pickup of transforms is recursive
-    // -> will have picked up all parent transforms
-    return transformedPositions.back();
+    //// Pick the last one as the pickup of transforms is recursive
+    //// -> will have picked up all parent transforms
+    //return transformedPositions.back();
+
+    // Calculate the centroid geometry
+    glm::vec3 mid = glm::vec3(0);
+    for (const auto part : transformedPositions) {
+        mid += part;
+    }
+    mid /= std::max(std::size_t(1), transformedPositions.size());
+    return mid;
 }
 
 void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedModel,
