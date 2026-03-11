@@ -62,7 +62,7 @@ public:
      * This enum specifies the allowed formats for the Texture%s. These are directly
      * mapped to the appropriate OpenGL constants.
      *
-     * \see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml
+     * \see https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage1D.xhtml
      */
     enum class Format : std::underlying_type_t<GLenum> {
         Red = static_cast<std::underlying_type_t<GLenum>>(GL_RED),
@@ -129,9 +129,9 @@ public:
         GLenum dataType;
 
         /// The internal format for the texture. See
-        /// http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml Tables 1, 2, and
-        /// 3 for concrete values. In addition, the S3TC_DXT formats can be used to
-        /// support hardware compression. See
+        /// https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage1D.xhtml
+        /// Tables 1, 2, and 3 for concrete values. In addition, the S3TC_DXT formats can
+        /// be used to support hardware compression. See
         /// http://www.opengl.org/wiki/Image_Format#S3TC.2FDXT for more information.
         /// If this value is not specified, a suitable internal format will be
         /// automatically selected based on the passed `format` and `dataType` parameters
@@ -250,15 +250,16 @@ public:
 
     /**
      * Returns the internal format for this texture. See
-     * http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for more information and
-     * the possible return values.
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage1D.xhtml for more
+     * information and the possible return values.
      */
     GLenum internalFormat() const;
 
     /**
      * Returns the storage data type for this Texture. For a complete list of available
-     * return values see http://www.opengl.org/sdk/docs/man/xhtml/glTexImage1D.xml for
-     * more information.
+     * return values see
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage1D.xhtml for more
+     * information.
      *
      * \return The storage data type
      */
