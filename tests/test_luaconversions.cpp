@@ -266,7 +266,7 @@ TEMPLATE_TEST_CASE("LuaConversion: Vec2 Float Fuzz", "[luaconversion]", glm::vec
 
     using T = TestType;
 
-    //TOD: update range to avoid infinity
+    // @TODO: update range to avoid infinity
     std::mt19937 gen(1337);
     std::uniform_real_distribution<typename T::value_type> dis(
         std::numeric_limits<typename T::value_type>::min(),

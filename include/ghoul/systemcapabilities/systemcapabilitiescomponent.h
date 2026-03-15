@@ -165,23 +165,6 @@ protected:
     static bool isWMIInitialized();
 
     /**
-     * Queries the Windows Management Instrumentation for the \p attribute contained in
-     * the \p wmiClass and returns the value of it. It will execute a query on the Wbem
-     * services.
-     *
-     * \param wmiClass The class in which the required attribute resides
-     * \param attribute The attribute which we are interested in
-     * \return The value of the requested attributes
-     *
-     * \throw WMIError If there was an error querying the Windows Management
-     *        Instrumentation service or there was no query result available
-     * \pre \p wmiClass must not be empty
-     * \pre \p attribute must not be empty
-     * \pre The Windows Management Instrumentation must have been initialized
-     */
-    //VARIANT* queryWMI(const std::string& wmiClass, const std::string& attribute);
-
-    /**
      * Helper function that queries the Windows Management Instrumentation for the
      * \p attribute within the \p wmiClass and it expects the attribute to be of type
      * `std::string`.
