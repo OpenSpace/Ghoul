@@ -38,6 +38,7 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "CameraReader";
+    constexpr std::string_view UnitScaleFactorKey = "UnitScaleFactor";
 
     void processCameraNodes(const aiNode& node, const aiScene& scene,
                             std::vector<ghoul::io::ModelNode>& nodes, int parent,
@@ -161,8 +162,8 @@ namespace {
 
 namespace ghoul::io {
 
-std::pair<std::vector<ModelNode>, std::unique_ptr<ModelAnimation>>
-CameraReader::loadCameraPath(const std::filesystem::path& filename)
+CameraReader::CameraPathData CameraReader::loadCameraPath(
+                                                    const std::filesystem::path& filename)
 {
     ZoneScoped;
 
@@ -179,6 +180,25 @@ CameraReader::loadCameraPath(const std::filesystem::path& filename)
         filename.string(),
         aiProcess_ValidateDataStructure
     );
+
+    double unitScaleFactor = 1.0;
+
+    // Try to find the unit scale that was used in the exported scene
+    if (scene->mMetaData) {
+        const aiMetadata* meta = scene->mMetaData;
+
+        for (unsigned int i = 0; i < meta->mNumProperties; i++) {
+            const aiString& key = meta->mKeys[i];
+            const aiMetadataEntry& entry = meta->mValues[i];
+
+            if (entry.mType == AI_FLOAT && std::string(key.C_Str()) == UnitScaleFactorKey)
+            {
+                // The scale factor seems to be defined in cm unit - convert it to meters
+                unitScaleFactor =
+                    static_cast<double>(*static_cast<float*>(entry.mData)) / 100.0;
+            }
+        }
+    }
 
     // The mFlags is set when no mesh is loaded,
     // https://github.com/assimp/assimp/blob/7e5a0acc48efc54d7aa7900c36cd63db1fbeec9b/
@@ -239,8 +259,11 @@ CameraReader::loadCameraPath(const std::filesystem::path& filename)
     );
 
     Assimp::DefaultLogger::kill();
-
-    return std::make_pair(std::move(nodeArray), std::move(modelAnimation));
+    return CameraPathData{
+        .animation = std::move(modelAnimation),
+        .nodes = std::move(nodeArray),
+        .unitScale = unitScaleFactor
+    };
 }
 
 } // namespace ghoul::io

@@ -34,8 +34,13 @@ class ModelAnimation;
 
 class CameraReader {
 public:
-static std::pair<std::vector<ModelNode>, std::unique_ptr<ModelAnimation>>loadCameraPath(
-    const std::filesystem::path& filename);
+struct CameraPathData {
+    std::unique_ptr<ModelAnimation> animation;
+    std::vector<ModelNode> nodes;
+    double unitScale = 1.0;
+};
+
+static CameraPathData loadCameraPath(const std::filesystem::path& filename);
 };
 
 } // namespace ghoul::io
