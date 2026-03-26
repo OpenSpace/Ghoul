@@ -214,11 +214,16 @@ void extractValues(const Dictionary& dict, std::tuple<Ts...>& tuple) {
         keys.begin(),
         keys.end(),
         [](std::string_view lhs, std::string_view rhs) {
-            int lhsValue;
-            int rhsValue;
-            std::from_chars(lhs.data(), lhs.data() + lhs.size(), lhsValue);
-            std::from_chars(rhs.data(), rhs.data() + rhs.size(), rhsValue);
-            return lhsValue < rhsValue;
+            int lhsVal = 0;
+            int rhsVal = 0;
+            auto [p1, e1] = std::from_chars(lhs.data(), lhs.data() + lhs.size(), lhsVal);
+            auto [p2, e2] = std::from_chars(rhs.data(), rhs.data() + rhs.size(), rhsVal);
+            if (e1 == std::errc() && e2 == std::errc()) {
+                return lhsVal < rhsVal;
+            }
+            else {
+                return lhs < rhs;
+            }
         }
     );
 
@@ -244,11 +249,24 @@ std::vector<T> dictionaryToVector(const Dictionary& d) {
             keys.begin(),
             keys.end(),
             [](std::string_view lhs, std::string_view rhs) {
-                int lhsValue;
-                int rhsValue;
-                std::from_chars(lhs.data(), lhs.data() + lhs.size(), lhsValue);
-                std::from_chars(rhs.data(), rhs.data() + rhs.size(), rhsValue);
-                return lhsValue < rhsValue;
+                int lhsVal = 0;
+                int rhsVal = 0;
+                auto [p1, e1] = std::from_chars(
+                    lhs.data(),
+                    lhs.data() + lhs.size(),
+                    lhsVal
+                );
+                auto [p2, e2] = std::from_chars(
+                    rhs.data(),
+                    rhs.data() + rhs.size(),
+                    rhsVal
+                );
+                if (e1 == std::errc() && e2 == std::errc()) {
+                    return lhsVal < rhsVal;
+                }
+                else {
+                    return lhs < rhs;
+                }
             }
         );
     }
