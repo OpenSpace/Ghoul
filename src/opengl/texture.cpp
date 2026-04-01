@@ -431,6 +431,9 @@ GLenum Texture::dataType() const {
 }
 
 std::vector<std::byte> Texture::pixelData() const {
+    // Set the pixel alignment for reading
+    glPixelStorei(GL_PACK_ALIGNMENT, _pixelAlignment);
+
     const int nBytes = expectedPixelDataSize();
     std::vector<std::byte> res = std::vector<std::byte>(nBytes);
     glGetTextureImage(_id, 0, GLenum(_format), _dataType, nBytes, res.data());
@@ -441,6 +444,10 @@ void Texture::downloadTexture() {
     if (!_pixels.empty()) {
         return;
     }
+
+    // Set the pixel alignment for reading
+    glPixelStorei(GL_PACK_ALIGNMENT, _pixelAlignment);
+
     const int nBytes = expectedPixelDataSize();
     _pixels.resize(nBytes);
     glGetTextureImage(_id, 0, GLenum(_format), _dataType, nBytes, _pixels.data());
