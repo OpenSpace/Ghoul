@@ -237,13 +237,11 @@ void Texture::initialize(const std::byte* data) {
             glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             break;
         case FilterMode::LinearMipMap:
-            glGenerateTextureMipmap(_id);
             glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTextureParameteri(_id, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
             break;
         case FilterMode::AnisotropicMipMap:
-            glGenerateTextureMipmap(_id);
             glTextureParameteri(_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTextureParameteri(_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTextureParameteri(_id, GL_TEXTURE_MAX_LEVEL, _mipMapLevel - 1);
@@ -301,17 +299,27 @@ void Texture::initialize(const std::byte* data) {
     //
     // Create data storage
     //
+    const bool useMipMaps =
+        (_filter == FilterMode::LinearMipMap) ||
+        (_filter == FilterMode::AnisotropicMipMap);
+    const GLsizei nMipMapLevels = useMipMaps ? _mipMapLevel : 1;
     switch (_type) {
         case GL_TEXTURE_1D:
-            glTextureStorage1D(_id, 1, _internalFormat, _dimensions.x);
+            glTextureStorage1D(_id, nMipMapLevels, _internalFormat, _dimensions.x);
             break;
         case GL_TEXTURE_2D:
-            glTextureStorage2D(_id, 1, _internalFormat, _dimensions.x, _dimensions.y);
+            glTextureStorage2D(
+                _id,
+                nMipMapLevels,
+                _internalFormat,
+                _dimensions.x,
+                _dimensions.y
+            );
             break;
         case GL_TEXTURE_3D:
             glTextureStorage3D(
                 _id,
-                1,
+                nMipMapLevels,
                 _internalFormat,
                 _dimensions.x,
                 _dimensions.y,
@@ -328,6 +336,10 @@ void Texture::initialize(const std::byte* data) {
     //
     if (data) {
         uploadTexture(data);
+
+        if (useMipMaps) {
+            glGenerateTextureMipmap(_id);
+        }
     }
 }
 
