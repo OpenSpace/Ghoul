@@ -403,6 +403,10 @@ private:
     /// The swizzle mask. If no swizzle mask was specified, this value is `std::nullopt`
     const std::optional<std::array<GLenum, 4>> _swizzleMask;
 
+    /// If this value is `true` and new data is uploaded, it will cause the mipmap to be
+    /// regenerated
+    bool _usesMipMapping = false;
+
     /// The desired mipmap level for this texture. This value is only used if the
     /// `_filter` used is one of the mip mapping filters
     const int _mipMapLevel;

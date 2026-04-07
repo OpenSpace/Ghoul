@@ -314,13 +314,15 @@ void Texture::initialize(const std::byte* data) {
         const int z = static_cast<int>(std::floor(std::log2(_dimensions.z)));
 
         if (_dimensions.z > 1) {
-            return std::min(std::min(x, y), z);
+            return std::min(std::min(std::min(x, y), z), _mipMapLevel);
         }
         if (_dimensions.y > 1) {
-            return std::min(x, y);
+            return std::min(std::min(x, y), _mipMapLevel);
         }
-        return x;
+        return std::min(x, _mipMapLevel);
     }();
+    _usesMipMapping = useMipMaps && nMipMapLevels > 1;
+
     switch (_type) {
         case GL_TEXTURE_1D:
             glTextureStorage1D(_id, nMipMapLevels, _internalFormat, _dimensions.x);
@@ -355,7 +357,7 @@ void Texture::initialize(const std::byte* data) {
     if (data) {
         uploadTexture(data);
 
-        if (useMipMaps) {
+        if (_usesMipMapping) {
             glGenerateTextureMipmap(_id);
         }
     }
@@ -409,6 +411,10 @@ void Texture::uploadTexture(const std::byte* data) const {
             break;
         default:
             throw MissingCaseException();
+    }
+
+    if (_usesMipMapping) {
+        glGenerateTextureMipmap(_id);
     }
 }
 
