@@ -26,17 +26,30 @@
 #include <ghoul/io/texture/texturewriter.h>
 
 #include <ghoul/format.h>
-#include <ghoul/io/texture/texturewriterbase.h>
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/misc/assert.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <algorithm>
 #include <filesystem>
+#include <stb_image_write.h>
 #include <utility>
+
+namespace {
+    constexpr std::string_view _loggerCat = "TextureWriter";
+} // namespace
 
 namespace ghoul::io {
 
 TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
     : RuntimeError(std::format("No writer was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
+{}
+
+TextureWriter::TextureWriteException::TextureWriteException(std::string name, std::string msg)
+    : RuntimeError(std::format("Error writing texture '{}'", name), "TextureWriter")
+    , filename(std::move(name))
+    , errorMessage(std::move(msg))
 {}
 
 TextureWriter& TextureWriter::ref() {
@@ -47,38 +60,86 @@ TextureWriter& TextureWriter::ref() {
 void TextureWriter::saveTexture(const opengl::Texture& texture,
                                 const std::string& filename)
 {
-    ghoul_assert(!_writers.empty(), "No writers were registered before");
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
+        // Remove the leading . of the extension
         extension = extension.substr(1);
     }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
-    TextureWriterBase* writer = writerForExtension(extension);
-    if (!writer) {
+    if (!isSupportedExtension(extension)) {
         throw MissingWriterException(extension);
+    }
+
+    if (texture.dimensions().z > 1) {
+        LERROR(std::format(
+            "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
+            filename
+        ));
+        return;
     }
 
     // Make sure the directory for the file exists
     std::filesystem::create_directory(std::filesystem::path(filename).parent_path());
-    writer->saveTexture(texture, filename);
-}
 
-void TextureWriter::addWriter(std::unique_ptr<TextureWriterBase> writer) {
-    _writers.push_back(std::move(writer));
-}
 
-TextureWriterBase* TextureWriter::writerForExtension(const std::string& extension) {
-    for (const std::unique_ptr<TextureWriterBase>& writer : _writers) {
-        std::vector<std::string> extensions = writer->supportedExtensions();
-        auto it = std::find(extensions.begin(), extensions.end(), extension);
-        if (it != extensions.end()) {
-            return writer.get();
-        }
+    const int w = texture.dimensions().x;
+    const int h = texture.dimensions().y;
+    const int nComponents = texture.numberOfChannels();
+    std::vector<std::byte> pixels = texture.pixelData();
+
+    extension = toLowerCase(extension);
+
+    if (extension == "jpeg" || extension == "jpg") {
+        stbi_write_jpg(filename.c_str(), w, h, nComponents, pixels.data(), 0);
     }
-    return nullptr;
+    else if (extension == "png") {
+        stbi_write_png(filename.c_str(), w, h, nComponents, pixels.data(), 0);
+    }
+    else if (extension == "bmp") {
+        stbi_write_bmp(filename.c_str(), w, h, nComponents, pixels.data());
+    }
+    else if (extension == "tga") {
+        stbi_write_tga(filename.c_str(), w, h, nComponents, pixels.data());
+    }
+    // @TODO (2023-10-06, emmbr26) Fix implementation. This does not generate correct
+    // colors. Prabably the data format is currently not correct, as the other formats
+    // expect 8-bit colors while the HDR function wants 32-bit rgb(e) data. Did not
+    // seem too important to fix at point of writing, as it's currently not used anywhere
+    //else if (extension == "hdr") {
+    //    stbi_write_hdr(
+    //        filename.c_str(),
+    //        w,
+    //        h,
+    //        nComponents,
+    //        reinterpret_cast<const float*>(data)
+    //    );
+    //}
+    else {
+        throw TextureWriteException(
+            filename,
+            std::format("Could not write to image with file extension {}", extension)
+        );
+    }
+}
+
+bool TextureWriter::isSupportedExtension(const std::string& extension) const {
+    const std::string e = toLowerCase(extension);
+    std::vector<std::string> extensions = supportedExtensions();
+    return std::find(extensions.begin(), extensions.end(), e) != extensions.end();
+}
+
+std::vector<std::string> TextureWriter::supportedExtensions() const {
+    // Taken from stb_image_writer.h
+    return {
+        "jpeg", "jpg",
+        "png",
+        "bmp",
+        // "hdr",
+        "tga"
+    };
 }
 
 } // namespace ghoul::io
