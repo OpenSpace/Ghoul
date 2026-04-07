@@ -348,7 +348,6 @@ public:
      * use this function on another type will lead to undefined behavior in the return
      * value.
      *
-     * \tparam T The type of the data that is returned
      * \param pos The coordinate of the texel
      * \return The texel at the specified position cast to the requested type T
      *
