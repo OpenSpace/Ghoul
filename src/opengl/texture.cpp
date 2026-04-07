@@ -302,7 +302,25 @@ void Texture::initialize(const std::byte* data) {
     const bool useMipMaps =
         (_filter == FilterMode::LinearMipMap) ||
         (_filter == FilterMode::AnisotropicMipMap);
-    const GLsizei nMipMapLevels = useMipMaps ? _mipMapLevel : 1;
+    const GLsizei nMipMapLevels = [this, useMipMaps]() {
+        if (!useMipMaps || _dimensions.x == 1) {
+            return 1;
+        }
+
+        // For each dimension calculate the maximally allowed mipmap level and then take
+        // the one that is lowest as the final result
+        const int x = static_cast<int>(std::floor(std::log2(_dimensions.x)));
+        const int y = static_cast<int>(std::floor(std::log2(_dimensions.y)));
+        const int z = static_cast<int>(std::floor(std::log2(_dimensions.z)));
+
+        if (_dimensions.z > 1) {
+            return std::min(std::min(x, y), z);
+        }
+        if (_dimensions.y > 1) {
+            return std::min(x, y);
+        }
+        return x;
+    }();
     switch (_type) {
         case GL_TEXTURE_1D:
             glTextureStorage1D(_id, nMipMapLevels, _internalFormat, _dimensions.x);
