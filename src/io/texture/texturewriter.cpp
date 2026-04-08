@@ -52,11 +52,6 @@ TextureWriter::TextureWriteException::TextureWriteException(std::string name, st
     , errorMessage(std::move(msg))
 {}
 
-TextureWriter& TextureWriter::ref() {
-    static TextureWriter textureWriter;
-    return textureWriter;
-}
-
 void TextureWriter::saveTexture(const opengl::Texture& texture,
                                 const std::string& filename)
 {
@@ -125,13 +120,13 @@ void TextureWriter::saveTexture(const opengl::Texture& texture,
     }
 }
 
-bool TextureWriter::isSupportedExtension(const std::string& extension) const {
+bool TextureWriter::isSupportedExtension(const std::string& extension) {
     const std::string e = toLowerCase(extension);
     std::vector<std::string> extensions = supportedExtensions();
     return std::find(extensions.begin(), extensions.end(), e) != extensions.end();
 }
 
-std::vector<std::string> TextureWriter::supportedExtensions() const {
+std::vector<std::string> TextureWriter::supportedExtensions() {
     // Taken from stb_image_writer.h
     return {
         "jpeg", "jpg",

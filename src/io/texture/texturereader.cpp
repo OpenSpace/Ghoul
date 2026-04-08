@@ -135,11 +135,6 @@ TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t s
     , _size(size)
 {}
 
-TextureReader& TextureReader::ref() {
-    static TextureReader textureReader;
-    return textureReader;
-}
-
 std::unique_ptr<opengl::Texture> TextureReader::loadTexture(
                                                     const std::filesystem::path& filename,
                                                                           int nDimensions,
@@ -194,7 +189,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
     return load(data, x, y, n, "Memory", nDimensions, std::move(samplerSettings));
 }
 
-glm::ivec2 TextureReader::imageSize(const std::filesystem::path& filename) const {
+glm::ivec2 TextureReader::imageSize(const std::filesystem::path& filename) {
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
         extension = extension.substr(1);
@@ -214,13 +209,13 @@ glm::ivec2 TextureReader::imageSize(const std::filesystem::path& filename) const
     return glm::ivec2(x, y);
 }
 
-bool TextureReader::isSupportedExtension(const std::string& extension) const {
+bool TextureReader::isSupportedExtension(const std::string& extension) {
     const std::string e = toLowerCase(extension);
     std::vector<std::string> extensions = supportedExtensions();
     return std::find(extensions.begin(), extensions.end(), e) != extensions.end();
 }
 
-std::vector<std::string> TextureReader::supportedExtensions() const {
+std::vector<std::string> TextureReader::supportedExtensions() {
     // Taken from stb_image.h
     return {
         "jpeg", "jpg",

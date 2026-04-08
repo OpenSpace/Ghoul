@@ -42,9 +42,6 @@ namespace ghoul::io {
  * loading textures from various common image formats and converting them into GPU-ready
  * texture objects.
  *
- * The class uses the singleton pattern through its static `ref()` method, providing a
- * globally accessible instance.
- *
  * The class supports loading textures with 1, 2, or 3 dimensions and provides
  * functionality to:
  * - Load textures directly from file paths
@@ -100,13 +97,6 @@ public:
     };
 
     /**
-     * Returns the static variant of the TextureReader.
-     *
-     * \return The static variant of the TextureReader
-     */
-    static TextureReader& ref();
-
-    /**
      * Loads the provided \p filename into a Texture and returns it. The image format is
      * determined by the extension of the \p filename.
      *
@@ -125,8 +115,9 @@ public:
      * \pre \p filename must have an extension
      * \pre \p nDimensions The number of texture dimension must be 1, 2, or 3
      */
-    std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
-        int nDimensions, opengl::Texture::SamplerInit samplerSettings = {});
+    static std::unique_ptr<opengl::Texture> loadTexture(
+        const std::filesystem::path& filename, int nDimensions,
+        opengl::Texture::SamplerInit samplerSettings = {});
 
     /**
      * Loads a Texture from the memory pointed at by \p memory. The memory block must
@@ -151,7 +142,7 @@ public:
      * \pre \p size must be > 0
      * \pre \p nDimensions The number of texture dimension must be 1, 2, or 3
      */
-    std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
+    static std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
         int nDimensions, opengl::Texture::SamplerInit samplerSettings = {},
         const std::string& format = "");
 
@@ -166,14 +157,14 @@ public:
      * \pre The extension of \p filename must be among the supported extensions as
      *      reported by `supportedExtensions`
      */
-    glm::ivec2 imageSize(const std::filesystem::path& filename) const;
+    static glm::ivec2 imageSize(const std::filesystem::path& filename);
 
     /**
      * Returns Whether the provided file \p extension is supported by this reader.
      *
      * \return True if the provided \p extension is supported, false otherwise
      */
-    bool isSupportedExtension(const std::string& extension) const;
+    static bool isSupportedExtension(const std::string& extension);
 
     /**
      * Returns a list of all the extensions that are supported. If a file with an
@@ -182,7 +173,7 @@ public:
      *
      * \return A list of all supported extensions
      */
-    std::vector<std::string> supportedExtensions() const;
+    static std::vector<std::string> supportedExtensions();
 };
 
 } // namespace ghoul::io

@@ -39,9 +39,8 @@ namespace ghoul::io {
  * image writer library. This class provides a centralized interface for saving textures
  * in various common image formats (JPEG, PNG, BMP, TGA).
  *
- * The class uses the singleton pattern through its static `ref()` method, providing a
- * globally accessible instance. The appropriate image format is automatically determined
- * from the file extension provided in the filename.
+ * When writing, the appropriate image format is automatically determined from the file
+ * extension provided in the filename.
  *
  * Supported file formats include:
  * - JPEG (.jpeg, .jpg)
@@ -76,13 +75,6 @@ public:
     };
 
     /**
-     * Returns the static variant of the TextureWriter.
-     *
-     * \return The static variant of the TextureWriter
-     */
-    static TextureWriter& ref();
-
-    /**
      * Saves the provided \p texture into the \p filename on disk. The image file format
      * is determined by the extension of the \p filename.
      *
@@ -94,21 +86,21 @@ public:
      * \pre \p filename must not be empty
      * \pre \p filename must have an extension
      */
-    void saveTexture(const opengl::Texture& texture, const std::string& filename);
+    static void saveTexture(const opengl::Texture& texture, const std::string& filename);
 
     /**
      * Returns Whether the provided file \p extension is supported by this TextureWriter.
      *
      * \return True if the provided \p extension is supported, false otherwise
      */
-    bool isSupportedExtension(const std::string& extension) const;
+    static bool isSupportedExtension(const std::string& extension);
 
     /**
      * Returns the supported file extensions.
      *
      * \return The supported file extensions
      */
-    std::vector<std::string> supportedExtensions() const;
+    static std::vector<std::string> supportedExtensions();
 };
 
 } // namespace ghoul::io

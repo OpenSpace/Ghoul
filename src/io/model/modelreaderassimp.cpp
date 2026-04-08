@@ -139,7 +139,7 @@ namespace {
                 if (texture->mHeight == 0) {
                     // Load compressed embedded texture
                     try {
-                        textureEntry.texture = TextureReader::ref().loadTexture(
+                        textureEntry.texture = TextureReader::loadTexture(
                             static_cast<void*>(texture->pcData),
                             texture->mWidth,
                             2,
@@ -186,7 +186,7 @@ namespace {
                         "{}/{}", modelDirectory, pathString
                     );
 
-                    textureEntry.texture = TextureReader::ref().loadTexture(
+                    textureEntry.texture = TextureReader::loadTexture(
                         absPath(absolutePath),
                         2
                     );
