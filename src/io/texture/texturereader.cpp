@@ -30,7 +30,6 @@
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <stb_image.h>
-#include <array>
 #include <cstring>
 #include <utility>
 
@@ -141,7 +140,7 @@ std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filena
                                              opengl::Texture::SamplerInit samplerSettings)
 {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    ghoul_assert(nDimensions >= 1 && nDimensions <= 4, "nDimensions must be 1, 2, or 3");
+    ghoul_assert(nDimensions >= 1 && nDimensions <= 3, "nDimensions must be 1, 2, or 3");
 
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
@@ -170,7 +169,7 @@ std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDim
     ghoul_assert(size > 0, "Size must be > 0");
 
     if (!isSupportedReadExtension(format)) {
-        throw MissingReaderException(format, "Memory");
+        throw InvalidLoadException(memory, size);
     }
 
     int x = 0;

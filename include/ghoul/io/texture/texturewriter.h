@@ -56,7 +56,7 @@ struct TextureWriteException final : public RuntimeError {
 };
 
 /**
- * Saves the provided \p texture into the \p filename on disk, using the STM image writer
+ * Saves the provided \p texture into the \p filename on disk, using the STB image writer
  * library. The image file format is determined by the extension of the \p filename.
  *
  * Supported file formats include:
