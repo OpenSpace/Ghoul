@@ -93,7 +93,7 @@ std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filena
     int nDimensions, opengl::Texture::SamplerInit samplerSettings = {});
 
 /**
- * Loads a Texture from the memory pointed at by \p memory using the STD image library.
+ * Loads a Texture from the memory pointed at by \p memory using the STB image library.
  * The memory block must contain at least \p size number of bytes.
  *
  * \param memory The memory that contains the bytes of the Texture to be loaded
@@ -133,7 +133,7 @@ glm::ivec2 imageSize(const std::filesystem::path& filename);
 
 /**
  * Returns Whether the provided file \p extension is supported by this reader, i.e., which
- * are supported in the STD image library.
+ * are supported in the STB image library.
  *
  * \return True if the provided \p extension is supported, false otherwise
  */
@@ -141,7 +141,7 @@ bool isSupportedReadExtension(const std::string& extension);
 
 /**
  * Returns a list of all the extensions that are supported for reading, i.e., which are
- * supported in the STD image library.
+ * supported in the STB image library.
  *
  * \return A list of all supported extensions
  */
