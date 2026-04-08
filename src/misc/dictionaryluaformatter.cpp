@@ -56,7 +56,7 @@ namespace {
         auto convert = [&](const std::string& key) {
             if (prettyPrint) {
                 return std::format(
-                    "{}{} = {}",
+                    "{}[\"{}\"] = {}",
                     indentation,
                     key,
                     formatValue(d, key, prettyPrint, indentation, indentationSteps + 1)
@@ -64,7 +64,7 @@ namespace {
             }
             else {
                 return std::format(
-                    "{}={}",
+                    "[\"{}\"]={}",
                     key,
                     formatValue(d, key, prettyPrint, indentation, indentationSteps + 1)
                 );

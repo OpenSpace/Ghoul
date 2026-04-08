@@ -50,10 +50,10 @@ TEST_CASE("DictionaryLuaFormatter: Simple Dictionary", "[dictionaryluaformatter]
     std::string res = ghoul::formatLua(d);
     CHECK(
         res ==
-        "{boolFalse=false,boolTrue=true,"
-        "double=2.2,int=1,string=\"\","
-        "vec2={0,0},vec3={0,0,0},"
-        "vec4={0,0,0,0}}"
+        "{[\"boolFalse\"]=false,[\"boolTrue\"]=true,"
+        "[\"double\"]=2.2,[\"int\"]=1,[\"string\"]=\"\","
+        "[\"vec2\"]={0,0},[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}}"
     );
 }
 
@@ -67,8 +67,8 @@ TEST_CASE("DictionaryLuaFormatter: Dictionary with Ivec", "[dictionaryluaformatt
     std::string res = ghoul::formatLua(d);
     CHECK(
         res ==
-        "{ivec2={0,0},ivec3={0,0,0},"
-        "ivec4={0,0,0,0}}"
+        "{[\"ivec2\"]={0,0},[\"ivec3\"]={0,0,0},"
+        "[\"ivec4\"]={0,0,0,0}}"
     );
 }
 
@@ -82,9 +82,9 @@ TEST_CASE("DictionaryLuaFormatter: std::vectors", "[dictionaryluaformatter]") {
     std::string res = ghoul::formatLua(d);
     CHECK(
         res ==
-        "{dVector={0.1,0.2,0.3,0.4,0.5},"
-        "empty={},"
-        "iVector={1,2,3,4,5}}"
+        "{[\"dVector\"]={0.1,0.2,0.3,0.4,0.5},"
+        "[\"empty\"]={},"
+        "[\"iVector\"]={1,2,3,4,5}}"
     );
 }
 
@@ -106,11 +106,12 @@ TEST_CASE("DictionaryLuaFormatter: Matrices", "[dictionaryluaformatter]") {
     std::string res = ghoul::formatLua(d);
     CHECK(
         res ==
-        "{dmat2x2={0,0,0,0},dmat2x3={0,0,0,0,0,0},dmat2x4={0,0,0,0,0,0,0,0},"
-        "dmat3x2={0,0,0,0,0,0},dmat3x3={0,0,0,0,0,0,0,0,0},"
-        "dmat3x4={0,0,0,0,0,0,0,0,0,0,0,0},dmat4x2={0,0,0,0,0,0,0,0},"
-        "dmat4x3={0,0,0,0,0,0,0,0,0,0,0,0},"
-        "dmat4x4={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}"
+        "{[\"dmat2x2\"]={0,0,0,0},[\"dmat2x3\"]={0,0,0,0,0,0},"
+        "[\"dmat2x4\"]={0,0,0,0,0,0,0,0},"
+        "[\"dmat3x2\"]={0,0,0,0,0,0},[\"dmat3x3\"]={0,0,0,0,0,0,0,0,0},"
+        "[\"dmat3x4\"]={0,0,0,0,0,0,0,0,0,0,0,0},[\"dmat4x2\"]={0,0,0,0,0,0,0,0},"
+        "[\"dmat4x3\"]={0,0,0,0,0,0,0,0,0,0,0,0},"
+        "[\"dmat4x4\"]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}"
     );
 }
 
@@ -120,7 +121,7 @@ TEST_CASE("DictionaryLuaFormatter: Dictionary with nan", "[dictionaryluaformatte
     d.setValue("nanValue", std::numeric_limits<double>::quiet_NaN());
 
     std::string res = ghoul::formatLua(d);
-    CHECK(res == "{nanValue=nan}");
+    CHECK(res == "{[\"nanValue\"]=nan}");
 }
 
 TEST_CASE("DictionaryLuaFormatter: Dictionary with infinity", "[dictionaryluaformatter]") {
@@ -129,7 +130,7 @@ TEST_CASE("DictionaryLuaFormatter: Dictionary with infinity", "[dictionaryluafor
     d.setValue("infinity", std::numeric_limits<double>::infinity());
 
     std::string res = ghoul::formatLua(d);
-    CHECK(res == "{infinity=inf}");
+    CHECK(res == "{[\"infinity\"]=inf}");
 }
 
 TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]") {
@@ -176,37 +177,38 @@ TEST_CASE("DictionaryLuaFormatter: Nested Dictionary", "[dictionaryluaformatter]
 
     CHECK(
         res ==
-        "{dict={dict={dict={double=2.2,int=1,"
-        "string=\"\",vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}},"
-        "double=2.2,int=1,string=\"\","
-        "vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}},"
-        "double=2.2,int=1,string=\"\","
-        "vec2={0,0},vec3={0,0,0},"
-        "vec4={0,0,0,0}},"
-        "dict2={dict={dict={double=2.2,int=1,string=\"\","
-        "vec2={0,0},vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.2,int=1,"
-        "string=\"\",vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.2,int=1,"
-        "string=\"\",vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}},dict3={dict={dict={"
-        "double=2.2,int=1,string=\"\",vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.2,int=1,"
-        "string=\"\",vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.2,int=1,"
-        "string=\"\",vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}},double=2.2,int=1,"
-        "string=\"\",vec2={0,0},"
-        "vec3={0,0,0},"
-        "vec4={0,0,0,0}}"
+        "{[\"dict\"]={[\"dict\"]={[\"dict\"]={[\"double\"]=2.2,[\"int\"]=1,"
+        "[\"string\"]=\"\",[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},"
+        "[\"double\"]=2.2,[\"int\"]=1,[\"string\"]=\"\","
+        "[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},"
+        "[\"double\"]=2.2,[\"int\"]=1,[\"string\"]=\"\","
+        "[\"vec2\"]={0,0},[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},"
+        "[\"dict2\"]={[\"dict\"]={[\"dict\"]={[\"double\"]=2.2,[\"int\"]=1,"
+        "[\"string\"]=\"\","
+        "[\"vec2\"]={0,0},[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},[\"double\"]=2.2,[\"int\"]=1,"
+        "[\"string\"]=\"\",[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},[\"double\"]=2.2,[\"int\"]=1,"
+        "[\"string\"]=\"\",[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},[\"dict3\"]={[\"dict\"]={[\"dict\"]={"
+        "[\"double\"]=2.2,[\"int\"]=1,[\"string\"]=\"\",[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},[\"double\"]=2.2,[\"int\"]=1,"
+        "[\"string\"]=\"\",[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},[\"double\"]=2.2,[\"int\"]=1,"
+        "[\"string\"]=\"\",[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}},[\"double\"]=2.2,[\"int\"]=1,"
+        "[\"string\"]=\"\",[\"vec2\"]={0,0},"
+        "[\"vec3\"]={0,0,0},"
+        "[\"vec4\"]={0,0,0,0}}"
     );
 }
