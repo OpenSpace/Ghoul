@@ -30,19 +30,20 @@
 #include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/texture.h>
 #include <stb_image.h>
+#include <array>
 #include <cstring>
 #include <utility>
 
 namespace {
     using namespace ghoul;
-    using namespace ghoul::io;
+    using namespace ghoul::io::texture;
 
     std::unique_ptr<opengl::Texture> load(unsigned char* data, int x, int y, int n,
                                           const std::string& message, int nDimensions,
                                           opengl::Texture::SamplerInit samplerSettings)
     {
         if (!data) {
-            throw TextureReader::TextureLoadException(
+            throw TextureLoadException(
                 message,
                 std::format("Error reading image data: {}", stbi_failure_reason())
             );
@@ -104,9 +105,9 @@ namespace {
     }
 } // namespace
 
-namespace ghoul::io {
+namespace ghoul::io::texture {
 
-TextureReader::MissingReaderException::MissingReaderException(std::string extension,
+MissingReaderException::MissingReaderException(std::string extension,
                                                               std::filesystem::path file_)
     : RuntimeError(
         std::format(
@@ -118,7 +119,7 @@ TextureReader::MissingReaderException::MissingReaderException(std::string extens
     , file(std::move(file_))
 {}
 
-TextureReader::TextureLoadException::TextureLoadException(std::filesystem::path name,
+TextureLoadException::TextureLoadException(std::filesystem::path name,
                                                           std::string msg)
     : RuntimeError(std::format("Error loading texture '{}'", name), "IO")
     , filename(std::move(name))
@@ -126,7 +127,7 @@ TextureReader::TextureLoadException::TextureLoadException(std::filesystem::path 
 {
 }
 
-TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t size)
+InvalidLoadException::InvalidLoadException(void* memory, size_t size)
     : RuntimeError(
         std::format("Error loading texture at location {} with size {}", memory, size),
         "IO"
@@ -135,8 +136,7 @@ TextureReader::InvalidLoadException::InvalidLoadException(void* memory, size_t s
     , _size(size)
 {}
 
-std::unique_ptr<opengl::Texture> TextureReader::loadTexture(
-                                                    const std::filesystem::path& filename,
+std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
                                                                           int nDimensions,
                                              opengl::Texture::SamplerInit samplerSettings)
 {
@@ -149,7 +149,7 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(
     }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
-    if (!isSupportedExtension(extension)) {
+    if (!isSupportedReadExtension(extension)) {
         throw MissingReaderException(extension, filename);
     }
 
@@ -162,15 +162,14 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(
     return load(data, x, y, n, f, nDimensions, std::move(samplerSettings));
 }
 
-std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t size,
-                                                            int nDimensions,
+std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDimensions,
                                              opengl::Texture::SamplerInit samplerSettings,
                                                                 const std::string& format)
 {
     ghoul_assert(memory, "Memory must not be nullptr");
     ghoul_assert(size > 0, "Size must be > 0");
 
-    if (!isSupportedExtension(format)) {
+    if (!isSupportedReadExtension(format)) {
         throw MissingReaderException(format, "Memory");
     }
 
@@ -189,14 +188,14 @@ std::unique_ptr<opengl::Texture> TextureReader::loadTexture(void* memory, size_t
     return load(data, x, y, n, "Memory", nDimensions, std::move(samplerSettings));
 }
 
-glm::ivec2 TextureReader::imageSize(const std::filesystem::path& filename) {
+glm::ivec2 imageSize(const std::filesystem::path& filename) {
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
         extension = extension.substr(1);
     }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
-    if (!isSupportedExtension(extension)) {
+    if (!isSupportedReadExtension(extension)) {
         throw MissingReaderException(extension, filename);
     }
 
@@ -209,15 +208,15 @@ glm::ivec2 TextureReader::imageSize(const std::filesystem::path& filename) {
     return glm::ivec2(x, y);
 }
 
-bool TextureReader::isSupportedExtension(const std::string& extension) {
+bool isSupportedReadExtension(const std::string& extension) {
     const std::string e = toLowerCase(extension);
-    std::vector<std::string> extensions = supportedExtensions();
+    std::vector<std::string> extensions = supportedReadExtensions();
     return std::find(extensions.begin(), extensions.end(), e) != extensions.end();
 }
 
-std::vector<std::string> TextureReader::supportedExtensions() {
+std::vector<std::string> supportedReadExtensions() {
     // Taken from stb_image.h
-    return {
+    return  {
         "jpeg", "jpg",
         "png",
         "bmp",
@@ -229,4 +228,5 @@ std::vector<std::string> TextureReader::supportedExtensions() {
         "ppm", "pgm"
     };
 }
-} // namespace ghoul::io
+
+} // namespace ghoul::io::texture

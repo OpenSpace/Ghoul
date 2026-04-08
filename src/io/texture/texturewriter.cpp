@@ -35,26 +35,20 @@
 #include <stb_image_write.h>
 #include <utility>
 
-namespace {
-    constexpr std::string_view _loggerCat = "TextureWriter";
-} // namespace
+namespace ghoul::io::texture {
 
-namespace ghoul::io {
-
-TextureWriter::MissingWriterException::MissingWriterException(std::string extension)
+MissingWriterException::MissingWriterException(std::string extension)
     : RuntimeError(std::format("No writer was found for extension '{}'", extension), "IO")
     , fileExtension(std::move(extension))
 {}
 
-TextureWriter::TextureWriteException::TextureWriteException(std::string name, std::string msg)
-    : RuntimeError(std::format("Error writing texture '{}'", name), "TextureWriter")
+TextureWriteException::TextureWriteException(std::string name, std::string msg)
+    : RuntimeError(std::format("Error writing texture '{}'", name), "IO")
     , filename(std::move(name))
     , errorMessage(std::move(msg))
 {}
 
-void TextureWriter::saveTexture(const opengl::Texture& texture,
-                                const std::string& filename)
-{
+void saveTexture(const opengl::Texture& texture, const std::string& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
 
     std::string extension = std::filesystem::path(filename).extension().string();
@@ -64,12 +58,12 @@ void TextureWriter::saveTexture(const opengl::Texture& texture,
     }
     ghoul_assert(!extension.empty(), "Filename must have an extension");
 
-    if (!isSupportedExtension(extension)) {
+    if (!isSupportedWriteExtension(extension)) {
         throw MissingWriterException(extension);
     }
 
     if (texture.dimensions().z > 1) {
-        LERROR(std::format(
+        LERRORC("TextureWriter", std::format(
             "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
             filename
         ));
@@ -120,21 +114,21 @@ void TextureWriter::saveTexture(const opengl::Texture& texture,
     }
 }
 
-bool TextureWriter::isSupportedExtension(const std::string& extension) {
+bool isSupportedWriteExtension(const std::string& extension) {
     const std::string e = toLowerCase(extension);
-    std::vector<std::string> extensions = supportedExtensions();
+    std::vector<std::string> extensions = supportedWriteExtensions();
     return std::find(extensions.begin(), extensions.end(), e) != extensions.end();
 }
 
-std::vector<std::string> TextureWriter::supportedExtensions() {
+std::vector<std::string> supportedWriteExtensions() {
     // Taken from stb_image_writer.h
     return {
-        "jpeg", "jpg",
-        "png",
-        "bmp",
-        // "hdr",
-        "tga"
+         "jpeg", "jpg",
+         "png",
+         "bmp",
+         // "hdr",
+         "tga"
     };
 }
 
-} // namespace ghoul::io
+} // namespace ghoul::io::texture
