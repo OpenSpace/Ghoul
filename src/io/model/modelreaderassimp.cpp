@@ -34,7 +34,6 @@
 #include <ghoul/io/model/modelnode.h>
 #include <ghoul/io/model/modelreaderbase.h>
 #include <ghoul/io/texture/texturereader.h>
-#include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
@@ -159,7 +158,7 @@ namespace {
                         textureArray.push_back(std::move(meshTexture));
                         return false;
                     }
-                    catch (const TextureReaderBase::TextureLoadException& e) {
+                    catch (const TextureReader::TextureLoadException& e) {
                         LWARNING(std::format(
                             "Failed to load texture from '{}' with error '{}': "
                             "Replacing with flashy color", e.filename, e.message
@@ -203,7 +202,7 @@ namespace {
                     textureArray.push_back(std::move(meshTexture));
                     return false;
                 }
-                catch (const TextureReaderBase::TextureLoadException& e) {
+                catch (const TextureReader::TextureLoadException& e) {
                     LWARNING(std::format(
                         "Failed to load texture from '{}' with error '{}': Replacing "
                         "with flashy color", e.filename, e.message
