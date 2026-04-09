@@ -201,7 +201,7 @@ glm::ivec2 imageSize(const std::filesystem::path& filename) {
     int x = 0;
     int y = 0;
     int n = 0;
-    stbi_load(f.c_str(), &x, &y, &n, 0);
+    stbi_info(f.c_str(), &x, &y, &n);
 
     return glm::ivec2(x, y);
 }
