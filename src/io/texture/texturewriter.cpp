@@ -63,10 +63,13 @@ void saveTexture(const opengl::Texture& texture, const std::string& filename) {
     }
 
     if (texture.dimensions().z > 1) {
-        LERRORC("TextureWriter", std::format(
-            "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
-            filename
-        ));
+        LERRORC(
+            "TextureWriter",
+            std::format(
+                "Cannot write 3D texture to file: '{}'. 3D textures are not supported",
+                filename
+            )
+        );
         return;
     }
 

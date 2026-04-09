@@ -40,8 +40,7 @@ namespace ghoul::io::texture {
  * Exception that gets thrown when the provided \p extension is not supported.
  */
 struct MissingReaderException final : public RuntimeError {
-    explicit MissingReaderException(std::string extension,
-        std::filesystem::path file_);
+    MissingReaderException(std::string extension, std::filesystem::path file_);
 
     const std::string fileExtension;
     const std::filesystem::path file;
@@ -51,7 +50,7 @@ struct MissingReaderException final : public RuntimeError {
  * The exception that gets thrown if there was an error loading the Texture.
  */
 struct TextureLoadException final : public RuntimeError {
-    explicit TextureLoadException(std::filesystem::path name, std::string msg);
+    TextureLoadException(std::filesystem::path name, std::string msg);
 
     /// The filename that caused the exception to be thrown
     const std::filesystem::path filename;
@@ -64,7 +63,7 @@ struct TextureLoadException final : public RuntimeError {
  * Exception that gets thrown when an invalid load result occurs.
  */
 struct InvalidLoadException final : public RuntimeError {
-    explicit InvalidLoadException(void* memory, size_t size);
+    InvalidLoadException(void* memory, size_t size);
 
     const void* _memory;
     const size_t _size;

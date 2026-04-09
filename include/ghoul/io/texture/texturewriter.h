@@ -46,7 +46,7 @@ struct MissingWriterException final : public RuntimeError {
  * The exception that gets thrown if there was an error writing the Texture.
  */
 struct TextureWriteException final : public RuntimeError {
-    explicit TextureWriteException(std::string name, std::string msg);
+    TextureWriteException(std::string name, std::string msg);
 
     /// The filename that caused the exception to be thrown
     const std::string filename;
@@ -60,13 +60,13 @@ struct TextureWriteException final : public RuntimeError {
  * library. The image file format is determined by the extension of the \p filename.
  *
  * Supported file formats include:
- * - JPEG (.jpeg, .jpg)
- * - PNG (.png)
- * - BMP (.bmp)
- * - TGA (.tga)
+ *   - JPEG (.jpeg, .jpg)
+ *   - PNG (.png)
+ *   - BMP (.bmp)
+ *   - TGA (.tga)
  *
  * \param texture The Texture that is to be written to disk
- * \param filename The target filename for \p filename.
+ * \param filename The target filename for \p filename
  *
  * \throw TextureWriteException If there was an error writing the \p filename
  * \throw MissingWriterException If the extension in the \p filename is not supported

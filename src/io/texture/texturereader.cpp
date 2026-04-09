@@ -70,27 +70,27 @@ namespace {
 
         const opengl::Texture::Format format = [](int nDim) {
             switch (nDim) {
-            case 1: return opengl::Texture::Format::Red;
-            case 2: return opengl::Texture::Format::RG;
-            case 3: return opengl::Texture::Format::RGB;
-            case 4: return opengl::Texture::Format::RGBA;
-            default:
-                throw RuntimeError(std::format("Unknown dimension '{}'", nDim));
-            }
+                case 1: return opengl::Texture::Format::Red;
+                case 2: return opengl::Texture::Format::RG;
+                case 3: return opengl::Texture::Format::RGB;
+                case 4: return opengl::Texture::Format::RGBA;
+                default:
+                    throw RuntimeError(std::format("Unknown dimension '{}'", nDim));
+                }
             }(n);
         const GLenum type = [](int d) {
             switch (d) {
-            case 1: return GL_TEXTURE_1D;
-            case 2: return GL_TEXTURE_2D;
-            case 3: return GL_TEXTURE_3D;
-            default:
-                throw RuntimeError(std::format("Unsupported dimensionality '{}'", d));
+                case 1: return GL_TEXTURE_1D;
+                case 2: return GL_TEXTURE_2D;
+                case 3: return GL_TEXTURE_3D;
+                default:
+                    throw RuntimeError(std::format("Unsupported dimensionality '{}'", d));
             }
-            }(nDimensions);
+        }(nDimensions);
 
         std::unique_ptr<opengl::Texture> texture =
             std::make_unique<opengl::Texture>(
-                opengl::Texture::FormatInit{
+                opengl::Texture::FormatInit {
                     .dimensions = glm::uvec3(x, y, 1),
                     .type = type,
                     .format = format,
@@ -119,12 +119,11 @@ MissingReaderException::MissingReaderException(std::string extension,
 {}
 
 TextureLoadException::TextureLoadException(std::filesystem::path name,
-                                                          std::string msg)
+                                           std::string msg)
     : RuntimeError(std::format("Error loading texture '{}'", name), "IO")
     , filename(std::move(name))
     , errorMessage(std::move(msg))
-{
-}
+{}
 
 InvalidLoadException::InvalidLoadException(void* memory, size_t size)
     : RuntimeError(
