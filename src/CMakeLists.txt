@@ -235,12 +235,7 @@ if (GHOUL_MODULE_OPENGL)
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/uniformcache.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderbase.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereadercmap.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereaderstb.h
       ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterbase.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriterstb.h
       opengl/debugcontext.cpp
       opengl/framebufferobject.cpp
       opengl/openglstatecache.cpp
@@ -254,12 +249,7 @@ if (GHOUL_MODULE_OPENGL)
       opengl/texturemanager.cpp
       opengl/textureunit.cpp
       io/texture/texturereader.cpp
-      io/texture/texturereaderbase.cpp
-      io/texture/texturereadercmap.cpp
-      io/texture/texturereaderstb.cpp
       io/texture/texturewriter.cpp
-      io/texture/texturewriterbase.cpp
-      io/texture/texturewriterstb.cpp
   )
 endif ()
 

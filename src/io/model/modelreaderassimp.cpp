@@ -34,7 +34,6 @@
 #include <ghoul/io/model/modelnode.h>
 #include <ghoul/io/model/modelreaderbase.h>
 #include <ghoul/io/texture/texturereader.h>
-#include <ghoul/io/texture/texturereaderbase.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/defer.h>
@@ -140,7 +139,7 @@ namespace {
                 if (texture->mHeight == 0) {
                     // Load compressed embedded texture
                     try {
-                        textureEntry.texture = TextureReader::ref().loadTexture(
+                        textureEntry.texture = texture::loadTexture(
                             static_cast<void*>(texture->pcData),
                             texture->mWidth,
                             2,
@@ -150,7 +149,7 @@ namespace {
                         textureEntry.texture->setName(path.C_Str());
                         meshTexture.texture = textureEntry.texture.get();
                     }
-                    catch (const TextureReader::InvalidLoadException& e) {
+                    catch (const texture::InvalidLoadException& e) {
                         LWARNING(std::format(
                             "Could not load unsupported texture from '{}' with size "
                             "'{}': Replacing with flashy color", e._memory, e._size
@@ -159,7 +158,7 @@ namespace {
                         textureArray.push_back(std::move(meshTexture));
                         return false;
                     }
-                    catch (const TextureReaderBase::TextureLoadException& e) {
+                    catch (const texture::TextureLoadException& e) {
                         LWARNING(std::format(
                             "Failed to load texture from '{}' with error '{}': "
                             "Replacing with flashy color", e.filename, e.message
@@ -187,14 +186,14 @@ namespace {
                         "{}/{}", modelDirectory, pathString
                     );
 
-                    textureEntry.texture = TextureReader::ref().loadTexture(
+                    textureEntry.texture = texture::loadTexture(
                         absPath(absolutePath),
                         2
                     );
                     textureEntry.texture->setName(path.C_Str());
                     meshTexture.texture = textureEntry.texture.get();
                 }
-                catch (const TextureReader::MissingReaderException& e) {
+                catch (const texture::MissingReaderException& e) {
                     LWARNING(std::format(
                         "Could not load unsupported texture from '{}' with extension "
                         "'{}': Replacing with flashy color", e.file, e.fileExtension
@@ -203,7 +202,7 @@ namespace {
                     textureArray.push_back(std::move(meshTexture));
                     return false;
                 }
-                catch (const TextureReaderBase::TextureLoadException& e) {
+                catch (const texture::TextureLoadException& e) {
                     LWARNING(std::format(
                         "Failed to load texture from '{}' with error '{}': Replacing "
                         "with flashy color", e.filename, e.message
