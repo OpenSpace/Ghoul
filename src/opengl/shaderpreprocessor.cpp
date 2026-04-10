@@ -678,6 +678,7 @@ std::string ShaderPreprocessor::process() {
     Env env = Env(_dictionary);
     env.processFile(_shaderPath);
     std::string result = env.output();
+    _includedFiles.clear();
     for (const std::filesystem::path& file : env.includedFiles()) {
         filesystem::File f = filesystem::File(file);
         f.setCallback([this]() { _onChangeCallback(); });
