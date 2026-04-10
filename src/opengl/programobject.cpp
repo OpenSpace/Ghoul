@@ -1123,44 +1123,36 @@ void ProgramObject::setUniform(GLint location,
 }
 
 void ProgramObject::setUniform(GLint location, GLint value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform1i(_id, location, value);
 }
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2i(_id, location, v1, v2);
 }
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3i(_id, location, v1, v2, v3);
 }
 
 void ProgramObject::setUniform(GLint location, GLint v1, GLint v2, GLint v3,
                                GLint v4) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4i(_id, location, v1, v2, v3, v4);
 }
 
 void ProgramObject::setUniform(GLint location, const glm::ivec2& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2iv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const glm::ivec3& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3iv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const glm::ivec4& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4iv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const std::vector<GLint>& values) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform1iv(
         _id,
         location,
@@ -1172,7 +1164,6 @@ void ProgramObject::setUniform(GLint location, const std::vector<GLint>& values)
 void ProgramObject::setUniform(GLint location,
                                const std::vector<glm::ivec2>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2iv(
         _id,
         location,
@@ -1184,7 +1175,6 @@ void ProgramObject::setUniform(GLint location,
 void ProgramObject::setUniform(GLint location,
                                const std::vector<glm::ivec3>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3iv(
         _id,
         location,
@@ -1196,7 +1186,6 @@ void ProgramObject::setUniform(GLint location,
 void ProgramObject::setUniform(GLint location,
                                const std::vector<glm::ivec4>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4iv(
         _id,
         location,
@@ -1206,44 +1195,36 @@ void ProgramObject::setUniform(GLint location,
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform1f(_id, location, value);
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2f(_id, location, v1, v2);
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3f(_id, location, v1, v2, v3);
 }
 
 void ProgramObject::setUniform(GLint location, GLfloat v1, GLfloat v2, GLfloat v3,
                                GLfloat v4) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4f(_id, location, v1, v2, v3, v4);
 }
 
 void ProgramObject::setUniform(GLint location, const glm::vec2& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2fv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const glm::vec3& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3fv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const glm::vec4& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4fv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const std::vector<GLfloat>& values) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform1fv(
         _id,
         location,
@@ -1254,7 +1235,6 @@ void ProgramObject::setUniform(GLint location, const std::vector<GLfloat>& value
 
 void ProgramObject::setUniform(GLint location, const std::vector<glm::vec2>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2fv(
         _id,
         location,
@@ -1265,7 +1245,6 @@ void ProgramObject::setUniform(GLint location, const std::vector<glm::vec2>& val
 
 void ProgramObject::setUniform(GLint location, const std::vector<glm::vec3>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3fv(
         _id,
         location,
@@ -1276,7 +1255,6 @@ void ProgramObject::setUniform(GLint location, const std::vector<glm::vec3>& val
 
 void ProgramObject::setUniform(GLint location, const std::vector<glm::vec4>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4fv(
         _id,
         location,
@@ -1286,47 +1264,39 @@ void ProgramObject::setUniform(GLint location, const std::vector<glm::vec4>& val
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform1d(_id, location, value);
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2d(_id, location, v1, v2);
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2,
                                GLdouble v3) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3d(_id, location, v1, v2, v3);
 }
 
 void ProgramObject::setUniform(GLint location, GLdouble v1, GLdouble v2, GLdouble v3,
                                GLdouble v4) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4d(_id, location, v1, v2, v3, v4);
 }
 
 void ProgramObject::setUniform(GLint location, const glm::dvec2& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2dv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const glm::dvec3& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3dv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const glm::dvec4& value) const {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4dv(_id, location, 1, glm::value_ptr(value));
 }
 
 void ProgramObject::setUniform(GLint location, const std::vector<GLdouble>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform1dv(
         _id,
         location,
@@ -1338,7 +1308,6 @@ void ProgramObject::setUniform(GLint location, const std::vector<GLdouble>& valu
 void ProgramObject::setUniform(GLint location,
                                const std::vector<glm::dvec2>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform2dv(
         _id,
         location,
@@ -1350,7 +1319,6 @@ void ProgramObject::setUniform(GLint location,
 void ProgramObject::setUniform(GLint location,
                                const std::vector<glm::dvec3>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform3dv(
         _id,
         location,
@@ -1362,7 +1330,6 @@ void ProgramObject::setUniform(GLint location,
 void ProgramObject::setUniform(GLint location,
                                const std::vector<glm::dvec4>& values) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniform4dv(
         _id,
         location,
@@ -1374,7 +1341,6 @@ void ProgramObject::setUniform(GLint location,
 void ProgramObject::setUniform(GLint location, const glm::mat2x2& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix2fv(
         _id,
         location,
@@ -1388,7 +1354,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x3& value,
                                Transpose transpose) const
 {
 
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix2x3fv(
         _id,
         location,
@@ -1401,7 +1366,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x3& value,
 void ProgramObject::setUniform(GLint location, const glm::mat2x4& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix2x4fv(
         _id,
         location,
@@ -1414,7 +1378,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat2x4& value,
 void ProgramObject::setUniform(GLint location, const glm::mat3x2& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix3x2fv(
         _id,
         location,
@@ -1427,7 +1390,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x2& value,
 void ProgramObject::setUniform(GLint location, const glm::mat3x3& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix3fv(
         _id,
         location,
@@ -1440,7 +1402,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x3& value,
 void ProgramObject::setUniform(GLint location, const glm::mat3x4& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix3x4fv(
         _id,
         location,
@@ -1453,7 +1414,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat3x4& value,
 void ProgramObject::setUniform(GLint location, const glm::mat4x2& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix4x2fv(
         _id,
         location,
@@ -1466,7 +1426,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x2& value,
 void ProgramObject::setUniform(GLint location, const glm::mat4x3& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix4x3fv(
         _id,
         location,
@@ -1479,7 +1438,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x3& value,
 void ProgramObject::setUniform(GLint location, const glm::mat4x4& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix4fv(
         _id,
         location,
@@ -1492,7 +1450,6 @@ void ProgramObject::setUniform(GLint location, const glm::mat4x4& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat2x2& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix2dv(
         _id,
         location,
@@ -1505,7 +1462,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x2& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat2x3& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix2x3dv(
         _id,
         location,
@@ -1518,7 +1474,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x3& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat2x4& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix2x4dv(
         _id,
         location,
@@ -1531,7 +1486,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat2x4& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat3x2& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix3x2dv(
         _id,
         location,
@@ -1544,7 +1498,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x2& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat3x3& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix3dv(
         _id,
         location,
@@ -1557,7 +1510,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x3& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat3x4& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix3x4dv(
         _id,
         location,
@@ -1570,7 +1522,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat3x4& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat4x2& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix4x2dv(
         _id,
         location,
@@ -1583,7 +1534,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x2& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat4x3& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix4x3dv(
         _id,
         location,
@@ -1596,7 +1546,6 @@ void ProgramObject::setUniform(GLint location, const glm::dmat4x3& value,
 void ProgramObject::setUniform(GLint location, const glm::dmat4x4& value,
                                Transpose transpose) const
 {
-    ghoul_assert(location != -1, "Location must not be -1");
     glProgramUniformMatrix4dv(
         _id,
         location,
