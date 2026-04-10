@@ -31,15 +31,15 @@
 #include <ghoul/opengl/texture.h>
 #include <stb_image.h>
 #include <cstring>
+#include <string_view>
 #include <utility>
 
 namespace {
     using namespace ghoul;
     using namespace ghoul::io::texture;
 
-    std::unique_ptr<opengl::Texture> load(unsigned char* data, int x, int y, int n,
-                                          const std::string& message, int nDimensions,
-                                          opengl::Texture::SamplerInit samplerSettings)
+    ImageInfo loadImageData(unsigned char* data, int x, int y, int n,
+                            std::string_view message)
     {
         if (!data) {
             throw TextureLoadException(
@@ -47,7 +47,6 @@ namespace {
                 std::format("Error reading image data: {}", stbi_failure_reason())
             );
         }
-
 
         // This is weird. stb_image.h says that the first pixel loaded is the one in the
         // upper left. However, if we load the data and just use it, the images are
@@ -68,6 +67,30 @@ namespace {
             std::memcpy(data + (y - i - 1) * x * n, buffer.data(), x * n);
         }
 
+        // Copy data into vector
+        std::vector<std::byte> vec(
+            reinterpret_cast<std::byte*>(data),
+            reinterpret_cast<std::byte*>(data) + (x * y * n)
+        );
+
+        // Done with the data, let's free it
+        stbi_image_free(data);
+
+        return {
+            .dimensions = glm::ivec2(x, y),
+            .nChannels = n,
+            .data = std::move(vec)
+        };
+    }
+
+    /**
+     * Load a texture object from the image data, using reasonable parameters based on the
+     * image dimensionality.
+     */
+    std::unique_ptr<opengl::Texture> makeTexture(ImageInfo info, std::string_view message,
+                                                 int nDimensions,
+                                             opengl::Texture::SamplerInit samplerSettings)
+    {
         const opengl::Texture::Format format = [](int nDim) {
             switch (nDim) {
                 case 1: return opengl::Texture::Format::Red;
@@ -76,8 +99,9 @@ namespace {
                 case 4: return opengl::Texture::Format::RGBA;
                 default:
                     throw RuntimeError(std::format("Unknown dimension '{}'", nDim));
-                }
-            }(n);
+            }
+        }(info.nChannels);
+
         const GLenum type = [](int d) {
             switch (d) {
                 case 1: return GL_TEXTURE_1D;
@@ -90,16 +114,15 @@ namespace {
 
         std::unique_ptr<opengl::Texture> texture =
             std::make_unique<opengl::Texture>(
-                opengl::Texture::FormatInit {
-                    .dimensions = glm::uvec3(x, y, 1),
+                opengl::Texture::FormatInit{
+                    .dimensions = glm::uvec3(info.dimensions.x, info.dimensions.y, 1),
                     .type = type,
                     .format = format,
                     .dataType = GL_UNSIGNED_BYTE
                 },
                 samplerSettings,
-                reinterpret_cast<std::byte*>(data)
+                reinterpret_cast<std::byte*>(info.data.data())
             );
-        stbi_image_free(data);
         return texture;
     }
 } // namespace
@@ -107,7 +130,7 @@ namespace {
 namespace ghoul::io::texture {
 
 MissingReaderException::MissingReaderException(std::string extension,
-                                                              std::filesystem::path file_)
+                                               std::filesystem::path file_)
     : RuntimeError(
         std::format(
             "No reader found for extension '{}' with file '{}'", extension, file_
@@ -134,12 +157,8 @@ InvalidLoadException::InvalidLoadException(void* memory, size_t size)
     , _size(size)
 {}
 
-std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
-                                                                          int nDimensions,
-                                             opengl::Texture::SamplerInit samplerSettings)
-{
+ImageInfo loadImage(const std::filesystem::path& filename) {
     ghoul_assert(!filename.empty(), "Filename must not be empty");
-    ghoul_assert(nDimensions >= 1 && nDimensions <= 3, "nDimensions must be 1, 2, or 3");
 
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
@@ -157,13 +176,10 @@ std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filena
     int n = 0;
     unsigned char* data = stbi_load(f.c_str(), &x, &y, &n, 0);
 
-    return load(data, x, y, n, f, nDimensions, std::move(samplerSettings));
+    return loadImageData(data, x, y, n, f);
 }
 
-std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDimensions,
-                                             opengl::Texture::SamplerInit samplerSettings,
-                                                                const std::string& format)
-{
+ImageInfo loadImage(void* memory, size_t size, const std::string& format) {
     ghoul_assert(memory, "Memory must not be nullptr");
     ghoul_assert(size > 0, "Size must be > 0");
 
@@ -183,7 +199,39 @@ std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDim
         0
     );
 
-    return load(data, x, y, n, "Memory", nDimensions, std::move(samplerSettings));
+    return loadImageData(data, x, y, n, "Memory");
+}
+
+std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
+                                                                          int nDimensions,
+                                             opengl::Texture::SamplerInit samplerSettings)
+{
+    ghoul_assert(!filename.empty(), "Filename must not be empty");
+    ghoul_assert(nDimensions >= 1 && nDimensions <= 3, "nDimensions must be 1, 2, or 3");
+
+    ImageInfo info = loadImage(filename);
+
+    return makeTexture(
+        std::move(info),
+        filename.string(),
+        nDimensions,
+        std::move(samplerSettings)
+    );
+}
+
+
+std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDimensions,
+                                             opengl::Texture::SamplerInit samplerSettings,
+                                                                const std::string& format)
+{
+    ImageInfo info = loadImage(memory, size, format);
+
+    return makeTexture(
+        std::move(info),
+        "Memory",
+        nDimensions,
+        std::move(samplerSettings)
+    );
 }
 
 glm::ivec2 imageSize(const std::filesystem::path& filename) {

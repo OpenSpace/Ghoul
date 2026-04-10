@@ -70,6 +70,27 @@ struct InvalidLoadException final : public RuntimeError {
 };
 
 /**
+ * Holds the information about a loaded image including its dimensions, channel count,
+ * and raw pixel data.
+ */
+struct ImageInfo {
+    /// The width and height of the image in pixels
+    glm::ivec2 dimensions;
+
+    /// The number of color channels (e.g., 3 for RGB, 4 for RGBA)
+    int nChannels;
+
+    /// The raw pixel data of the image
+    std::vector<std::byte> data;
+};
+
+/// TODO: Docs
+ImageInfo loadImage(const std::filesystem::path& filename);
+
+/// TODO: Docs
+ImageInfo loadImage(void* memory, size_t size, const std::string& format);
+
+/**
  * Loads the provided \p filename using the STB image library into a Texture and returns
  * it. The image format is determined by the extension of the \p filename.
  *
