@@ -84,10 +84,43 @@ struct ImageInfo {
     std::vector<std::byte> data;
 };
 
-/// TODO: Docs
+/**
+ * Loads the provided \p filename using the STB image library and returns the image
+ * information including dimensions, channel count, and raw pixel data. The image format
+ * is determined by the extension of the \p filename.
+ *
+ * \param filename The name of the file which should be loaded
+ * \return An ImageInfo structure containing the image dimensions, number of channels,
+ *         and raw pixel data
+ *
+ * \throw TextureLoadException If there was an error reading the \p filename
+ * \throw MissingReaderException If the extension in the \p filename is not supported
+ * \pre \p filename must not be empty
+ * \pre \p filename must have an extension
+ * \pre The extension of \p filename must be among the supported file extensions
+ */
 ImageInfo loadImage(const std::filesystem::path& filename);
 
-/// TODO: Docs
+/**
+ * Loads an image from the memory pointed at by \p memory using the STB image library and
+ * returns the image information including dimensions, channel count, and raw pixel data.
+ * The memory block must contain at least \p size number of bytes.
+ *
+ * \param memory The memory that contains the bytes of the image to be loaded
+ * \param size The number of bytes contained in \p memory
+ * \param format The format of the image pointed to by \p memory. This parameter should
+ *        be the same as the usual file extension for the image and is used to determine
+ *        if the file type is supported for reading
+ * \return An ImageInfo structure containing the image dimensions, number of channels,
+ *         and raw pixel data
+ *
+ * \throw TextureLoadException If there was an error reading the \p memory
+ * \throw MissingReaderException If the \p format is not supported
+ * \throw InvalidLoadException If the load result is invalid
+ * \pre \p memory must not be `nullptr`
+ * \pre \p size must be > 0
+ * \pre \p format must be among the supported file extensions
+ */
 ImageInfo loadImage(void* memory, size_t size, const std::string& format);
 
 /**
@@ -132,6 +165,7 @@ std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filena
  * \throw MissingReaderException If the extension in the \p filename is not supported
  * \pre \p memory must not be `nullptr`
  * \pre \p size must be > 0
+ * \pre \p format must be among the supported file extensions
  * \pre \p nDimensions The number of texture dimension must be 1, 2, or 3
  * \pre The extension of \p filename must be among the supported file extensions
  */
