@@ -174,7 +174,8 @@ std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
     const std::string& format = "");
 
 /**
- * Returns the size of the image pointed to by \p filename.
+ * Loads the information about the image at the provided \p filename using the STB image
+ * library, without thefully loading the image data.
  *
  * \param filename The image file that should be inspected
  * \return The size of the image in pixels
@@ -183,7 +184,7 @@ std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
  * \pre \p filename must not be empty
  * \pre The extension of \p filename must be among the supported file extensions
  */
-glm::ivec2 imageSize(const std::filesystem::path& filename);
+ImageInfo imageInfo(const std::filesystem::path& filename);
 
 /**
  * Returns Whether the provided file \p extension is supported by this reader, i.e., which

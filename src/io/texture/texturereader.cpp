@@ -87,8 +87,7 @@ namespace {
      * Load a texture object from the image data, using reasonable parameters based on the
      * image dimensionality.
      */
-    std::unique_ptr<opengl::Texture> makeTexture(ImageInfo info, std::string_view message,
-                                                 int nDimensions,
+    std::unique_ptr<opengl::Texture> makeTexture(ImageInfo info, int nDimensions,
                                              opengl::Texture::SamplerInit samplerSettings)
     {
         const opengl::Texture::Format format = [](int nDim) {
@@ -213,12 +212,10 @@ std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filena
 
     return makeTexture(
         std::move(info),
-        filename.string(),
         nDimensions,
         std::move(samplerSettings)
     );
 }
-
 
 std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDimensions,
                                              opengl::Texture::SamplerInit samplerSettings,
@@ -228,13 +225,12 @@ std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDim
 
     return makeTexture(
         std::move(info),
-        "Memory",
         nDimensions,
         std::move(samplerSettings)
     );
 }
 
-glm::ivec2 imageSize(const std::filesystem::path& filename) {
+ImageInfo imageInfo(const std::filesystem::path& filename) {
     std::string extension = std::filesystem::path(filename).extension().string();
     if (!extension.empty()) {
         extension = extension.substr(1);
@@ -251,7 +247,11 @@ glm::ivec2 imageSize(const std::filesystem::path& filename) {
     int n = 0;
     stbi_info(f.c_str(), &x, &y, &n);
 
-    return glm::ivec2(x, y);
+    return {
+        .dimensions = glm::ivec2(x, y),
+        .nChannels = n,
+        .data = {}
+    };
 }
 
 bool isSupportedReadExtension(const std::string& extension) {
