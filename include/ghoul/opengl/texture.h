@@ -155,6 +155,11 @@ public:
 
         /// Changes the general swizzle mask of the texture
         std::optional<std::array<GLenum, 4>> swizzleMask = std::nullopt;
+
+        /// If true and the texture has a single Red channel, a swizzle mask of
+        /// { GL_RED, GL_RED, GL_RED, GL_ONE } will be applied to the texture.
+        /// If the swizzle mask is already set, this option is ignored
+        std::optional<bool> autoSwizzleGrayscale = std::nullopt;
     };
 
     /**

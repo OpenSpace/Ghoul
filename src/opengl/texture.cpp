@@ -141,6 +141,23 @@ namespace {
         }
     }
 
+
+    std::optional<std::array<GLenum, 4>> parseSwizzleMask(
+                                                      const Texture::SamplerInit& sampler,
+                                                        const Texture::FormatInit& format)
+    {
+        if (sampler.swizzleMask.has_value()) {
+            return *sampler.swizzleMask;
+        }
+
+        bool shouldAutoSwizzle = sampler.autoSwizzleGrayscale.value_or(false);
+        if (shouldAutoSwizzle && format.format == Texture::Format::Red) {
+            return std::array<GLenum, 4>{ GL_RED, GL_RED, GL_RED, GL_ONE };
+        }
+
+        return std::nullopt;
+    }
+
     constexpr int nChannels(Texture::Format format) {
         switch (format) {
             case Texture::Format::Red:            return 1;
@@ -194,7 +211,7 @@ Texture::Texture(FormatInit format, SamplerInit sampler, const std::byte* data,
     , _filter(std::move(sampler.filter))
     , _wrapping(toWrappingModes(sampler.wrapping))
     , _borderColor(std::move(sampler.borderColor))
-    , _swizzleMask(std::move(sampler.swizzleMask))
+    , _swizzleMask(parseSwizzleMask(sampler, format))
     , _mipMapLevel(sampler.mipMapLevel.value_or(8))
     , _pixelAlignment(std::move(pixelAlignment))
 {
