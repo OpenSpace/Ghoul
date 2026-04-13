@@ -280,6 +280,15 @@ public:
     std::vector<std::byte> pixelData() const;
 
     /**
+     * Returns the recommended `Format` corresponding to the given number of color
+     * channels.
+     *
+     * \param nChannels The number of channels to return a format for
+     * \return The recommended `Format`
+     */
+    static Format formatFromNumChannels(int nChannels);
+
+    /**
      * Downloads the contents of this texture into CPU memory and stores it locally. The
      * The data can then be retrieved through a call to `cachedPixelData` which will use
      * this cached data. The cache can be cleared and the memory reclaimed through a call

@@ -493,6 +493,19 @@ std::vector<std::byte> Texture::pixelData() const {
     return res;
 }
 
+Texture::Format Texture::formatFromNumChannels(int nChannels) {
+    switch (nChannels) {
+        case 1: return Texture::Format::Red;
+        case 2: return Texture::Format::RG;
+        case 3: return Texture::Format::RGB;
+        case 4: return Texture::Format::RGBA;
+        default:
+            throw ghoul::RuntimeError(
+                std::format("Unsupported channel count: {}", nChannels)
+            );
+    }
+}
+
 void Texture::downloadTexture() {
     if (!_pixels.empty()) {
         return;

@@ -90,17 +90,6 @@ namespace {
     std::unique_ptr<opengl::Texture> makeTexture(ImageInfo info, int nDimensions,
                                              opengl::Texture::SamplerInit samplerSettings)
     {
-        const opengl::Texture::Format format = [](int nDim) {
-            switch (nDim) {
-                case 1: return opengl::Texture::Format::Red;
-                case 2: return opengl::Texture::Format::RG;
-                case 3: return opengl::Texture::Format::RGB;
-                case 4: return opengl::Texture::Format::RGBA;
-                default:
-                    throw RuntimeError(std::format("Unknown dimension '{}'", nDim));
-            }
-        }(info.nChannels);
-
         const GLenum type = [](int d) {
             switch (d) {
                 case 1: return GL_TEXTURE_1D;
@@ -116,7 +105,7 @@ namespace {
                 opengl::Texture::FormatInit{
                     .dimensions = glm::uvec3(info.dimensions.x, info.dimensions.y, 1),
                     .type = type,
-                    .format = format,
+                    .format = opengl::Texture::formatFromNumChannels(info.nChannels),
                     .dataType = GL_UNSIGNED_BYTE
                 },
                 samplerSettings,
