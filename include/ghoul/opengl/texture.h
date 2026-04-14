@@ -153,13 +153,15 @@ public:
         /// Sets the border color of the texture
         std::optional<glm::vec4> borderColor = std::nullopt;
 
-        /// Changes the general swizzle mask of the texture
+        /// Changes the general swizzle mask of the texture. Note that single-channel
+        /// grayscale images, i.e., with only a Red channel, will be automatically
+        /// swizzled to RGB if `autoSwizzleGrayscale`  is true (this is the default)
         std::optional<std::array<GLenum, 4>> swizzleMask = std::nullopt;
 
         /// If true and the texture has a single Red channel, a swizzle mask of
         /// { GL_RED, GL_RED, GL_RED, GL_ONE } will be applied to the texture.
         /// If the swizzle mask is already set, this option is ignored
-        std::optional<bool> autoSwizzleGrayscale = std::nullopt;
+        bool autoSwizzleGrayscale = true;
     };
 
     /**

@@ -150,8 +150,7 @@ namespace {
             return *sampler.swizzleMask;
         }
 
-        bool shouldAutoSwizzle = sampler.autoSwizzleGrayscale.value_or(false);
-        if (shouldAutoSwizzle && format.format == Texture::Format::Red) {
+        if (sampler.autoSwizzleGrayscale && format.format == Texture::Format::Red) {
             return std::array<GLenum, 4>{ GL_RED, GL_RED, GL_RED, GL_ONE };
         }
 
