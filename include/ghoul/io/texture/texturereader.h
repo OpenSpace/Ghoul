@@ -175,7 +175,7 @@ std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size,
 
 /**
  * Loads the information about the image at the provided \p filename using the STB image
- * library, without thefully loading the image data.
+ * library, without fully loading the image data.
  *
  * \param filename The image file that should be inspected
  * \return The size of the image in pixels
