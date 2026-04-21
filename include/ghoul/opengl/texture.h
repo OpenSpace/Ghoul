@@ -153,8 +153,15 @@ public:
         /// Sets the border color of the texture
         std::optional<glm::vec4> borderColor = std::nullopt;
 
-        /// Changes the general swizzle mask of the texture
+        /// Changes the general swizzle mask of the texture. Note that single-channel
+        /// grayscale images, i.e., with only a Red channel, will be automatically
+        /// swizzled to RGB if `autoSwizzleGrayscale`  is true (this is the default)
         std::optional<std::array<GLenum, 4>> swizzleMask = std::nullopt;
+
+        /// If true and the texture has a single Red channel, a swizzle mask of
+        /// { GL_RED, GL_RED, GL_RED, GL_ONE } will be applied to the texture.
+        /// If the swizzle mask is already set, this option is ignored
+        bool autoSwizzleGrayscale = true;
     };
 
     /**
@@ -273,6 +280,15 @@ public:
      * \return The data of this texture
      */
     std::vector<std::byte> pixelData() const;
+
+    /**
+     * Returns the recommended `Format` corresponding to the given number of color
+     * channels.
+     *
+     * \param nChannels The number of channels to return a format for
+     * \return The recommended `Format`
+     */
+    static Format formatFromNumChannels(int nChannels);
 
     /**
      * Downloads the contents of this texture into CPU memory and stores it locally. The
