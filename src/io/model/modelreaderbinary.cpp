@@ -189,7 +189,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 .dataType = dataType,
                 .internalFormat = internalFormat
             },
-            opengl::Texture::SamplerInit {},
+            opengl::Texture::SamplerInit{
+                .filter = opengl::Texture::FilterMode::AnisotropicMipMap
+            },
             data.data()
         );
         textureStorageArray.push_back(std::move(textureEntry));
