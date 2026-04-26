@@ -141,6 +141,9 @@ if (GHOUL_MODULE_ASSIMP)
 
   # We need to include this to be able to find the assimp/config.h file
   target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
+  # We need to include this to be able to find the draco_features.h
+  target_include_directories(assimp PRIVATE "${CMAKE_BINARY_DIR}")
+
   target_precompile_headers(assimp PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:functional>"
     "$<$<COMPILE_LANGUAGE:CXX>:istream>"
