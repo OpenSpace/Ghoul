@@ -625,8 +625,17 @@ void runScript(lua_State* state, std::string_view script) {
 
     const int call = lua_pcall(state, 0, LUA_MULTRET, 0);
     if (call != LUA_OK) {
-        std::string error = lua_tostring(state, -1);
-        throw LuaExecutionException(std::move(error));
+        if (lua_isstring(state, -1)) {
+            std::string error = lua_tostring(state, -1);
+            throw LuaExecutionException(std::move(error));
+        }
+        else {
+            std::string stack = ghoul::lua::stackInformation(state);
+            throw LuaExecutionException(std::format(
+                "Fatal error in Lua execution. Return value not an error message.\n{}",
+                stack
+            ));
+        }
     }
 }
 
