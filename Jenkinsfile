@@ -132,38 +132,4 @@ windows_ninja: {
       cleanWs()
     } // node('windows')
   }
-},
-macos_make: {
-  if (env.USE_BUILD_OS_MACOS == 'true') {
-    node('macos') {
-      stage('macos-make/scm') {
-        deleteDir();
-        gitHelper.checkoutGit(url, branch);
-      }
-      stage('macos-make/build') {
-          compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
-      }
-      stage('macos-make/test') {
-        testHelper.runUnitTests('build-make/tests/GhoulTest')
-      }
-      cleanWs()
-    } // node('osx')
-  }
-},
-macos_ninja: {
-  if (env.USE_BUILD_OS_MACOS == 'true') {
-    node('macos') {
-      stage('macos-xcode/scm') {
-        deleteDir();
-        gitHelper.checkoutGit(url, branch);
-      }
-      stage('macos-xcode/build') {
-          compileHelper.build(compileHelper.Xcode(), compileHelper.Xcode(), '', '', 'build-xcode');
-      }
-      stage('macos-xcode/test') {
-        testHelper.runUnitTests('build-xcode/tests/GhoulTest')
-      }
-      cleanWs()
-    } // node('osx')
-  }
 }
