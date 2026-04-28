@@ -143,7 +143,9 @@ namespace {
                             static_cast<void*>(texture->pcData),
                             texture->mWidth,
                             2,
-                            {},
+                            opengl::Texture::SamplerInit{
+                                .filter = opengl::Texture::FilterMode::AnisotropicMipMap
+                            },
                             texture->achFormatHint
                         );
                         textureEntry.texture->setName(path.C_Str());
@@ -188,7 +190,10 @@ namespace {
 
                     textureEntry.texture = texture::loadTexture(
                         absPath(absolutePath),
-                        2
+                        2,
+                        opengl::Texture::SamplerInit{
+                            .filter = opengl::Texture::FilterMode::AnisotropicMipMap
+                        }
                     );
                     textureEntry.texture->setName(path.C_Str());
                     meshTexture.texture = textureEntry.texture.get();
