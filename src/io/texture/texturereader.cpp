@@ -32,6 +32,7 @@
 #include <stb_image.h>
 #include <cstring>
 #include <string_view>
+#include <thread>
 #include <utility>
 
 namespace {
@@ -81,37 +82,6 @@ namespace {
             .nChannels = n,
             .data = std::move(vec)
         };
-    }
-
-    /**
-     * Load a texture object from the image data, using reasonable parameters based on the
-     * image dimensionality.
-     */
-    std::unique_ptr<opengl::Texture> makeTexture(ImageInfo info, int nDimensions,
-                                             opengl::Texture::SamplerInit samplerSettings)
-    {
-        const GLenum type = [](int d) {
-            switch (d) {
-                case 1: return GL_TEXTURE_1D;
-                case 2: return GL_TEXTURE_2D;
-                case 3: return GL_TEXTURE_3D;
-                default:
-                    throw RuntimeError(std::format("Unsupported dimensionality '{}'", d));
-            }
-        }(nDimensions);
-
-        std::unique_ptr<opengl::Texture> texture =
-            std::make_unique<opengl::Texture>(
-                opengl::Texture::FormatInit{
-                    .dimensions = glm::uvec3(info.dimensions.x, info.dimensions.y, 1),
-                    .type = type,
-                    .format = opengl::Texture::formatFromNumChannels(info.nChannels),
-                    .dataType = GL_UNSIGNED_BYTE
-                },
-                samplerSettings,
-                reinterpret_cast<std::byte*>(info.data.data())
-            );
-        return texture;
     }
 } // namespace
 
@@ -167,6 +137,10 @@ ImageInfo loadImage(const std::filesystem::path& filename) {
     return loadImageData(data, x, y, n, f);
 }
 
+std::future<ImageInfo> loadImageAsync(const std::filesystem::path& filename) {
+    return std::async(std::launch::async, [filename]() { return loadImage(filename); });
+}
+
 ImageInfo loadImage(void* memory, size_t size, const std::string& format) {
     ghoul_assert(memory, "Memory must not be nullptr");
     ghoul_assert(size > 0, "Size must be > 0");
@@ -190,6 +164,33 @@ ImageInfo loadImage(void* memory, size_t size, const std::string& format) {
     return loadImageData(data, x, y, n, "Memory");
 }
 
+std::unique_ptr<opengl::Texture> loadTexture(const ImageInfo& info, int nDimensions,
+                                             opengl::Texture::SamplerInit samplerSettings)
+{
+    const GLenum type = [](int d) {
+        switch (d) {
+            case 1: return GL_TEXTURE_1D;
+            case 2: return GL_TEXTURE_2D;
+            case 3: return GL_TEXTURE_3D;
+            default:
+                throw RuntimeError(std::format("Unsupported dimensionality '{}'", d));
+        }
+    }(nDimensions);
+
+    std::unique_ptr<opengl::Texture> texture =
+        std::make_unique<opengl::Texture>(
+            opengl::Texture::FormatInit{
+                .dimensions = glm::uvec3(info.dimensions.x, info.dimensions.y, 1),
+                .type = type,
+                .format = opengl::Texture::formatFromNumChannels(info.nChannels),
+                .dataType = GL_UNSIGNED_BYTE
+            },
+            samplerSettings,
+            reinterpret_cast<const std::byte*>(info.data.data())
+        );
+    return texture;
+}
+
 std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filename,
                                                                           int nDimensions,
                                              opengl::Texture::SamplerInit samplerSettings)
@@ -198,12 +199,7 @@ std::unique_ptr<opengl::Texture> loadTexture(const std::filesystem::path& filena
     ghoul_assert(nDimensions >= 1 && nDimensions <= 3, "nDimensions must be 1, 2, or 3");
 
     ImageInfo info = loadImage(filename);
-
-    return makeTexture(
-        std::move(info),
-        nDimensions,
-        std::move(samplerSettings)
-    );
+    return loadTexture(info, nDimensions, std::move(samplerSettings));
 }
 
 std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDimensions,
@@ -211,12 +207,7 @@ std::unique_ptr<opengl::Texture> loadTexture(void* memory, size_t size, int nDim
                                                                 const std::string& format)
 {
     ImageInfo info = loadImage(memory, size, format);
-
-    return makeTexture(
-        std::move(info),
-        nDimensions,
-        std::move(samplerSettings)
-    );
+    return loadTexture(info, nDimensions, std::move(samplerSettings));
 }
 
 ImageInfo imageInfo(const std::filesystem::path& filename) {

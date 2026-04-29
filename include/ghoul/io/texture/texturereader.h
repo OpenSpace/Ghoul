@@ -30,6 +30,7 @@
 #include <ghoul/misc/exception.h>
 #include <ghoul/opengl/texture.h>
 #include <filesystem>
+#include <future>
 #include <memory>
 #include <string>
 #include <vector>
@@ -102,6 +103,23 @@ struct ImageInfo {
 ImageInfo loadImage(const std::filesystem::path& filename);
 
 /**
+ * Loads the provided \p filename using the STB image library asynchronously and returns a
+ * future to the image information including dimensions, channel count, and raw pixel
+ * data. The image format is determined by the extension of the \p filename.
+ *
+ * \param filename The name of the file which should be loaded
+ * \return A future for a ImageInfo structure containing the image dimensions, number of
+ *         channels, and raw pixel data
+ *
+ * \throw TextureLoadException If there was an error reading the \p filename
+ * \throw MissingReaderException If the extension in the \p filename is not supported
+ * \pre \p filename must not be empty
+ * \pre \p filename must have an extension
+ * \pre The extension of \p filename must be among the supported file extensions
+ */
+std::future<ImageInfo> loadImageAsync(const std::filesystem::path& filename);
+
+/**
  * Loads an image from the memory pointed at by \p memory using the STB image library and
  * returns the image information including dimensions, channel count, and raw pixel data.
  * The memory block must contain at least \p size number of bytes.
@@ -122,6 +140,20 @@ ImageInfo loadImage(const std::filesystem::path& filename);
  * \pre \p format must be among the supported file extensions
  */
 ImageInfo loadImage(void* memory, size_t size, const std::string& format);
+
+/**
+ * Loads the texture provided by the \p info data.
+ *
+ * \param info The information used to initialize and create the texture
+ * \param nDimensions The number of dimensions of the texture that are returned when using
+ *        this function. This parameter is necessary as it is not always possible to
+ *        automatically detect this based on the image information. For example, someone
+ *        might want to load a 128x1 texture but use it as a 2D texture instead
+ * \param samplerSettings The settings that should be used for the Texture that is
+ *        created from the contents of the \p filename
+ */
+std::unique_ptr<opengl::Texture> loadTexture(const ImageInfo& info, int nDimensions,
+    opengl::Texture::SamplerInit samplerSettings = {});
 
 /**
  * Loads the provided \p filename using the STB image library into a Texture and returns
