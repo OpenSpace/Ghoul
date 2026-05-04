@@ -3,7 +3,7 @@
 	url = https://github.com/g-truc/glm.git
 [submodule "ext/freetype2"]
 	path = ext/freetype2
-	url = https://gitlab.freedesktop.org/freetype/freetype
+	url = https://github.com/freetype/freetype
 [submodule "ext/assimp"]
 	path = ext/assimp
 	url = https://github.com/assimp/assimp.git
