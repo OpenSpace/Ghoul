@@ -595,7 +595,7 @@ namespace {
             meshArray.push_back(std::move(loadedMesh));
         }
 
-        ModelNode modelNode(nodeTransform, std::move(meshArray));
+        ModelNode modelNode(node.mName.C_Str(), nodeTransform, std::move(meshArray));
         modelNode.setParent(parent);
         nodes.push_back(std::move(modelNode));
         const int newNode = static_cast<int>(nodes.size() - 1);

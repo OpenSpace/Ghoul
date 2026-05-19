@@ -41,7 +41,7 @@ namespace {
     using namespace ghoul;
 
     constexpr std::string_view _loggerCat = "ModelReaderBinary";
-    constexpr int8_t CurrentModelVersion = 10;
+    constexpr int8_t CurrentModelVersion = 12;
     constexpr int FormatStringSize = 4;
     constexpr int8_t ShouldSkipMarker = -1;
 
@@ -50,6 +50,8 @@ namespace {
     constexpr int8_t OpacityUpdateVersion = 8;
     constexpr int8_t VertexColorUpdateVersion = 9;
     constexpr int8_t SkipMarkerUpdateVersion = 10;
+    constexpr int8_t ImmutableTexturesVersion = 11; // No file format difference from 10
+    constexpr int8_t NodeNameUpdateVersion = 12;
 
     opengl::Texture::Format stringToFormat(std::string_view format) {
         using Format = opengl::Texture::Format;
@@ -95,9 +97,10 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
     int8_t version = 0;
     fileStream.read(reinterpret_cast<char*>(&version), sizeof(int8_t));
     if (version != CurrentModelVersion &&
-        // Backward compatible versions are ok
+        // Backward compatible versions that are ok
         version != AnimationUpdateVersion && version != OpacityUpdateVersion &&
-        version != VertexColorUpdateVersion && version != SkipMarkerUpdateVersion)
+        version != VertexColorUpdateVersion && version != SkipMarkerUpdateVersion &&
+        version != ImmutableTexturesVersion && version != NodeNameUpdateVersion)
     {
         throw ModelLoadException(
             filename,
@@ -419,8 +422,31 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
         const bool hasAnimation = (a == 1);
 
+        // Name
+        std::string name = "";
+        if (version >= NodeNameUpdateVersion) {
+            int32_t nChars = 0;
+            fileStream.read(reinterpret_cast<char*>(&nChars), sizeof(int32_t));
+            if (nChars < 0) {
+                std::string message = std::format(
+                    "Model node name cannot have negative number of characters: {}",
+                    nChars
+                );
+                throw ModelLoadException(filename, message, this);
+            }
+            name.resize(nChars);
+            fileStream.read(
+                reinterpret_cast<char*>(name.data()),
+                nChars * sizeof(char)
+            );
+        }
+
         // Create Node
-        io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
+        io::ModelNode node = io::ModelNode(
+            name,
+            std::move(transform),
+            std::move(meshArray)
+        );
         node.setChildren(std::move(childrenArray));
         node.setParent(parent);
         if (hasAnimation) {

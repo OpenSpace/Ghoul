@@ -36,7 +36,7 @@ namespace ghoul::io {
 
 class ModelNode {
 public:
-    ModelNode(glm::mat4 transform, std::vector<io::ModelMesh> meshes);
+    ModelNode(std::string name, glm::mat4 transform, std::vector<io::ModelMesh> meshes);
 
     ModelNode(ModelNode&&) noexcept = default;
     ~ModelNode() noexcept = default;
@@ -45,6 +45,7 @@ public:
     void setChildren(std::vector<int> children);
     void addChild(int child);
     void setAnimation(const glm::mat4& animation);
+    void updateCustomTransform(const glm::dmat4& customTransform);
 
     std::vector<io::ModelMesh>& meshes();
     const std::vector<io::ModelMesh>& meshes() const;
@@ -53,7 +54,10 @@ public:
     const std::vector<int>& children() const;
     glm::mat4 transform() const;
     glm::mat4 animationTransform() const;
+    glm::mat4 customTransform() const;
     bool hasAnimation() const;
+    bool hasCustomTransform() const;
+    std::string name() const;
 
 private:
     // `glm::mat4` is not noexcept move constructable, use an array instead for transform
@@ -70,10 +74,18 @@ private:
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f
     };
+    std::array<GLfloat, 16> _customTransform = {
+        1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+    };
     std::vector<ModelMesh> _meshes;
     int _parent = -1;
     std::vector<int> _children;
     bool _hasAnimation = false;
+    bool _hasCustomTransform = false;
+    std::string _name;
 };
 
 } // namespace ghoul::io

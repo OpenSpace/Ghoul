@@ -29,8 +29,10 @@
 
 namespace ghoul::io {
 
-ModelNode::ModelNode(glm::mat4 transform, std::vector<io::ModelMesh> meshes)
+ModelNode::ModelNode(std::string name, glm::mat4 transform,
+                     std::vector<io::ModelMesh> meshes)
     : _meshes(std::move(meshes))
+    , _name(std::move(name))
 {
     // GLM is column major, array is column major too
     _transform[0] = transform[0][0];
@@ -91,6 +93,31 @@ void ModelNode::setAnimation(const glm::mat4& animation) {
     _hasAnimation = true;
 }
 
+void ModelNode::updateCustomTransform(const glm::dmat4& customTransform) {
+    // GLM is column major, array is column major too
+    _customTransform[0] = customTransform[0][0];
+    _customTransform[1] = customTransform[0][1];
+    _customTransform[2] = customTransform[0][2];
+    _customTransform[3] = customTransform[0][3];
+
+    _customTransform[4] = customTransform[1][0];
+    _customTransform[5] = customTransform[1][1];
+    _customTransform[6] = customTransform[1][2];
+    _customTransform[7] = customTransform[1][3];
+
+    _customTransform[8] = customTransform[2][0];
+    _customTransform[9] = customTransform[2][1];
+    _customTransform[10] = customTransform[2][2];
+    _customTransform[11] = customTransform[2][3];
+
+    _customTransform[12] = customTransform[3][0];
+    _customTransform[13] = customTransform[3][1];
+    _customTransform[14] = customTransform[3][2];
+    _customTransform[15] = customTransform[3][3];
+
+    _hasCustomTransform = true;
+}
+
 std::vector<io::ModelMesh>& ModelNode::meshes() {
     return _meshes;
 }
@@ -119,8 +146,20 @@ glm::mat4 ModelNode::animationTransform() const {
     return glm::make_mat4(_animationTransform.data());
 }
 
+glm::mat4 ModelNode::customTransform() const {
+    return glm::make_mat4(_customTransform.data());
+}
+
 bool ModelNode::hasAnimation() const {
     return _hasAnimation;
+}
+
+bool ModelNode::hasCustomTransform() const {
+    return _hasCustomTransform;
+}
+
+std::string ModelNode::name() const {
+    return _name;
 }
 
 } // namespace ghoul::io
