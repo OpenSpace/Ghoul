@@ -75,7 +75,7 @@ public:
     void setTimeScale(float timeScale);
     void enableAnimation(bool value);
     void updateCustomNodeTransform(const glm::dmat4& customTransform,
-        const std::string& nodeName);
+        const std::string& nodeName, bool customTransformsShouldOverride);
 
     void initialize();
     void deinitialize();
@@ -104,6 +104,7 @@ protected:
     std::unique_ptr<io::ModelAnimation> _animation;
     bool _hasCalcTransparency = false;
     bool _isTransparent = false;
+    bool _customTransformsShouldOverride = false;
 };
 
 } // namespace ghoul::modelgeometry

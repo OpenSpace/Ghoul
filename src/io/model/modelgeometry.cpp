@@ -133,7 +133,7 @@ namespace {
     void renderRecursive(const std::vector<io::ModelNode>& nodes,
                          const io::ModelNode* node, opengl::ProgramObject& program,
                          const glm::mat4& parentTransform, bool isFullyTexturedModel,
-                         bool isProjection)
+                         bool isProjection, bool customTransformsShouldOverride)
     {
         if (!node) {
             LERROR("Cannot render empty node");
@@ -141,18 +141,25 @@ namespace {
         }
 
         glm::mat4 globalTransform;
+        glm::mat4 animationTransform = glm::mat4(1.f);
+        glm::mat4 customTransform = glm::mat4(1.f);
+        glm::mat4 nodeTransform = node->transform();
+
         if (node->hasAnimation()) {
             // Animation is given by Assimp in absolute format, i.e. animation replaces
             // old transform
-            globalTransform = parentTransform * node->animationTransform();
+            animationTransform = node->animationTransform();
         }
-        else if (node->hasCustomTransform()) {
-            // Custom transform is applied on top of the normal transform
-            globalTransform = parentTransform * node->customTransform() * node->transform();
+
+        if (node->hasCustomTransform()) {
+            if (customTransformsShouldOverride) {
+                nodeTransform = glm::mat4(1.f);
+            }
+
+            customTransform = node->customTransform();
         }
-        else {
-            globalTransform = parentTransform * node->transform();
-        }
+
+        globalTransform = parentTransform * animationTransform * customTransform * nodeTransform;
 
         for (const io::ModelMesh& mesh : node->meshes()) {
             mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
@@ -165,7 +172,8 @@ namespace {
                 program,
                 globalTransform,
                 isFullyTexturedModel,
-                isProjection
+                isProjection,
+                customTransformsShouldOverride
             );
         }
     }
@@ -1151,7 +1159,8 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedM
         program,
         parentTransform,
         isFullyTexturedModel,
-        isProjection
+        isProjection,
+        _customTransformsShouldOverride
     );
 }
 
@@ -1182,10 +1191,12 @@ void ModelGeometry::enableAnimation(bool value) {
 }
 
 void ModelGeometry::updateCustomNodeTransform(const glm::dmat4& customTransform,
-                                              const std::string& nodeName)
+                                              const std::string& nodeName,
+                                              bool customTransformsShouldOverride)
 {
     for (io::ModelNode& node : _nodes) {
         if (node.name() == nodeName) {
+            _customTransformsShouldOverride = customTransformsShouldOverride;
             node.updateCustomTransform(customTransform);
             return;
         }
