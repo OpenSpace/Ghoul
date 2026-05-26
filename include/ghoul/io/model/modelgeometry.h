@@ -74,8 +74,9 @@ public:
 
     void setTimeScale(float timeScale);
     void enableAnimation(bool value);
-    void updateCustomNodeTransform(const glm::dmat4& customTransform,
-        const std::string& nodeName, bool customTransformsShouldOverride);
+    void updateCustomNodeTransform(const std::string& nodeName,
+        const glm::dmat4& customTransform);
+    void setCustomTransformsOverride(bool customTransformsShouldOverride);
 
     void initialize();
     void deinitialize();

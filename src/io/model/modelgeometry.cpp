@@ -149,6 +149,7 @@ namespace {
             // Animation is given by Assimp in absolute format, i.e. animation replaces
             // old transform
             animationTransform = node->animationTransform();
+            nodeTransform = glm::mat4(1.f);
         }
 
         if (node->hasCustomTransform()) {
@@ -1190,13 +1191,11 @@ void ModelGeometry::enableAnimation(bool value) {
     }
 }
 
-void ModelGeometry::updateCustomNodeTransform(const glm::dmat4& customTransform,
-                                              const std::string& nodeName,
-                                              bool customTransformsShouldOverride)
+void ModelGeometry::updateCustomNodeTransform(const std::string& nodeName,
+                                              const glm::dmat4& customTransform)
 {
     for (io::ModelNode& node : _nodes) {
         if (node.name() == nodeName) {
-            _customTransformsShouldOverride = customTransformsShouldOverride;
             node.updateCustomTransform(customTransform);
             return;
         }
@@ -1206,6 +1205,10 @@ void ModelGeometry::updateCustomNodeTransform(const glm::dmat4& customTransform,
         "Could not find node with name '{}' to update custom transform",
         nodeName
     ));
+}
+
+void ModelGeometry::setCustomTransformsOverride(bool customTransformsShouldOverride) {
+    _customTransformsShouldOverride = customTransformsShouldOverride;
 }
 
 void ModelGeometry::initialize() {
