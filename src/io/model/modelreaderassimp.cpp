@@ -595,7 +595,21 @@ namespace {
             meshArray.push_back(std::move(loadedMesh));
         }
 
-        ModelNode modelNode(node.mName.C_Str(), nodeTransform, std::move(meshArray));
+        // When the name field of a node is missing, it is replaced by Assimp with the
+        // string "nodes[{i}]". Blender, for example, will automatically replace that
+        // auto-generated name with the name of the contained mesh, if there is only one.
+        // For consistency with Blender, we do the same here.
+        std::string nodeName = node.mName.C_Str();
+        const bool hasSyntheticName =
+            nodeName.starts_with("nodes[") && nodeName.ends_with(']');
+        if (hasSyntheticName && node.mNumMeshes == 1) {
+            const aiMesh* nodeMesh = scene.mMeshes[node.mMeshes[0]];
+            if (nodeMesh && nodeMesh->mName.length > 0) {
+                nodeName = nodeMesh->mName.C_Str();
+            }
+        }
+        ModelNode modelNode(nodeName.c_str(), nodeTransform, std::move(meshArray));
+
         modelNode.setParent(parent);
         nodes.push_back(std::move(modelNode));
         const int newNode = static_cast<int>(nodes.size() - 1);

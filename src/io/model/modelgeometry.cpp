@@ -133,14 +133,13 @@ namespace {
     void renderRecursive(const std::vector<io::ModelNode>& nodes,
                          const io::ModelNode* node, opengl::ProgramObject& program,
                          const glm::mat4& parentTransform, bool isFullyTexturedModel,
-                         bool isProjection, bool customTransformsShouldOverride)
+                         bool isProjection, bool replaceWithCustomTransforms)
     {
         if (!node) {
             LERROR("Cannot render empty node");
             return;
         }
 
-        glm::mat4 globalTransform;
         glm::mat4 animationTransform = glm::mat4(1.f);
         glm::mat4 customTransform = glm::mat4(1.f);
         glm::mat4 nodeTransform = node->transform();
@@ -153,14 +152,15 @@ namespace {
         }
 
         if (node->hasCustomTransform()) {
-            if (customTransformsShouldOverride) {
+            if (replaceWithCustomTransforms) {
                 nodeTransform = glm::mat4(1.f);
             }
 
             customTransform = node->customTransform();
         }
 
-        globalTransform = parentTransform * animationTransform * customTransform * nodeTransform;
+        glm::mat4 globalTransform =
+            parentTransform * animationTransform * customTransform * nodeTransform;
 
         for (const io::ModelMesh& mesh : node->meshes()) {
             mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
@@ -174,7 +174,7 @@ namespace {
                 globalTransform,
                 isFullyTexturedModel,
                 isProjection,
-                customTransformsShouldOverride
+                replaceWithCustomTransforms
             );
         }
     }
@@ -523,10 +523,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         }
         std::string name;
         name.resize(nChars);
-        fileStream.read(
-            reinterpret_cast<char*>(name.data()),
-            nChars * sizeof(char)
-        );
+        fileStream.read(reinterpret_cast<char*>(name.data()), nChars * sizeof(char));
 
         // Create Node
         io::ModelNode node = io::ModelNode(
@@ -914,7 +911,10 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         std::string name = node.name();
         int32_t nChars = static_cast<int32_t>(name.size());
         fileStream.write(reinterpret_cast<const char*>(&nChars), sizeof(int32_t));
-        fileStream.write(reinterpret_cast<const char*>(name.data()), nChars * sizeof(char));
+        fileStream.write(
+            reinterpret_cast<const char*>(name.data()),
+            nChars * sizeof(char)
+        );
     }
 
     // Animation
@@ -1161,7 +1161,7 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedM
         parentTransform,
         isFullyTexturedModel,
         isProjection,
-        _customTransformsShouldOverride
+        _replaceWithCustomTransforms
     );
 }
 
@@ -1191,7 +1191,7 @@ void ModelGeometry::enableAnimation(bool value) {
     }
 }
 
-void ModelGeometry::updateCustomNodeTransform(const std::string& nodeName,
+void ModelGeometry::updateCustomNodeTransform(std::string_view nodeName,
                                               const glm::dmat4& customTransform)
 {
     for (io::ModelNode& node : _nodes) {
@@ -1202,13 +1202,12 @@ void ModelGeometry::updateCustomNodeTransform(const std::string& nodeName,
     }
 
     LERROR(std::format(
-        "Could not find node with name '{}' to update custom transform",
-        nodeName
+        "Could not find node with name '{}' to update custom transform", nodeName
     ));
 }
 
-void ModelGeometry::setCustomTransformsOverride(bool customTransformsShouldOverride) {
-    _customTransformsShouldOverride = customTransformsShouldOverride;
+void ModelGeometry::setReplaceWithCustomTransforms(bool replaceWithCustomTransforms) {
+    _replaceWithCustomTransforms = replaceWithCustomTransforms;
 }
 
 void ModelGeometry::initialize() {

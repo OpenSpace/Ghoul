@@ -423,7 +423,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
         const bool hasAnimation = (a == 1);
 
         // Name
-        std::string name = "";
+        std::string name;
         if (version >= NodeNameUpdateVersion) {
             int32_t nChars = 0;
             fileStream.read(reinterpret_cast<char*>(&nChars), sizeof(int32_t));
@@ -435,10 +435,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderBinary::loadModel(
                 throw ModelLoadException(filename, message, this);
             }
             name.resize(nChars);
-            fileStream.read(
-                reinterpret_cast<char*>(name.data()),
-                nChars * sizeof(char)
-            );
+            fileStream.read(reinterpret_cast<char*>(name.data()), nChars * sizeof(char));
         }
 
         // Create Node
