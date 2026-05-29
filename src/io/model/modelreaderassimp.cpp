@@ -58,6 +58,7 @@ namespace {
     using namespace ghoul::io;
 
     constexpr std::string_view _loggerCat = "ModelReaderAssimp";
+    constexpr int TreeTabLength = 2;
 
     bool isTextureTransparent(const ModelMesh::Texture& texture) {
         const int nChannels = texture.texture->numberOfChannels();
@@ -608,8 +609,8 @@ namespace {
                 nodeName = nodeMesh->mName.C_Str();
             }
         }
-        ModelNode modelNode(nodeName.c_str(), nodeTransform, std::move(meshArray));
 
+        ModelNode modelNode(nodeName.c_str(), nodeTransform, std::move(meshArray));
         modelNode.setParent(parent);
         nodes.push_back(std::move(modelNode));
         const int newNode = static_cast<int>(nodes.size() - 1);
@@ -711,6 +712,37 @@ namespace {
             );
         }
     }
+
+    void printModelTreeRecursive(const aiNode& node, const aiScene& scene,
+                                 const std::string& prefix = "")
+    {
+        // When the name field of a node is missing, it is replaced by Assimp with the
+        // string "nodes[{i}]". Blender, for example, will automatically replace that
+        // auto-generated name with the name of the contained mesh, if there is only one.
+        // For consistency with Blender, we do the same here.
+        std::string nodeName = node.mName.C_Str();
+        const bool hasSyntheticName =
+            nodeName.starts_with("nodes[") && nodeName.ends_with(']');
+        if (hasSyntheticName && node.mNumMeshes == 1) {
+            const aiMesh* nodeMesh = scene.mMeshes[node.mMeshes[0]];
+            if (nodeMesh && nodeMesh->mName.length > 0) {
+                nodeName = nodeMesh->mName.C_Str();
+            }
+        }
+
+        // Print the name of this node, the parent
+        LINFO(std::format("{}{}", prefix, nodeName));
+
+        // Then print the name of the children nodes with increased prefix
+        for (unsigned int i = 0; i < node.mNumChildren; i++) {
+            printModelTreeRecursive(
+                *(node.mChildren[i]),
+                scene,
+                std::string(prefix.size() + TreeTabLength, ' ')
+            );
+        }
+    }
+
 } // namespace
 
 namespace ghoul::io {
@@ -794,6 +826,26 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
         std::move(nodeArray),
         std::move(textureStorage),
         std::move(modelAnimation)
+    );
+}
+
+void ModelReaderAssimp::printModelTree(const std::filesystem::path& filename) const {
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(
+        filename.string(),
+        aiProcess_Triangulate |       // Only triangles
+        aiProcess_GenSmoothNormals |  // Generate smooth normals
+        aiProcess_CalcTangentSpace    // Generate tangents and bitangents
+    );
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        throw ModelLoadException(filename, importer.GetErrorString(), this);
+    }
+
+    LINFO(std::format("Model tree for '{}':", filename));
+    printModelTreeRecursive(
+        *(scene->mRootNode),
+        *scene
     );
 }
 

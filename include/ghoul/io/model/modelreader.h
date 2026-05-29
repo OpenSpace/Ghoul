@@ -108,7 +108,6 @@ public:
      */
     void addReader(std::unique_ptr<ModelReaderBase> reader);
 
-private:
     /**
      * Returns the ModelReaderBase that is responsible for the provided extension.
      *
@@ -118,6 +117,7 @@ private:
      */
     ModelReaderBase* readerForExtension(const std::string& extension);
 
+private:
     /// The list of all registered readers
     std::vector<std::unique_ptr<ModelReaderBase>> _readers;
 };
