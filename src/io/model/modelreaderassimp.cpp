@@ -829,20 +829,20 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelReaderAssimp::loadModel(
     );
 }
 
-void ModelReaderAssimp::printModelTree(const std::filesystem::path& filename) const {
+void ModelReaderAssimp::printModelTree(const std::filesystem::path& filepath) const {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
-        filename.string(),
+        filepath.string(),
         aiProcess_Triangulate |       // Only triangles
         aiProcess_GenSmoothNormals |  // Generate smooth normals
         aiProcess_CalcTangentSpace    // Generate tangents and bitangents
     );
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        throw ModelLoadException(filename, importer.GetErrorString(), this);
+        throw ModelLoadException(filepath, importer.GetErrorString(), this);
     }
 
-    LINFO(std::format("Model tree for '{}':", filename));
+    LINFO(std::format("Model tree for '{}':", filepath));
     printModelTreeRecursive(
         *(scene->mRootNode),
         *scene

@@ -64,13 +64,13 @@ public:
         bool notifyInvisibleDropped = true) const override;
 
     /**
-     * Prints the model tree of the model file pointed to by \p filename to the info log.
+     * Prints the model tree of the model file pointed to by \p filepath to the info log.
      * This is useful for identifying the structure of the model and the names of the
      * nodes, which can be used for custom node transformations and animations.
      *
-     * \param filename The geometric model file to print the model tree for
+     * \param filepath The geometric model file to print the model tree for
      */
-    void printModelTree(const std::filesystem::path& filename) const;
+    void printModelTree(const std::filesystem::path& filepath) const;
 
     /**
      * Returns if this reader needs a cache file or not.
