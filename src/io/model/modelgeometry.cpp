@@ -45,7 +45,7 @@ namespace {
     using namespace ghoul;
 
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 11;
+    constexpr int8_t CurrentCacheVersion = 12;
     constexpr int FormatStringSize = 4;
     constexpr int8_t ShouldSkipMarker = -1;
     constexpr int8_t NoSkipMarker = 1;
@@ -133,22 +133,34 @@ namespace {
     void renderRecursive(const std::vector<io::ModelNode>& nodes,
                          const io::ModelNode* node, opengl::ProgramObject& program,
                          const glm::mat4& parentTransform, bool isFullyTexturedModel,
-                         bool isProjection)
+                         bool isProjection, bool replaceWithCustomTransforms)
     {
         if (!node) {
             LERROR("Cannot render empty node");
             return;
         }
 
-        glm::mat4 globalTransform;
+        glm::mat4 animationTransform = glm::mat4(1.f);
+        glm::mat4 customTransform = glm::mat4(1.f);
+        glm::mat4 nodeTransform = node->transform();
+
         if (node->hasAnimation()) {
             // Animation is given by Assimp in absolute format, i.e. animation replaces
             // old transform
-            globalTransform = parentTransform * node->animationTransform();
+            animationTransform = node->animationTransform();
+            nodeTransform = glm::mat4(1.f);
         }
-        else {
-            globalTransform = parentTransform * node->transform();
+
+        if (node->hasCustomTransform()) {
+            if (replaceWithCustomTransforms) {
+                nodeTransform = glm::mat4(1.f);
+            }
+
+            customTransform = node->customTransform();
         }
+
+        glm::mat4 globalTransform =
+            parentTransform * animationTransform * customTransform * nodeTransform;
 
         for (const io::ModelMesh& mesh : node->meshes()) {
             mesh.render(program, globalTransform, isFullyTexturedModel, isProjection);
@@ -161,7 +173,8 @@ namespace {
                 program,
                 globalTransform,
                 isFullyTexturedModel,
-                isProjection
+                isProjection,
+                replaceWithCustomTransforms
             );
         }
     }
@@ -498,8 +511,26 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
         fileStream.read(reinterpret_cast<char*>(&a), sizeof(uint8_t));
         const bool hasAnimation = (a == 1);
 
+        // Name
+        int32_t nChars = 0;
+        fileStream.read(reinterpret_cast<char*>(&nChars), sizeof(int32_t));
+        if (nChars < 0) {
+            std::string message = std::format(
+                "Model node name cannot have negative number of characters while loading "
+                "cache: {}", nChars
+            );
+            throw ModelCacheException(cachedFile, message);
+        }
+        std::string name;
+        name.resize(nChars);
+        fileStream.read(reinterpret_cast<char*>(name.data()), nChars * sizeof(char));
+
         // Create Node
-        io::ModelNode node = io::ModelNode(std::move(transform), std::move(meshArray));
+        io::ModelNode node = io::ModelNode(
+            name,
+            std::move(transform),
+            std::move(meshArray)
+        );
         node.setChildren(std::move(childrenArray));
         node.setParent(parent);
         if (hasAnimation) {
@@ -875,6 +906,15 @@ bool ModelGeometry::saveToCacheFile(const std::filesystem::path& cachedFile) con
         // HasAnimation
         uint8_t a = node.hasAnimation() ? 1 : 0;
         fileStream.write(reinterpret_cast<const char*>(&a), sizeof(uint8_t));
+
+        // Name
+        std::string name = node.name();
+        int32_t nChars = static_cast<int32_t>(name.size());
+        fileStream.write(reinterpret_cast<const char*>(&nChars), sizeof(int32_t));
+        fileStream.write(
+            reinterpret_cast<const char*>(name.data()),
+            nChars * sizeof(char)
+        );
     }
 
     // Animation
@@ -1120,7 +1160,8 @@ void ModelGeometry::render(opengl::ProgramObject& program, bool isFullyTexturedM
         program,
         parentTransform,
         isFullyTexturedModel,
-        isProjection
+        isProjection,
+        _replaceWithCustomTransforms
     );
 }
 
@@ -1148,6 +1189,25 @@ void ModelGeometry::enableAnimation(bool value) {
     if (!value) {
         _animation->reset(_nodes);
     }
+}
+
+void ModelGeometry::updateCustomNodeTransform(std::string_view nodeName,
+                                              const glm::dmat4& customTransform)
+{
+    for (io::ModelNode& node : _nodes) {
+        if (node.name() == nodeName) {
+            node.updateCustomTransform(customTransform);
+            return;
+        }
+    }
+
+    LERROR(std::format(
+        "Could not find node with name '{}' to update custom transform", nodeName
+    ));
+}
+
+void ModelGeometry::setReplaceWithCustomTransforms(bool replaceWithCustomTransforms) {
+    _replaceWithCustomTransforms = replaceWithCustomTransforms;
 }
 
 void ModelGeometry::initialize() {
