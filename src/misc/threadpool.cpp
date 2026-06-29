@@ -314,7 +314,7 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
     const std::unique_lock lock(_queueMutex);
     if (_queue.empty()) {
         // No work to be done, the default constructed Task is never read
-        return std::make_tuple(Task(), false);
+        return std::tuple(Task(), false);
     }
     else {
         // We have a task, so we move it out of the queue
@@ -322,7 +322,7 @@ std::tuple<ThreadPool::Task, bool> ThreadPool::TaskQueue::pop() {
         // And remove the item
         _queue.pop();
         // And return the task together with a positive reply
-        return std::make_tuple(std::move(t), true);
+        return std::tuple(std::move(t), true);
     }
 }
 

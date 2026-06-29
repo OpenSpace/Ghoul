@@ -79,7 +79,7 @@ namespace ghoul {
  *
  *  {
  *     auto f = [](int i, float f, std::string s) -> std::tuple<std::string, float, int> {
- *        return std::make_tuple(s, f, i);
+ *        return std::tuple(s, f, i);
  *     };
  *
  *     std::future<std::tuple<std::string, float, int>> r = pool.queue(f, 1, 2.f, "3");
@@ -239,7 +239,7 @@ public:
      *
      * {
      *     auto func = [](int i, float f, std::string s) {
-     *         return std::make_tuple(s, f, i);
+     *         return std::tuple(s, f, i);
      *     };
      *
      *     std::future<std::tuple<std::string, float, int>> ret =
