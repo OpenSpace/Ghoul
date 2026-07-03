@@ -75,7 +75,7 @@ public:
 
      /**
       * Non-blocking counterpart to disconnect(), stops the I/O loops and closes the
-      * socket,  but does not join the threads. Safe tocall from within those threads
+      * socket, but does not join the threads. Safe tocall from within those threads
       * themselves (unlike disconnect())
       */
     void closeConnection();
