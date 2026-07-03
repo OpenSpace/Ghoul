@@ -162,6 +162,7 @@ void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
     const std::unique_lock lock(_connectionHandlesMutex);
     _connectionHandles.erase(hdl);
     _inputNotifier.notify_one();
+    _tcpSocket->closeConnection();
 }
 
 } // namespace ghoul::io

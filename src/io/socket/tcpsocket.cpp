@@ -445,6 +445,13 @@ void TcpSocket::uninterceptInput() {
     _inputInterceptor = nullptr;
 }
 
+void TcpSocket::closeConnection() {
+    _shouldStopThreads = true;
+    closeSocket();
+    _inputNotifier.notify_all();
+    _outputNotifier.notify_all();
+}
+
 bool TcpSocket::getBytes(char* buffer, size_t nItems) {
     waitForInput(nItems);
     if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {

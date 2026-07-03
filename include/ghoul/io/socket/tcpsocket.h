@@ -73,6 +73,13 @@ public:
     void interceptInput(InputInterceptor interceptor);
     void uninterceptInput();
 
+     /**
+      * Non-blocking counterpart to disconnect(), stops the I/O loops and closes the
+      * socket,  but does not join the threads. Safe tocall from within those threads
+      * themselves (unlike disconnect())
+      */
+    void closeConnection();
+
     // Methods for binary communication
     template <typename T = char>
     bool get(T* buffer, size_t nItems = 1);
