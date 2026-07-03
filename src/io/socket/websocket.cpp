@@ -59,6 +59,16 @@ WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
      _tcpSocket->interceptInput(
         [this](const char* data, size_t nBytes) {
             _socketConnection->read_some(data, nBytes);
+
+            // `read_some` can cause the websocketpp to generate protocol-level output
+            // e.g., a Close frame response, or a Pong reply to a Ping. We need to send
+            // those responses back to the client so they are not kept waiting forever
+            const std::string output = _outputStream.str();
+            if (!output.empty()) {
+                _tcpSocket->put<char>(output.c_str(), output.size());
+                _outputStream.str("");
+            }
+
             _inputNotifier.notify_one();
         }
     );
