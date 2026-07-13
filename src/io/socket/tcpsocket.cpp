@@ -338,7 +338,7 @@ void TcpSocket::streamOutput() {
                 nBytesToSend,
                 0
             );
-            auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+            auto failed = [](ssize_t nBytes) { return nBytes <= 0; };
 #endif // WIN32
 
             if (failed(nSentBytes)) {
@@ -348,7 +348,7 @@ void TcpSocket::streamOutput() {
                 _outputNotifier.notify_all();
                 return;
             }
-            _outputQueue.erase(_outputQueue.begin(), _outputQueue.begin() + nBytesToSend);
+            _outputQueue.erase(_outputQueue.begin(), _outputQueue.begin() + nSentBytes);
         }
         _outputNotifier.notify_all(); // Let anyone waiting on drainage know
     }
