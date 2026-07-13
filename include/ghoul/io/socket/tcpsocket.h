@@ -79,7 +79,7 @@ public:
       * themselves (unlike disconnect())
       */
     void closeConnection();
-    void waitForOuputQueueDrained();
+    bool waitForOutputQueueDrained(std::chrono::milliseconds timeout);
 
     // Methods for binary communication
     template <typename T = char>

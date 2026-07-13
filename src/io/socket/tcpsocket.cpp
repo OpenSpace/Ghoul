@@ -453,10 +453,11 @@ void TcpSocket::closeConnection() {
     _outputNotifier.notify_all();
 }
 
-void TcpSocket::waitForOuputQueueDrained() {
+bool TcpSocket::waitForOutputQueueDrained(std::chrono::milliseconds timeout) {
     std::unique_lock lock(_outputQueueMutex);
-    _outputNotifier.wait(
+    return _outputNotifier.wait_for(
         lock,
+        timeout,
         [this]() {
             return _outputQueue.empty() || _shouldStopThreads ||
                 (!_isConnected && !_isConnecting);

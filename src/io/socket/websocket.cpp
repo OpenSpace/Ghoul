@@ -82,7 +82,11 @@ WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
                 _tcpSocket->put<char>(output.c_str(), output.size());
             }
             if (_isMarkedForClosing) {
-                _tcpSocket->waitForOuputQueueDrained();
+                const bool drained =
+                    _tcpSocket->waitForOutputQueueDrained(std::chrono::seconds(3));
+                if (!drained) {
+                    LWARNING("Timed out flushing final output before closing socket");
+                }
                 _tcpSocket->closeConnection();
             }
             _inputNotifier.notify_one();
