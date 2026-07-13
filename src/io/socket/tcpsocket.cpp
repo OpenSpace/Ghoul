@@ -350,6 +350,7 @@ void TcpSocket::streamOutput() {
             }
             _outputQueue.erase(_outputQueue.begin(), _outputQueue.begin() + nBytesToSend);
         }
+        _outputNotifier.notify_all(); // Let anyone waiting on drainage know
     }
 }
 
@@ -450,6 +451,17 @@ void TcpSocket::closeConnection() {
     closeSocket();
     _inputNotifier.notify_all();
     _outputNotifier.notify_all();
+}
+
+void TcpSocket::waitForOuputQueueDrained() {
+    std::unique_lock lock(_outputQueueMutex);
+    _outputNotifier.wait(
+        lock,
+        [this]() {
+            return _outputQueue.empty() || _shouldStopThreads ||
+                (!_isConnected && !_isConnecting);
+        }
+    );
 }
 
 bool TcpSocket::getBytes(char* buffer, size_t nItems) {

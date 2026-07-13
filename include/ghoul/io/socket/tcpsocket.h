@@ -79,6 +79,7 @@ public:
       * themselves (unlike disconnect())
       */
     void closeConnection();
+    void waitForOuputQueueDrained();
 
     // Methods for binary communication
     template <typename T = char>

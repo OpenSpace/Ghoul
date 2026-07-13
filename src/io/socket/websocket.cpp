@@ -81,6 +81,10 @@ WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
             if (!output.empty()) {
                 _tcpSocket->put<char>(output.c_str(), output.size());
             }
+            if (_isMarkedForClosing) {
+                _tcpSocket->waitForOuputQueueDrained();
+                _tcpSocket->closeConnection();
+            }
             _inputNotifier.notify_one();
         }
     );
@@ -186,7 +190,7 @@ void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
     const std::unique_lock lock(_connectionHandlesMutex);
     _connectionHandles.erase(hdl);
     _inputNotifier.notify_one();
-    _tcpSocket->closeConnection();
+    _isMarkedForClosing = true;
 }
 
 } // namespace ghoul::io
