@@ -95,25 +95,25 @@ void ModelNode::setAnimation(const glm::mat4& animation) {
 
 void ModelNode::updateCustomTransform(const glm::dmat4& customTransform) {
     // GLM is column major, array is column major too
-    _customTransform[0] = customTransform[0][0];
-    _customTransform[1] = customTransform[0][1];
-    _customTransform[2] = customTransform[0][2];
-    _customTransform[3] = customTransform[0][3];
+    _customTransform[0] = static_cast<float>(customTransform[0][0]);
+    _customTransform[1] = static_cast<float>(customTransform[0][1]);
+    _customTransform[2] = static_cast<float>(customTransform[0][2]);
+    _customTransform[3] = static_cast<float>(customTransform[0][3]);
 
-    _customTransform[4] = customTransform[1][0];
-    _customTransform[5] = customTransform[1][1];
-    _customTransform[6] = customTransform[1][2];
-    _customTransform[7] = customTransform[1][3];
+    _customTransform[4] = static_cast<float>(customTransform[1][0]);
+    _customTransform[5] = static_cast<float>(customTransform[1][1]);
+    _customTransform[6] = static_cast<float>(customTransform[1][2]);
+    _customTransform[7] = static_cast<float>(customTransform[1][3]);
 
-    _customTransform[8] = customTransform[2][0];
-    _customTransform[9] = customTransform[2][1];
-    _customTransform[10] = customTransform[2][2];
-    _customTransform[11] = customTransform[2][3];
+    _customTransform[8] = static_cast<float>(customTransform[2][0]);
+    _customTransform[9] = static_cast<float>(customTransform[2][1]);
+    _customTransform[10] = static_cast<float>(customTransform[2][2]);
+    _customTransform[11] = static_cast<float>(customTransform[2][3]);
 
-    _customTransform[12] = customTransform[3][0];
-    _customTransform[13] = customTransform[3][1];
-    _customTransform[14] = customTransform[3][2];
-    _customTransform[15] = customTransform[3][3];
+    _customTransform[12] = static_cast<float>(customTransform[3][0]);
+    _customTransform[13] = static_cast<float>(customTransform[3][1]);
+    _customTransform[14] = static_cast<float>(customTransform[3][2]);
+    _customTransform[15] = static_cast<float>(customTransform[3][3]);
 
     _hasCustomTransform = true;
 }
