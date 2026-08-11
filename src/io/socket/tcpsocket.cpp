@@ -282,7 +282,7 @@ void TcpSocket::streamInput() {
         auto failed = [](int nBytes) { return nBytes <= 0; };
 #else // ^^^^ WIN32 // !WIN32 vvvv
         ssize_t nReadBytes = 0;
-        auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+        auto failed = [](ssize_t nBytes) { return nBytes <= 0; };
 #endif // WIN32
 
         nReadBytes = recv(

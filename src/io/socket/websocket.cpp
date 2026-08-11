@@ -66,7 +66,6 @@ WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
                 const std::unique_lock lock(_outputStreamMutex);
                 _socketConnection->read_some(data, nBytes);
 
-
                 // `read_some` can cause the websocketpp to generate protocol-level output
                 // e.g., a Close frame response, or a Pong reply to a Ping. Flush the
                 // responses so the client isn't left waiting
@@ -84,6 +83,7 @@ WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
             if (_isMarkedForClosing) {
                 const bool drained =
                     _tcpSocket->waitForOutputQueueDrained(std::chrono::seconds(3));
+
                 if (!drained) {
                     LWARNING("Timed out flushing final output before closing socket");
                 }
@@ -146,9 +146,9 @@ bool WebSocket::putMessage(const std::string& message) {
             _outputStream.str("");
             _outputStream.clear();
         }
-
     }
 
+    // Write outside the lock, since TcpSocket::put has its own internal locking
     if (!output.empty()) {
         _tcpSocket->put<char>(output.c_str(), output.size());
     }
