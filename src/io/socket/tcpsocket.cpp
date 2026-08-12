@@ -282,7 +282,7 @@ void TcpSocket::streamInput() {
         auto failed = [](int nBytes) { return nBytes <= 0; };
 #else // ^^^^ WIN32 // !WIN32 vvvv
         ssize_t nReadBytes = 0;
-        auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+        auto failed = [](ssize_t nBytes) { return nBytes <= 0; };
 #endif // WIN32
 
         nReadBytes = recv(
@@ -338,7 +338,7 @@ void TcpSocket::streamOutput() {
                 nBytesToSend,
                 0
             );
-            auto failed = [](ssize_t nBytes) { return nBytes == ssize_t(-1); };
+            auto failed = [](ssize_t nBytes) { return nBytes <= 0; };
 #endif // WIN32
 
             if (failed(nSentBytes)) {
@@ -348,8 +348,9 @@ void TcpSocket::streamOutput() {
                 _outputNotifier.notify_all();
                 return;
             }
-            _outputQueue.erase(_outputQueue.begin(), _outputQueue.begin() + nBytesToSend);
+            _outputQueue.erase(_outputQueue.begin(), _outputQueue.begin() + nSentBytes);
         }
+        _outputNotifier.notify_all(); // Let anyone waiting on drainage know
     }
 }
 
@@ -443,6 +444,25 @@ void TcpSocket::interceptInput(InputInterceptor interceptor) {
 void TcpSocket::uninterceptInput() {
     const std::unique_lock lock(_inputInterceptionMutex);
     _inputInterceptor = nullptr;
+}
+
+void TcpSocket::closeConnection() {
+    _shouldStopThreads = true;
+    closeSocket();
+    _inputNotifier.notify_all();
+    _outputNotifier.notify_all();
+}
+
+bool TcpSocket::waitForOutputQueueDrained(std::chrono::milliseconds timeout) {
+    std::unique_lock lock(_outputQueueMutex);
+    return _outputNotifier.wait_for(
+        lock,
+        timeout,
+        [this]() {
+            return _outputQueue.empty() || _shouldStopThreads ||
+                (!_isConnected && !_isConnecting);
+        }
+    );
 }
 
 bool TcpSocket::getBytes(char* buffer, size_t nItems) {

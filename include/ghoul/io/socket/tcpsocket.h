@@ -73,6 +73,18 @@ public:
     void interceptInput(InputInterceptor interceptor);
     void uninterceptInput();
 
+    /**
+     * Non-blocking counterpart to disconnect(). Stops the I/O loops and closes the
+     * socket, but does not join the threads. Safe to call from within those threads
+     * themselves (unlike disconnect())
+     */
+    void closeConnection();
+
+    /**
+     * Waits for the socket output to be emptied, or until the timeout is reached
+     */
+    bool waitForOutputQueueDrained(std::chrono::milliseconds timeout);
+
     // Methods for binary communication
     template <typename T = char>
     bool get(T* buffer, size_t nItems = 1);

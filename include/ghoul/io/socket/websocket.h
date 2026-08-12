@@ -115,6 +115,7 @@ private:
     std::condition_variable _inputNotifier;
 
     std::unique_ptr<TcpSocket> _tcpSocket;
+    bool _isMarkedForClosing = false;
 };
 
 } // namespace ghoul::io

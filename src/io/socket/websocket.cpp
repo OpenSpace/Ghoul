@@ -58,7 +58,37 @@ WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
 
      _tcpSocket->interceptInput(
         [this](const char* data, size_t nBytes) {
-            _socketConnection->read_some(data, nBytes);
+            std::string output;
+            {
+                // Guards _socketConnection/_outputStream against putMessage() on other
+                // threads. onOpen/onMessage/onClose run nested inside read_some(), so
+                // they must not lock _outputStreamMutex themselves
+                const std::unique_lock lock(_outputStreamMutex);
+                _socketConnection->read_some(data, nBytes);
+
+                // `read_some` can cause the websocketpp to generate protocol-level output
+                // e.g., a Close frame response, or a Pong reply to a Ping. Flush the
+                // responses so the client isn't left waiting
+                output = _outputStream.str();
+                if (!output.empty()) {
+                    _outputStream.str("");
+                    _outputStream.clear();
+                }
+            }
+
+            // Write outside the lock, since TcpSocket::put has its own internal locking
+            if (!output.empty()) {
+                _tcpSocket->put<char>(output.c_str(), output.size());
+            }
+            if (_isMarkedForClosing) {
+                const bool drained =
+                    _tcpSocket->waitForOutputQueueDrained(std::chrono::seconds(3));
+
+                if (!drained) {
+                    LWARNING("Timed out flushing final output before closing socket");
+                }
+                _tcpSocket->closeConnection();
+            }
             _inputNotifier.notify_one();
         }
     );
@@ -66,6 +96,7 @@ WebSocket::WebSocket(std::unique_ptr<TcpSocket> socket,
 
 WebSocket::~WebSocket() {
     LDEBUG("Destroying socket connection");
+    _tcpSocket->uninterceptInput();
     _socketConnection->eof();
     _tcpSocket = nullptr;
 }
@@ -105,9 +136,22 @@ bool WebSocket::getMessage(std::string& message) {
 }
 
 bool WebSocket::putMessage(const std::string& message) {
-    _socketConnection->send(message);
-    _tcpSocket->put<char>(_outputStream.str().c_str(), _outputStream.str().size());
-    _outputStream.str("");
+    std::string output;
+
+    {
+        const std::unique_lock lock(_outputStreamMutex);
+        _socketConnection->send(message);
+        output = _outputStream.str();
+        if (!output.empty()) {
+            _outputStream.str("");
+            _outputStream.clear();
+        }
+    }
+
+    // Write outside the lock, since TcpSocket::put has its own internal locking
+    if (!output.empty()) {
+        _tcpSocket->put<char>(output.c_str(), output.size());
+    }
     return true;
 }
 
@@ -139,8 +183,6 @@ void WebSocket::onOpen(const websocketpp::connection_hdl& hdl) {
     ));
     const std::unique_lock lock(_connectionHandlesMutex);
     _connectionHandles.insert(hdl);
-    _tcpSocket->put<char>(_outputStream.str().c_str(), _outputStream.str().size());
-    _outputStream.str("");
 }
 
 void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
@@ -152,6 +194,7 @@ void WebSocket::onClose(const websocketpp::connection_hdl& hdl) {
     const std::unique_lock lock(_connectionHandlesMutex);
     _connectionHandles.erase(hdl);
     _inputNotifier.notify_one();
+    _isMarkedForClosing = true;
 }
 
 } // namespace ghoul::io
