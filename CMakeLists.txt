@@ -40,12 +40,6 @@ option(GHOUL_HIGH_DEBUG_MODE "Add additional debugging code" ON)
 option(GHOUL_LOGGING_ENABLE_TRACE "Enables the LTRACE macro" ON)
 option(GHOUL_THROW_ON_ASSERT "Disables the feedback on asserts; for use in unit tests" OFF)
 
-option(GHOUL_MODULE_ASSIMP "Enable AssImp Model loader" ON)
-option(GHOUL_MODULE_COMMANDLINEPARSER "Enable Commandlineparser" ON)
-option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
-option(GHOUL_MODULE_LUA "Enable Lua" ON)
-option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
-option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
 option(TRACY_ENABLE "Enable profiling with Tracy" OFF)
 
 # The tests pull in Catch2 and the install rules are of no use to a project that consumes
@@ -61,19 +55,7 @@ endif ()
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries" OFF)
 
-# The options above are translated into vcpkg manifest features
-if (GHOUL_MODULE_ASSIMP)
-  list(APPEND VCPKG_MANIFEST_FEATURES "assimp")
-endif ()
-if (GHOUL_MODULE_FONTRENDERING)
-  list(APPEND VCPKG_MANIFEST_FEATURES "fontrendering")
-endif ()
-if (GHOUL_MODULE_LUA)
-  list(APPEND VCPKG_MANIFEST_FEATURES "lua")
-endif ()
-if (GHOUL_MODULE_OPENGL)
-  list(APPEND VCPKG_MANIFEST_FEATURES "opengl")
-endif ()
+# The optional switches above are translated into vcpkg manifest features
 if (TRACY_ENABLE)
   list(APPEND VCPKG_MANIFEST_FEATURES "profiling")
 endif ()

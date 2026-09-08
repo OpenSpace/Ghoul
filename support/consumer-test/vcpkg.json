@@ -13,15 +13,7 @@
     ]
   },
   "dependencies": [
-    {
-      "name": "ghoul",
-      "features": [
-        "assimp",
-        "fontrendering",
-        "lua",
-        "opengl"
-      ]
-    }
+    "ghoul"
   ],
   "overrides": [
     {

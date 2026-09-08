@@ -13,9 +13,9 @@ the registry baseline and registers the overlay ports under `support/vcpkg/ports
 
 Three dependencies are built from those overlay ports: `websocketpp` and
 `tiny-process-library` track the OpenSpace forks, and `glbinding` pins 3.5.0 because the
-version in the vcpkg registry declares `glClampColor` with the wrong parameter type. The
-`GHOUL_MODULE_*` options are translated into vcpkg manifest features, so disabling a module
-also stops its dependency from being built.
+version in the vcpkg registry declares `glClampColor` with the wrong parameter type. All
+dependencies are always built; the only optional one is Tracy, gated behind `TRACY_ENABLE`
+and the `profiling` manifest feature.
 
 `stb` and RenderDoc stay vendored under `ext/`, because each is a single translation unit
 or header that has to be compiled with Ghoul-specific settings.
@@ -47,9 +47,7 @@ project's manifest:
 ```jsonc
 // vcpkg.json
 {
-  "dependencies": [
-    { "name": "ghoul", "features": [ "assimp", "fontrendering", "lua", "opengl" ] }
-  ],
+  "dependencies": [ "ghoul" ],
   "overrides": [ { "name": "lua", "version": "5.4.7" } ],
   "vcpkg-configuration": {
     "overlay-ports": [ "./ext/ghoul/support/vcpkg/ports" ]

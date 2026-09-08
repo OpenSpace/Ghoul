@@ -51,13 +51,11 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-if (GHOUL_MODULE_OPENGL)
-  # ghoul/opengl/renderdoc.h includes this vendored header
-  install(
-    FILES ${GHOUL_ROOT_DIR}/ext/renderdoc/renderdoc_app.h
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  )
-endif ()
+# ghoul/opengl/renderdoc.h includes this vendored header
+install(
+  FILES ${GHOUL_ROOT_DIR}/ext/renderdoc/renderdoc_app.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
 install(
   EXPORT GhoulTargets

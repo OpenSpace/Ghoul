@@ -20,7 +20,19 @@
     ]
   },
   "dependencies": [
+    {
+      "name": "assimp",
+      "features": [
+        "draco"
+      ]
+    },
+    {
+      "name": "freetype",
+      "default-features": false
+    },
+    "glbinding",
     "glm",
+    "lua",
     "lz4",
     "scnlib",
     "stb",
@@ -28,38 +40,6 @@
     "websocketpp"
   ],
   "features": {
-    "assimp": {
-      "description": "Model loading through AssImp",
-      "dependencies": [
-        {
-          "name": "assimp",
-          "features": [
-            "draco"
-          ]
-        }
-      ]
-    },
-    "fontrendering": {
-      "description": "Font rendering through FreeType",
-      "dependencies": [
-        {
-          "name": "freetype",
-          "default-features": false
-        }
-      ]
-    },
-    "lua": {
-      "description": "Lua scripting support",
-      "dependencies": [
-        "lua"
-      ]
-    },
-    "opengl": {
-      "description": "OpenGL support through glbinding",
-      "dependencies": [
-        "glbinding"
-      ]
-    },
     "profiling": {
       "description": "Profiling support through Tracy",
       "dependencies": [

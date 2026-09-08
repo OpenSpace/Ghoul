@@ -2,37 +2,19 @@
 
 include(CMakeFindDependencyMacro)
 
-set(GHOUL_MODULE_ASSIMP @GHOUL_MODULE_ASSIMP@)
-set(GHOUL_MODULE_COMMANDLINEPARSER @GHOUL_MODULE_COMMANDLINEPARSER@)
-set(GHOUL_MODULE_FONTRENDERING @GHOUL_MODULE_FONTRENDERING@)
-set(GHOUL_MODULE_LUA @GHOUL_MODULE_LUA@)
-set(GHOUL_MODULE_OPENGL @GHOUL_MODULE_OPENGL@)
-set(GHOUL_MODULE_SYSTEMCAPABILITIES @GHOUL_MODULE_SYSTEMCAPABILITIES@)
 set(GHOUL_PROFILING @TRACY_ENABLE@)
 
+find_dependency(assimp CONFIG)
+find_dependency(Freetype)
+find_dependency(glbinding CONFIG)
 find_dependency(glm CONFIG)
+find_dependency(OpenGL)
 find_dependency(scn CONFIG)
+find_dependency(unofficial-lua CONFIG)
 
 # Ghoul is a static library, so its private dependencies are still needed to link a consumer
 find_dependency(lz4 CONFIG)
 find_dependency(tiny-process-library CONFIG)
-
-if (GHOUL_MODULE_ASSIMP)
-  find_dependency(assimp CONFIG)
-endif ()
-
-if (GHOUL_MODULE_OPENGL)
-  find_dependency(OpenGL)
-  find_dependency(glbinding CONFIG)
-endif ()
-
-if (GHOUL_MODULE_FONTRENDERING)
-  find_dependency(Freetype)
-endif ()
-
-if (GHOUL_MODULE_LUA)
-  find_dependency(unofficial-lua CONFIG)
-endif ()
 
 if (GHOUL_PROFILING)
   find_dependency(Tracy CONFIG)

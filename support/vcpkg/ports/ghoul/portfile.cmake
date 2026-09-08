@@ -31,11 +31,7 @@ get_filename_component(SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOL
 vcpkg_check_features(
   OUT_FEATURE_OPTIONS FEATURE_OPTIONS
   FEATURES
-    assimp        GHOUL_MODULE_ASSIMP
-    fontrendering GHOUL_MODULE_FONTRENDERING
-    lua           GHOUL_MODULE_LUA
-    opengl        GHOUL_MODULE_OPENGL
-    profiling     TRACY_ENABLE
+    profiling TRACY_ENABLE
 )
 
 vcpkg_cmake_configure(
