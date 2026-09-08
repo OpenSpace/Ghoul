@@ -25,14 +25,13 @@
 
 cmake_minimum_required(VERSION 4.0)
 
-# Ghoul is either built standalone or added to a superproject through add_subdirectory. In
-# the latter case vcpkg ignores this manifest and the superproject has to provide the
-# dependencies itself, which it can do by depending on the `ghoul-deps` port
-if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(GHOUL_IS_TOP_LEVEL ON)
-else ()
-  set(GHOUL_IS_TOP_LEVEL OFF)
-endif ()
+# The options gating optional dependencies have to be declared before the first project()
+# call: that is when vcpkg's toolchain file runs and reads VCPKG_MANIFEST_FEATURES.
+#
+# vcpkg only reads VCPKG_MANIFEST_FEATURES on the configure that first creates the build
+# directory. Changing any of the options below afterwards will not add or remove the
+# corresponding dependency: delete build/<preset>/vcpkg_installed (or the whole build
+# directory) and configure again.
 
 #############################
 # Options
@@ -47,33 +46,39 @@ option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_LUA "Enable Lua" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
-option(GHOUL_HAVE_TESTS "Activate the unit tests" ${GHOUL_IS_TOP_LEVEL})
-option(GHOUL_ENABLE_INSTALL "Generate the install and export rules for Ghoul" ${GHOUL_IS_TOP_LEVEL})
 option(TRACY_ENABLE "Enable profiling with Tracy" OFF)
+
+# The tests pull in Catch2 and the install rules are of no use to a project that consumes
+# Ghoul, so both default to on only when Ghoul is the top-level project. project() has not
+# run yet, so PROJECT_IS_TOP_LEVEL is not available and the directory comparison stands in.
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
+  option(GHOUL_ENABLE_INSTALL "Generate the install and export rules for Ghoul" ON)
+else ()
+  option(GHOUL_HAVE_TESTS "Activate the unit tests" OFF)
+  option(GHOUL_ENABLE_INSTALL "Generate the install and export rules for Ghoul" OFF)
+endif ()
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries" OFF)
 
-# The options above are translated into vcpkg manifest features, which has to happen before
-# the first project() call so that vcpkg installs the correct set of dependencies
-if (GHOUL_IS_TOP_LEVEL)
-  if (GHOUL_MODULE_ASSIMP)
-    list(APPEND VCPKG_MANIFEST_FEATURES "assimp")
-  endif ()
-  if (GHOUL_MODULE_FONTRENDERING)
-    list(APPEND VCPKG_MANIFEST_FEATURES "fontrendering")
-  endif ()
-  if (GHOUL_MODULE_LUA)
-    list(APPEND VCPKG_MANIFEST_FEATURES "lua")
-  endif ()
-  if (GHOUL_MODULE_OPENGL)
-    list(APPEND VCPKG_MANIFEST_FEATURES "opengl")
-  endif ()
-  if (TRACY_ENABLE)
-    list(APPEND VCPKG_MANIFEST_FEATURES "profiling")
-  endif ()
-  if (GHOUL_HAVE_TESTS)
-    list(APPEND VCPKG_MANIFEST_FEATURES "tests")
-  endif ()
+# The options above are translated into vcpkg manifest features
+if (GHOUL_MODULE_ASSIMP)
+  list(APPEND VCPKG_MANIFEST_FEATURES "assimp")
+endif ()
+if (GHOUL_MODULE_FONTRENDERING)
+  list(APPEND VCPKG_MANIFEST_FEATURES "fontrendering")
+endif ()
+if (GHOUL_MODULE_LUA)
+  list(APPEND VCPKG_MANIFEST_FEATURES "lua")
+endif ()
+if (GHOUL_MODULE_OPENGL)
+  list(APPEND VCPKG_MANIFEST_FEATURES "opengl")
+endif ()
+if (TRACY_ENABLE)
+  list(APPEND VCPKG_MANIFEST_FEATURES "profiling")
+endif ()
+if (GHOUL_HAVE_TESTS)
+  list(APPEND VCPKG_MANIFEST_FEATURES "tests")
 endif ()
 
 project(Ghoul VERSION 0.1.0 LANGUAGES C CXX)
@@ -97,7 +102,6 @@ endif ()
 
 
 add_subdirectory(src)
-add_subdirectory(ext SYSTEM)
 
 if (GHOUL_ENABLE_INSTALL)
   include(${GHOUL_ROOT_DIR}/support/cmake/ghoul_install.cmake)

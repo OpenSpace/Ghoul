@@ -6,58 +6,69 @@
 
 ## Dependencies
 
-All third-party dependencies are provided by [vcpkg](https://vcpkg.io) and are declared in
-`vcpkg.json`. Three dependencies are built from the overlay ports in
-`support/vcpkg/ports`, which `vcpkg-configuration.json` registers automatically:
-`websocketpp` and `tiny-process-library` track the OpenSpace forks, and `glbinding` pins
-3.5.0 because the version in the vcpkg registry declares `glClampColor` with the wrong
-parameter type. The `GHOUL_MODULE_*` options are translated into vcpkg manifest features,
-so disabling a module also stops its dependency from being built.
+Ghoul resolves its dependencies through [vcpkg](https://vcpkg.io) in manifest mode, so the
+only prerequisites are a C++ compiler, CMake 4.0 or newer, and a vcpkg checkout. The
+dependencies are declared in `vcpkg.json`; the embedded `vcpkg-configuration` block pins
+the registry baseline and registers the overlay ports under `support/vcpkg/ports`.
+
+Three dependencies are built from those overlay ports: `websocketpp` and
+`tiny-process-library` track the OpenSpace forks, and `glbinding` pins 3.5.0 because the
+version in the vcpkg registry declares `glClampColor` with the wrong parameter type. The
+`GHOUL_MODULE_*` options are translated into vcpkg manifest features, so disabling a module
+also stops its dependency from being built.
+
+`stb` and RenderDoc stay vendored under `ext/`, because each is a single translation unit
+or header that has to be compiled with Ghoul-specific settings.
 
 ## Building standalone
 
-Set `VCPKG_ROOT` to a vcpkg checkout and use one of the presets:
+Point `VCPKG_ROOT` at your vcpkg checkout and use one of the CMake presets. The first
+configure downloads and builds the dependencies, which takes a while; subsequent runs are
+served from vcpkg's binary cache.
 
 ```
-cmake --preset windows      # or linux / macos
+cmake --preset windows        # or linux
 cmake --build --preset windows
 ctest --preset windows
 ```
 
-## Consuming Ghoul as an external project
+The presets also offer `windows-debug`, `windows-release`, `linux-debug`, and
+`linux-release`, plus `windows-static` for linking the CRT statically as well. The `windows`
+triplet is `x64-windows-static-md` rather than the fully dynamic `x64-windows` that SGCT
+uses, because the `glbinding` overlay port only supports static linkage. `ctest` runs the
+unit tests and `VcpkgManifestSync`, which checks that the root manifest and the `ghoul`
+port stay in step.
 
-`cmake --install` produces a package that can be consumed with:
+## Consuming Ghoul
+
+A vcpkg port lives in `support/vcpkg/ports/ghoul`. Register it as an overlay from your own
+project's manifest:
+
+```jsonc
+// vcpkg.json
+{
+  "dependencies": [
+    { "name": "ghoul", "features": [ "assimp", "fontrendering", "lua", "opengl" ] }
+  ],
+  "overrides": [ { "name": "lua", "version": "5.4.7" } ],
+  "vcpkg-configuration": {
+    "overlay-ports": [ "./ext/ghoul/support/vcpkg/ports" ]
+  }
+}
+```
+
+The `overrides` have to be repeated because a port cannot express them. Then link against
+Ghoul:
 
 ```cmake
-find_package(Ghoul CONFIG REQUIRED)
+find_package(ghoul CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE Ghoul::Ghoul)
 ```
 
 `support/consumer-test` is a minimal project that exercises this path and is used as a
-regression test for the install and export rules.
+regression test for the port and the install and export rules.
 
-## Consuming Ghoul as a subproject
-
-vcpkg only reads the manifest of the top-level project, so a superproject that adds Ghoul
-through `add_subdirectory` has to declare Ghoul's dependencies itself. Depend on the
-`ghoul-deps` meta-port to do that with a single entry:
-
-```jsonc
-// vcpkg.json of the superproject
-{
-  "dependencies": [
-    { "name": "ghoul-deps", "features": [ "assimp", "fontrendering", "lua", "opengl" ] }
-  ],
-  "overrides": [ { "name": "lua", "version": "5.4.7" } ]
-}
-```
-
-```jsonc
-// vcpkg-configuration.json of the superproject
-{ "overlay-ports": [ "./ext/ghoul/support/vcpkg/ports" ] }
-```
-
-The `overrides` have to be repeated because a port cannot express them. `ghoul-deps` is
-kept in sync with `vcpkg.json` by `support/vcpkg/check-manifest-sync.cmake`, which runs as
-part of the test suite.
-
+Ghoul can still be added through `add_subdirectory` (`GHOUL_HAVE_TESTS` and
+`GHOUL_ENABLE_INSTALL` default off when Ghoul is not the top-level project), but the
+superproject then has to provide Ghoul's dependencies itself, since vcpkg only reads the
+top-level manifest. Depending on the `ghoul` port is the supported way to do that.

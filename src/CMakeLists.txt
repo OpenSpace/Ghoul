@@ -28,8 +28,6 @@ include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
 add_library(Ghoul STATIC)
 add_library(Ghoul::Ghoul ALIAS Ghoul)
 set_ghoul_compile_settings(Ghoul)
-# Keeps the Debug and Release artifacts apart within a single install prefix
-set_target_properties(Ghoul PROPERTIES DEBUG_POSTFIX "d")
 target_include_directories(Ghoul PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -308,9 +306,97 @@ if (GHOUL_THROW_ON_ASSERT)
   target_compile_definitions(Ghoul PUBLIC "GHL_THROW_ON_ASSERT")
 endif ()
 
+
+##########################################################################################
+# Dependencies
+# Every third-party library comes from vcpkg, see the root vcpkg.json. The only exceptions
+# are stb_image and RenderDoc, which stay vendored under ext/ because they consist of a
+# single translation unit / header that has to be compiled with Ghoul-specific settings.
+##########################################################################################
+
+if (WIN32)
+  target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
+endif ()
+
+if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+  find_library(INOTIFY_LIBRARIES inotify PATHS "/usr/local/lib")
+  target_include_directories(Ghoul SYSTEM PRIVATE "/usr/local/include")
+  target_link_libraries(Ghoul PRIVATE ${INOTIFY_LIBRARIES})
+endif ()
+
+find_package(glm CONFIG REQUIRED)
+find_package(lz4 CONFIG REQUIRED)
+find_package(scn CONFIG REQUIRED)
+find_package(tiny-process-library CONFIG REQUIRED)
+
+target_link_libraries(Ghoul
+  PUBLIC
+    glm::glm
+    scn::scn
+  PRIVATE
+    lz4::lz4
+    tiny-process-library::tiny-process-library
+)
+
+# stb_image: the headers come from vcpkg, but the translation unit that instantiates them
+# is ours as it selects the stb feature macros
+find_path(STB_INCLUDE_DIR "stb_image.h" REQUIRED)
+add_library(stb_image OBJECT ${PROJECT_SOURCE_DIR}/ext/stb_image/stb_image.c)
+target_include_directories(stb_image SYSTEM PRIVATE ${STB_INCLUDE_DIR})
+set_target_properties(stb_image PROPERTIES FOLDER "External")
+target_sources(Ghoul PRIVATE $<TARGET_OBJECTS:stb_image>)
+target_include_directories(Ghoul SYSTEM PRIVATE ${STB_INCLUDE_DIR})
+
+# WebSocket++ is header only and ships no CMake package, so it is located through its
+# include directory
+find_path(WEBSOCKETPP_INCLUDE_DIR "websocketpp/version.hpp" REQUIRED)
+target_include_directories(Ghoul SYSTEM PUBLIC $<BUILD_INTERFACE:${WEBSOCKETPP_INCLUDE_DIR}>)
+
+# RenderDoc is a single vendored header included by the public ghoul/opengl/renderdoc.h
+target_include_directories(
+  Ghoul SYSTEM PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ext/renderdoc>
+)
+
+if (TRACY_ENABLE)
+  find_package(Tracy CONFIG REQUIRED)
+  target_link_libraries(Ghoul PUBLIC Tracy::TracyClient)
+  target_compile_definitions(Ghoul PUBLIC "TRACY_ENABLE")
+endif ()
+
+if (GHOUL_MODULE_OPENGL)
+  find_package(OpenGL REQUIRED)
+  find_package(glbinding CONFIG REQUIRED)
+  target_link_libraries(Ghoul PUBLIC OpenGL::GL glbinding::glbinding glbinding::glbinding-aux)
+endif ()
+
+if (GHOUL_MODULE_LUA)
+  find_package(unofficial-lua CONFIG REQUIRED)
+  if (TARGET unofficial::lua::lua)
+    target_link_libraries(Ghoul PUBLIC unofficial::lua::lua)
+  else ()
+    # Lua 5.4.7 exports an unnamespaced target, later versions do not
+    target_link_libraries(Ghoul PUBLIC lua)
+  endif ()
+endif ()
+
+if (GHOUL_MODULE_ASSIMP)
+  find_package(assimp CONFIG REQUIRED)
+  target_link_libraries(Ghoul PRIVATE assimp::assimp)
+endif ()
+
+if (GHOUL_MODULE_FONTRENDERING)
+  find_package(Freetype REQUIRED)
+  target_link_libraries(Ghoul PUBLIC Freetype::Freetype)
+endif ()
+
 # Place files into source_group
 get_target_property(source_files Ghoul SOURCES)
 foreach (file ${source_files})
+  # Skip generator expressions such as the stb_image object files
+  if (file MATCHES "^\\$<")
+    continue ()
+  endif ()
+
   # Remove prefixes from the files
   set(original_file ${file})
   string(REPLACE "${PROJECT_SOURCE_DIR}/src/" "" file ${file})

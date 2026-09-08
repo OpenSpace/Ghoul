@@ -23,27 +23,40 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-# Minimal stand-in for a third-party project. It consumes Ghoul the same way an external
-# developer would - through the `ghoul` overlay port and `find_package` - and therefore
-# catches breakage in the port, the install rules, and the exported target that building
-# Ghoul in-tree cannot catch.
-#
-# The manifest here depends on the `ghoul` port, which builds and installs Ghoul into
-# vcpkg_installed; configure this project with the vcpkg toolchain and it resolves:
-#   cmake -S support/consumer-test -B build/consumer-test
-#     --toolchain $env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
-#     -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
-#   cmake --build build/consumer-test
-#   ctest --test-dir build/consumer-test
+# This port lives inside the Ghoul repository and builds the enclosing checkout. When
+# publishing Ghoul to a registry, replace this with vcpkg_from_github(REPO OpenSpace/Ghoul
+# REF <tag> SHA512 <hash>) so that the port is reproducible and content-addressed.
+get_filename_component(SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOLUTE)
 
-cmake_minimum_required(VERSION 3.25)
-project(GhoulConsumerTest LANGUAGES CXX)
+vcpkg_check_features(
+  OUT_FEATURE_OPTIONS FEATURE_OPTIONS
+  FEATURES
+    assimp        GHOUL_MODULE_ASSIMP
+    fontrendering GHOUL_MODULE_FONTRENDERING
+    lua           GHOUL_MODULE_LUA
+    opengl        GHOUL_MODULE_OPENGL
+    profiling     TRACY_ENABLE
+)
 
-find_package(ghoul CONFIG REQUIRED)
+vcpkg_cmake_configure(
+  SOURCE_PATH "${SOURCE_PATH}"
+  OPTIONS
+    ${FEATURE_OPTIONS}
+    # The tests only exercise this checkout and pull in Catch2, which a consumer does not want
+    -DGHOUL_HAVE_TESTS=OFF
+    -DGHOUL_ENABLE_INSTALL=ON
+    # /ZI is a developer convenience that would otherwise be baked into the shipped library
+    -DGHOUL_ENABLE_EDIT_CONTINUE=OFF
+)
 
-add_executable(GhoulConsumerTest main.cpp)
-target_compile_features(GhoulConsumerTest PRIVATE cxx_std_20)
-target_link_libraries(GhoulConsumerTest PRIVATE Ghoul::Ghoul)
+vcpkg_cmake_install()
+vcpkg_cmake_config_fixup(CONFIG_PATH share/ghoul)
+vcpkg_copy_pdbs()
 
-enable_testing()
-add_test(NAME GhoulConsumerTest COMMAND GhoulConsumerTest)
+file(REMOVE_RECURSE
+  "${CURRENT_PACKAGES_DIR}/debug/include"
+  "${CURRENT_PACKAGES_DIR}/debug/share"
+)
+
+file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")

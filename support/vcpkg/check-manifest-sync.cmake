@@ -23,10 +23,18 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-# Verifies that the `ghoul-deps` meta-port declares exactly the same dependencies and
-# features as the root vcpkg.json. Superprojects that add Ghoul through add_subdirectory
-# cannot use Ghoul's manifest (vcpkg only reads the manifest of the top-level project) and
-# instead depend on `ghoul-deps`, so the two lists have to stay identical.
+# Verifies that the `ghoul` overlay port under support/vcpkg/ports declares the same
+# runtime dependencies and optional features as the root vcpkg.json. A superproject that
+# adds Ghoul through add_subdirectory (such as OpenSpace) cannot use Ghoul's manifest, since
+# vcpkg only reads the manifest of the top-level project, and instead depends on the port,
+# so the two lists have to stay identical apart from the intentional differences listed
+# below.
+#
+# Intentional differences (a mismatch in these is allowed, anything else is an error):
+#   - the port additionally depends on the vcpkg-cmake / vcpkg-cmake-config host tools,
+#     which the standalone manifest gets from vcpkg itself
+#   - the port never builds the unit tests, so it omits the `tests` feature and its Catch2
+#     dependency
 #
 # Run with:  cmake -P support/vcpkg/check-manifest-sync.cmake
 
@@ -34,7 +42,12 @@ cmake_minimum_required(VERSION 3.19)
 
 get_filename_component(GHOUL_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 set(MANIFEST "${GHOUL_ROOT_DIR}/vcpkg.json")
-set(META_PORT "${CMAKE_CURRENT_LIST_DIR}/ports/ghoul-deps/vcpkg.json")
+set(PORT "${CMAKE_CURRENT_LIST_DIR}/ports/ghoul/vcpkg.json")
+
+# Dependencies that are allowed to appear only in the port
+set(PORT_ONLY_DEPENDENCIES "vcpkg-cmake" "vcpkg-cmake-config")
+# Features that are allowed to appear only in the manifest
+set(MANIFEST_ONLY_FEATURES "tests")
 
 function (flatten_dependencies outVar dependencies)
   set(result "")
@@ -80,6 +93,18 @@ function (flatten_dependencies outVar dependencies)
   set(${outVar} "${result}" PARENT_SCOPE)
 endfunction ()
 
+# Removes every flattened entry whose dependency name is in `excluded` from `list`
+function (drop_dependencies outVar list excluded)
+  set(result "")
+  foreach (entry IN LISTS list)
+    string(REGEX REPLACE "\\[.*$" "" entryName "${entry}")
+    if (NOT entryName IN_LIST excluded)
+      list(APPEND result "${entry}")
+    endif ()
+  endforeach ()
+  set(${outVar} "${result}" PARENT_SCOPE)
+endfunction ()
+
 function (feature_names outVar features)
   string(JSON count LENGTH "${features}")
   set(result "")
@@ -94,33 +119,46 @@ function (feature_names outVar features)
   set(${outVar} "${result}" PARENT_SCOPE)
 endfunction ()
 
+# Returns the "dependencies" array of `feature`, or "[]" if the feature declares none
+function (feature_dependencies outVar features feature)
+  string(JSON deps ERROR_VARIABLE depsError GET "${features}" "${feature}" "dependencies")
+  if (NOT depsError STREQUAL "NOTFOUND")
+    set(deps "[]")
+  endif ()
+  set(${outVar} "${deps}" PARENT_SCOPE)
+endfunction ()
+
 file(READ "${MANIFEST}" manifestJson)
-file(READ "${META_PORT}" metaPortJson)
+file(READ "${PORT}" portJson)
 
 set(errors "")
 
 string(JSON manifestDependencies GET "${manifestJson}" "dependencies")
-string(JSON metaPortDependencies GET "${metaPortJson}" "dependencies")
+string(JSON portDependencies GET "${portJson}" "dependencies")
 flatten_dependencies(manifestDeps "${manifestDependencies}")
-flatten_dependencies(metaPortDeps "${metaPortDependencies}")
-if (NOT manifestDeps STREQUAL metaPortDeps)
-  list(APPEND errors "  dependencies\n    vcpkg.json:  ${manifestDeps}\n    ghoul-deps:  ${metaPortDeps}")
+flatten_dependencies(portDeps "${portDependencies}")
+drop_dependencies(portDeps "${portDeps}" "${PORT_ONLY_DEPENDENCIES}")
+if (NOT manifestDeps STREQUAL portDeps)
+  list(APPEND errors "  dependencies\n    vcpkg.json:  ${manifestDeps}\n    port:        ${portDeps}")
 endif ()
 
 string(JSON manifestFeatures GET "${manifestJson}" "features")
-string(JSON metaPortFeatures GET "${metaPortJson}" "features")
+string(JSON portFeatures GET "${portJson}" "features")
 feature_names(manifestFeatureNames "${manifestFeatures}")
-feature_names(metaPortFeatureNames "${metaPortFeatures}")
-if (NOT manifestFeatureNames STREQUAL metaPortFeatureNames)
-  list(APPEND errors "  feature names\n    vcpkg.json:  ${manifestFeatureNames}\n    ghoul-deps:  ${metaPortFeatureNames}")
+feature_names(portFeatureNames "${portFeatures}")
+if (manifestFeatureNames)
+  list(REMOVE_ITEM manifestFeatureNames ${MANIFEST_ONLY_FEATURES})
+endif ()
+if (NOT manifestFeatureNames STREQUAL portFeatureNames)
+  list(APPEND errors "  feature names\n    vcpkg.json:  ${manifestFeatureNames}\n    port:        ${portFeatureNames}")
 else ()
   foreach (feature ${manifestFeatureNames})
-    string(JSON manifestFeatureDependencies GET "${manifestFeatures}" "${feature}" "dependencies")
-    string(JSON metaPortFeatureDependencies GET "${metaPortFeatures}" "${feature}" "dependencies")
+    feature_dependencies(manifestFeatureDependencies "${manifestFeatures}" "${feature}")
+    feature_dependencies(portFeatureDependencies "${portFeatures}" "${feature}")
     flatten_dependencies(manifestFeatureDeps "${manifestFeatureDependencies}")
-    flatten_dependencies(metaPortFeatureDeps "${metaPortFeatureDependencies}")
-    if (NOT manifestFeatureDeps STREQUAL metaPortFeatureDeps)
-      list(APPEND errors "  feature '${feature}'\n    vcpkg.json:  ${manifestFeatureDeps}\n    ghoul-deps:  ${metaPortFeatureDeps}")
+    flatten_dependencies(portFeatureDeps "${portFeatureDependencies}")
+    if (NOT manifestFeatureDeps STREQUAL portFeatureDeps)
+      list(APPEND errors "  feature '${feature}'\n    vcpkg.json:  ${manifestFeatureDeps}\n    port:        ${portFeatureDeps}")
     endif ()
   endforeach ()
 endif ()
@@ -128,8 +166,8 @@ endif ()
 if (errors)
   list(JOIN errors "\n" errorText)
   message(FATAL_ERROR
-    "vcpkg.json and support/vcpkg/ports/ghoul-deps/vcpkg.json have diverged:\n${errorText}\n"
+    "vcpkg.json and support/vcpkg/ports/ghoul/vcpkg.json have diverged:\n${errorText}\n"
   )
 endif ()
 
-message(STATUS "vcpkg.json and ghoul-deps are in sync")
+message(STATUS "vcpkg.json and the ghoul port are in sync")

@@ -1,11 +1,24 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "ghoul",
-  "version-semver": "0.1.0",
-  "description": "General Helpful Open Utility Library",
+  "version": "0.1.0",
+  "description": [
+    "General Helpful Open Utility Library.",
+    "This manifest is used when building Ghoul standalone from this checkout. The port under support/vcpkg/ports/ghoul declares the same runtime dependencies for consumers; support/vcpkg/check-manifest-sync.cmake verifies that the two lists stay in sync. The intentional differences are the tests feature (Catch2), which the port never builds, and the vcpkg-cmake host tools, which the port needs explicitly.",
+    "Ghoul's overrides (lua 5.4.7) cannot be expressed by a port, so a superproject that consumes the port has to repeat them in its own manifest."
+  ],
   "homepage": "https://github.com/OpenSpace/Ghoul",
   "license": "MIT",
-  "builtin-baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4",
+  "supports": "!(osx | uwp | android)",
+  "vcpkg-configuration": {
+    "default-registry": {
+      "kind": "builtin",
+      "baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4"
+    },
+    "overlay-ports": [
+      "./support/vcpkg/ports"
+    ]
+  },
   "dependencies": [
     "glm",
     "lz4",

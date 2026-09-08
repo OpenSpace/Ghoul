@@ -24,7 +24,7 @@
 ##########################################################################################
 
 # Install and export rules that make Ghoul consumable through
-# `find_package(Ghoul CONFIG REQUIRED)` and `target_link_libraries(... Ghoul::Ghoul)`
+# `find_package(ghoul CONFIG REQUIRED)` and `target_link_libraries(... Ghoul::Ghoul)`
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -67,20 +67,20 @@ install(
 )
 
 configure_package_config_file(
-  ${GHOUL_ROOT_DIR}/support/cmake/GhoulConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/GhoulConfig.cmake
+  ${GHOUL_ROOT_DIR}/support/cmake/ghoulConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfig.cmake
   INSTALL_DESTINATION ${GHOUL_INSTALL_CMAKEDIR}
 )
 
 write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/GhoulConfigVersion.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfigVersion.cmake
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY SameMinorVersion
 )
 
 install(
   FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/GhoulConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/GhoulConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfigVersion.cmake
   DESTINATION ${GHOUL_INSTALL_CMAKEDIR}
 )

@@ -1,0 +1,9 @@
+ghoul provides CMake targets:
+
+  find_package(ghoul CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE Ghoul::Ghoul)
+
+ghoul's overrides cannot be expressed by this port, so repeat them in the consuming
+manifest:
+
+  "overrides": [ { "name": "lua", "version": "5.4.7" } ]

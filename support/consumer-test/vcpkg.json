@@ -3,10 +3,18 @@
   "name": "ghoul-consumer-test",
   "version-string": "0.0.1",
   "description": "Regression project that links against an installed Ghoul",
-  "builtin-baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4",
+  "vcpkg-configuration": {
+    "default-registry": {
+      "kind": "builtin",
+      "baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4"
+    },
+    "overlay-ports": [
+      "../vcpkg/ports"
+    ]
+  },
   "dependencies": [
     {
-      "name": "ghoul-deps",
+      "name": "ghoul",
       "features": [
         "assimp",
         "fontrendering",

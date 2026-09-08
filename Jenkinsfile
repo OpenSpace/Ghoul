@@ -1,56 +1,90 @@
-library('sharedSpace'); // jenkins-pipeline-lib
+// The build relies on vcpkg in manifest mode. Each agent needs VCPKG_ROOT pointing at a
+// vcpkg checkout; vcpkg's default binary cache lives outside the workspace and therefore
+// survives cleanWs(). Set VCPKG_BINARY_SOURCES on the agent to share a cache between
+// machines.
 
-def url = 'https://github.com/OpenSpace/Ghoul';
-def branch = env.BRANCH_NAME;
+def checkoutGit() {
+  checkout scm;
 
-//
-// All third-party dependencies are provided by vcpkg. Every build node has to export
-// VCPKG_ROOT pointing at a vcpkg checkout; the CMake presets in CMakePresets.json pick up
-// the toolchain file from there. A shared vcpkg binary cache on the nodes keeps the
-// dependency build from dominating the CI time.
-//
+  // support/cmake/common-compile-settings is the only remaining submodule; every other
+  // dependency now comes from vcpkg
+  if (isUnix()) {
+    sh(
+      script: "git submodule update --init",
+      label: "Init submodules"
+    )
+  }
+  else {
+    bat(
+      script: "git submodule update --init",
+      label: "Init submodules"
+    )
+  }
+}
 
-//
-// Pipeline start
-//
+def buildWithPreset(preset) {
+  def script = """
+  cmake --preset ${preset}
+  cmake --build --preset ${preset} --parallel 4
+  """
+
+  if (isUnix()) {
+    sh(script: script, label: "Configure and build (${preset})")
+  }
+  else {
+    bat(script: script, label: "Configure and build (${preset})")
+  }
+}
+
+def runUnitTests(preset) {
+  def script = "ctest --preset ${preset} --output-junit test_results.xml"
+
+  if (isUnix()) {
+    sh(script: script, label: "Run unit tests (${preset})")
+  }
+  else {
+    bat(script: script, label: "Run unit tests (${preset})")
+  }
+  junit([testResults: "build/${preset}/test_results.xml"])
+}
+
 parallel tools: {
   node('tools') {
     stage('tools/scm') {
       deleteDir();
-      gitHelper.checkoutGit(url, branch, false);
+      checkoutGit();
     }
-    stage('tools/cppcheck/create') {
+    stage('tools/cppcheck/run') {
       sh(
-        script: 'cppcheck --enable=all --xml --xml-version=2 -i ext --suppressions-list=support/cppcheck/suppressions.txt include src tests 2> cppcheck.xml',
+        script: 'cppcheck --enable=all --xml --xml-version=2 --suppressions-list=support/cppcheck/suppressions.txt -i ext -i support include src tests 2> cppcheck.xml',
         label: 'CPPCheck'
       )
+    }
+    stage("tools/cppcheck/record") {
       recordIssues(
         id: 'tools-cppcheck',
         tool: cppCheck(pattern: 'cppcheck.xml')
       )
     }
-    // stage('master/cloc/create') {
-    //   sh 'cloc --by-file --exclude-dir=build,data,ext --xml --out=build/cloc.xml --force-lang-def=support/cloc/langDef --quiet .';
-    // }
     cleanWs()
-  }
+  } // node('tools')
 },
 linux_gcc: {
   if (env.USE_BUILD_OS_LINUX == 'true') {
     node('linux-gcc') {
       stage('linux-gcc/scm') {
         deleteDir();
-        gitHelper.checkoutGit(url, branch);
+        checkoutGit();
       }
       stage('linux-gcc/build') {
-        sh(
-          script: 'cmake --preset linux && cmake --build --preset linux',
-          label: 'Configure and build (Ninja, gcc)'
-        );
-        recordIssues(id: 'linux-gcc', tool: gcc());
+        buildWithPreset('linux');
+        recordIssues(
+          id: 'linux-gcc',
+          tool: gcc()
+        )
       }
       stage('linux-gcc/test') {
-        sh(script: 'ctest --preset linux', label: 'ctest');
+        runUnitTests('linux')
       }
       cleanWs()
     } // node('linux-gcc')
@@ -61,17 +95,17 @@ linux_clang: {
     node('linux-clang') {
       stage('linux-clang/scm') {
         deleteDir();
-        gitHelper.checkoutGit(url, branch);
+        checkoutGit();
       }
       stage('linux-clang/build') {
-        sh(
-          script: 'cmake --preset linux && cmake --build --preset linux',
-          label: 'Configure and build (Ninja, clang)'
-        );
-        recordIssues(id: 'linux-clang', tool: clang());
+        buildWithPreset('linux');
+        recordIssues(
+          id: 'linux-clang',
+          tool: clang()
+        )
       }
       stage('linux-clang/test') {
-        sh(script: 'ctest --preset linux', label: 'ctest');
+        runUnitTests('linux')
       }
       cleanWs()
     } // node('linux-clang')
@@ -82,17 +116,17 @@ windows_msvc: {
     node('windows') {
       stage('windows-msvc/scm') {
         deleteDir();
-        gitHelper.checkoutGit(url, branch);
+        checkoutGit();
       }
       stage('windows-msvc/build') {
-        bat(
-          script: 'cmake --preset windows && cmake --build --preset windows',
-          label: 'Configure and build (Visual Studio)'
-        );
-        recordIssues(id: 'windows-msvc', tool: msBuild());
+        buildWithPreset('windows');
+        recordIssues(
+          id: 'windows-msbuild-msvc',
+          tool: msBuild()
+        )
       }
       stage('windows-msvc/test') {
-        bat(script: 'ctest --preset windows', label: 'ctest');
+        runUnitTests('windows')
       }
       cleanWs()
     } // node('windows')
