@@ -4,6 +4,13 @@ def url = 'https://github.com/OpenSpace/Ghoul';
 def branch = env.BRANCH_NAME;
 
 //
+// All third-party dependencies are provided by vcpkg. Every build node has to export
+// VCPKG_ROOT pointing at a vcpkg checkout; the CMake presets in CMakePresets.json pick up
+// the toolchain file from there. A shared vcpkg binary cache on the nodes keeps the
+// dependency build from dominating the CI time.
+//
+
+//
 // Pipeline start
 //
 parallel tools: {
@@ -28,74 +35,46 @@ parallel tools: {
     cleanWs()
   }
 },
-linux_gcc_make: {
+linux_gcc: {
   if (env.USE_BUILD_OS_LINUX == 'true') {
     node('linux-gcc') {
-      stage('linux-gcc-make/scm') {
+      stage('linux-gcc/scm') {
         deleteDir();
         gitHelper.checkoutGit(url, branch);
       }
-      stage('linux-gcc-make/build') {
-        compileHelper.build(compileHelper.Make(), compileHelper.Gcc(), '', '', 'build-make');
-        compileHelper.recordCompileIssues(compileHelper.Gcc());
+      stage('linux-gcc/build') {
+        sh(
+          script: 'cmake --preset linux && cmake --build --preset linux',
+          label: 'Configure and build (Ninja, gcc)'
+        );
+        recordIssues(id: 'linux-gcc', tool: gcc());
       }
-      stage('linux-gcc-make/test') {
-        testHelper.runUnitTests('build-make/tests/GhoulTest');
-      }
-      cleanWs()
-    } // node('linux')
-  }
-},
-linux_gcc_ninja: {
-  if (env.USE_BUILD_OS_LINUX == 'true') {
-    node('linux-gcc') {
-      stage('linux-gcc-ninja/scm') {
-        deleteDir();
-        gitHelper.checkoutGit(url, branch);
-      }
-      stage('linux-gcc-ninja/build') {
-          compileHelper.build(compileHelper.Ninja(), compileHelper.Gcc(), '', '', 'build-ninja');
-      }
-      stage('linux-gcc-ninja/test') {
-        testHelper.runUnitTests('build-ninja/tests/GhoulTest');
+      stage('linux-gcc/test') {
+        sh(script: 'ctest --preset linux', label: 'ctest');
       }
       cleanWs()
-    } // node('linux')
+    } // node('linux-gcc')
   }
 },
-linux_clang_make: {
+linux_clang: {
   if (env.USE_BUILD_OS_LINUX == 'true') {
     node('linux-clang') {
-      stage('linux-clang-make/scm') {
+      stage('linux-clang/scm') {
         deleteDir();
         gitHelper.checkoutGit(url, branch);
       }
-      stage('linux-clang-make/build') {
-        compileHelper.build(compileHelper.Make(), compileHelper.Clang(), '', '', 'build-make');
-        compileHelper.recordCompileIssues(compileHelper.Clang());
+      stage('linux-clang/build') {
+        sh(
+          script: 'cmake --preset linux && cmake --build --preset linux',
+          label: 'Configure and build (Ninja, clang)'
+        );
+        recordIssues(id: 'linux-clang', tool: clang());
       }
-      stage('linux-clang-make/test') {
-        testHelper.runUnitTests('build-make/tests/GhoulTest');
-      }
-      cleanWs()
-    } // node('linux')
-  }
-},
-linux_clang_ninja: {
-  if (env.USE_BUILD_OS_LINUX == 'true') {
-    node('linux-clang') {
-      stage('linux-clang-ninja/scm') {
-        deleteDir();
-        gitHelper.checkoutGit(url, branch);
-      }
-      stage('linux-clang-ninja/build') {
-          compileHelper.build(compileHelper.Ninja(), compileHelper.Clang(), '', '', 'build-ninja');
-      }
-      stage('linux-clang-ninja/test') {
-        testHelper.runUnitTests('build-ninja/tests/GhoulTest');
+      stage('linux-clang/test') {
+        sh(script: 'ctest --preset linux', label: 'ctest');
       }
       cleanWs()
-    } // node('linux')
+    } // node('linux-clang')
   }
 },
 windows_msvc: {
@@ -106,28 +85,14 @@ windows_msvc: {
         gitHelper.checkoutGit(url, branch);
       }
       stage('windows-msvc/build') {
-        compileHelper.build(compileHelper.VisualStudio(), compileHelper.VisualStudio(), '', '', 'build-msvc');
-        compileHelper.recordCompileIssues(compileHelper.VisualStudio());
+        bat(
+          script: 'cmake --preset windows && cmake --build --preset windows',
+          label: 'Configure and build (Visual Studio)'
+        );
+        recordIssues(id: 'windows-msvc', tool: msBuild());
       }
-      stage('wiwindows-msvcndows/test') {
-        testHelper.runUnitTests('build-msvc\\tests\\Debug\\GhoulTest')
-      }
-      cleanWs()
-    } // node('windows')
-  }
-},
-windows_ninja: {
-  if (env.USE_BUILD_OS_WINDOWS == 'true') {
-    node('windows') {
-      stage('windows-ninja/scm') {
-        deleteDir();
-        gitHelper.checkoutGit(url, branch);
-      }
-      stage('windows-ninja/build') {
-        compileHelper.build(compileHelper.Ninja(), compileHelper.VisualStudio(), '', '', 'build-ninja');
-      }
-      stage('windows-ninja/test') {
-        testHelper.runUnitTests('build-ninja\\tests\\GhoulTest')
+      stage('windows-msvc/test') {
+        bat(script: 'ctest --preset windows', label: 'ctest');
       }
       cleanWs()
     } // node('windows')
