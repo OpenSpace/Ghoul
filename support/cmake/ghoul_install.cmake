@@ -23,31 +23,62 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.10)
-project(Lua)
+# Install and export rules that make Ghoul consumable through
+# `find_package(ghoul CONFIG REQUIRED)` and `target_link_libraries(... Ghoul::Ghoul)`
 
-set(LUA_ROOT_DIR ${PROJECT_SOURCE_DIR})
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
-# LUA_USE_APICHECK  in full debug modes
+set(GHOUL_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/ghoul")
 
-file(GLOB LUA_SOURCE ${LUA_ROOT_DIR}/src/*.c)
-file(GLOB LUA_HEADER ${LUA_ROOT_DIR}/src/*.h)
-
-list(
-  REMOVE_ITEM LUA_SOURCE
-  "${LUA_ROOT_DIR}/src/lua.c"
-  "${LUA_ROOT_DIR}/src/luac.c"
-  "${LUA_ROOT_DIR}/src/onelua.c"
+install(
+  TARGETS Ghoul
+  EXPORT GhoulTargets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-add_library(Lua STATIC ${LUA_SOURCE})
-target_compile_features(Lua PUBLIC cxx_std_20)
+# Ghoul links compile_settings privately, but a static library keeps its private
+# dependencies in the link interface, so the target has to be part of the export set
+if (TARGET compile_settings)
+  install(TARGETS compile_settings EXPORT GhoulTargets)
+endif ()
 
-if (WIN32)
-  target_compile_definitions(Lua PRIVATE "_CRT_SECURE_NO_WARNINGS")
-  set_target_properties(Lua PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-elseif (UNIX)
-  target_compile_definitions(Lua PRIVATE "LUA_USE_POSIX")
-endif()
+install(
+  DIRECTORY ${GHOUL_ROOT_DIR}/include/ghoul
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
-target_include_directories(Lua PUBLIC "${LUA_ROOT_DIR}/src")
+# ghoul/opengl/renderdoc.h includes this vendored header
+install(
+  FILES ${GHOUL_ROOT_DIR}/ext/renderdoc/renderdoc_app.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(
+  EXPORT GhoulTargets
+  FILE GhoulTargets.cmake
+  NAMESPACE Ghoul::
+  DESTINATION ${GHOUL_INSTALL_CMAKEDIR}
+)
+
+configure_package_config_file(
+  ${GHOUL_ROOT_DIR}/support/cmake/ghoulConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfig.cmake
+  INSTALL_DESTINATION ${GHOUL_INSTALL_CMAKEDIR}
+)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMinorVersion
+)
+
+install(
+  FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/ghoulConfigVersion.cmake
+  DESTINATION ${GHOUL_INSTALL_CMAKEDIR}
+)

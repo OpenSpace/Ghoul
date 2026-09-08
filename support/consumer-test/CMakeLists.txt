@@ -23,14 +23,27 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-set(LZ4_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/lz4")
-add_subdirectory(${LZ4_ROOT_DIR})
+# Minimal stand-in for a third-party project. It consumes Ghoul the same way an external
+# developer would - through the `ghoul` overlay port and `find_package` - and therefore
+# catches breakage in the port, the install rules, and the exported target that building
+# Ghoul in-tree cannot catch.
+#
+# The manifest here depends on the `ghoul` port, which builds and installs Ghoul into
+# vcpkg_installed; configure this project with the vcpkg toolchain and it resolves:
+#   cmake -S support/consumer-test -B build/consumer-test
+#     --toolchain $env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+#     -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
+#   cmake --build build/consumer-test
+#   ctest --test-dir build/consumer-test
 
-set(LZ4_LIBRARIES lz4)
-set(LZ4_INCLUDE_DIR ${LZ4_ROOT_DIR}/include)
+cmake_minimum_required(VERSION 3.25)
+project(GhoulConsumerTest LANGUAGES CXX)
 
+find_package(ghoul CONFIG REQUIRED)
 
-# handle the QUIETLY and REQUIRED arguments and set GTEST_FOUND to TRUE
-# if all listed variables are TRUE
-find_package_handle_standard_args(LZ4  DEFAULT_MSG
-                                  LZ4_LIBRARIES LZ4_INCLUDE_DIR)
+add_executable(GhoulConsumerTest main.cpp)
+target_compile_features(GhoulConsumerTest PRIVATE cxx_std_20)
+target_link_libraries(GhoulConsumerTest PRIVATE Ghoul::Ghoul)
+
+enable_testing()
+add_test(NAME GhoulConsumerTest COMMAND GhoulConsumerTest)

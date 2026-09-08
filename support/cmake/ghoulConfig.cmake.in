@@ -1,0 +1,38 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+set(GHOUL_PROFILING @TRACY_ENABLE@)
+
+find_dependency(assimp CONFIG)
+find_dependency(Freetype)
+find_dependency(glbinding CONFIG)
+find_dependency(glm CONFIG)
+find_dependency(OpenGL)
+find_dependency(scn CONFIG)
+find_dependency(unofficial-lua CONFIG)
+
+# Ghoul is a static library, so its private dependencies are still needed to link a consumer
+find_dependency(lz4 CONFIG)
+find_dependency(tiny-process-library CONFIG)
+
+if (GHOUL_PROFILING)
+  find_dependency(Tracy CONFIG)
+endif ()
+
+# WebSocket++ is header only and ships no CMake package, so the include directory cannot be
+# recorded in the exported target and has to be located again here
+find_path(GHOUL_WEBSOCKETPP_INCLUDE_DIR "websocketpp/version.hpp")
+if (NOT GHOUL_WEBSOCKETPP_INCLUDE_DIR)
+  set(Ghoul_FOUND FALSE)
+  set(Ghoul_NOT_FOUND_MESSAGE "Could not find the WebSocket++ headers required by Ghoul")
+  return ()
+endif ()
+
+include("${CMAKE_CURRENT_LIST_DIR}/GhoulTargets.cmake")
+
+set_property(TARGET Ghoul::Ghoul APPEND PROPERTY
+  INTERFACE_INCLUDE_DIRECTORIES "${GHOUL_WEBSOCKETPP_INCLUDE_DIR}"
+)
+
+check_required_components(Ghoul)

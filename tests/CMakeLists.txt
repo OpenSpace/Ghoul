@@ -25,6 +25,8 @@
 
 include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
 
+find_package(Catch2 3 CONFIG REQUIRED)
+
 add_executable(GhoulTest)
 set_ghoul_compile_settings(GhoulTest)
 target_sources(
@@ -57,8 +59,15 @@ else ()
   target_compile_options(GhoulTest PRIVATE "-O0" )
 endif ()
 
-target_link_libraries(GhoulTest PRIVATE Catch2 Ghoul)
+target_link_libraries(GhoulTest PRIVATE Catch2::Catch2 Ghoul)
 
 target_precompile_headers(GhoulTest PRIVATE
   <catch2/catch_test_macros.hpp>
+)
+
+add_test(NAME GhoulTest COMMAND GhoulTest)
+
+add_test(
+  NAME VcpkgManifestSync
+  COMMAND ${CMAKE_COMMAND} -P ${GHOUL_ROOT_DIR}/support/vcpkg/check-manifest-sync.cmake
 )

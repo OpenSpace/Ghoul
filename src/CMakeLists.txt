@@ -26,8 +26,12 @@
 include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
 
 add_library(Ghoul STATIC)
+add_library(Ghoul::Ghoul ALIAS Ghoul)
 set_ghoul_compile_settings(Ghoul)
-target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(Ghoul PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 
 target_sources(
   Ghoul
@@ -157,119 +161,87 @@ target_sources(
     ghoul.cpp
 )
 
-if (GHOUL_MODULE_ASSIMP)
-  target_sources(
-    Ghoul
-    PRIVATE
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderassimp.h
-      io/model/modelreaderassimp.cpp
-  )
-endif ()
+target_sources(
+  Ghoul
+  PRIVATE
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/model/modelreaderassimp.h
+    io/model/modelreaderassimp.cpp
 
-if (GHOUL_MODULE_COMMANDLINEPARSER)
-  target_sources(
-    Ghoul
-    PRIVATE
-      ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
-      ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlineparser.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.inl
-      ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
-      cmdparser/commandlinecommand.cpp
-      cmdparser/commandlineparser.cpp
-      cmdparser/multiplecommand.cpp
-      cmdparser/singlecommand.cpp
-  )
-endif ()
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlinecommand.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/commandlineparser.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/multiplecommand.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/cmdparser/singlecommand.inl
+    cmdparser/commandlinecommand.cpp
+    cmdparser/commandlineparser.cpp
+    cmdparser/multiplecommand.cpp
+    cmdparser/singlecommand.cpp
 
-if (GHOUL_MODULE_FONTRENDERING)
-  target_sources(
-    Ghoul
-    PRIVATE
-      ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/font/fonterrors.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
-      font/font.cpp
-      font/fonterrors.cpp
-      font/fontmanager.cpp
-      font/fontrenderer.cpp
-  )
-endif ()
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/font.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fonterrors.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontmanager.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/font/fontrenderer.h
+    font/font.cpp
+    font/fonterrors.cpp
+    font/fontmanager.cpp
+    font/fontrenderer.cpp
 
-if (GHOUL_MODULE_LUA)
-  target_sources(
-    Ghoul
-    PRIVATE
-      ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.inl
-      ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_types.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/lua/luastate.h
-      lua/lua_helper.cpp
-      lua/lua_types.cpp
-      lua/luastate.cpp
-  )
-endif ()
+    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/ghoul_lua.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_helper.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/lua_types.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/lua/luastate.h
+    lua/lua_helper.cpp
+    lua/lua_types.cpp
+    lua/luastate.cpp
 
-if (GHOUL_MODULE_OPENGL)
-  target_sources(
-    Ghoul
-    PRIVATE
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.inl
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/debugcontext.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/openglstatecache.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/renderdoc.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/uniformcache.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
-      opengl/debugcontext.cpp
-      opengl/framebufferobject.cpp
-      opengl/openglstatecache.cpp
-      opengl/programobject.cpp
-      opengl/programobjectmanager.cpp
-      opengl/renderdoc.cpp
-      opengl/shaderobject.cpp
-      opengl/shaderpreprocessor.cpp
-      opengl/texture.cpp
-      opengl/textureatlas.cpp
-      opengl/texturemanager.cpp
-      opengl/textureunit.cpp
-      io/texture/texturereader.cpp
-      io/texture/texturewriter.cpp
-  )
-endif ()
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/bufferbinding.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/debugcontext.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/framebufferobject.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/ghoul_gl.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/openglstatecache.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobject.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/programobjectmanager.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/renderdoc.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderobject.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/shaderpreprocessor.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texture.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureatlas.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/texturemanager.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/textureunit.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/opengl/uniformcache.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturereader.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/io/texture/texturewriter.h
+    opengl/debugcontext.cpp
+    opengl/framebufferobject.cpp
+    opengl/openglstatecache.cpp
+    opengl/programobject.cpp
+    opengl/programobjectmanager.cpp
+    opengl/renderdoc.cpp
+    opengl/shaderobject.cpp
+    opengl/shaderpreprocessor.cpp
+    opengl/texture.cpp
+    opengl/textureatlas.cpp
+    opengl/texturemanager.cpp
+    opengl/textureunit.cpp
+    io/texture/texturereader.cpp
+    io/texture/texturewriter.cpp
 
-if (GHOUL_MODULE_SYSTEMCAPABILITIES)
-  target_sources(
-    Ghoul
-    PRIVATE
-      ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/openglcapabilitiescomponent.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.inl
-      ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h
-      ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/version.h
-      systemcapabilities/generalcapabilitiescomponent.cpp
-      systemcapabilities/openglcapabilitiescomponent.cpp
-      systemcapabilities/systemcapabilities.cpp
-      systemcapabilities/systemcapabilitiescomponent.cpp
-      systemcapabilities/version.cpp
-  )
-endif ()
+    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/generalcapabilitiescomponent.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/openglcapabilitiescomponent.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilities.inl
+    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/systemcapabilitiescomponent.h
+    ${PROJECT_SOURCE_DIR}/include/ghoul/systemcapabilities/version.h
+    systemcapabilities/generalcapabilitiescomponent.cpp
+    systemcapabilities/openglcapabilitiescomponent.cpp
+    systemcapabilities/systemcapabilities.cpp
+    systemcapabilities/systemcapabilitiescomponent.cpp
+    systemcapabilities/version.cpp
+)
 
 
 target_precompile_headers(Ghoul PRIVATE
@@ -302,9 +274,89 @@ if (GHOUL_THROW_ON_ASSERT)
   target_compile_definitions(Ghoul PUBLIC "GHL_THROW_ON_ASSERT")
 endif ()
 
+
+##########################################################################################
+# Dependencies
+# Every third-party library comes from vcpkg, see the root vcpkg.json. The only exceptions
+# are stb_image and RenderDoc, which stay vendored under ext/ because they consist of a
+# single translation unit / header that has to be compiled with Ghoul-specific settings.
+##########################################################################################
+
+if (WIN32)
+  target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
+endif ()
+
+if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+  find_library(INOTIFY_LIBRARIES inotify PATHS "/usr/local/lib")
+  target_include_directories(Ghoul SYSTEM PRIVATE "/usr/local/include")
+  target_link_libraries(Ghoul PRIVATE ${INOTIFY_LIBRARIES})
+endif ()
+
+find_package(glm CONFIG REQUIRED)
+find_package(lz4 CONFIG REQUIRED)
+find_package(scn CONFIG REQUIRED)
+find_package(tiny-process-library CONFIG REQUIRED)
+
+target_link_libraries(Ghoul
+  PUBLIC
+    glm::glm
+    scn::scn
+  PRIVATE
+    lz4::lz4
+    tiny-process-library::tiny-process-library
+)
+
+# stb_image: the headers come from vcpkg, but the translation unit that instantiates them
+# is ours as it selects the stb feature macros
+find_path(STB_INCLUDE_DIR "stb_image.h" REQUIRED)
+add_library(stb_image OBJECT ${PROJECT_SOURCE_DIR}/ext/stb_image/stb_image.c)
+target_include_directories(stb_image SYSTEM PRIVATE ${STB_INCLUDE_DIR})
+set_target_properties(stb_image PROPERTIES FOLDER "External")
+target_sources(Ghoul PRIVATE $<TARGET_OBJECTS:stb_image>)
+target_include_directories(Ghoul SYSTEM PRIVATE ${STB_INCLUDE_DIR})
+
+# WebSocket++ is header only and ships no CMake package, so it is located through its
+# include directory
+find_path(WEBSOCKETPP_INCLUDE_DIR "websocketpp/version.hpp" REQUIRED)
+target_include_directories(Ghoul SYSTEM PUBLIC $<BUILD_INTERFACE:${WEBSOCKETPP_INCLUDE_DIR}>)
+
+# RenderDoc is a single vendored header included by the public ghoul/opengl/renderdoc.h
+target_include_directories(
+  Ghoul SYSTEM PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ext/renderdoc>
+)
+
+if (TRACY_ENABLE)
+  find_package(Tracy CONFIG REQUIRED)
+  target_link_libraries(Ghoul PUBLIC Tracy::TracyClient)
+  target_compile_definitions(Ghoul PUBLIC "TRACY_ENABLE")
+endif ()
+
+find_package(OpenGL REQUIRED)
+find_package(glbinding CONFIG REQUIRED)
+target_link_libraries(Ghoul PUBLIC OpenGL::GL glbinding::glbinding glbinding::glbinding-aux)
+
+find_package(unofficial-lua CONFIG REQUIRED)
+if (TARGET unofficial::lua::lua)
+  target_link_libraries(Ghoul PUBLIC unofficial::lua::lua)
+else ()
+  # Lua 5.4.7 exports an unnamespaced target, later versions do not
+  target_link_libraries(Ghoul PUBLIC lua)
+endif ()
+
+find_package(assimp CONFIG REQUIRED)
+target_link_libraries(Ghoul PRIVATE assimp::assimp)
+
+find_package(Freetype REQUIRED)
+target_link_libraries(Ghoul PUBLIC Freetype::Freetype)
+
 # Place files into source_group
 get_target_property(source_files Ghoul SOURCES)
 foreach (file ${source_files})
+  # Skip generator expressions such as the stb_image object files
+  if (file MATCHES "^\\$<")
+    continue ()
+  endif ()
+
   # Remove prefixes from the files
   set(original_file ${file})
   string(REPLACE "${PROJECT_SOURCE_DIR}/src/" "" file ${file})

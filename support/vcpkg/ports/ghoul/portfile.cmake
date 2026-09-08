@@ -3,7 +3,7 @@
 # GHOUL                                                                                  #
 # General Helpful Open Utility Library                                                   #
 #                                                                                        #
-# Copyright (c) 2012-2014                                                                #
+# Copyright (c) 2012-2026                                                                #
 #                                                                                        #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this   #
 # software and associated documentation files (the "Software"), to deal in the Software  #
@@ -23,16 +23,36 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.10)
-project(LZ4)
+# This port lives inside the Ghoul repository and builds the enclosing checkout. When
+# publishing Ghoul to a registry, replace this with vcpkg_from_github(REPO OpenSpace/Ghoul
+# REF <tag> SHA512 <hash>) so that the port is reproducible and content-addressed.
+get_filename_component(SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOLUTE)
 
-if (NOT LZ4_ROOT_DIR)
-    set(LZ4_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-endif ()
+vcpkg_check_features(
+  OUT_FEATURE_OPTIONS FEATURE_OPTIONS
+  FEATURES
+    profiling TRACY_ENABLE
+)
 
-file(GLOB LZ4_SOURCE ${LZ4_ROOT_DIR}/src/*.c ${LZ4_ROOT_DIR}/src/*.cpp)
-file(GLOB LZ4_HEADER ${LZ4_ROOT_DIR}/include/*.h ${LZ4_ROOT_DIR}/include/*.hpp)
+vcpkg_cmake_configure(
+  SOURCE_PATH "${SOURCE_PATH}"
+  OPTIONS
+    ${FEATURE_OPTIONS}
+    # The tests only exercise this checkout and pull in Catch2, which a consumer does not want
+    -DGHOUL_HAVE_TESTS=OFF
+    -DGHOUL_ENABLE_INSTALL=ON
+    # /ZI is a developer convenience that would otherwise be baked into the shipped library
+    -DGHOUL_ENABLE_EDIT_CONTINUE=OFF
+)
 
-add_library(lz4 STATIC ${LZ4_SOURCE})
-set (LZ4_INCLUDE_DIR "${LZ4_ROOT_DIR}/include/lz4")
-include_directories("${LZ4_INCLUDE_DIR}")
+vcpkg_cmake_install()
+vcpkg_cmake_config_fixup(CONFIG_PATH share/ghoul)
+vcpkg_copy_pdbs()
+
+file(REMOVE_RECURSE
+  "${CURRENT_PACKAGES_DIR}/debug/include"
+  "${CURRENT_PACKAGES_DIR}/debug/share"
+)
+
+file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
