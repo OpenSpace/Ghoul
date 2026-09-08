@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ghoul-consumer-test",
+  "version-string": "0.0.1",
+  "description": "Regression project that links against an installed Ghoul",
+  "builtin-baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4",
+  "dependencies": [
+    {
+      "name": "ghoul-deps",
+      "features": [
+        "assimp",
+        "fontrendering",
+        "lua",
+        "opengl"
+      ]
+    }
+  ],
+  "overrides": [
+    {
+      "name": "lua",
+      "version": "5.4.7"
+    }
+  ]
+}

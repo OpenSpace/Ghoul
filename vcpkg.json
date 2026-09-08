@@ -1,0 +1,69 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ghoul",
+  "version-semver": "0.1.0",
+  "description": "General Helpful Open Utility Library",
+  "homepage": "https://github.com/OpenSpace/Ghoul",
+  "license": "MIT",
+  "builtin-baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4",
+  "dependencies": [
+    "glm",
+    "lz4",
+    "scnlib",
+    "stb",
+    "tiny-process-library",
+    "websocketpp"
+  ],
+  "features": {
+    "assimp": {
+      "description": "Model loading through AssImp",
+      "dependencies": [
+        {
+          "name": "assimp",
+          "features": [
+            "draco"
+          ]
+        }
+      ]
+    },
+    "fontrendering": {
+      "description": "Font rendering through FreeType",
+      "dependencies": [
+        {
+          "name": "freetype",
+          "default-features": false
+        }
+      ]
+    },
+    "lua": {
+      "description": "Lua scripting support",
+      "dependencies": [
+        "lua"
+      ]
+    },
+    "opengl": {
+      "description": "OpenGL support through glbinding",
+      "dependencies": [
+        "glbinding"
+      ]
+    },
+    "profiling": {
+      "description": "Profiling support through Tracy",
+      "dependencies": [
+        "tracy"
+      ]
+    },
+    "tests": {
+      "description": "Unit tests",
+      "dependencies": [
+        "catch2"
+      ]
+    }
+  },
+  "overrides": [
+    {
+      "name": "lua",
+      "version": "5.4.7"
+    }
+  ]
+}

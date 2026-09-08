@@ -1,0 +1,67 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ghoul-deps",
+  "version-date": "2026-09-04",
+  "description": [
+    "Meta-port that pulls in every third-party dependency of Ghoul without building Ghoul itself.",
+    "Use this in a superproject (such as OpenSpace) that consumes Ghoul through add_subdirectory and therefore needs Ghoul's dependencies in its own manifest, because vcpkg only reads the manifest of the top-level project.",
+    "The dependency list is kept in sync with the root vcpkg.json of Ghoul by support/vcpkg/check-manifest-sync.cmake.",
+    "Note that `overrides` cannot be expressed in a port, so the superproject manifest must repeat the `overrides` entries from Ghoul's vcpkg.json."
+  ],
+  "homepage": "https://github.com/OpenSpace/Ghoul",
+  "license": "MIT",
+  "dependencies": [
+    "glm",
+    "lz4",
+    "scnlib",
+    "stb",
+    "tiny-process-library",
+    "websocketpp"
+  ],
+  "features": {
+    "assimp": {
+      "description": "Model loading through AssImp",
+      "dependencies": [
+        {
+          "name": "assimp",
+          "features": [
+            "draco"
+          ]
+        }
+      ]
+    },
+    "fontrendering": {
+      "description": "Font rendering through FreeType",
+      "dependencies": [
+        {
+          "name": "freetype",
+          "default-features": false
+        }
+      ]
+    },
+    "lua": {
+      "description": "Lua scripting support",
+      "dependencies": [
+        "lua"
+      ]
+    },
+    "opengl": {
+      "description": "OpenGL support through glbinding",
+      "dependencies": [
+        "glbinding"
+      ]
+    },
+    "profiling": {
+      "description": "Profiling support through Tracy",
+      "dependencies": [
+        "tracy"
+      ]
+    },
+    "tests": {
+      "description": "Unit tests",
+      "dependencies": [
+        "catch2"
+      ]
+    }
+  }
+}

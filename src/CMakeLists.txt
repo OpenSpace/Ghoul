@@ -26,8 +26,14 @@
 include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
 
 add_library(Ghoul STATIC)
+add_library(Ghoul::Ghoul ALIAS Ghoul)
 set_ghoul_compile_settings(Ghoul)
-target_include_directories(Ghoul PUBLIC ${PROJECT_SOURCE_DIR}/include)
+# Keeps the Debug and Release artifacts apart within a single install prefix
+set_target_properties(Ghoul PROPERTIES DEBUG_POSTFIX "d")
+target_include_directories(Ghoul PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 
 target_sources(
   Ghoul

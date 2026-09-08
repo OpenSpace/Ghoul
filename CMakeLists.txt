@@ -24,15 +24,15 @@
 ##########################################################################################
 
 cmake_minimum_required(VERSION 4.0)
-project(Ghoul LANGUAGES C CXX)
 
-# Setting default paths
-set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/support/cmake)
-
-include(${GHOUL_ROOT_DIR}/support/cmake/message_macros.cmake)
-
-begin_header("Configuring Ghoul Project")
+# Ghoul is either built standalone or added to a superproject through add_subdirectory. In
+# the latter case vcpkg ignores this manifest and the superproject has to provide the
+# dependencies itself, which it can do by depending on the `ghoul-deps` port
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(GHOUL_IS_TOP_LEVEL ON)
+else ()
+  set(GHOUL_IS_TOP_LEVEL OFF)
+endif ()
 
 #############################
 # Options
@@ -47,9 +47,44 @@ option(GHOUL_MODULE_FONTRENDERING "Enable Fontrendering" ON)
 option(GHOUL_MODULE_LUA "Enable Lua" ON)
 option(GHOUL_MODULE_OPENGL "Enable OpenGL" ON)
 option(GHOUL_MODULE_SYSTEMCAPABILITIES "Enable System Capabilities" ON)
-option(GHOUL_HAVE_TESTS "Activate the unit tests" ON)
+option(GHOUL_HAVE_TESTS "Activate the unit tests" ${GHOUL_IS_TOP_LEVEL})
+option(GHOUL_ENABLE_INSTALL "Generate the install and export rules for Ghoul" ${GHOUL_IS_TOP_LEVEL})
+option(TRACY_ENABLE "Enable profiling with Tracy" OFF)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries" OFF)
+
+# The options above are translated into vcpkg manifest features, which has to happen before
+# the first project() call so that vcpkg installs the correct set of dependencies
+if (GHOUL_IS_TOP_LEVEL)
+  if (GHOUL_MODULE_ASSIMP)
+    list(APPEND VCPKG_MANIFEST_FEATURES "assimp")
+  endif ()
+  if (GHOUL_MODULE_FONTRENDERING)
+    list(APPEND VCPKG_MANIFEST_FEATURES "fontrendering")
+  endif ()
+  if (GHOUL_MODULE_LUA)
+    list(APPEND VCPKG_MANIFEST_FEATURES "lua")
+  endif ()
+  if (GHOUL_MODULE_OPENGL)
+    list(APPEND VCPKG_MANIFEST_FEATURES "opengl")
+  endif ()
+  if (TRACY_ENABLE)
+    list(APPEND VCPKG_MANIFEST_FEATURES "profiling")
+  endif ()
+  if (GHOUL_HAVE_TESTS)
+    list(APPEND VCPKG_MANIFEST_FEATURES "tests")
+  endif ()
+endif ()
+
+project(Ghoul VERSION 0.1.0 LANGUAGES C CXX)
+
+# Setting default paths
+set(GHOUL_ROOT_DIR ${PROJECT_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GHOUL_ROOT_DIR}/support/cmake)
+
+include(${GHOUL_ROOT_DIR}/support/cmake/message_macros.cmake)
+
+begin_header("Configuring Ghoul Project")
 
 if (WIN32)
   option(GHOUL_ENABLE_EDIT_CONTINUE "Enable Edit&Continue" ON)
@@ -64,9 +99,14 @@ endif ()
 add_subdirectory(src)
 add_subdirectory(ext SYSTEM)
 
+if (GHOUL_ENABLE_INSTALL)
+  include(${GHOUL_ROOT_DIR}/support/cmake/ghoul_install.cmake)
+endif ()
+
 # Other applications
 if (GHOUL_HAVE_TESTS)
   begin_header("Generating unit test")
+  enable_testing()
   add_subdirectory(tests)
   end_header()
 endif ()

@@ -23,6 +23,10 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
+# All third-party dependencies are provided by vcpkg, see the root vcpkg.json. The only
+# exceptions are stb and RenderDoc, which stay vendored because they consist of a single
+# translation unit that has to be compiled with Ghoul-specific settings.
+
 # System Libraries
 if (WIN32)
   target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
@@ -38,304 +42,105 @@ endif ()
 
 # GLM
 begin_dependency("GLM")
-set(GLM_ROOT_DIR "${GHOUL_ROOT_DIR}/ext/glm")
-find_package(GLM REQUIRED)
-message(STATUS "Including GLM found at ${GLM_INCLUDE_DIRS}")
-target_include_directories(Ghoul SYSTEM PUBLIC ${GLM_INCLUDE_DIRS})
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(Ghoul PUBLIC glm::glm)
 end_dependency("GLM")
-
-if (GHOUL_HAVE_TESTS)
-  add_subdirectory(catch2)
-  # Catch2 by default compiles with C++14, which leads to some linker errors:
-  # https://github.com/catchorg/Catch2/issues/2046
-  target_compile_features(Catch2 PUBLIC cxx_std_20)
-  target_compile_features(Catch2WithMain PUBLIC cxx_std_20)
-  set_target_properties(Catch2 PROPERTIES FOLDER External)
-  set_target_properties(Catch2WithMain PROPERTIES FOLDER External)
-endif()
-
-if (GHOUL_MODULE_OPENGL)
-  begin_module("OpenGL")
-
-  # OpenGL
-  begin_dependency("OpenGL")
-  find_package(OpenGL REQUIRED)
-  target_link_libraries(Ghoul PUBLIC ${OPENGL_LIBRARIES})
-  message(STATUS "Linking OpenGL found at ${OPENGL_LIBRARIES}")
-  end_dependency("OpenGL")
-
-  # glbindings
-  if (NOT TARGET glbinding)
-    begin_dependency("glbinding")
-
-    set(OPTION_BUILD_GPU_TESTS OFF CACHE BOOL "")
-    set(OPTION_BUILD_TESTS OFF CACHE BOOL "")
-    set(OPTION_BUILD_TOOLS OFF CACHE BOOL "")
-    set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "")
-    add_subdirectory(${GHOUL_ROOT_DIR}/ext/glbinding)
-    target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
-
-    if (MSVC)
-      target_compile_options(glbinding PRIVATE "/W0")
-      target_compile_options(glbinding-aux PRIVATE "/W0")
-    else ()
-      target_compile_options(glbinding PRIVATE "-w")
-      target_compile_options(glbinding-aux PRIVATE "-w")
-    endif ()
-
-    set_target_properties(glbinding PROPERTIES FOLDER "External")
-    set_target_properties(glbinding-aux PROPERTIES FOLDER "External/glbinding-ext")
-    set_target_properties(pack PROPERTIES FOLDER "External/glbinding-ext")
-    set_target_properties(pack-glbinding PROPERTIES FOLDER "External/glbinding-ext")
-    set_target_properties(KHRplatform-sources PROPERTIES FOLDER "External/glbinding-ext")
-
-    end_dependency("glbinding")
-  endif ()
-  end_module("OpenGL")
-endif ()
 
 # LZ4
 begin_dependency("LZ4")
-find_package(LZ4 REQUIRED)
-target_include_directories(Ghoul PRIVATE ${LZ4_INCLUDE_DIR})
-target_link_libraries(Ghoul PRIVATE ${LZ4_LIBRARIES})
-set_target_properties(lz4 PROPERTIES FOLDER "External")
+find_package(lz4 CONFIG REQUIRED)
+target_link_libraries(Ghoul PRIVATE lz4::lz4)
 end_dependency("LZ4")
+
+# scnlib
+begin_dependency("scnlib")
+find_package(scn CONFIG REQUIRED)
+target_link_libraries(Ghoul PUBLIC scn::scn)
+end_dependency("scnlib")
+
+# stb_image
+# The headers come from vcpkg, but the translation unit instantiating them is ours as it
+# selects the stb feature macros
+begin_dependency("stb_image")
+find_path(STB_INCLUDE_DIR "stb_image.h" REQUIRED)
+add_subdirectory(stb_image)
+target_sources(Ghoul PRIVATE $<TARGET_OBJECTS:stb_image>)
+target_include_directories(Ghoul SYSTEM PRIVATE ${STB_INCLUDE_DIR})
+set_target_properties(stb_image PROPERTIES FOLDER "External")
+end_dependency("stb_image")
+
+# WebSocket++ / WebSocketPP
+# Header only and without a CMake package, so it is located through its include directory
+begin_dependency("WebSocketPP")
+find_path(WEBSOCKETPP_INCLUDE_DIR "websocketpp/version.hpp" REQUIRED)
+target_include_directories(Ghoul SYSTEM PUBLIC $<BUILD_INTERFACE:${WEBSOCKETPP_INCLUDE_DIR}>)
+end_dependency("WebSocketPP")
+
+# Tiny process library
+begin_dependency("tiny-process-library")
+find_package(tiny-process-library CONFIG REQUIRED)
+target_link_libraries(Ghoul PRIVATE tiny-process-library::tiny-process-library)
+end_dependency("tiny-process-library")
+
+# RenderDoc
+# A single vendored header that is included by the public ghoul/opengl/renderdoc.h
+begin_dependency("RenderDoc")
+target_include_directories(
+  Ghoul SYSTEM PUBLIC $<BUILD_INTERFACE:${GHOUL_ROOT_DIR}/ext/renderdoc>
+)
+end_dependency("RenderDoc")
+
+# Tracy
+if (TRACY_ENABLE)
+  begin_dependency("Tracy")
+  find_package(Tracy CONFIG REQUIRED)
+  target_link_libraries(Ghoul PUBLIC Tracy::TracyClient)
+  target_compile_definitions(Ghoul PUBLIC "TRACY_ENABLE")
+  end_dependency("Tracy")
+endif ()
+
+# OpenGL
+if (GHOUL_MODULE_OPENGL)
+  begin_module("OpenGL")
+
+  begin_dependency("OpenGL")
+  find_package(OpenGL REQUIRED)
+  target_link_libraries(Ghoul PUBLIC OpenGL::GL)
+  end_dependency("OpenGL")
+
+  begin_dependency("glbinding")
+  find_package(glbinding CONFIG REQUIRED)
+  target_link_libraries(Ghoul PUBLIC glbinding::glbinding glbinding::glbinding-aux)
+  end_dependency("glbinding")
+
+  end_module("OpenGL")
+endif ()
 
 # Lua
 if (GHOUL_MODULE_LUA)
   begin_module("Lua")
-  add_subdirectory(lua)
-  target_link_libraries(Ghoul PUBLIC Lua)
-  set_target_properties(Lua PROPERTIES FOLDER "External")
-
-  if (MSVC)
-    target_compile_options(Lua PRIVATE "/W0")
-    target_compile_definitions(Lua PRIVATE "_SCL_SECURE_NO_WARNINGS")
+  find_package(unofficial-lua CONFIG REQUIRED)
+  if (TARGET unofficial::lua::lua)
+    target_link_libraries(Ghoul PUBLIC unofficial::lua::lua)
   else ()
-    target_compile_options(Lua PRIVATE "-w")
+    # Lua 5.4.7 exports an unnamespaced target, later versions do not
+    target_link_libraries(Ghoul PUBLIC lua)
   endif ()
-
   end_module("Lua")
 endif ()
 
 # Assimp
 if (GHOUL_MODULE_ASSIMP)
   begin_module("AssImp")
-  set(ASSIMP_BUILD_SHARED_LIBS OFF)
-  set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
-  set(ASSIMP_NO_EXPORTER ON CACHE BOOL "")
-  set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
-  set(ASSIMP_BUILD_DRACO ON CACHE BOOL "")
-  set(ASSIMP_BUILD_DRACO_STATIC ON CACHE BOOL "")
-
-  if (UNIX)
-    set(ASSIMP_BUILD_MINIZIP ON CACHE BOOL "Set to have assimp build minizip" FORCE)
-  endif ()
-
-  set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
-
-  add_subdirectory(assimp)
-  target_link_libraries(Ghoul PRIVATE assimp)
-  set_target_properties(assimp PROPERTIES FOLDER "External")
-
-  # We need to include this to be able to find the assimp/config.h file
-  target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ext/assimp/include")
-  # We need to include this to be able to find the draco_features.h
-  target_include_directories(assimp PRIVATE "${CMAKE_BINARY_DIR}")
-
-  target_precompile_headers(assimp PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:functional>"
-    "$<$<COMPILE_LANGUAGE:CXX>:istream>"
-    "$<$<COMPILE_LANGUAGE:CXX>:list>"
-    "$<$<COMPILE_LANGUAGE:CXX>:locale>"
-    "$<$<COMPILE_LANGUAGE:CXX>:map>"
-    "$<$<COMPILE_LANGUAGE:CXX>:ostream>"
-    "$<$<COMPILE_LANGUAGE:CXX>:set>"
-    "$<$<COMPILE_LANGUAGE:CXX>:sstream>"
-    "$<$<COMPILE_LANGUAGE:CXX>:vector>"
-    "$<$<COMPILE_LANGUAGE:CXX>:tuple>"
-    "$<$<COMPILE_LANGUAGE:CXX>:unordered_map>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/DefaultLogger.hpp>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/Exceptional.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/mesh.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/scene.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/StringUtils.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/types.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:assimp/XmlParser.h>"
-    <string.h>
-  )
-
-  if (MSVC)
-    target_compile_options(assimp PRIVATE "/W0")
-  else ()
-    target_compile_options(assimp PRIVATE "-w")
-  endif ()
-
-  set_target_properties(uninstall PROPERTIES FOLDER "External")
-  if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
-    set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "External")
-  endif ()
-  if (TARGET draco)
-    set_target_properties(draco PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_animation)
-    set_target_properties(draco_animation PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_animation_dec)
-    set_target_properties(draco_animation_dec PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_animation_enc)
-    set_target_properties(draco_animation_enc PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_attributes)
-    set_target_properties(draco_attributes PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_attributes_dec)
-    set_target_properties(draco_compression_attributes_dec PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_attributes_enc)
-    set_target_properties(draco_compression_attributes_enc PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_attributes_pred_schemes_enc)
-    set_target_properties(draco_compression_attributes_pred_schemes_enc PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_bit_coders)
-    set_target_properties(draco_compression_bit_coders PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_decode)
-    set_target_properties(draco_compression_decode PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_encode)
-    set_target_properties(draco_compression_encode PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_entropy)
-    set_target_properties(draco_compression_entropy PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_mesh_dec)
-    set_target_properties(draco_compression_mesh_dec PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_mesh_enc)
-    set_target_properties(draco_compression_mesh_enc PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_options)
-    set_target_properties(draco_compression_options PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_point_cloud_dec)
-    set_target_properties(draco_compression_point_cloud_dec PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_compression_point_cloud_enc)
-    set_target_properties(draco_compression_point_cloud_enc PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_core)
-    set_target_properties(draco_core PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_io)
-    set_target_properties(draco_io PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_mesh)
-    set_target_properties(draco_mesh PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_metadata)
-    set_target_properties(draco_metadata PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_metadata_dec)
-    set_target_properties(draco_metadata_dec PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_metadata_enc)
-    set_target_properties(draco_metadata_enc PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_point_cloud)
-    set_target_properties(draco_point_cloud PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_points_dec)
-    set_target_properties(draco_points_dec PROPERTIES FOLDER "External/draco")
-  endif ()
-  if (TARGET draco_points_enc)
-    set_target_properties(draco_points_enc PROPERTIES FOLDER "External/draco")
-  endif ()
-
+  find_package(assimp CONFIG REQUIRED)
+  target_link_libraries(Ghoul PRIVATE assimp::assimp)
   end_module("AssImp")
 endif ()
-
-# scnlib
-begin_dependency("scnlib")
-add_subdirectory(scnlib SYSTEM)
-target_link_libraries(Ghoul PUBLIC scn)
-set_target_properties(scn PROPERTIES FOLDER "External")
-end_dependency("scnlib")
-
-# stb_image
-begin_dependency("stb_image")
-add_subdirectory(stb_image)
-target_link_libraries(Ghoul PUBLIC stb_image)
-set_target_properties(stb_image PROPERTIES FOLDER "External")
-end_dependency("stb_image")
-
-# WebSocket++ / WebSocketPP
-begin_dependency("WebSocketPP")
-include(ExternalProject)
-set(WEBSOCKETPP_ROOT_DIR ${GHOUL_ROOT_DIR}/ext/websocketpp)
-ExternalProject_Add(websocketpp
-  SOURCE_DIR ${WEBSOCKETPP_ROOT_DIR}
-  CMAKE_GENERATOR "${CMAKE_GENERATOR}"
-  CMAKE_ARGS ${EXTERNAL_TOOLCHAIN} ${EXTRA_EXTERNAL_ARGS} -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
-  INSTALL_COMMAND ""
-  LOG_CONFIGURE 1
-  LOG_BUILD 1
-  STEP_TARGETS configure build
-)
-add_dependencies(Ghoul websocketpp)
-target_include_directories(Ghoul SYSTEM PUBLIC ${WEBSOCKETPP_ROOT_DIR})
-set_target_properties(websocketpp PROPERTIES FOLDER "External")
-set_target_properties(websocketpp-build PROPERTIES FOLDER "External")
-set_target_properties(websocketpp-configure PROPERTIES FOLDER "External")
-end_dependency("WebSocketPP")
 
 # Freetype
 if (GHOUL_MODULE_FONTRENDERING)
   begin_module("FontRendering")
-  set(FREETYPE_DIST OFF CACHE BOOL "")
-  add_subdirectory(freetype2)
-  target_link_libraries(Ghoul PUBLIC freetype)
-
-  if (MSVC)
-    target_compile_options(freetype PRIVATE "/W0")
-    target_compile_definitions(freetype PRIVATE "_SCL_SECURE_NO_WARNINGS")
-  else ()
-    target_compile_options(freetype PRIVATE "-w")
-  endif ()
-
-  set_target_properties(freetype PROPERTIES FOLDER "External")
-
-  if (TARGET zlib)
-    set_target_properties(zlib PROPERTIES FOLDER "External")
-  endif ()
+  find_package(Freetype REQUIRED)
+  target_link_libraries(Ghoul PUBLIC Freetype::Freetype)
   end_module("FontRendering")
 endif ()
-
-# Tiny process library
-begin_dependency("tiny-process-library")
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-add_subdirectory(tiny-process-library)
-target_link_libraries(Ghoul PRIVATE tiny-process-library)
-set_target_properties(tiny-process-library PROPERTIES FOLDER "External")
-end_dependency("tiny-process-library")
-
-
-# Tracy
-begin_dependency("Tracy")
-if (NOT TARGET TracyClient)
-  option(TRACY_ENABLE "Enable profiling" OFF)
-  option(TRACY_NO_FRAME_IMAGE "Disable the frame image support and its thread" ON)
-  add_subdirectory(tracy)
-  set_target_properties(TracyClient PROPERTIES FOLDER "External")
-endif ()
-target_link_libraries(Ghoul PUBLIC TracyClient)
-end_dependency("Tracy")
-
-# RenderDoc
-begin_dependency("RenderDoc")
-add_subdirectory(renderdoc)
-target_link_libraries(Ghoul PUBLIC renderdoc)
-end_dependency("RenderDoc")

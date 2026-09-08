@@ -23,51 +23,32 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-include(${GHOUL_ROOT_DIR}/support/cmake/set_ghoul_compile_settings.cmake)
+# Minimal stand-in for a third-party project. It consumes an *installed* Ghoul the same way
+# an external developer would and therefore catches breakage in the install and export
+# rules that building Ghoul in-tree cannot catch.
+#
+# Install Ghoul in every configuration you want to consume, then configure this project
+# against that prefix:
+#   cmake --build build/windows --config Debug
+#   cmake --install build/windows --config Debug
+#   cmake -S support/consumer-test -B build/consumer-test
+#     --toolchain $env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+#     -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
+#     -DCMAKE_CONFIGURATION_TYPES="Debug;Release"
+#     -DCMAKE_PREFIX_PATH=<ghoul-install-prefix>
+#
+# CMAKE_CONFIGURATION_TYPES has to be restricted to the configurations that were actually
+# installed, because a multi-config generator otherwise asks the imported target for
+# MinSizeRel and RelWithDebInfo as well.
 
-find_package(Catch2 3 CONFIG REQUIRED)
+cmake_minimum_required(VERSION 3.25)
+project(GhoulConsumerTest LANGUAGES CXX)
 
-add_executable(GhoulTest)
-set_ghoul_compile_settings(GhoulTest)
-target_sources(
-  GhoulTest
-  PRIVATE
-    ${GHOUL_ROOT_DIR}/tests/main.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_commandlineparser.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_crc32.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_csvreader.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_dictionary.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_dictionaryjsonformatter.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_dictionaryluaformatter.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_filesystem.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_luaconversions.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_luatodictionary.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_memorypool.cpp
-    ${GHOUL_ROOT_DIR}/tests/test_templatefactory.cpp
-)
+find_package(Ghoul CONFIG REQUIRED)
 
-target_compile_definitions(GhoulTest PRIVATE
-  # Jenkins shouldn't ask for asserts when they happen, but just throw
-  "GHL_THROW_ON_ASSERT"
-  "GHOUL_HAVE_TESTS"
-  "GHOUL_ROOT_DIR=\"${GHOUL_ROOT_DIR}\""
-)
+add_executable(GhoulConsumerTest main.cpp)
+target_compile_features(GhoulConsumerTest PRIVATE cxx_std_20)
+target_link_libraries(GhoulConsumerTest PRIVATE Ghoul::Ghoul)
 
-if (MSVC)
-  target_compile_options(GhoulTest PRIVATE "-Od" "/bigobj")
-else ()
-  target_compile_options(GhoulTest PRIVATE "-O0" )
-endif ()
-
-target_link_libraries(GhoulTest PRIVATE Catch2::Catch2 Ghoul)
-
-target_precompile_headers(GhoulTest PRIVATE
-  <catch2/catch_test_macros.hpp>
-)
-
-add_test(NAME GhoulTest COMMAND GhoulTest)
-
-add_test(
-  NAME VcpkgManifestSync
-  COMMAND ${CMAKE_COMMAND} -P ${GHOUL_ROOT_DIR}/support/vcpkg/check-manifest-sync.cmake
-)
+enable_testing()
+add_test(NAME GhoulConsumerTest COMMAND GhoulConsumerTest)
