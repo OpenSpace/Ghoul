@@ -28,20 +28,11 @@
 # REF <tag> SHA512 <hash>) so that the port is reproducible and content-addressed.
 get_filename_component(SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOLUTE)
 
-vcpkg_check_features(
-  OUT_FEATURE_OPTIONS FEATURE_OPTIONS
-  FEATURES
-    profiling TRACY_ENABLE
-)
-
 vcpkg_cmake_configure(
   SOURCE_PATH "${SOURCE_PATH}"
   OPTIONS
-    ${FEATURE_OPTIONS}
-    # The tests only exercise this checkout and pull in Catch2, which a consumer does not want
     -DGHOUL_HAVE_TESTS=OFF
     -DGHOUL_ENABLE_INSTALL=ON
-    # /ZI is a developer convenience that would otherwise be baked into the shipped library
     -DGHOUL_ENABLE_EDIT_CONTINUE=OFF
 )
 

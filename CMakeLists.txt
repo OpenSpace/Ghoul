@@ -25,14 +25,6 @@
 
 cmake_minimum_required(VERSION 4.0)
 
-# The options gating optional dependencies have to be declared before the first project()
-# call: that is when vcpkg's toolchain file runs and reads VCPKG_MANIFEST_FEATURES.
-#
-# vcpkg only reads VCPKG_MANIFEST_FEATURES on the configure that first creates the build
-# directory. Changing any of the options below afterwards will not add or remove the
-# corresponding dependency: delete build/<preset>/vcpkg_installed (or the whole build
-# directory) and configure again.
-
 #############################
 # Options
 #############################
@@ -54,14 +46,6 @@ else ()
 endif ()
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries" OFF)
-
-# The optional switches above are translated into vcpkg manifest features
-if (TRACY_ENABLE)
-  list(APPEND VCPKG_MANIFEST_FEATURES "profiling")
-endif ()
-if (GHOUL_HAVE_TESTS)
-  list(APPEND VCPKG_MANIFEST_FEATURES "tests")
-endif ()
 
 project(Ghoul VERSION 0.1.0 LANGUAGES C CXX)
 

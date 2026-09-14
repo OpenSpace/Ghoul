@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "ghoul",
-  "version": "0.1.0",
+  "version": "0.27.0",
   "description": [
     "General Helpful Open Utility Library.",
-    "This manifest is used when building Ghoul standalone from this checkout. The port under support/vcpkg/ports/ghoul declares the same runtime dependencies for consumers; support/vcpkg/check-manifest-sync.cmake verifies that the two lists stay in sync. The intentional differences are the tests feature (Catch2), which the port never builds, and the vcpkg-cmake host tools, which the port needs explicitly.",
+    "This manifest is used when building Ghoul standalone from this checkout. The port under support/vcpkg/ports/ghoul declares the same runtime dependencies for consumers; support/vcpkg/check-manifest-sync.cmake verifies that the two lists stay in sync.",
     "Ghoul's overrides (lua 5.4.7) cannot be expressed by a port, so a superproject that consumes the port has to repeat them in its own manifest."
   ],
   "homepage": "https://github.com/OpenSpace/Ghoul",
@@ -26,6 +26,7 @@
         "draco"
       ]
     },
+    "catch2",
     {
       "name": "freetype",
       "default-features": false
@@ -37,26 +38,7 @@
     "scnlib",
     "stb",
     "tiny-process-library",
+    "tracy",
     "websocketpp"
-  ],
-  "features": {
-    "profiling": {
-      "description": "Profiling support through Tracy",
-      "dependencies": [
-        "tracy"
-      ]
-    },
-    "tests": {
-      "description": "Unit tests",
-      "dependencies": [
-        "catch2"
-      ]
-    }
-  },
-  "overrides": [
-    {
-      "name": "lua",
-      "version": "5.4.7"
-    }
   ]
 }

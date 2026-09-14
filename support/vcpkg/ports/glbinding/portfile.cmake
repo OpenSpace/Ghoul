@@ -4,11 +4,20 @@ vcpkg_from_git(
     REF c8a66c92e8a81d82e384a4c80207913519c1f17e # v3.5.0
 )
 
+# Upstream's non-system-install path hardcodes INSTALL_BIN to "." instead of "bin", so the
+# DLLs built for a dynamic triplet land next to the package root instead of <prefix>/bin
+# (and debug/bin), where vcpkg and consumers expect runtime binaries to be.
+vcpkg_replace_string(
+    "${SOURCE_PATH}/CMakeLists.txt"
+    "set\\(INSTALL_BIN[ \t]+\"\\.\"\\)"
+    "set(INSTALL_BIN \"bin\")"
+    REGEX
+)
+
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         -DOPTION_BUILD_TESTS=OFF
-        -DOPTION_BUILD_GPU_TESTS=OFF
         -DOPTION_BUILD_TOOLS=OFF
         -DOPTION_BUILD_EXAMPLES=OFF
         -DOPTION_BUILD_DOCS=OFF
@@ -42,6 +51,10 @@ foreach(FRAGMENT IN LISTS GLBINDING_DEBUG_FRAGMENTS)
     set(RELOCATED "${GLBINDING_SHARE}/cmake/${MODULE_NAME}/${FRAGMENT_NAME}")
     file(RENAME "${FRAGMENT}" "${RELOCATED}")
     vcpkg_replace_string("${RELOCATED}" [[${_IMPORT_PREFIX}/lib/]] [[${_IMPORT_PREFIX}/debug/lib/]])
+    # For a dynamic triplet the fragment also carries an IMPORTED_LOCATION_DEBUG pointing at
+    # the DLL under bin/, which vcpkg installs to debug/bin/ alongside the debug import lib.
+    # Static triplets have no such reference, hence IGNORE_UNCHANGED.
+    vcpkg_replace_string("${RELOCATED}" [[${_IMPORT_PREFIX}/bin/]] [[${_IMPORT_PREFIX}/debug/bin/]] IGNORE_UNCHANGED)
 endforeach()
 
 # Moving the export files two directories deeper invalidates the prefix they compute from
