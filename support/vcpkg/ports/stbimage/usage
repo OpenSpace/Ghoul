@@ -8,4 +8,4 @@ stbimage provides two CMake targets:
 
     # The final executable that actually needs the compiled symbols to resolve
     # links the implementation once:
-    target_link_libraries(myexe PRIVATE unofficial::stbimage::impl)
+    target_link_libraries(myexe PRIVATE unofficial::stbimage::stbimage-impl)
