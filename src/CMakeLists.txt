@@ -277,7 +277,7 @@ endif ()
 
 
 if (WIN32)
-  target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
+  target_link_libraries(Ghoul PUBLIC "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
 endif ()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
