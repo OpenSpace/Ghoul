@@ -25,8 +25,8 @@ endif ()
 # recorded in the exported target and has to be located again here
 find_path(GHOUL_WEBSOCKETPP_INCLUDE_DIR "websocketpp/version.hpp")
 if (NOT GHOUL_WEBSOCKETPP_INCLUDE_DIR)
-  set(Ghoul_FOUND FALSE)
-  set(Ghoul_NOT_FOUND_MESSAGE "Could not find the WebSocket++ headers required by Ghoul")
+  set(ghoul_FOUND FALSE)
+  set(ghoul_NOT_FOUND_MESSAGE "Could not find the WebSocket++ headers required by Ghoul")
   return ()
 endif ()
 
@@ -36,4 +36,4 @@ set_property(TARGET Ghoul::Ghoul APPEND PROPERTY
   INTERFACE_INCLUDE_DIRECTORIES "${GHOUL_WEBSOCKETPP_INCLUDE_DIR}"
 )
 
-check_required_components(Ghoul)
+check_required_components(ghoul)
