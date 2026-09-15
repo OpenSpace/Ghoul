@@ -27,7 +27,7 @@
     "lua",
     "lz4",
     "scnlib",
-    "stb",
+    "stbimage",
     "tiny-process-library",
     "tracy",
     "websocketpp",

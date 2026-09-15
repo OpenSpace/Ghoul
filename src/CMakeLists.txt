@@ -275,12 +275,6 @@ if (GHOUL_THROW_ON_ASSERT)
 endif ()
 
 
-##########################################################################################
-# Dependencies
-# Every third-party library comes from vcpkg, see the root vcpkg.json. The only exceptions
-# are stb_image and RenderDoc, which stay vendored under ext/ because they consist of a
-# single translation unit / header that has to be compiled with Ghoul-specific settings.
-##########################################################################################
 
 if (WIN32)
   target_link_libraries(Ghoul PRIVATE "shlwapi" "WbemUuid.lib" "Ws2_32.lib")
@@ -306,14 +300,12 @@ target_link_libraries(Ghoul
     tiny-process-library::tiny-process-library
 )
 
-# stb_image: the headers come from vcpkg, but the translation unit that instantiates them
-# is ours as it selects the stb feature macros
-find_path(STB_INCLUDE_DIR "stb_image.h" REQUIRED)
-add_library(stb_image OBJECT ${PROJECT_SOURCE_DIR}/ext/stb_image/stb_image.c)
-target_include_directories(stb_image SYSTEM PRIVATE ${STB_INCLUDE_DIR})
-set_target_properties(stb_image PROPERTIES FOLDER "External")
-target_sources(Ghoul PRIVATE $<TARGET_OBJECTS:stb_image>)
-target_include_directories(Ghoul SYSTEM PRIVATE ${STB_INCLUDE_DIR})
+
+# stb_image/stb_image_write: Ghoul only calls stbi_* functions, so it links the
+# declarations-only target; the compiled implementation is linked once by whichever
+# executable produces the final link (see support/vcpkg/ports/stbimage/vcpkg.json).
+find_package(stbimage CONFIG REQUIRED)
+target_link_libraries(Ghoul PRIVATE unofficial::stbimage::stbimage)
 
 # WebSocket++ is header only and ships no CMake package, so it is located through its
 # include directory

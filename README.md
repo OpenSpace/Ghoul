@@ -11,14 +11,20 @@ only prerequisites are a C++ compiler, CMake 4.0 or newer, and a vcpkg checkout.
 dependencies are declared in `vcpkg.json`; the embedded `vcpkg-configuration` block pins
 the registry baseline and registers the overlay ports under `support/vcpkg/ports`.
 
-Three dependencies are built from those overlay ports: `websocketpp` and
+Four dependencies are built from the `support/vcpkg/ports` overlay: `websocketpp` and
 `tiny-process-library` track the OpenSpace forks, and `glbinding` pins 3.5.0 because the
-version in the vcpkg registry declares `glClampColor` with the wrong parameter type. All
-dependencies are always built; the only optional one is Tracy, gated behind `TRACY_ENABLE`
-and the `profiling` manifest feature.
+version in the vcpkg registry declares `glClampColor` with the wrong parameter type.
+`stbimage` compiles the stb_image/stb_image_write implementation that Ghoul and SGCT
+share; it lives in its own repository (https://github.com/sgct/stbimage), and this port
+fetches the pinned commit directly from GitHub via `vcpkg_from_github`. It exports a
+declarations-only `unofficial::stbimage::stbimage` target that Ghoul links (it only calls
+`stbi_*` functions), and a compiled `unofficial::stbimage::impl` target meant to be
+linked once by whichever executable produces the final link. All dependencies are
+always built; the only optional one is Tracy, gated behind `TRACY_ENABLE` and the
+`profiling` manifest feature.
 
-`stb` and RenderDoc stay vendored under `ext/`, because each is a single translation unit
-or header that has to be compiled with Ghoul-specific settings.
+RenderDoc stays vendored under `ext/`, because it consists of a single header that has to
+be compiled with Ghoul-specific settings.
 
 ## Building standalone
 
