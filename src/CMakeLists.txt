@@ -301,11 +301,14 @@ target_link_libraries(Ghoul
 )
 
 
-# stb_image/stb_image_write: Ghoul only calls stbi_* functions, so it links the
-# declarations-only target; the compiled implementation is linked once by whichever
-# executable produces the final link (see support/vcpkg/ports/stbimage/vcpkg.json).
+# stb_image/stb_image_write: Ghoul only calls stbi_* functions, so it only needs the
+# declarations-only target itself. The compiled *write* implementation is linked PUBLIC so
+# it propagates as a proper CMake dependency edge to whatever executable finally links
 find_package(stbimage CONFIG REQUIRED)
-target_link_libraries(Ghoul PRIVATE unofficial::stbimage::stbimage)
+target_link_libraries(Ghoul
+  PRIVATE unofficial::stbimage::stbimage
+  PUBLIC unofficial::stbimage::stbimage-write-impl
+)
 
 # WebSocket++ is header only and ships no CMake package, so it is located through its
 # include directory

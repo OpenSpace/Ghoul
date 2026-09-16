@@ -2,6 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "ghoul",
   "version": "0.1.0",
+  "port-version": 1,
   "description": [
     "General Helpful Open Utility Library.",
     "This port lives inside the Ghoul repository and builds the enclosing checkout. When publishing Ghoul to a registry, replace the path-based source in the portfile with vcpkg_from_github(REPO OpenSpace/Ghoul REF <tag> SHA512 <hash>).",
