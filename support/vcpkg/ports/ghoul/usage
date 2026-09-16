@@ -1,0 +1,4 @@
+ghoul provides CMake targets:
+
+  find_package(ghoul CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE Ghoul::Ghoul)

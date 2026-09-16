@@ -1,0 +1,43 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ghoul",
+  "version": "0.27.0",
+  "description": [
+    "General Helpful Open Utility Library.",
+    "This manifest is used when building Ghoul standalone from this checkout."
+  ],
+  "homepage": "https://github.com/OpenSpace/Ghoul",
+  "license": "MIT",
+  "supports": "!(osx | uwp | android)",
+  "vcpkg-configuration": {
+    "default-registry": {
+      "kind": "builtin",
+      "baseline": "04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4"
+    },
+    "overlay-ports": [
+      "./support/vcpkg/ports"
+    ]
+  },
+  "dependencies": [
+    {
+      "name": "assimp",
+      "features": [
+        "draco"
+      ]
+    },
+    "catch2",
+    {
+      "name": "freetype",
+      "default-features": false
+    },
+    "glbinding",
+    "glm",
+    "lua",
+    "lz4",
+    "scnlib",
+    "stbimage",
+    "tiny-process-library",
+    "tracy",
+    "websocketpp"
+  ]
+}
