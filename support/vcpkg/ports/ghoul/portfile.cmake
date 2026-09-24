@@ -23,31 +23,27 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                          #
 ##########################################################################################
 
-cmake_minimum_required(VERSION 3.10)
-project(Lua)
+# This port lives inside the Ghoul repository and builds the enclosing checkout. When
+# publishing Ghoul to a registry, replace this with vcpkg_from_github(REPO OpenSpace/Ghoul
+# REF <tag> SHA512 <hash>) so that the port is reproducible and content-addressed.
+get_filename_component(SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOLUTE)
 
-set(LUA_ROOT_DIR ${PROJECT_SOURCE_DIR})
-
-# LUA_USE_APICHECK  in full debug modes
-
-file(GLOB LUA_SOURCE ${LUA_ROOT_DIR}/src/*.c)
-file(GLOB LUA_HEADER ${LUA_ROOT_DIR}/src/*.h)
-
-list(
-  REMOVE_ITEM LUA_SOURCE
-  "${LUA_ROOT_DIR}/src/lua.c"
-  "${LUA_ROOT_DIR}/src/luac.c"
-  "${LUA_ROOT_DIR}/src/onelua.c"
+vcpkg_cmake_configure(
+  SOURCE_PATH "${SOURCE_PATH}"
+  OPTIONS
+    -DGHOUL_HAVE_TESTS=OFF
+    -DGHOUL_ENABLE_INSTALL=ON
+    -DGHOUL_ENABLE_EDIT_CONTINUE=OFF
 )
 
-add_library(Lua STATIC ${LUA_SOURCE})
-target_compile_features(Lua PUBLIC cxx_std_20)
+vcpkg_cmake_install()
+vcpkg_cmake_config_fixup(CONFIG_PATH share/ghoul)
+vcpkg_copy_pdbs()
 
-if (WIN32)
-  target_compile_definitions(Lua PRIVATE "_CRT_SECURE_NO_WARNINGS")
-  set_target_properties(Lua PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-elseif (UNIX)
-  target_compile_definitions(Lua PRIVATE "LUA_USE_POSIX")
-endif()
+file(REMOVE_RECURSE
+  "${CURRENT_PACKAGES_DIR}/debug/include"
+  "${CURRENT_PACKAGES_DIR}/debug/share"
+)
 
-target_include_directories(Lua PUBLIC "${LUA_ROOT_DIR}/src")
+file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")

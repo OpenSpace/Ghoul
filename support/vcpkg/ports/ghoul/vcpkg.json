@@ -1,0 +1,44 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ghoul",
+  "version": "0.1.0",
+  "port-version": 1,
+  "description": [
+    "General Helpful Open Utility Library.",
+    "This port lives inside the Ghoul repository and builds the enclosing checkout. When publishing Ghoul to a registry, replace the path-based source in the portfile with vcpkg_from_github(REPO OpenSpace/Ghoul REF <tag> SHA512 <hash>).",
+    "The dependency list is kept in sync with the manifest at the root of the Ghoul repository by support/vcpkg/check-manifest-sync.cmake, except that this port does not build the unit tests and therefore omits Catch2, and it depends on the vcpkg-cmake host tools explicitly."
+  ],
+  "homepage": "https://github.com/OpenSpace/Ghoul",
+  "license": "MIT",
+  "supports": "!(osx | uwp | android)",
+  "dependencies": [
+    {
+      "name": "assimp",
+      "features": [
+        "draco"
+      ]
+    },
+    "catch2",
+    {
+      "name": "freetype",
+      "default-features": false
+    },
+    "glbinding",
+    "glm",
+    "lua",
+    "lz4",
+    "scnlib",
+    "stbimage",
+    "tiny-process-library",
+    "tracy",
+    "websocketpp",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ]
+}
